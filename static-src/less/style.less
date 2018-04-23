@@ -8,6 +8,14 @@
 // common
 .main-wrap {display: flex; flex-direction: column; min-height: 100vh;}
 .main-content {width: 100%; flex-grow: 2; padding-top: 20px; padding-bottom: 50px;}
+// common panel
+.panel {background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
+.panel__section {
+    padding: 20px;
+    &+& {border-top: 1px solid @c-border;}
+}
+.panel__section--header {padding: 10px;}
+.panel__title {font: inherit; font-weight: 700; text-transform: uppercase; margin: 0;}
 
 @keyframes fade-in {
     0% {opacity: 0;}
@@ -44,16 +52,40 @@
 
 
 
-.index-stats {background: #4C4C4C; box-shadow: 0 4px 8px rgba(0,0,0,0.1); color: #fff;}
+.index-stats {background: #4c4c4c; color: #fff;}
 .index-stats__section {
-    padding: 20px;
     &+& {border-top: 1px solid #3c3c3c;}
 }
-.index-stats__name {color: rgba(255,255,255, 0.7); font-size: 14px; font-weight: 700;}
-.index-stats__name--primary {text-transform: uppercase;}
+.index-stats__name {color: rgba(255,255,255, 0.7);}
 .index-stats__value {font-size: 16px; font-weight: 700; margin-top: 2px;}
 .index-stats__value--primary {font-size: 22px; line-height: 25px; margin-top: 4px; display: flex; align-items: baseline;}
 .index-stats__sub-value {font-size: 15px; line-height: 1.4; margin-left: 8px;}
 .index-stats__sub-value--dynamic {align-self: center; display: flex; align-items: center;}
 .index-stats__sub-value--dynamic--up {color: #afd693;}
 .index-stats__sub-value--dynamic--down {color: #c05858;}
+
+
+.history-cell {display: flex;}
+.history {display: flex; flex-direction: column; width: 100%;}
+.history__title {text-align: center; margin-bottom: 15px;}
+.history__chart-wrap {position: relative; flex-grow: 2; height: 200px; margin-right: -4px;}
+.history__chart {width: 100%; position: absolute;}
+@media (min-width: @breakpoint-medium-up) {
+    .history__chart-wrap {height: auto; margin-bottom: -5px;}
+}
+
+
+.preview__header {display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid @c-border;}
+.preview__title {display: flex; align-items: center;}
+.preview__title-icon {margin-right: 10px;}
+.preview__block-id {font-size: 16px; font-weight: 700;}
+.preview__block-time {font-size: 12px; color: @c-black-light;}
+.preview__block-reward {font-size: 12px;}
+.preview__transaction-row {
+    &+& {margin-top: 10px;}
+}
+.preview__transaction-meta {display: flex; justify-content: space-between; color: @c-black-light;}
+@media (min-width: @breakpoint-medium-up) {
+    .preview__content {height: 50vh; min-height: 460px; overflow: auto;}
+}
+

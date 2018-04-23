@@ -15,8 +15,8 @@ body {
     background: @body-bg-color;
 }
 
-a, .link {color: inherit; outline: none; text-decoration: underline; text-decoration-skip: ink; transition: 0.15s;}
-a, .link {&:hover, &:focus {text-decoration: none; outline: none;}}
+a, .link {color: inherit; outline: none; text-decoration: none; text-decoration-skip: ink; transition: 0.15s;}
+a, .link {&:hover, &:focus {/*text-decoration: underline; */outline: none;}}
 .no-link {text-decoration: none;}
 .link--main {&, &:hover, &:focus {color: @c-main;}}
 .link--opacity {
@@ -24,7 +24,7 @@ a, .link {&:hover, &:focus {text-decoration: none; outline: none;}}
     &:hover, &:focus {opacity: 0.65;}
 }
 .link--hover {
-    text-decoration: none;
+    //text-decoration: none;
     &:hover, &:focus {text-decoration: underline;}
 }
 button {cursor: pointer; outline: none;}
@@ -69,10 +69,10 @@ hr {border: none; border-top: 1px solid @c-border;}
     color: @c-main; background: #fff;
     &:active {background: shade(#fff, 10%);}
 }
-.button--ghost-white {
-    color: #fff; background: transparent; border-color: #fff;
-    &:hover, &:focus {color: @c-main; background: #fff;}
-    &:active {color: @c-main; background: shade(#fff, 10%);}
+.button--ghost-main {
+    color: @c-main; background: transparent; border-color: @c-main;
+    &:hover, &:focus {color: #fff; background: @c-main;}
+    &:active {color: #fff; background: shade(@c-main, 10%);}
 }
 // button group
 .button-group {
