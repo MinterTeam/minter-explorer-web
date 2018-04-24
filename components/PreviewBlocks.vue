@@ -21,9 +21,9 @@
                         <div class="preview__block-time">> 45 secs ago</div>
                     </div>
                     <div class="u-cell u-cell--2-3">
-                        Mined by <a class="link--main link--hover u-fw-700" href="#">f2pool_2</a>
+                        Mined by <a class="link--default" href="#">f2pool_2</a>
                         <div class="preview__block-reward">
-                            <a class="link--main link--hover u-fw-700" href="#">152 txns</a> in 26 secs
+                            <nuxt-link class="link--default" :to="'/blocks/1'">152 txns</nuxt-link> in 26 secs
                             <br>
                             Block Reward 3.33474 Ether
                         </div>

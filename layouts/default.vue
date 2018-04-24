@@ -9,7 +9,9 @@
             </div>
         </header>
 
-        <nuxt class="main-content"/>
+        <main class="main-content u-container">
+            <nuxt/>
+        </main>
 
         <footer class="footer">
             <div class="footer__container u-container u-container--large">

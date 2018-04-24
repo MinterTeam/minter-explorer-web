@@ -27,6 +27,7 @@ a, .link {&:hover, &:focus {/*text-decoration: underline; */outline: none;}}
     //text-decoration: none;
     &:hover, &:focus {text-decoration: underline;}
 }
+.link--default {.link--main(); .link--hover(); font-weight: 700;}
 button {cursor: pointer; outline: none;}
 p, ul, ol {margin: 0;}
 p + p {margin-top: 10px;}
@@ -43,8 +44,10 @@ h1, h2, h3, h4, h5, h6 {margin: 0; font-family: @heading-font-family; font-weigh
 
 hr {border: none; border-top: 1px solid @c-border;}
 
+
+// table
 .table-wrap {overflow: auto;}
-.table-overflow {max-width: 120px;}
+.table-overflow, .table-overflow--large {max-width: 120px; overflow: hidden; text-overflow: ellipsis; display: inline-block;}
 table {width: 100%; border-collapse: collapse;}
 th {background: #f6f6f6;}
 td, th {
@@ -56,8 +59,23 @@ td, th {
     .table-overflow--large {max-width: 240px;}
 }
 @media (min-width: @breakpoint-large-up) {
-    .table-overflow {max-width: none;}
+    .table-overflow--large {max-width: none;}
     td, th {padding: 15px 20px;}
+}
+
+// dl
+dl {margin: 0; padding: 20px; border-top: 1px solid @c-border;}
+dt {
+    font-weight: 700; margin-top: 15px;
+    &:first-child {margin-top: 0;}
+}
+dd {overflow-wrap: break-word; margin: 0;}
+@media (min-width: @breakpoint-medium-up) {
+    dl {display: flex; flex-wrap: wrap; border: none; padding: 0;}
+    dt, dd {padding: 15px 20px; margin: 0;}
+    dt {width: 140px; border-top: 1px solid @c-border; border-right: 1px solid @c-border; background: #f6f6f6;}
+    dd {width: calc(100% - 140px); border-top: 1px solid @c-border;}
+
 }
 
 

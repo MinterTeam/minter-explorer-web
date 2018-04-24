@@ -15,20 +15,18 @@
 </script>
 
 <template>
-    <main class="u-container">
-        <div class="u-grid u-grid--vertical-margin">
-            <section class="u-cell u-cell--medium--1-2">
-                <Stats/>
-            </section>
-            <section class="u-cell u-cell--medium--1-2 history-cell">
-                <HistoryChart/>
-            </section>
-            <section class="u-cell u-cell--medium--1-2">
-                <PreviewBlocks/>
-            </section>
-            <section class="u-cell u-cell--medium--1-2">
-                <PreviewTransactions/>
-            </section>
-        </div>
-    </main>
+    <div class="u-grid u-grid--vertical-margin">
+        <section class="u-cell u-cell--medium--1-2">
+            <Stats/>
+        </section>
+        <section class="u-cell u-cell--medium--1-2 history-cell">
+            <HistoryChart/>
+        </section>
+        <section class="u-cell u-cell--medium--1-2">
+            <PreviewBlocks/>
+        </section>
+        <section class="u-cell u-cell--medium--1-2">
+            <PreviewTransactions/>
+        </section>
+    </div>
 </template>
