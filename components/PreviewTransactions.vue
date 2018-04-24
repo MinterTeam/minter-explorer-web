@@ -6,12 +6,12 @@
 
 <template>
     <div class="panel">
-        <div class="preview__header panel__section panel__section--header">
-            <h2 class="preview__title panel__title">
-                <img class="preview__title-icon" src="/img/icon-transaction.svg" alt="" role="presentation">
+        <div class="preview__header panel__section panel__header">
+            <h2 class="panel__header-title panel__title">
+                <img class="panel__header-title-icon" src="/img/icon-transaction.svg" alt="" role="presentation">
                 Transactions
             </h2>
-            <a href="#" class="button button--ghost-main">View All</a>
+            <a href="#" class="button button--ghost-main button--small">View All</a>
         </div>
         <div class="preview__content">
             <div class="preview__transaction panel__section" v-for="n in 10" :key="n">

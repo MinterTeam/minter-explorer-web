@@ -43,6 +43,23 @@ h1, h2, h3, h4, h5, h6 {margin: 0; font-family: @heading-font-family; font-weigh
 
 hr {border: none; border-top: 1px solid @c-border;}
 
+.table-wrap {overflow: auto;}
+.table-overflow {max-width: 120px;}
+table {width: 100%; border-collapse: collapse;}
+th {background: #f6f6f6;}
+td, th {
+    border: 1px solid @c-border; padding: 10px; text-align: left;
+    &:first-child {border-left: none;}
+    &:last-child {border-right: none;}
+}
+@media (min-width: @breakpoint-medium-up) {
+    .table-overflow--large {max-width: 240px;}
+}
+@media (min-width: @breakpoint-large-up) {
+    .table-overflow {max-width: none;}
+    td, th {padding: 15px 20px;}
+}
+
 
 
 
@@ -73,6 +90,11 @@ hr {border: none; border-top: 1px solid @c-border;}
     color: @c-main; background: transparent; border-color: @c-main;
     &:hover, &:focus {color: #fff; background: @c-main;}
     &:active {color: #fff; background: shade(@c-main, 10%);}
+}
+.button--icon {padding-left: 0; padding-right: 0; width: 42px;}
+.button--small {padding-left: 14px; padding-right: 14px;}
+@media (min-width: @breakpoint-medium-up) {
+    .button--small {padding-left: 26px; padding-right: 26px;}
 }
 // button group
 .button-group {

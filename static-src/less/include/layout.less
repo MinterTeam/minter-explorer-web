@@ -3,10 +3,16 @@
 
 
 // container
-.u-container {padding: 0 @container-padding; margin: 0 auto;}
+.u-container {padding: 0 10px; margin: 0 auto;}
+@media (min-width: @breakpoint-small-up) {
+    .u-container {padding: 0 @container-padding;}
+}
 @media (min-width: @breakpoint-medium-up) {
     .u-container {max-width: @container-width + @container-padding-large * 2; padding: 0 @container-padding-large;}
 }
+
+
+.u-section {&+& {margin-top: 20px;}}
 
 
 

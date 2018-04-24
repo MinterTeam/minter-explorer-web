@@ -14,8 +14,18 @@
     padding: 20px;
     &+& {border-top: 1px solid @c-border;}
 }
-.panel__section--header {padding: 10px;}
 .panel__title {font: inherit; font-weight: 700; text-transform: uppercase; margin: 0;}
+.panel__header {padding: 10px; display: flex; justify-content: space-between; align-items: center;}
+.panel__header-title {display: flex; align-items: center;}
+.panel__header-title-icon {margin-right: 10px;}
+// common pagination
+.pagination {display: flex; align-items: center;}
+.pagination--header {margin-left: 10px;}
+.pagination--bottom {
+    justify-content: center;
+    .button {margin: 0 5px;}
+}
+.pagination__current {margin: 0 10px; display: inline-block; font-weight: 700; white-space: nowrap;}
 
 @keyframes fade-in {
     0% {opacity: 0;}
@@ -58,8 +68,9 @@
 }
 .index-stats__name {color: rgba(255,255,255, 0.7);}
 .index-stats__value {font-size: 16px; font-weight: 700; margin-top: 2px;}
-.index-stats__value--primary {font-size: 22px; line-height: 25px; margin-top: 4px; display: flex; align-items: baseline;}
-.index-stats__sub-value {font-size: 15px; line-height: 1.4; margin-left: 8px;}
+.index-stats__value--primary {font-size: 22px; line-height: 25px; margin-top: 4px; display: flex; align-items: baseline; flex-wrap: wrap;}
+.index-stats__value-text {margin-right: 8px;}
+.index-stats__sub-value {font-size: 15px; line-height: 1.4;}
 .index-stats__sub-value--dynamic {align-self: center; display: flex; align-items: center;}
 .index-stats__sub-value--dynamic--up {color: #afd693;}
 .index-stats__sub-value--dynamic--down {color: #c05858;}
@@ -75,9 +86,7 @@
 }
 
 
-.preview__header {display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid @c-border;}
-.preview__title {display: flex; align-items: center;}
-.preview__title-icon {margin-right: 10px;}
+.preview__header { border-bottom: 1px solid @c-border;}
 .preview__block-id {font-size: 16px; font-weight: 700;}
 .preview__block-time {font-size: 12px; color: @c-black-light;}
 .preview__block-reward {font-size: 12px;}
@@ -88,4 +97,7 @@
 @media (min-width: @breakpoint-medium-up) {
     .preview__content {height: 50vh; min-height: 460px; overflow: auto;}
 }
+
+
+
 

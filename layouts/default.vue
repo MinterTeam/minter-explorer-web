@@ -2,10 +2,10 @@
     <div class="main-wrap">
         <header class="header">
             <div class="header__container u-container">
-                <a class="header__logo no-link" href="/">
+                <nuxt-link class="header__logo no-link" to="/">
                     <img class="header__logo-image" src="/img/minter-logo-circle.svg" alt="Minter" width="36" height="36">
                     <div class="header__logo-text">Explorer</div>
-                </a>
+                </nuxt-link>
             </div>
         </header>
 
