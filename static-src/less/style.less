@@ -8,6 +8,10 @@
 // common
 .main-wrap {display: flex; flex-direction: column; min-height: 100vh;}
 .main-content {width: 100%; flex-grow: 2; padding-top: 20px; padding-bottom: 50px;}
+// nuxt page transition
+.page-leave-active {transition: opacity .1s;}
+.page-enter-active {transition: opacity .25s;}
+.page-enter, .page-leave-to {opacity: 0;}
 // common panel
 .panel {background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
 .panel__section {

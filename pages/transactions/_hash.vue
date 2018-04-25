@@ -1,9 +1,11 @@
 <script>
     import TransactionList from '~/components/TransactionList';
+    import BackButton from '~/components/BackButton';
 
     export default {
         components: {
             TransactionList,
+            BackButton,
         }
     }
 </script>
@@ -13,7 +15,7 @@
         <section class="panel u-section">
             <div class="panel__section panel__header">
                 <h1 class="panel__header-title panel__title">
-                    <img class="panel__header-title-icon" src="/img/icon-back.svg" alt="Back">
+                    <BackButton/>
                     Transaction Information
                 </h1>
             </div>

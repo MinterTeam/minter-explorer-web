@@ -1,9 +1,19 @@
+<script>
+    import BackButton from '~/components/BackButton';
+
+    export default {
+        components: {
+            BackButton,
+        }
+    }
+</script>
+
 <template>
     <div>
         <section class="panel u-section">
             <div class="panel__section panel__header">
                 <h1 class="panel__title panel__header-title">
-                    <img class="panel__header-title-icon" src="/img/icon-back.svg" alt="Back">
+                    <BackButton/>
                     Blocks (#5372481 to #5372457) out&nbsp;of&nbsp;5372482 total blocks
                 </h1>
                 <div class="pagination pagination--header u-hidden-medium-down">

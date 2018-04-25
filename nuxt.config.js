@@ -32,16 +32,16 @@ module.exports = {
         linkActiveClass: '',
         linkExactActiveClass: 'is-active',
         middleware: [
-
+            'history',
         ],
     },
+    plugins: [
+        //'~/plugins/history',
+    ],
     /*
     ** Build configuration
     */
     build: {
-        vendor: [
-            'axios',
-        ],
         extractCSS: true,
         /*
         ** Run ESLint on save
@@ -56,5 +56,5 @@ module.exports = {
                 })
             }
         }
-    }
-}
+    },
+};

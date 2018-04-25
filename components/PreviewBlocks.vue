@@ -17,7 +17,7 @@
             <div class="preview__block panel__section" v-for="n in 10" :key="n">
                 <div class="u-grid">
                     <div class="u-cell u-cell--1-3">
-                        <div class="preview__block-id">5372230</div>
+                        <div class="preview__block-id"><nuxt-link class="link--hover" :to="'/blocks/1'">5372230</nuxt-link></div>
                         <div class="preview__block-time">> 45 secs ago</div>
                     </div>
                     <div class="u-cell u-cell--2-3">
