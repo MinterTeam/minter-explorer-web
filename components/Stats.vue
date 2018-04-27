@@ -6,7 +6,7 @@
                     <h3 class="index-stats__name panel__title">Market cap of $39.444 billion</h3>
                     <div class="index-stats__value index-stats__value--primary">
                         <span class="index-stats__value-text">$400.10 @&nbsp;0.05421&nbsp;BTC/ETH</span>
-                        <span class="index-stats__sub-value index-stats__sub-value--dynamic index-stats__sub-value--dynamic--up">
+                        <span class="index-stats__sub-value index-stats__sub-value--dynamic index-stats__green">
                             <img src="/img/icon-dynamic-up.svg" alt="Up">
                             2.17%
                         </span>

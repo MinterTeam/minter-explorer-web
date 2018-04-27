@@ -5,8 +5,10 @@
   "author": "shrpne <shrpne@gmail.com>",
   "private": true,
   "scripts": {
-    "dev": "gulp & nuxt",
-    "build": "gulp once && nuxt build",
+    "prod": "npm run production",
+    "production": "npm run build",
+    "dev": "gulp & nuxt --spa",
+    "build": "gulp once && nuxt build --spa",
     "start": "nuxt start",
     "generate": "nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
