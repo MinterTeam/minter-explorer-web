@@ -1,3 +1,6 @@
+const dotenv = require('dotenv');
+const fs = require('fs');
+
 const BASE_TITLE = 'Minter Explorer';
 const BASE_DESCRIPTION = '';
 
@@ -37,6 +40,7 @@ module.exports = {
     plugins: [
         //'~/plugins/history',
     ],
+    env: dotenv.parse(fs.readFileSync('.env')),
     /*
     ** Build configuration
     */
