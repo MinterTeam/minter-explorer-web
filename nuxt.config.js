@@ -18,7 +18,6 @@ module.exports = {
         link: [
             { rel: 'icon', href: '/favicon.png' },
             { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
-            { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Ubuntu:400,700' },
         ]
     },
     css: [

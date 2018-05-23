@@ -1,11 +1,14 @@
 <script>
     import Chart from 'chart.js';
-    import {getTxHistory} from "~/api";
+    import {getTxChartData} from "~/api";
 
     export default {
         mounted() {
-            getTxHistory()
+            getTxChartData()
                 .then((dataset) => {
+                    if (!dataset) {
+                        return;
+                    }
                     let ctx = this.$el.querySelector('[data-history-chart]').getContext('2d');
                     let myChart = new Chart(ctx, {
                         type: 'line',
@@ -60,15 +63,15 @@
                     });
                 })
                 .catch((e) => {
-                    console.log(e)
-                });
+                    console.log('api error', 'txCountChartData', e);
+                })
         }
     }
 </script>
 
 <template>
     <div class="history panel panel__section">
-        <div class="history__title panel__title">14 day Ethereum Transaction History</div>
+        <div class="history__title panel__title">14 day Bip Transaction History</div>
         <div class="history__chart-wrap">
             <canvas class="history__chart" data-history-chart></canvas>
         </div>

@@ -1,4 +1,5 @@
 <script>
+    import {getTransaction} from "~/api";
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
 
@@ -6,6 +7,15 @@
         components: {
             TransactionList,
             BackButton,
+        },
+        asyncData({ params, error }) {
+            return getTransaction(params.hash)
+                .then((tx) => {
+                    return {tx};
+                })
+                .catch((e) => {
+                    error({ statusCode: 404, message: 'Transaction not found' });
+                });
         }
     }
 </script>
@@ -21,25 +31,25 @@
             </div>
             <dl>
                 <dt>Hash</dt>
-                <dd>0xd694ad99f7a3f58f538978abdeae20416dd3440358401c99e8634b5474ee898f</dd>
+                <dd>{{ tx.hash }}</dd>
 
                 <dt>Status</dt>
-                <dd><strong class="tx__success">Success</strong></dd>
+                <dd><strong :class="tx.status === 'success' ? 'tx__success' : 'tx__fail'">{{ tx.status }}</strong></dd>
 
                 <dt>Block</dt>
-                <dd><nuxt-link class="link--default" :to="'/blocks/1'">5493393</nuxt-link></dd>
+                <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.block">{{ tx.block }}</nuxt-link></dd>
 
                 <dt>From</dt>
-                <dd><nuxt-link class="link--default" :to="'/address/1'">0x2edf1db11cf04961abf508aed5d36b3d8c0df0ff</nuxt-link></dd>
+                <dd><nuxt-link class="link--default" :to="'/address/' + tx.data.from">{{ tx.data.from }}</nuxt-link></dd>
 
                 <dt>To</dt>
-                <dd><nuxt-link class="link--default" :to="'/address/1'">0x2edf1db11cf04961abf508aed5d36b3d8c0df0ff</nuxt-link></dd>
+                <dd><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
 
                 <dt>Value</dt>
-                <dd>1.434420 BIP</dd>
+                <dd>{{ tx.data.amount }} BIP</dd>
 
                 <dt>Nonce</dt>
-                <dd>2</dd>
+                <dd>{{ tx.nonce }}</dd>
             </dl>
         </section>
         <div class="u-section navigation">

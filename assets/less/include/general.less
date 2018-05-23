@@ -1,6 +1,25 @@
 @import "variables";
 
 
+/* https://google-webfonts-helper.herokuapp.com/fonts/ubuntu?subsets=latin,cyrillic */
+@font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Ubuntu Regular'), local('Ubuntu-Regular'),
+    url('../fonts/ubuntu-v11-cyrillic_latin-regular.woff2') format('woff2'),
+    url('../fonts/ubuntu-v11-cyrillic_latin-regular.woff') format('woff');
+}
+@font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Ubuntu Bold'), local('Ubuntu-Bold'),
+    url('../fonts/ubuntu-v11-cyrillic_latin-700.woff2') format('woff2'),
+    url('../fonts/ubuntu-v11-cyrillic_latin-700.woff') format('woff');
+}
+
+
 *, *::before, *::after {box-sizing: border-box;}
 html { height: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-overflow-scrolling: touch;}
 body {
@@ -35,7 +54,7 @@ sub, sup { font-size: 75%;}
 
 input, textarea, select {
     font: inherit; color: @c-black; outline: none; caret-color: @c-main;
-    &::placeholder {color: @c-black-light;}
+    &::placeholder {color: #a4a4a4; opacity: 1;}
 }
 input {vertical-align: middle;}
 
@@ -91,7 +110,7 @@ dd {overflow-wrap: break-word; margin: 0;}
     &:active {box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
     &[disabled], &.is-disabled {
         cursor: default;
-        &:not(.is-loading) {opacity: 0.15; box-shadow: none;}
+        &:not(.is-loading) {background: shade(#fff, 30%); box-shadow: none;}
     }
     &.is-loading {color: transparent;}
 }
@@ -114,49 +133,13 @@ dd {overflow-wrap: break-word; margin: 0;}
 @media (min-width: @breakpoint-medium-up) {
     .button--small {padding-left: 26px; padding-right: 26px;}
 }
-// button group
-.button-group {
-    display: flex; flex-direction: column; align-items: center; margin-top: -10px; margin-left: -20px; margin-bottom: @default-indent;
-    .button {margin-top: 10px; margin-left: 20px;}
-    * + & {margin-top: @default-indent - 10px;}
-    &:last-child {margin-bottom: 0;}
-}
-.button-group--small {
-    margin-left: -10px;
-    .button {margin-left: 10px;}
-}
-@media (min-width: @breakpoint-medium-up) {
-    .button-group {flex-direction: row; justify-content: center; flex-wrap: wrap;}
-}
 
 
 
 
 
 // input
-@field-input-padding: 4px;
-@field-label-height: 20px;
-@field-label-scale: 0.75;
-@field-padding: (@field-label-height * @field-label-scale);
-@field-label-top: (@field-padding + @field-input-padding);
-@field-label-translate: (@field-label-height + @field-input-padding);
-.form-field {display: block; position: relative; cursor: pointer; font-weight: 700; padding-top: @field-padding; pointer-events: none;}
-.form-field__input {
-    padding: @field-input-padding 0 8px; font-size: 16px; line-height: 22px; color: inherit; background: transparent; border: none; border-bottom: 1px solid @c-black-light; transition: 0.2s; display: block; width: 100%; pointer-events: auto; border-radius: 0;
-    &:focus {border-color: @c-main;}
-    .is-error > & {border-color: @c-red;}
-}
-.form-field__label {
-    font-size: 16px; line-height: @field-label-height; color: @c-black-light; position: absolute; left: 0; top: @field-label-top; transition: 0.2s; transform-origin: 0 50%; user-select: none;
-    .form-field__input:focus ~ &, .is-not-empty ~ & {transform: translateY(-@field-label-translate) scale(@field-label-scale);}
-    .form-field__input:focus ~ & {color: @c-main;}
-    .form-field.is-error > & {color: @c-red;}
-}
-.error-text() {font-size: 12px; color: @c-red;}
-.form-field__error {
-    .error-text(); margin-top: 10px; display: none;
-    .is-error + & {display: block;}
-}
+
 
 
 

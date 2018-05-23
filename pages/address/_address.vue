@@ -1,4 +1,5 @@
 <script>
+    import {getAddress, getTransactionList} from "~/api";
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
 
@@ -6,7 +7,30 @@
         components: {
             TransactionList,
             BackButton,
-        }
+        },
+        asyncData({ params, error }) {
+            return getAddress(params.address)
+                .then((address) => address)
+                .catch((e) => {
+                    error({ statusCode: 404, message: 'Address not found' });
+                });
+        },
+        data() {
+            return {
+                bipBalance: 0,
+                bipBalanceUsd: 0,
+                txCount: 0,
+                txList: [],
+            }
+        },
+        mounted() {
+            getTransactionList(this.$route.params)
+                .then((txListInfo) => {
+                    if (txListInfo.data && txListInfo.data.length) {
+                        this.txList = txListInfo.data;
+                    }
+                });
+        },
     }
 </script>
 
@@ -21,16 +45,16 @@
             </div>
             <dl>
                 <dt>Address</dt>
-                <dd>0xe75c4ff8d7ace4085c2372b3b112f99a2e75f246</dd>
+                <dd>{{ $route.params.address }}</dd>
 
                 <dt>BIP Balance</dt>
-                <dd>1.434420 BIP</dd>
+                <dd>{{ bipBalance}} BIP</dd>
 
                 <dt>BIP USD Value</dt>
-                <dd>$1000.43</dd>
+                <dd>${{ bipBalanceUsd }}</dd>
 
                 <dt>#Transactions</dt>
-                <dd>5</dd>
+                <dd>{{ txCount }}</dd>
             </dl>
         </section>
         <section class="panel u-section">
@@ -40,7 +64,7 @@
                     Transactions
                 </h2>
             </div>
-            <TransactionList :transaction-list="5"/>
+            <TransactionList :tx-list="txList" v-if="txList.length" :current-address="$route.params.address"/>
         </section>
     </div>
 </template>

@@ -1,12 +1,37 @@
 <script>
+    import {getTimeDistance} from '~/assets/utils';
+
     export default {
         props: {
-            transactionList: {
-                //@TODO пока что принием number, потом будет array
-                type: Number|Array,
+            txList: {
+                type: Array,
                 required: true,
             },
+            currentAddress: {
+                type: String,
+            },
+            currentBlock: {
+                type: Number,
+            },
         },
+        computed: {
+            txListFormatted() {
+                return this.txList.map((tx) => {
+                   return {
+                       ...tx,
+                       timeDistance:  getTimeDistance(tx.timestamp),
+                   }
+                });
+            },
+        },
+        methods: {
+            isCurrentAddress(address) {
+                return address === this.currentAddress;
+            },
+            isCurrentBlock(height) {
+                return height === this.currentBlock;
+            },
+        }
     }
 </script>
 
@@ -25,15 +50,23 @@
             </tr>
             </thead>
             <tbody>
-            <!--@TODO скрыть ссылки на текущий блок и на текущий адрес-->
-            <tr v-for="n in transactionList" :key="n">
-                <td><nuxt-link class="link--default table-overflow" :to="'/transactions/1' + n">0xb5ac9dd2e6e304bbe7fa1140fc45c9ca7265868c0bffd7fdc8f3828e21109422</nuxt-link></td>
-                <td><nuxt-link class="link--default table-overflow" :to="'/blocks/' + n">{{ 5493393 + n }}</nuxt-link></td>
-                <td>3 d 22 h</td>
-                <td><nuxt-link class="link--default table-overflow" :to="'/address/1'">0x2edf1db11cf04961abf508aed5d36b3d8c0df0ff</nuxt-link></td>
-                <td><nuxt-link class="link--default table-overflow" :to="'/address/2'">0x2edf1db11cf04961abf508aed5d36b3d8c0df0ff</nuxt-link></td>
-                <td>0.14424 BIP</td>
-                <td class="u-text-muted">0.0002 BIP</td>
+            <tr v-for="tx in txListFormatted" :key="tx.hash">
+                <td><nuxt-link class="link--default table-overflow" :to="'/transactions/' + tx.hash">{{ tx.hash }}</nuxt-link></td>
+                <td>
+                    <span class="table-overflow" v-if="isCurrentBlock(tx.block)">{{ tx.block }}</span>
+                    <nuxt-link class="link--default table-overflow" :to="'/blocks/' + tx.block" v-else>{{ tx.block }}</nuxt-link>
+                </td>
+                <td>{{ tx.timeDistance }} ago</td>
+                <td>
+                    <span class="table-overflow" v-if="isCurrentAddress(tx.data.from)">{{ tx.data.from }}</span>
+                    <nuxt-link class="link--default table-overflow" :to="'/address/' + tx.data.from" v-else>{{ tx.data.from }}</nuxt-link>
+                </td>
+                <td>
+                    <span class="table-overflow" v-if="isCurrentAddress(tx.data.to)">{{ tx.data.to }}</span>
+                    <nuxt-link class="link--default table-overflow" :to="'/address/' + tx.data.to" v-else>{{ tx.data.to }}</nuxt-link>
+                </td>
+                <td>{{ tx.data.amount }} {{ tx.data.coin }}</td>
+                <td class="u-text-muted">{{ tx.fee }} BIP</td>
             </tr>
             </tbody>
         </table>

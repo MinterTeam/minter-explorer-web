@@ -1,6 +1,28 @@
 <script>
-    export default {
+    import {getTimeDistance} from '~/assets/utils';
 
+    export default {
+        props: {
+            /** @type Array<Block> */
+            blockList: {
+                type: Array,
+                required: true,
+            },
+        },
+        computed: {
+            blockListFormatted() {
+                return this.blockList.map((block) => {
+                    const validator = block.validators[0];
+                    return {
+                        ...block,
+                        url: '/blocks/' + block.height,
+                        validatorName: validator.name || validator.address,
+                        validatorUrl: '/address/' + validator.address,
+                        timeDistance: getTimeDistance(block.timestamp),
+                    }
+                })
+            }
+        }
     }
 </script>
 
@@ -14,18 +36,18 @@
             <nuxt-link class="button button--ghost-main button--small" to="/blocks">View All</nuxt-link>
         </div>
         <div class="preview__content">
-            <div class="preview__block panel__section" v-for="n in 10" :key="n">
+            <div class="preview__block panel__section" v-for="block in blockListFormatted" :key="block.height">
                 <div class="u-grid">
                     <div class="u-cell u-cell--1-3">
-                        <div class="preview__block-id"><nuxt-link class="link--hover" :to="'/blocks/1'">5372230</nuxt-link></div>
-                        <div class="preview__block-time">> 45 secs ago</div>
+                        <div class="preview__block-id"><nuxt-link class="link--hover" :to="block.url">{{ block.height }}</nuxt-link></div>
+                        <div class="preview__block-time">> {{ block.timeDistance }} ago</div>
                     </div>
                     <div class="u-cell u-cell--2-3">
-                        Mined by <a class="link--default" href="#">f2pool_2</a>
+                        Mined by <nuxt-link class="link--default" :to="block.validatorUrl">{{ block.validatorName }}</nuxt-link>
                         <div class="preview__block-reward">
-                            <nuxt-link class="link--default" :to="'/blocks/1'">152 txns</nuxt-link> in 26 secs
+                            <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime }} secs
                             <br>
-                            Block Reward 3.33474 Ether
+                            Block Reward {{ block.reward }} BIP
                         </div>
                     </div>
                 </div>

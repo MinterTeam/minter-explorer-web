@@ -1,9 +1,47 @@
 <script>
+    import {getBlockList} from "~/api";
+    import {getTimeDistance} from '~/assets/utils';
     import BackButton from '~/components/BackButton';
+    import Pagination from "~/components/Pagination";
 
     export default {
         components: {
+            Pagination,
             BackButton,
+        },
+        watchQuery: ['page'],
+        key: (to) => to.fullPath,
+        asyncData ({ query }) {
+            return getBlockList(query)
+                .then((blockListInfo) => {
+                    return {
+                        paginationInfo: blockListInfo.meta,
+                        blockList: blockListInfo.data,
+                    };
+                });
+        },
+        data() {
+            return {
+                paginationInfo: {},
+                /** @type Array<Block> */
+                blockList: [],
+            }
+        },
+        computed: {
+            blockListFormatted() {
+                return this.blockList.map((block) => {
+                    return {
+                        ...block,
+                        timeDistance: getTimeDistance(block.timestamp),
+                    };
+                });
+            },
+            blockListFromHeight() {
+                return this.blockList.length ? this.blockList[0].height : false;
+            },
+            blockListToHeight() {
+                return this.blockList.length ? this.blockList[this.blockList.length - 1].height : false;
+            },
         }
     }
 </script>
@@ -14,15 +52,19 @@
             <div class="panel__section panel__header">
                 <h1 class="panel__title panel__header-title">
                     <BackButton/>
-                    Blocks (#5372481 to #5372457) out&nbsp;of&nbsp;5372482 total blocks
+                    <span>
+                        Blocks
+                        <span v-if="blockList.length">
+                            (#{{ blockListFromHeight }} to #{{ blockListToHeight }}) out&nbsp;of&nbsp;{{ paginationInfo.total }} total blocks
+                        </span>
+                    </span>
                 </h1>
-                <div class="pagination pagination--header u-hidden-medium-down">
-                    <button class="button button--white button--icon"> &lt;&lt; </button>
-                    <button class="button button--white button--icon"> &lt; </button>
-                    <div class="pagination__current">Page 1 of 214900</div>
-                    <button class="button button--white button--icon"> > </button>
-                    <button class="button button--white button--icon"> >> </button>
-                </div>
+                <Pagination :pagination-info="paginationInfo"
+                            base-path="/blocks"
+                            pagination-class="pagination--header u-hidden-medium-down"
+                            button-class="button--white"
+                            button-disabled-class="u-hidden"
+                />
             </div>
             <div class="table-wrap">
                 <table class="u-text-nowrap">
@@ -36,23 +78,17 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="n in 10" :key="n">
-                        <td><nuxt-link class="link--default" :to="'/blocks/' + n">{{ 5493390 + n }}</nuxt-link></td>
-                        <td>35 secs ago</td>
-                        <td><div class="table-overflow--large">MxcC16E3c00DBbe76603fa833Ec20A48f786dfE610</div></td>
-                        <td><nuxt-link class="link--default" :to="'/blocks/' + n">114</nuxt-link></td>
-                        <td>20 BIP</td>
+                    <tr v-for="block in blockListFormatted" :key="block.height">
+                        <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.height }}</nuxt-link></td>
+                        <td>{{ block.timeDistance}} ago</td>
+                        <td><div class="table-overflow--large">{{ block.validators[0].address }}</div></td>
+                        <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.txCount }}</nuxt-link></td>
+                        <td>{{ block.reward }} BIP</td>
                     </tr>
                     </tbody>
                 </table>
             </div>
         </section>
-        <div class="pagination pagination--bottom u-section">
-            <button class="button button--ghost-main button--icon"> &lt;&lt; </button>
-            <button class="button button--ghost-main button--icon"> &lt; </button>
-            <div class="pagination__current">Page 1 of 214900</div>
-            <button class="button button--ghost-main button--icon"> > </button>
-            <button class="button button--ghost-main button--icon"> >> </button>
-        </div>
+        <Pagination :pagination-info="paginationInfo" base-path="/blocks"/>
     </div>
 </template>

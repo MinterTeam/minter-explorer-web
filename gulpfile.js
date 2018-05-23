@@ -22,15 +22,15 @@ const mozjpeg = require('imagemin-mozjpeg');
 
 let paths = {
     src: {
-        less: 'static-src/less/*.less',
-        img: ['static-src/img/**/*.{png,jpg,gif,svg}'],
+        less: 'assets/less/*.less',
+        img: ['assets/img/**/*.{png,jpg,gif,svg}'],
     },
     dest: {
         css: 'static/css/',
         img: 'static/img/',
     },
     watch: {
-        less: 'static-src/less/**/*.less',
+        less: 'assets/less/**/*.less',
     },
     cache: {
         tmpDir: 'tmp/',

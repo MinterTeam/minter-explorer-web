@@ -1,33 +1,47 @@
+<script>
+    export default {
+        props: {
+            /** @type Status */
+            stats: {
+                type: Object,
+                required: true,
+            }
+        },
+    }
+</script>
+
 <template>
     <div class="index-stats panel">
         <div class="index-stats__section panel__section">
             <div class="u-grid u-grid--vertical-margin">
                 <div class="u-cell">
-                    <h3 class="index-stats__name panel__title">Market cap of $39.444 billion</h3>
+                    <h3 class="index-stats__name panel__title">Market cap of ${{ stats.marketCap }}</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">$400.10 @&nbsp;0.05421&nbsp;BTC/ETH</span>
-                        <span class="index-stats__sub-value index-stats__sub-value--dynamic index-stats__green">
-                            <img src="/img/icon-dynamic-up.svg" alt="Up">
-                            2.17%
+                        <span class="index-stats__value-text">${{ stats.bipPriceUsd }} @&nbsp;{{ stats.bipPriceBtc }}&nbsp;BTC/BIP</span>
+                        <span class="index-stats__sub-value index-stats__sub-value--dynamic" :class="stats.bipPriceChange >= 0 ? 'index-stats__green' : 'index-stats__red'">
+                            <img src="/img/icon-dynamic-up.svg" alt="Up" v-if="stats.bipPriceChange >= 0">
+                            <img src="/img/icon-dynamic-down.svg" alt="Down" v-else>
+                            {{ stats.bipPriceChange }}%
                         </span>
                     </div>
                 </div>
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Last block</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">5372230</span>
-                        <span class="index-stats__sub-value">(14.1s)</span>
+                        <span class="index-stats__value-text">{{ stats.latestBlockHeight }}</span>
+                        <span class="index-stats__sub-value">({{ stats.averageBlockTime }}s)</span>
                     </div>
                 </div>
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Transactions</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">195.05 M</span>
-                        <span class="index-stats__sub-value">(8.7 TPS)</span>
+                        <span class="index-stats__value-text">{{ stats.totalTransactions }}</span>
+                        <span class="index-stats__sub-value">({{ stats.transactionsPerSecond }} TPS)</span>
                     </div>
                 </div>
             </div>
         </div>
+        <!--
         <div class="index-stats__section panel__section">
             <div class="u-grid u-grid--vertical-margin">
                 <div class="u-cell u-cell--1-2">
@@ -40,5 +54,6 @@
                 </div>
             </div>
         </div>
+        -->
     </div>
 </template>
