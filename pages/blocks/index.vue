@@ -81,7 +81,7 @@
                     <tr v-for="block in blockListFormatted" :key="block.height">
                         <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.height }}</nuxt-link></td>
                         <td>{{ block.timeDistance}} ago</td>
-                        <td><div class="table-overflow--large">{{ block.validators[0].address }}</div></td>
+                        <td><div class="table-overflow--large">{{ block.validators.length && block.validators[0].address }}</div></td>
                         <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.txCount }}</nuxt-link></td>
                         <td>{{ block.reward }} BIP</td>
                     </tr>

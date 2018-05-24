@@ -57,14 +57,14 @@
                 <dd>{{ txCount }}</dd>
             </dl>
         </section>
-        <section class="panel u-section">
+        <section class="panel u-section" v-if="txList.length">
             <div class="panel__section panel__header">
                 <h2 class="panel__header-title panel__title">
                     <img class="panel__header-title-icon" src="/img/icon-transaction.svg" alt="" role="presentation">
                     Transactions
                 </h2>
             </div>
-            <TransactionList :tx-list="txList" v-if="txList.length" :current-address="$route.params.address"/>
+            <TransactionList :tx-list="txList" :current-address="$route.params.address"/>
         </section>
     </div>
 </template>

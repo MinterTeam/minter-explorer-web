@@ -46,6 +46,11 @@ module.exports = {
     */
     build: {
         extractCSS: true,
+        // optimization: {
+        //     splitChunks: {
+        //         name: true
+        //     }
+        // },
         /*
         ** Run ESLint on save
         */

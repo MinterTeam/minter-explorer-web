@@ -68,10 +68,14 @@
                 <dd>{{ block.timeDistance }} ago ({{ block.timeUTC }})</dd>
 
                 <dt>Hash</dt>
-                <dd>{{ block.height }}</dd>
+                <dd>{{ block.hash }}</dd>
 
                 <dt>Validator</dt>
-                <dd>{{ block.validators[0].address }}</dd>
+                <dd>
+                    <nuxt-link class="link--default" :to="'/address/' + block.validators[0].address" v-if="block.validators[0]">
+                        {{ block.validators[0].address }}
+                    </nuxt-link>
+                </dd>
 
                 <dt>Size</dt>
                 <dd>{{ block.size }} bytes</dd>

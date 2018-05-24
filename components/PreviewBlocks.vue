@@ -12,7 +12,7 @@
         computed: {
             blockListFormatted() {
                 return this.blockList.map((block) => {
-                    const validator = block.validators[0];
+                    const validator = block.validators[0] || {};
                     return {
                         ...block,
                         url: '/blocks/' + block.height,

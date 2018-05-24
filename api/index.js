@@ -85,16 +85,13 @@ export function getBlockList(params) {
             params,
         })
         .then((response) => {
-            //@TODO temp
-            response.data.data = response.data.data.map(fixBlockTmp);
-
             return response.data;
         });
 }
 
 export function getBlock(height) {
     return axios.get('block/' + height)
-        .then((response) => fixBlockTmp(response.data.data));
+        .then((response) => response.data.data);
 }
 
 /**
@@ -113,23 +110,10 @@ export function getTransactionList(params) {
 
 export function getTransaction(hash) {
     return axios.get('transaction/' + hash)
-        .then((response) => response.data.data);
+        .then((response) => response.data);
 }
 
 export function getAddress(address) {
     return axios.get('address/' + address)
         .then((response) => response.data);
 }
-
-//@TODO tmp
-function fixBlockTmp(block) {
-    block.validators = [{
-        id: 1,
-        name: 'testValidator',
-        address: 'asd',
-        publicKey: 'asd',
-    }];
-    block.reward = parseFloat(block.reward);
-    return block;
-}
-

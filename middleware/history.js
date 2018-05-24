@@ -2,7 +2,7 @@ export default function ({from, to, store}) {
     if (process.server || !from) {
         return;
     }
-    console.log(from.fullPath, window.history.state);
+    //console.log(from.fullPath, window.history.state);
 
     let storeHistory = store.state.history
 

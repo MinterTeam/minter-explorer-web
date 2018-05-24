@@ -1,5 +1,5 @@
 <script>
-    import Chart from 'chart.js';
+    import Chart from 'chart.js/dist/Chart.min.js';
     import {getTxChartData} from "~/api";
 
     export default {
