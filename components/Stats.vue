@@ -1,5 +1,10 @@
 <script>
+    import {thousandsFilter} from "~/assets/utils";
+
     export default {
+        filters: {
+            thousands: thousandsFilter,
+        },
         props: {
             /** @type Status */
             stats: {
@@ -17,7 +22,7 @@
                 <div class="u-cell">
                     <h3 class="index-stats__name panel__title">Market cap of ${{ stats.marketCap }}</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">${{ stats.bipPriceUsd }} @&nbsp;{{ stats.bipPriceBtc }}&nbsp;BTC/BIP</span>
+                        <span class="index-stats__value-text">${{ stats.bipPriceUsd }} @&nbsp;{{ stats.bipPriceBtc }}&nbsp;BTC/{{ $store.state.COIN_NAME }}</span>
                         <span class="index-stats__sub-value index-stats__sub-value--dynamic" :class="stats.bipPriceChange >= 0 ? 'index-stats__green' : 'index-stats__red'">
                             <img src="/img/icon-dynamic-up.svg" alt="Up" v-if="stats.bipPriceChange >= 0">
                             <img src="/img/icon-dynamic-down.svg" alt="Down" v-else>
@@ -28,7 +33,7 @@
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Last block</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">{{ stats.latestBlockHeight }}</span>
+                        <span class="index-stats__value-text">{{ stats.latestBlockHeight | thousands }}</span>
                         <span class="index-stats__sub-value">({{ stats.averageBlockTime }}s)</span>
                     </div>
                 </div>

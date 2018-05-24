@@ -58,18 +58,17 @@ export function getStatus() {
 export function getTxChartData() {
     return axios.get('txCountChartData')
         .then((response) => {
-            //@TODO tmp
-            response.data = [response.data, response.data];
-            if (!response.data[0] || !response.data[1]) {
-                throw new Error('Not valid response from api');
+            let chartData = response.data.data;
+            if (!chartData[0] || !chartData[1]) {
+                chartData = []
             }
 
-            let lastData = response.data.length > 14 ? response.data.slice(response.data.length - 14 - 1) : response.data;
+            let lastData = chartData.length > 14 ? chartData.slice(0, 14 - 1) : chartData;
 
             // format data for line chart.js
             return lastData.reduce((accum, item) => {
-                accum.data.push(Math.round(item.amount / 1000)); // tx count in thousands
-                accum.labels.push(item.date); // timestamp in milliseconds
+                accum.data.push(item.txCount);
+                accum.labels.push(item.date);
                 return accum;
             }, {data: [], labels: []});
         });

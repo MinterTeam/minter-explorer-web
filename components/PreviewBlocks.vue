@@ -47,7 +47,7 @@
                         <div class="preview__block-reward">
                             <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime }} secs
                             <br>
-                            Block Reward {{ block.reward }} BIP
+                            Block Reward {{ block.reward }} {{ $store.state.COIN_NAME }}
                         </div>
                     </div>
                 </div>

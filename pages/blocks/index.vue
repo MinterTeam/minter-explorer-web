@@ -83,7 +83,7 @@
                         <td>{{ block.timeDistance}} ago</td>
                         <td><div class="table-overflow--large">{{ block.validators.length && block.validators[0].address }}</div></td>
                         <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.txCount }}</nuxt-link></td>
-                        <td>{{ block.reward }} BIP</td>
+                        <td>{{ block.reward }} {{ $store.state.COIN_NAME }}</td>
                     </tr>
                     </tbody>
                 </table>

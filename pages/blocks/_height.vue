@@ -81,7 +81,7 @@
                 <dd>{{ block.size }} bytes</dd>
 
                 <dt>Reward</dt>
-                <dd>{{ block.reward }} BIP</dd>
+                <dd>{{ block.reward }} {{ $store.state.COIN_NAME }}</dd>
             </dl>
         </section>
         <div class="u-section navigation">

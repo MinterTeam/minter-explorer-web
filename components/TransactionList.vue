@@ -66,7 +66,7 @@
                     <nuxt-link class="link--default table-overflow" :to="'/address/' + tx.data.to" v-else>{{ tx.data.to }}</nuxt-link>
                 </td>
                 <td>{{ tx.data.amount }} {{ tx.data.coin }}</td>
-                <td class="u-text-muted">{{ tx.fee }} BIP</td>
+                <td class="u-text-muted">{{ tx.fee }} {{ $store.state.COIN_NAME }}</td>
             </tr>
             </tbody>
         </table>

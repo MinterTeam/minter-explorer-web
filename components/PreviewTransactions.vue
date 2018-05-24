@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <div class="preview__transaction-row preview__transaction-meta">
-                    <div>Amount {{ tx.data.amount }} BIP</div>
+                    <div>Amount {{ tx.data.amount }} {{ $store.state.COIN_NAME }}</div>
                     <div>> {{ tx.timeDistance }} ago</div>
                 </div>
             </div>

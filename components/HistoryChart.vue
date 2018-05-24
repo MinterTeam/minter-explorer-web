@@ -1,11 +1,19 @@
 <script>
     import Chart from 'chart.js/dist/Chart.min.js';
     import {getTxChartData} from "~/api";
+    import {COIN_NAME} from "~/assets/variables";
 
     export default {
+        data() {
+            return {
+                dataset: null,
+            }
+        },
         mounted() {
             getTxChartData()
                 .then((dataset) => {
+                    this.dataset = dataset;
+
                     if (!dataset) {
                         return;
                     }
@@ -39,7 +47,7 @@
                                 }],
                                 yAxes: [{
                                     ticks: {
-                                        callback: (value, index, values) => value + 'k'
+                                        // callback: (value, index, values) => value + 'k',
                                     },
                                 }]
                             },
@@ -71,7 +79,7 @@
 
 <template>
     <div class="history panel panel__section">
-        <div class="history__title panel__title">14 day Bip Transaction History</div>
+        <div class="history__title panel__title">14 day {{ $store.state.COIN_NAME }} Transaction History</div>
         <div class="history__chart-wrap">
             <canvas class="history__chart" data-history-chart></canvas>
         </div>
