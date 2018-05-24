@@ -1,16 +1,4 @@
 /**
- * @typedef {Object} Status
- * @property {number} marketCap - in $
- * @property {number} bipPriceUsd
- * @property {number} bipPriceBtc
- * @property {number} bipPriceChange - in %
- * @property {number} latestBlockHeight - block count
- * @property {number} averageBlockTime - in seconds
- * @property {number} totalTransactions - tx count
- * @property {number} transactionsPerSecond - tps
- */
-
-/**
  * @typedef {Object} Block
  * @property {number} height
  * @property {string} timestamp
@@ -47,9 +35,25 @@
  * @property {number} data.amount
  */
 
-
 import axios from '~/api/axios';
 
+
+
+/**
+ * @typedef {Object} Status
+ * @property {number} marketCap - in $
+ * @property {number} bipPriceUsd
+ * @property {number} bipPriceBtc
+ * @property {number} bipPriceChange - in %
+ * @property {number} latestBlockHeight - block count
+ * @property {number} averageBlockTime - in seconds
+ * @property {number} totalTransactions - tx count
+ * @property {number} transactionsPerSecond - tps
+ */
+
+/**
+ * @return {Promise<Status>}
+ */
 export function getStatus() {
     return axios.get('status')
         .then((response) => response.data)
@@ -59,8 +63,9 @@ export function getTxChartData() {
     return axios.get('txCountChartData')
         .then((response) => {
             let chartData = response.data.data;
-            if (!chartData[0] || !chartData[1]) {
-                chartData = []
+            if (!Array.isArray(chartData)) {
+                throw new Error('Not valid response from api');
+                //chartData = [];
             }
 
             let lastData = chartData.length > 14 ? chartData.slice(0, 14 - 1) : chartData;
@@ -75,9 +80,15 @@ export function getTxChartData() {
 }
 
 /**
+ * @typedef {Object} BlockListInfo
+ * @property {Array<Block>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
  * @param {Object} [params]
  * @param {number} params.page
- * @return {Promise}
+ * @return {Promise<BlockListInfo>}
  */
 export function getBlockList(params) {
     return axios.get('blocks', {
@@ -88,17 +99,34 @@ export function getBlockList(params) {
         });
 }
 
+/**
+ * @typedef {Object} BlockInfo
+ * @property {Block} data
+ * @property {Object} meta
+ * @property {number} meta.latestBlockHeight
+ */
+
+/**
+ * @param {number} height
+ * @return {Promise<Block>}
+ */
 export function getBlock(height) {
     return axios.get('block/' + height)
         .then((response) => response.data.data);
 }
 
 /**
+ * @typedef {Object} TransactionListInfo
+ * @property {Array<Transaction>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
  * @param {Object} [params]
  * @param {number} [params.block]
  * @param {number} [params.address]
  * @param {number} [params.page]
- * @return {Promise}
+ * @return {Promise<TransactionListInfo>}
  */
 export function getTransactionList(params) {
     return axios.get('transactions', {
@@ -107,9 +135,26 @@ export function getTransactionList(params) {
         .then((response) => response.data);
 }
 
+/**
+ * @typedef {Object} TransactionInfo
+ * @property {Transaction} data
+ * @property {Object} meta
+ * @property {string} meta.prevTxHash
+ * @property {string} meta.nextTxHash
+ */
+
+/**
+ * @param {string} hash
+ * @return {Promise<TransactionInfo>}
+ */
 export function getTransaction(hash) {
     return axios.get('transaction/' + hash)
-        .then((response) => response.data);
+        .then((response) => {
+            if (!response.data.data || !response.data.data.hash) {
+                throw new Error('Not valid response from api');
+            }
+            return response.data
+        });
 }
 
 export function getAddress(address) {

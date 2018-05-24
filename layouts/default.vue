@@ -1,8 +1,10 @@
 <script>
+    import HeaderMenu from '~/components/HeaderMenu';
     import Search from '~/components/Search';
 
     export default {
         components: {
+            HeaderMenu,
             Search,
         },
         data() {
@@ -30,9 +32,11 @@
                     <img class="header__logo-image" src="/img/minter-logo-circle.svg" alt="Minter" width="36" height="36">
                     <div class="header__logo-text">Explorer</div>
                 </nuxt-link>
+                <HeaderMenu class="u-hidden-large-down"/>
                 <Search :class="{'header__search--expanded': isSearchFocused}" @inputFocus="inputFocus" @inputBlur="inputBlur"/>
             </div>
         </header>
+        <HeaderMenu class="u-hidden-large-up"/>
 
         <main class="main-content u-container">
             <nuxt/>

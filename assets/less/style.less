@@ -62,11 +62,22 @@
 .header__logo {display: flex; align-items: center; width: 159px; transition: @header-transition;}
 .header__logo-image {margin-right: 20px; margin-left: 2px;}
 .header__logo-text {font-size: 26px; line-height: 32px;}
-.header__search {display: flex; position: relative; margin-left: 30px; transition: @header-transition;}
+.header__menu {display: flex; border-bottom: 1px solid @c-border;}
+.header__link {
+    padding: 20px 20px; position: relative; font-size: 16px; line-height: 24px; font-family: @heading-font-family; font-weight: 700; text-transform: uppercase; text-decoration: none; width: 50%; text-align: center; margin-bottom: -1px;
+    &::after {content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: currentColor; opacity: 0; transition: 0.15s;}
+    &:hover::after, &:focus::after {opacity: 0.4;}
+    &.is-active::after {opacity: 1; background: @c-main;}
+}
+.header__search {display: flex; position: relative; transition: @header-transition;}
 .header__search-icon {position: absolute; top: 9px; left: 10px;}
 .header__search-input-wrap {flex-grow: 2;}
 .header__search-input {border: none; background: @body-bg-color; font-size: 16px; line-height: 20px; padding: 11px 9px 11px 40px; width: 100%;}
 .header__search-button {}
+@media (min-width: @breakpoint-small-up) {
+    .header__menu {border: none;}
+    .header__link {margin-bottom: 0;}
+}
 @media (min-width: @breakpoint-medium-up) {
     .header__search-icon {left: 16px;}
     .header__search-input-wrap {width: 340px;}
