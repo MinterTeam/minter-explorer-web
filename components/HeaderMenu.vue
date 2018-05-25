@@ -1,16 +1,16 @@
 <script>
-    import {MAINNET_HOST, TESTNET_HOST, CURRENT_HOST} from "~/assets/variables";
+    import {MAINNET_URL, TESTNET_URL, CURRENT_URL} from "~/assets/variables";
 
     export default {
         computed: {
             isMain() {
-                return CURRENT_HOST === MAINNET_HOST;
+                return CURRENT_URL === MAINNET_URL;
             },
             mainnetUrl() {
-                return this.isMain ? false : MAINNET_HOST;
+                return this.isMain ? false : MAINNET_URL;
             },
             testnetUrl() {
-                return !this.isMain ? false : TESTNET_HOST;
+                return !this.isMain ? false : TESTNET_URL;
             }
         }
     }

@@ -1,9 +1,8 @@
 import axios from 'axios'
-
-const HOST = process.env.APP_ENV === 'production' ? 'explorer.minter.network' : 'explorer.beta.minter.network';
+import {CURRENT_URL} from "~/assets/variables";
 
 const instance = axios.create({
-    baseURL: `https://${HOST}/api/v1/`,
+    baseURL: `${CURRENT_URL}/api/v1/`,
 });
 
 export default instance;
