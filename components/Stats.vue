@@ -1,9 +1,20 @@
 <script>
-    import {thousandsFilter} from "~/assets/utils";
+    import {thousandsFilter, roundMoney, round} from "~/assets/utils";
 
     export default {
         filters: {
             thousands: thousandsFilter,
+            money: (value) => roundMoney(value),
+            marketCap: (value) => {
+                const ROUND_POWER = 3;
+                if (value > Math.pow(10, 9)) {
+                    return round(value / Math.pow(10, 9), ROUND_POWER) + ' billion';
+                }
+                if (value > Math.pow(10, 6)) {
+                    return round(value / Math.pow(10, 6), ROUND_POWER) + ' million';
+                }
+                return Math.round(value);
+            }
         },
         props: {
             /** @type Status */
@@ -20,9 +31,9 @@
         <div class="index-stats__section panel__section">
             <div class="u-grid u-grid--vertical-margin">
                 <div class="u-cell">
-                    <h3 class="index-stats__name panel__title">Market cap of ${{ stats.marketCap }}</h3>
+                    <h3 class="index-stats__name panel__title">Market cap of ${{ stats.marketCap | marketCap }}</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">${{ stats.bipPriceUsd }} @&nbsp;{{ stats.bipPriceBtc }}&nbsp;BTC/{{ $store.state.COIN_NAME }}</span>
+                        <span class="index-stats__value-text">${{ stats.bipPriceUsd | money }} @&nbsp;{{ stats.bipPriceBtc | money }}&nbsp;BTC/{{ $store.state.COIN_NAME }}</span>
                         <span class="index-stats__sub-value index-stats__sub-value--dynamic" :class="stats.bipPriceChange >= 0 ? 'index-stats__green' : 'index-stats__red'">
                             <img src="/img/icon-dynamic-up.svg" alt="Up" v-if="stats.bipPriceChange >= 0">
                             <img src="/img/icon-dynamic-down.svg" alt="Down" v-else>

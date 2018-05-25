@@ -47,10 +47,10 @@
                 <dt>Address</dt>
                 <dd>{{ $route.params.address }}</dd>
 
-                <dt>{{ $store.state.COIN_NAME }} Balance</dt>
+                <dt>Balance</dt>
                 <dd>{{ bipBalance}} {{ $store.state.COIN_NAME }}</dd>
 
-                <dt>{{ $store.state.COIN_NAME }} USD Value</dt>
+                <dt>USD Value</dt>
                 <dd>${{ bipBalanceUsd }}</dd>
 
                 <dt>#Transactions</dt>

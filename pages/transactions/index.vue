@@ -40,7 +40,7 @@
                     Transactions
                 </h1>
                 <Pagination :pagination-info="paginationInfo"
-                            base-path="/blocks"
+                            base-path="/transactions"
                             pagination-class="pagination--header u-hidden-medium-down"
                             button-class="button--white"
                             button-disabled-class="u-hidden"
@@ -48,7 +48,7 @@
             </div>
             <TransactionList :tx-list="txList"/>
         </section>
-        <Pagination :pagination-info="paginationInfo" base-path="/blocks"/>
+        <Pagination :pagination-info="paginationInfo" base-path="/transactions"/>
     </div>
 </template>
 

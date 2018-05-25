@@ -1,5 +1,5 @@
 <script>
-    import {getBlockList, getStatus, getTransactionList} from "~/api";
+    import {getStatus,} from "~/api";
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/HistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
@@ -13,16 +13,8 @@
             PreviewTransactions,
         },
         asyncData () {
-            const statsPromise = getStatus();
-            const blocksPromise = getBlockList()
-                .then((blockListInfo) => blockListInfo.data);
-            const txPromise = getTransactionList()
-                .then((txListInfo) => txListInfo.data);
-
-            return Promise.all([statsPromise, blocksPromise, txPromise])
-                .then(([stats, blockList, txList]) => {
-                    return {stats, blockList, txList};
-                })
+            return getStatus()
+                .then((stats) => ({stats}));
         },
 
     }
@@ -37,10 +29,10 @@
             <HistoryChart/>
         </section>
         <section class="u-cell u-cell--medium--1-2">
-            <PreviewBlocks :block-list="blockList"/>
+            <PreviewBlocks/>
         </section>
         <section class="u-cell u-cell--medium--1-2">
-            <PreviewTransactions :tx-list="txList"/>
+            <PreviewTransactions/>
         </section>
     </div>
 </template>

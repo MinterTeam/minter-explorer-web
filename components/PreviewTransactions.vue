@@ -1,54 +1,67 @@
 <script>
+    import {getTransactionList} from "~/api";
     import {getTimeDistance} from '~/assets/utils';
 
     export default {
-        props: {
-            /** @type Array<Transaction>*/
-            txList: {
-                type: Array,
-                required: true,
-            },
+        data() {
+            return {
+                txListLoading: true,
+                /** @type Array<Transaction> */
+                txList: [],
+            }
         },
         computed: {
             txListFormatted() {
-                return this.txList.map((tx) => {
+                return this.txList.slice(0, 20).map((tx) => {
                     return {
                         ...tx,
                         timeDistance: getTimeDistance(tx.timestamp),
                     }
                 })
             }
+        },
+        created() {
+            getTransactionList()
+                .then((txListInfo) => {
+                    this.txList =  txListInfo.data || [];
+                    this.txListLoading = false;
+                })
+                .catch(() => {
+                    this.txListLoading = false;
+                });
         }
     }
 </script>
 
 <template>
-    <div class="panel">
+    <div class="panel preview">
         <div class="preview__header panel__section panel__header">
             <h2 class="panel__header-title panel__title">
-                <img class="panel__header-title-icon" src="/img/icon-transaction.svg" alt="" role="presentation">
+                <img class="panel__header-title-icon" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
                 Transactions
             </h2>
             <nuxt-link class="button button--ghost-main button--small" to="/transactions">View All</nuxt-link>
         </div>
-        <div class="preview__content">
-            <div class="preview__transaction panel__section" v-for="tx in txListFormatted" :key="tx.hash">
-                <div class="preview__transaction-row u-text-overflow">
-                    TX# <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash }}</nuxt-link>
-                </div>
-                <div class="preview__transaction-row u-grid">
-                    <div class="u-cell u-cell--small--1-2 u-text-overflow">
-                        From <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.from">{{ tx.data.from }}</nuxt-link>
+        <transition name="v-transition-fade">
+            <div class="preview__content" v-if="txListFormatted.length">
+                <div class="preview__transaction panel__section" v-for="tx in txListFormatted" :key="tx.hash">
+                    <div class="preview__transaction-row u-text-overflow">
+                        TX# <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash }}</nuxt-link>
                     </div>
-                    <div class="u-cell u-cell--small--1-2 u-text-overflow">
-                        To <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link>
+                    <div class="preview__transaction-row u-grid">
+                        <div class="u-cell u-cell--small--1-2 u-text-overflow">
+                            From <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.from">{{ tx.data.from }}</nuxt-link>
+                        </div>
+                        <div class="u-cell u-cell--small--1-2 u-text-overflow">
+                            To <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link>
+                        </div>
                     </div>
-                </div>
-                <div class="preview__transaction-row preview__transaction-meta">
-                    <div>Amount {{ tx.data.amount }} {{ $store.state.COIN_NAME }}</div>
-                    <div>> {{ tx.timeDistance }} ago</div>
+                    <div class="preview__transaction-row preview__transaction-meta">
+                        <div>Amount {{ tx.data.amount }} {{ $store.state.COIN_NAME }}</div>
+                        <div>> {{ tx.timeDistance }} ago</div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </transition>
     </div>
 </template>

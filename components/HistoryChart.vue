@@ -1,12 +1,16 @@
 <script>
     import Chart from 'chart.js/dist/Chart.min.js';
     import {getTxChartData} from "~/api";
-    import {COIN_NAME} from "~/assets/variables";
 
     export default {
         data() {
             return {
                 dataset: null,
+            }
+        },
+        computed: {
+            hasData() {
+                return this.dataset && this.dataset.data && this.dataset.data.length && this.dataset.labels && this.dataset.labels.length;
             }
         },
         mounted() {
@@ -78,10 +82,12 @@
 </script>
 
 <template>
-    <div class="history panel panel__section">
-        <div class="history__title panel__title">14 day {{ $store.state.COIN_NAME }} Transaction History</div>
-        <div class="history__chart-wrap">
-            <canvas class="history__chart" data-history-chart></canvas>
+    <transition name="v-transition-fade">
+        <div class="history panel panel__section" v-show="hasData">
+            <div class="history__title panel__title">14 day {{ $store.state.COIN_NAME }} Transaction History</div>
+            <div class="history__chart-wrap">
+                <canvas class="history__chart" data-history-chart></canvas>
+            </div>
         </div>
-    </div>
+    </transition>
 </template>
