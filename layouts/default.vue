@@ -39,7 +39,10 @@
         <HeaderMenu class="u-hidden-large-up"/>
 
         <main class="main-content u-container">
+            <h1 class="u-text-center" style="margin-top: 50px">Mainnet is not launched yet</h1>
+            <!--
             <nuxt/>
+            -->
         </main>
 
         <footer class="footer">
