@@ -36,7 +36,6 @@
             buttonClassPrev() {
                 let classList = this.buttonClass.split(' ');
                 if (!this.hasPrev) {
-                    console.log('next:', classList, this.buttonDisabledClass.split(' '), classList.concat(this.buttonDisabledClass.split(' ')))
                     classList = classList.concat(this.buttonDisabledClass.split(' '));
                 }
                 return classList;
@@ -44,7 +43,6 @@
             buttonClassNext() {
                 let classList = this.buttonClass.split(' ');
                 if (!this.hasNext) {
-                    console.log('next:', classList, this.buttonDisabledClass.split(' '), classList.concat(this.buttonDisabledClass.split(' ')))
                     classList = classList.concat(this.buttonDisabledClass.split(' '));
                 }
                 return classList;

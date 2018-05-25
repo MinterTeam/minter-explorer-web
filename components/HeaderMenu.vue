@@ -1,17 +1,16 @@
 <script>
+    import {MAINNET_HOST, TESTNET_HOST, CURRENT_HOST} from "~/assets/variables";
+
     export default {
         computed: {
             isMain() {
-                console.log('main', process.env.APP_ENV === 'production')
-                console.log(process.env.APP_MAINNET_URL);
-                console.log(process.env.APP_TESTNET_URL);
-                return process.env.APP_ENV === 'production';
+                return CURRENT_HOST === MAINNET_HOST;
             },
             mainnetUrl() {
-                return this.isMain ? false : process.env.APP_MAINNET_URL;
+                return this.isMain ? false : MAINNET_HOST;
             },
             testnetUrl() {
-                return !this.isMain ? false : process.env.APP_TESTNET_URL;
+                return !this.isMain ? false : TESTNET_HOST;
             }
         }
     }

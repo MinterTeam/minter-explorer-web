@@ -8,7 +8,6 @@
         methods: {
             submit() {
                 let query = this.query.trim();
-                console.log(query)
                 if (!query.length) {
                     return;
                 }

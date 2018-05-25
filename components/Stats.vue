@@ -51,7 +51,7 @@
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Transactions</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">{{ stats.totalTransactions }}</span>
+                        <span class="index-stats__value-text">{{ stats.totalTransactions | thousands }}</span>
                         <span class="index-stats__sub-value">({{ stats.transactionsPerSecond }} TPS)</span>
                     </div>
                 </div>
