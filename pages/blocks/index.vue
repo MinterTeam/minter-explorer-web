@@ -60,7 +60,6 @@
                     </span>
                 </h1>
                 <Pagination :pagination-info="paginationInfo"
-                            base-path="/blocks"
                             pagination-class="pagination--header u-hidden-medium-down"
                             button-class="button--white"
                             button-disabled-class="u-hidden"
@@ -89,6 +88,6 @@
                 </table>
             </div>
         </section>
-        <Pagination :pagination-info="paginationInfo" base-path="/blocks"/>
+        <Pagination :pagination-info="paginationInfo"/>
     </div>
 </template>

@@ -55,7 +55,7 @@
                             <div class="preview__block-time">> {{ block.timeDistance }} ago</div>
                         </div>
                         <div class="u-cell u-cell--2-3">
-                            Mined by <nuxt-link class="link--default" :to="block.validatorUrl">{{ block.validatorName }}</nuxt-link>
+                            <!--Mined by <nuxt-link class="link&#45;&#45;default" :to="block.validatorUrl">{{ block.validatorName }}</nuxt-link>-->
                             <div class="preview__block-reward">
                                 <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime }} secs
                                 <br>

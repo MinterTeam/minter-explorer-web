@@ -3,7 +3,9 @@
         props: {
             basePath: {
                 type: String,
-                required: true,
+                default() {
+                    return this.$route.path;
+                }
             },
             paginationInfo: {
                 type: Object,
@@ -64,7 +66,7 @@
 </script>
 
 <template>
-    <div class="pagination" :class="paginationClass" v-if="paginationInfo.current_page && paginationInfo.last_page">
+    <div class="pagination" :class="paginationClass" v-if="paginationInfo.current_page && paginationInfo.last_page > 1">
         <nuxt-link class="button button--icon"
                    :class="buttonClassPrev"
                    :to="getPageHref(1)"

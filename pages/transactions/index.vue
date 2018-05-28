@@ -33,22 +33,8 @@
 
 <template>
     <div>
-        <section class="panel u-section">
-            <div class="panel__section panel__header">
-                <h1 class="panel__title panel__header-title">
-                    <BackButton/>
-                    Transactions
-                </h1>
-                <Pagination :pagination-info="paginationInfo"
-                            base-path="/transactions"
-                            pagination-class="pagination--header u-hidden-medium-down"
-                            button-class="button--white"
-                            button-disabled-class="u-hidden"
-                />
-            </div>
-            <TransactionList :tx-list="txList"/>
-        </section>
-        <Pagination :pagination-info="paginationInfo" base-path="/transactions"/>
+        <TransactionList :tx-list="txList" :pagination-info="paginationInfo" :back-button="true"/>
+        <Pagination :pagination-info="paginationInfo"/>
     </div>
 </template>
 

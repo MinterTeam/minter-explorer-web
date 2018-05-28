@@ -1,12 +1,10 @@
 <script>
     import {getTransaction} from "~/api";
     import {getTimeDistance, getTimeUTC} from "~/assets/utils";
-    import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
 
     export default {
         components: {
-            TransactionList,
             BackButton,
         },
         asyncData({ params, error }) {

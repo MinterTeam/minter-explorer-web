@@ -2,12 +2,16 @@
     import {getAddress, getTransactionList} from "~/api";
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
+    import Pagination from "~/components/Pagination";
 
     export default {
         components: {
             TransactionList,
             BackButton,
+            Pagination,
         },
+        watchQuery: ['page'],
+        key: (to) => to.fullPath,
         asyncData({ params, error }) {
             return getAddress(params.address)
                 .then((address) => address)
@@ -21,13 +25,15 @@
                 bipBalanceUsd: 0,
                 txCount: 0,
                 txList: [],
+                txPaginationInfo: {},
             }
         },
         mounted() {
-            getTransactionList(this.$route.params)
+            getTransactionList(Object.assign({}, this.$route.params, this.$route.query))
                 .then((txListInfo) => {
                     if (txListInfo.data && txListInfo.data.length) {
                         this.txList = txListInfo.data;
+                        this.txPaginationInfo = txListInfo.meta;
                     }
                 });
         },
@@ -57,14 +63,11 @@
                 <dd>{{ txCount }}</dd>
             </dl>
         </section>
-        <section class="panel u-section" v-if="txList.length">
-            <div class="panel__section panel__header">
-                <h2 class="panel__header-title panel__title">
-                    <img class="panel__header-title-icon" src="/img/icon-transaction.svg" alt="" role="presentation">
-                    Transactions
-                </h2>
-            </div>
-            <TransactionList :tx-list="txList" :current-address="$route.params.address"/>
-        </section>
+        <TransactionList :tx-list="txList"
+                         :current-address="$route.params.address"
+                         :pagination-info="txPaginationInfo"
+                         v-if="txList.length"
+        />
+        <Pagination :pagination-info="txPaginationInfo"/>
     </div>
 </template>

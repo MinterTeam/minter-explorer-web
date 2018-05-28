@@ -3,12 +3,16 @@
     import {getTimeDistance, getTimeUTC} from "~/assets/utils";
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
+    import Pagination from "~/components/Pagination";
 
     export default {
         components: {
             TransactionList,
             BackButton,
+            Pagination,
         },
+        watchQuery: ['page'],
+        key: (to) => to.fullPath,
         asyncData({ params, error }) {
             return getBlock(params.height)
                 .then((block) => {
@@ -30,6 +34,7 @@
                 block: {},
                 //isTxListLoading: true,
                 txList: [],
+                txPaginationInfo: {},
             }
         },
         computed: {
@@ -41,10 +46,11 @@
             },
         },
         mounted() {
-            getTransactionList({block: this.block.height})
+            getTransactionList(Object.assign({block: this.block.height}, this.$route.query))
                 .then((txListInfo) => {
                     if (txListInfo.data && txListInfo.data.length) {
                         this.txList = txListInfo.data;
+                        this.txPaginationInfo = txListInfo.meta;
                     }
                 });
         }
@@ -88,14 +94,11 @@
             <nuxt-link class="button button--ghost-main" :to="prevUrl" v-if="prevUrl">Prev Block</nuxt-link>
             <nuxt-link class="button button--ghost-main" :to="nextUrl" v-if="nextUrl">Next Block</nuxt-link>
         </div>
-        <section class="panel u-section" v-if="txList.length">
-            <div class="panel__section panel__header">
-                <h2 class="panel__header-title panel__title">
-                    <img class="panel__header-title-icon" src="/img/icon-transaction.svg" alt="" role="presentation">
-                    Transactions
-                </h2>
-            </div>
-            <TransactionList :tx-list="txList" :current-block="block.height"/>
-        </section>
+        <TransactionList :tx-list="txList"
+                         :current-block="block.height"
+                         :pagination-info="txPaginationInfo"
+                         v-if="txList.length"
+        />
+        <Pagination :pagination-info="txPaginationInfo"/>
     </div>
 </template>
