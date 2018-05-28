@@ -12,10 +12,6 @@
             PreviewBlocks,
             PreviewTransactions,
         },
-        asyncData () {
-            return getStatus()
-                .then((stats) => ({stats}));
-        },
 
     }
 </script>
