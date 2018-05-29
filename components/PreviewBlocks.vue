@@ -1,18 +1,17 @@
 <script>
-    import {getBlockList} from "~/api";
     import {getTimeDistance} from '~/assets/utils';
 
     export default {
-        data() {
-            return {
-                blockListLoading: true,
-                /** @type Array<Block> */
-                blockList: [],
-            }
+        props: {
+            /** @type Array<Block> */
+            blockList: {
+                type: Array|null,
+                required: true,
+            },
         },
         computed: {
             blockListFormatted() {
-                return this.blockList.slice(0, 15).map((block) => {
+                return this.blockList ? this.blockList.slice(0, 15).map((block) => {
                     const validator = block.validators[0] || {};
                     return {
                         ...block,
@@ -21,19 +20,9 @@
                         validatorUrl: '/address/' + validator.address,
                         timeDistance: getTimeDistance(block.timestamp),
                     }
-                })
-            }
+                }) : [];
+            },
         },
-        created() {
-            getBlockList()
-                .then((blockListInfo) => {
-                    this.blockList =  blockListInfo.data || [];
-                    this.blockListLoading = false;
-                })
-                .catch(() => {
-                    this.blockListLoading = false;
-                })
-        }
     }
 </script>
 

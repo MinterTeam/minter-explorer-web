@@ -1,35 +1,25 @@
 <script>
-    import {getTransactionList} from "~/api";
     import {getTimeDistance} from '~/assets/utils';
 
     export default {
-        data() {
-            return {
-                txListLoading: true,
-                /** @type Array<Transaction> */
-                txList: [],
-            }
+        props: {
+            /** @type Array<Transaction>*/
+            txList: {
+                type: Array|null,
+                required: true,
+            },
         },
         computed: {
             txListFormatted() {
-                return this.txList.slice(0, 20).map((tx) => {
+                return this.txList ? this.txList.slice(0, 20).map((tx) => {
                     return {
                         ...tx,
                         timeDistance: getTimeDistance(tx.timestamp),
                     }
-                })
-            }
+                }) : [];
+            },
         },
-        created() {
-            getTransactionList()
-                .then((txListInfo) => {
-                    this.txList =  txListInfo.data || [];
-                    this.txListLoading = false;
-                })
-                .catch(() => {
-                    this.txListLoading = false;
-                });
-        }
+
     }
 </script>
 
