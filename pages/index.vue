@@ -15,6 +15,9 @@
             PreviewTransactions,
         },
         asyncData () {
+            if (process.server) {
+                return;
+            }
             return getStatus()
                 .then((stats) => ({stats}));
         },

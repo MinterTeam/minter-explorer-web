@@ -1,6 +1,7 @@
 <script>
     import {getTransaction} from "~/api";
     import {getTimeDistance, getTimeUTC} from "~/assets/utils";
+    import getTitle from '~/assets/get-title';
     import BackButton from '~/components/BackButton';
 
     export default {
@@ -24,6 +25,16 @@
                 .catch((e) => {
                     error({ statusCode: 404, message: 'Transaction not found' });
                 });
+        },
+        head() {
+            const title = getTitle('Transaction');
+
+            return {
+                title: title,
+                meta: [
+                    { hid: 'og-title', name: 'og:title', content: title },
+                ],
+            }
         },
         data() {
             return {

@@ -2,8 +2,9 @@ const nodeExternals = require('webpack-node-externals');
 const dotenv = require('dotenv');
 const fs = require('fs');
 
-const BASE_TITLE = require('./assets/variables').BASE_TITLE;
+import {BASE_TITLE} from "./assets/variables";
 const BASE_DESCRIPTION = '';
+console.log('vars', BASE_TITLE)
 
 module.exports = {
     /*
@@ -67,13 +68,13 @@ module.exports = {
             /*
             ** process some node_modules through webpack in server build
             */
-            // if (isServer) {
-            //     config.externals = [
-            //         nodeExternals({
-            //             whitelist: [/^vue\/src/]
-            //         })
-            //     ]
-            // }
+            if (isServer) {
+                config.externals = [
+                    nodeExternals({
+                        whitelist: [/^date-fns\/esm/]
+                    })
+                ]
+            }
         }
     },
 };

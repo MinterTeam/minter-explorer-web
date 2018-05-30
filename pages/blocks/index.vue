@@ -1,6 +1,7 @@
 <script>
     import {getBlockList} from "~/api";
     import {getTimeDistance, roundMoney} from '~/assets/utils';
+    import getTitle from '~/assets/get-title';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
@@ -22,6 +23,16 @@
                         blockList: blockListInfo.data,
                     };
                 });
+        },
+        head() {
+            const title = getTitle('Blocks');
+
+            return {
+                title: title,
+                meta: [
+                    { hid: 'og-title', name: 'og:title', content: title },
+                ],
+            }
         },
         data() {
             return {

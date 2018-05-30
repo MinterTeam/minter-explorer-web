@@ -1,5 +1,6 @@
 <script>
     import {getAddress, getTransactionList} from "~/api";
+    import getTitle from '~/assets/get-title';
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -18,6 +19,16 @@
                 .catch((e) => {
                     error({ statusCode: 404, message: 'Address not found' });
                 });
+        },
+        head() {
+            const title = getTitle('Address ' + this.$route.params.address);
+
+            return {
+                title: title,
+                meta: [
+                    { hid: 'og-title', name: 'og:title', content: title },
+                ],
+            }
         },
         data() {
             return {

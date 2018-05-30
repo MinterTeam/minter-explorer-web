@@ -1,5 +1,6 @@
 <script>
     import {getTransactionList} from "~/api";
+    import getTitle from '~/assets/get-title';
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -20,6 +21,16 @@
                         txList: txListInfo.data,
                     };
                 });
+        },
+        head() {
+            const title = getTitle('Transactions');
+
+            return {
+                title: title,
+                meta: [
+                    { hid: 'og-title', name: 'og:title', content: title },
+                ],
+            }
         },
         data() {
             return {
