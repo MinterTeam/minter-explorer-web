@@ -26,7 +26,8 @@
             }
         },
         created() {
-            this.handleData();
+            // get blocks, txs and set loop
+            this.updateData();
         },
         destroyed() {
             clearTimeout(timer);

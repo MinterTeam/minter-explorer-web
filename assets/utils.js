@@ -2,6 +2,7 @@ import toDate from 'date-fns/esm/toDate';
 import format from 'date-fns/esm/format';
 import formatDistanceStrict from 'date-fns/esm/formatDistanceStrict';
 import thousands from 'thousands';
+import decode from 'entity-decode';
 
 export function getTimeDistance(timestamp) {
     const distance = formatDistanceStrict(toDate(timestamp), new Date());
@@ -18,19 +19,6 @@ export function getTimeUTC(timestamp) {
 export function thousandsFilter(value) {
     return decode(thousands(value, '&thinsp;'));
 }
-
-
-/**
- * @TODO separate module
- * from vue/src/compiler/parser/entity-decoder
- */
-let decoder;
-function decode(html) {
-    decoder = decoder || document.createElement('div');
-    decoder.innerHTML = html;
-    return decoder.textContent;
-}
-
 
 /**
  * @param {number} num

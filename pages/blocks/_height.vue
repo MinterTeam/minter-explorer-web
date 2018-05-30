@@ -1,6 +1,6 @@
 <script>
     import {getBlock, getTransactionList} from "~/api";
-    import {getTimeDistance, getTimeUTC} from "~/assets/utils";
+    import {getTimeDistance, getTimeUTC, roundMoney} from "~/assets/utils";
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -10,6 +10,9 @@
             TransactionList,
             BackButton,
             Pagination,
+        },
+        filters: {
+            money: (value) => roundMoney(value),
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
@@ -87,7 +90,7 @@
                 <dd>{{ block.size }} bytes</dd>
 
                 <dt>Reward</dt>
-                <dd>{{ block.reward }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ block.reward | money}} {{ $store.state.COIN_NAME }}</dd>
             </dl>
         </section>
         <div class="u-section navigation">

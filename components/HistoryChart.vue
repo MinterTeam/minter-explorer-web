@@ -10,7 +10,7 @@
         },
         computed: {
             hasData() {
-                return this.dataset && this.dataset.data && this.dataset.data.length && this.dataset.labels && this.dataset.labels.length;
+                return this.dataset && this.dataset.data && this.dataset.data.length > 1 && this.dataset.labels && this.dataset.labels.length > 1;
             }
         },
         mounted() {

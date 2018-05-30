@@ -1,7 +1,10 @@
 <script>
-    import {getTimeDistance} from '~/assets/utils';
+    import {getTimeDistance, roundMoney} from '~/assets/utils';
 
     export default {
+        filters: {
+            money: (value) => roundMoney(value),
+        },
         props: {
             /** @type Array<Block> */
             blockList: {
@@ -48,7 +51,7 @@
                             <div class="preview__block-reward">
                                 <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime }} secs
                                 <br>
-                                Block Reward {{ block.reward }} {{ $store.state.COIN_NAME }}
+                                Block Reward {{ block.reward | money }} {{ $store.state.COIN_NAME }}
                             </div>
                         </div>
                     </div>
