@@ -2,7 +2,7 @@ const nodeExternals = require('webpack-node-externals');
 const dotenv = require('dotenv');
 const fs = require('fs');
 
-const BASE_TITLE = 'Minter Explorer';
+const BASE_TITLE = require('./assets/variables').BASE_TITLE;
 const BASE_DESCRIPTION = '';
 
 module.exports = {

@@ -5,6 +5,8 @@
     import PreviewBlocks from '~/components/PreviewBlocks';
     import PreviewTransactions from '~/components/PreviewTransactions';
 
+    let timer = null;
+
     export default {
         components: {
             Stats,
@@ -24,7 +26,10 @@
             }
         },
         created() {
-            this.updateData();
+            this.handleData();
+        },
+        destroyed() {
+            clearTimeout(timer);
         },
         methods: {
             updateData() {
@@ -44,7 +49,7 @@
                     .catch(this.handleData);
             },
             handleData() {
-                setTimeout(this.updateData, 5000);
+                timer = setTimeout(this.updateData, 5000);
             },
         }
 
