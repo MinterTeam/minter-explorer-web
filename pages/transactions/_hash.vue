@@ -83,6 +83,9 @@
 
                 <dt>Nonce</dt>
                 <dd>{{ tx.nonce }}</dd>
+
+                <dt>Message</dt>
+                <dd>{{ tx.payload ? tx.payload : 'blank' }}</dd>
             </dl>
         </section>
         <div class="u-section navigation">

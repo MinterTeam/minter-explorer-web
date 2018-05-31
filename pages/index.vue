@@ -1,5 +1,6 @@
 <script>
     import {getBlockList, getStatus, getTransactionList} from "~/api";
+    import {NETWORK} from "~/assets/variables";
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/HistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
@@ -19,10 +20,12 @@
                 return;
             }
             return getStatus()
-                .then((stats) => ({stats}));
+                .then((stats) => ({stats}))
+                .catch((e) => {});
         },
         data() {
             return {
+                isStatsLoading: true,
                 stats: null,
                 blockList: null,
                 txList: null,
@@ -31,9 +34,17 @@
         created() {
             // get blocks, txs and set loop
             this.updateData();
+            if (this.stats) {
+                this.isStatsLoading = false;
+            }
         },
         destroyed() {
             clearTimeout(timer);
+        },
+        computed: {
+            network() {
+                return NETWORK[0].toUpperCase() + NETWORK.slice(1);
+            }
         },
         methods: {
             updateData() {
@@ -53,6 +64,7 @@
                     .catch(this.handleData);
             },
             handleData() {
+                this.isStatsLoading = false;
                 timer = setTimeout(this.updateData, 5000);
             },
         }
@@ -61,7 +73,7 @@
 </script>
 
 <template>
-    <div class="u-grid u-grid--vertical-margin">
+    <div class="u-grid u-grid--vertical-margin" v-if="stats">
         <section class="u-cell u-cell--medium--1-2">
             <Stats :stats="stats"/>
         </section>
@@ -75,4 +87,5 @@
             <PreviewTransactions :tx-list="txList"/>
         </section>
     </div>
+    <h1 class="u-text-center" style="margin-top: 50px" v-else-if="!isStatsLoading">{{ network }} is not available</h1>
 </template>
