@@ -4,7 +4,6 @@ const fs = require('fs');
 
 import {BASE_TITLE} from "./assets/variables";
 const BASE_DESCRIPTION = '';
-console.log('vars', BASE_TITLE)
 
 module.exports = {
     /*
