@@ -44,7 +44,7 @@
                     <div class="u-grid">
                         <div class="u-cell u-cell--1-3">
                             <div class="preview__block-id"><nuxt-link class="link--hover" :to="block.url">{{ block.height }}</nuxt-link></div>
-                            <div class="preview__block-time">> {{ block.timeDistance }} ago</div>
+                            <div class="preview__block-time">{{ block.timeDistance }} ago</div>
                         </div>
                         <div class="u-cell u-cell--2-3">
                             <!--Mined by <nuxt-link class="link&#45;&#45;default" :to="block.validatorUrl">{{ block.validatorName }}</nuxt-link>-->

@@ -1,5 +1,5 @@
 <script>
-    import {getTimeDistance} from '~/assets/utils';
+    import {getTimeDistance, roundMoney} from '~/assets/utils';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
@@ -7,6 +7,14 @@
         components: {
             BackButton,
             Pagination,
+        },
+        filters: {
+            money: (value) => roundMoney(value),
+            // bipAmount: (value) => {
+            //     const result = roundMoney(value);
+            //     const isReducedPrecision = parseFloat(result) !== value;
+            //     return isReducedPrecision ? '~ ' + result : result;
+            // },
         },
         props: {
             txList: {
@@ -91,8 +99,8 @@
                         <span class="table-overflow" v-if="isCurrentAddress(tx.data.to)">{{ tx.data.to }}</span>
                         <nuxt-link class="link--default table-overflow" :to="'/address/' + tx.data.to" v-else>{{ tx.data.to }}</nuxt-link>
                     </td>
-                    <td>{{ tx.data.amount }} {{ tx.data.coin }}</td>
-                    <td class="u-text-muted">{{ tx.fee }} {{ $store.state.COIN_NAME }}</td>
+                    <td>{{ tx.data.amount | money }} {{ tx.data.coin }}</td>
+                    <td class="u-text-muted">{{ tx.fee | money }} {{ $store.state.COIN_NAME }}</td>
                 </tr>
                 </tbody>
             </table>

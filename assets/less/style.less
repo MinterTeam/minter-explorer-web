@@ -152,7 +152,12 @@
 }
 .preview__transaction-meta {display: flex; justify-content: space-between; color: @c-black-light;}
 @media (min-width: @breakpoint-medium-up) {
-    .preview__content {height: 50vh; min-height: 460px; overflow: auto;}
+    .preview__content {
+        height: 50vh; min-height: 460px; overflow: auto;
+        &::-webkit-scrollbar {width: 10px;}
+        &::-webkit-scrollbar-track {background: #F6F6F6;}
+        &::-webkit-scrollbar-thumb {background: #A4A4A4; border: 2px solid #F6F6F6; border-radius: 5px;}
+    }
 }
 
 .tx__success {color: #7fc150; text-transform: capitalize;}

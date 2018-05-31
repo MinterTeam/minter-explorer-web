@@ -85,7 +85,7 @@
                 <dd>{{ tx.nonce }}</dd>
 
                 <dt>Message</dt>
-                <dd>{{ tx.payload ? tx.payload : 'blank' }}</dd>
+                <dd :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? tx.payload : 'Blank' }}</dd>
             </dl>
         </section>
         <div class="u-section navigation">

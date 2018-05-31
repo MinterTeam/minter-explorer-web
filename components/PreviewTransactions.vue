@@ -1,7 +1,15 @@
 <script>
-    import {getTimeDistance} from '~/assets/utils';
+    import {getTimeDistance, roundMoney} from '~/assets/utils';
 
     export default {
+        filters: {
+            money: (value) => roundMoney(value),
+            // bipAmount: (value) => {
+            //     const result = roundMoney(value);
+            //     const isReducedPrecision = parseFloat(result) !== value;
+            //     return isReducedPrecision ? '~ ' + result : result;
+            // },
+        },
         props: {
             /** @type Array<Transaction>*/
             txList: {
@@ -47,8 +55,8 @@
                         </div>
                     </div>
                     <div class="preview__transaction-row preview__transaction-meta">
-                        <div>Amount {{ tx.data.amount }} {{ $store.state.COIN_NAME }}</div>
-                        <div>> {{ tx.timeDistance }} ago</div>
+                        <div>Amount {{ tx.data.amount | money }} {{ $store.state.COIN_NAME }}</div>
+                        <div>{{ tx.timeDistance }} ago</div>
                     </div>
                 </div>
             </div>
