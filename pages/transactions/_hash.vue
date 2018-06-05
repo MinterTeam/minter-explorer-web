@@ -76,7 +76,7 @@
                 <dd><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
 
                 <dt>Amount</dt>
-                <dd>{{ tx.data.amount }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ tx.data.amount }} {{ tx.data.coin }}</dd>
 
                 <dt>Fee</dt>
                 <dd>{{ tx.fee }} {{ $store.state.COIN_NAME }}</dd>

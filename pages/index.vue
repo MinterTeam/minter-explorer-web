@@ -20,12 +20,15 @@
                 return;
             }
             return getStatus()
-                .then((stats) => ({stats}))
+                .then((stats) => ({
+                    stats,
+                    isDataLoading: false,
+                }))
                 .catch((e) => {});
         },
         data() {
             return {
-                isStatsLoading: true,
+                isDataLoading: true,
                 stats: null,
                 blockList: null,
                 txList: null,
@@ -34,9 +37,6 @@
         created() {
             // get blocks, txs and set loop
             this.updateData();
-            if (this.stats) {
-                this.isStatsLoading = false;
-            }
         },
         destroyed() {
             clearTimeout(timer);
@@ -64,7 +64,7 @@
                     .catch(this.handleData);
             },
             handleData() {
-                this.isStatsLoading = false;
+                this.isDataLoading = false;
                 timer = setTimeout(this.updateData, 5000);
             },
         }
@@ -87,5 +87,5 @@
             <PreviewTransactions :tx-list="txList"/>
         </section>
     </div>
-    <h1 class="u-text-center" style="margin-top: 50px" v-else-if="!isStatsLoading">{{ network }} is not available</h1>
+    <h1 class="u-text-center" style="margin-top: 50px" v-else-if="!isDataLoading">{{ network }} is not available</h1>
 </template>

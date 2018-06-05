@@ -1,6 +1,7 @@
 const nodeExternals = require('webpack-node-externals');
 const dotenv = require('dotenv');
-const fs = require('fs');
+
+const envConfig = dotenv.config();
 
 import {BASE_TITLE} from "./assets/variables";
 const BASE_DESCRIPTION = '';
@@ -41,7 +42,7 @@ module.exports = {
     plugins: [
         //'~/plugins/history',
     ],
-    env: dotenv.parse(fs.readFileSync('.env')),
+    env: envConfig.error ? {} : envConfig.parsed,
     /*
     ** Build configuration
     */
