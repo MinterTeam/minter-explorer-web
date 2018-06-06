@@ -1,12 +1,15 @@
 <script>
     import {getTransaction} from "~/api";
-    import {getTimeDistance, getTimeUTC} from "~/assets/utils";
+    import {getTimeDistance, getTimeUTC, roundMoney} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import BackButton from '~/components/BackButton';
 
     export default {
         components: {
             BackButton,
+        },
+        filters: {
+            money: (value) => roundMoney(value),
         },
         asyncData({ params, error }) {
             return getTransaction(params.hash)
@@ -76,7 +79,7 @@
                 <dd><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
 
                 <dt>Amount</dt>
-                <dd>{{ tx.data.amount }} {{ tx.data.coin }}</dd>
+                <dd>{{ tx.data.amount | money }} {{ tx.data.coin }}</dd>
 
                 <dt>Fee</dt>
                 <dd>{{ tx.fee }} {{ $store.state.COIN_NAME }}</dd>
