@@ -159,5 +159,5 @@ export function getTransaction(hash) {
 
 export function getAddress(address) {
     return axios.get('address/' + address)
-        .then((response) => response.data);
+        .then((response) => response.data.data);
 }

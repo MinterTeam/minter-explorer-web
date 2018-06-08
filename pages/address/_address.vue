@@ -1,7 +1,7 @@
 <script>
     import {getAddress, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
-    import {roundMoney} from "~/assets/utils";
+    import {roundMoney, thousandsFilter} from "~/assets/utils";
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -13,7 +13,8 @@
             Pagination,
         },
         filters: {
-            money: (value) => roundMoney(value),
+            money: roundMoney,
+            thousands: thousandsFilter,
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
@@ -36,9 +37,8 @@
         },
         data() {
             return {
-                bipBalance: 0,
-                bipBalanceUsd: 0,
-                txCount: 0,
+                bipTotal: 0,
+                usdTotal: 0,
                 txList: [],
                 txPaginationInfo: {},
             }
@@ -69,13 +69,13 @@
                 <dd>{{ $route.params.address }}</dd>
 
                 <dt>Balance</dt>
-                <dd>{{ bipBalance | money }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ bipTotal | money | thousands }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>USD Value</dt>
-                <dd>${{ bipBalanceUsd }}</dd>
+                <dd>${{ usdTotal | money | thousands }}</dd>
 
                 <dt>#Transactions</dt>
-                <dd>{{ txCount }}</dd>
+                <dd>{{ txPaginationInfo.total || 0 }}</dd>
             </dl>
         </section>
         <TransactionList :tx-list="txList"
