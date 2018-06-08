@@ -1,15 +1,18 @@
-# minter-explorer
+# Minter Explorer Website
 
-[explorer.minter.network](https://explorer.minter.network)
+This is the repository containing the code for the official Minter Explorer website [explorer.minter.network](https://explorer.minter.network)
+
 
 ## Deployment script
+
+Build in Nuxt SPA mode
 ```
 npm ci && npm run production
 ```
 Root folder: `./dist/`
 
 
-## Nuxt build info
+### Nuxt build cheatsheet
 
 ``` bash
 # install dependencies

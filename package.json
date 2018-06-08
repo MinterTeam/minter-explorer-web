@@ -1,7 +1,7 @@
 {
-  "name": "minter-explorer",
+  "name": "minter-explorer-web",
   "version": "1.0.0",
-  "description": " ",
+  "description": "Minter Explorer Website",
   "author": "shrpne <shrpne@gmail.com>",
   "private": true,
   "scripts": {
