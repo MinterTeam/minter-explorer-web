@@ -2,11 +2,14 @@
     import {getTimeDistance, roundMoney} from '~/assets/utils';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
+    import TableLink from '~/components/TableLink';
+    //import TableLink from '~/components/TableO';
 
     export default {
         components: {
             BackButton,
             Pagination,
+            TableLink,
         },
         filters: {
             money: (value) => roundMoney(value),
@@ -85,19 +88,18 @@
                 </thead>
                 <tbody>
                 <tr v-for="tx in txListFormatted" :key="tx.hash">
-                    <td><nuxt-link class="link--default table-overflow" :to="'/transactions/' + tx.hash">{{ tx.hash }}</nuxt-link></td>
                     <td>
-                        <span class="table-overflow" v-if="isCurrentBlock(tx.block)">{{ tx.block }}</span>
-                        <nuxt-link class="link--default table-overflow" :to="'/blocks/' + tx.block" v-else>{{ tx.block }}</nuxt-link>
+                        <TableLink :link-text="tx.hash" :link-path="'/transactions/' + tx.hash"/>
+                    </td>
+                    <td>
+                        <TableLink :link-text="tx.block" :link-path="'/blocks/' + tx.block" :is-not-link="isCurrentBlock(tx.block)"/>
                     </td>
                     <td>{{ tx.timeDistance }} ago</td>
                     <td>
-                        <span class="table-overflow" v-if="isCurrentAddress(tx.data.from)">{{ tx.data.from }}</span>
-                        <nuxt-link class="link--default table-overflow" :to="'/address/' + tx.data.from" v-else>{{ tx.data.from }}</nuxt-link>
+                        <TableLink :link-text="tx.data.from" :link-path="'/address/' + tx.data.from" :is-not-link="isCurrentAddress(tx.data.from)"/>
                     </td>
                     <td>
-                        <span class="table-overflow" v-if="isCurrentAddress(tx.data.to)">{{ tx.data.to }}</span>
-                        <nuxt-link class="link--default table-overflow" :to="'/address/' + tx.data.to" v-else>{{ tx.data.to }}</nuxt-link>
+                        <TableLink :link-text="tx.data.to" :link-path="'/address/' + tx.data.to" :is-not-link="isCurrentAddress(tx.data.to)"/>
                     </td>
                     <td>{{ tx.data.amount | money }} {{ tx.data.coin }}</td>
                     <td class="u-text-muted">{{ tx.fee | money }} {{ $store.state.COIN_NAME }}</td>

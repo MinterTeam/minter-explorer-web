@@ -1,9 +1,11 @@
 <script>
-    import {getTimeDistance, roundMoney} from '~/assets/utils';
+    import {getTimeDistance, roundMoney, shortFilter} from '~/assets/utils';
 
     export default {
         filters: {
-            money: (value) => roundMoney(value),
+            money: roundMoney,
+            addressHash: (value) => shortFilter(value, 7),
+            txHash: (value) => shortFilter(value, 13),
             // bipAmount: (value) => {
             //     const result = roundMoney(value);
             //     const isReducedPrecision = parseFloat(result) !== value;
@@ -44,14 +46,14 @@
             <div class="preview__content" v-if="txListFormatted.length">
                 <div class="preview__transaction panel__section" v-for="tx in txListFormatted" :key="tx.hash">
                     <div class="preview__transaction-row u-text-overflow">
-                        TX# <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash }}</nuxt-link>
+                        TX# <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash | txHash }}</nuxt-link>
                     </div>
                     <div class="preview__transaction-row u-grid">
-                        <div class="u-cell u-cell--small--1-2 u-text-overflow">
-                            From <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.from">{{ tx.data.from }}</nuxt-link>
+                        <div class="u-cell u-cell--large--1-2">
+                            From <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.from">{{ tx.data.from | addressHash }}</nuxt-link>
                         </div>
-                        <div class="u-cell u-cell--small--1-2 u-text-overflow">
-                            To <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link>
+                        <div class="u-cell u-cell--large--1-2">
+                            To <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.to">{{ tx.data.to | addressHash }}</nuxt-link>
                         </div>
                     </div>
                     <div class="preview__transaction-row preview__transaction-meta">

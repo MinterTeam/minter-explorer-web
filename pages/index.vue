@@ -74,16 +74,16 @@
 
 <template>
     <div class="u-grid u-grid--vertical-margin" v-if="stats">
-        <section class="u-cell u-cell--medium--1-2">
+        <section class="u-cell u-cell--large--1-2">
             <Stats :stats="stats"/>
         </section>
-        <section class="u-cell u-cell--medium--1-2 history-cell">
+        <section class="u-cell u-cell--large--1-2 history-cell">
             <HistoryChart/>
         </section>
-        <section class="u-cell u-cell--medium--1-2">
+        <section class="u-cell u-cell--large--1-2">
             <PreviewBlocks :block-list="blockList"/>
         </section>
-        <section class="u-cell u-cell--medium--1-2">
+        <section class="u-cell u-cell--large--1-2">
             <PreviewTransactions :tx-list="txList"/>
         </section>
     </div>

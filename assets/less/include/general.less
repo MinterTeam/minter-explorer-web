@@ -66,7 +66,7 @@ hr {border: none; border-top: 1px solid @c-border;}
 
 // table
 .table-wrap {overflow: auto;}
-.table-overflow, .table-overflow--large {max-width: 120px; overflow: hidden; text-overflow: ellipsis; display: inline-block; margin-right: -10px;}
+.table__cell-overflow--middle {}
 table {width: 100%; border-collapse: collapse;}
 th {background: #f6f6f6;}
 td, th {
@@ -75,11 +75,11 @@ td, th {
     &:last-child {border-right: none;}
 }
 @media (min-width: @breakpoint-medium-up) {
-    .table-overflow--large {max-width: 240px;}
+
 }
 @media (min-width: @breakpoint-large-up) {
-    .table-overflow--large {max-width: none;}
-    td, th {padding: 15px 20px;}
+    .table__cell-overflow--middle {margin-left: -2px; margin-right: -2px;}
+    td, th {padding: 15px 18px;}
 }
 
 // dl

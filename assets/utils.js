@@ -20,6 +20,16 @@ export function thousandsFilter(value) {
     return decode(thousands(value, '&thinsp;'));
 }
 
+export function shortFilter(value, endLength = 6, minLengthToShort) {
+    const startLength = endLength + 'Mx'.length - 1;
+    minLengthToShort = minLengthToShort || startLength + endLength;
+    value = value.toString();
+    const isLong = value.length > minLengthToShort;
+
+    return isLong ? value.substr(0, startLength) + '…' + value.substr(-endLength) : value;
+
+}
+
 /**
  * @param {number} num
  * @param {number} [precision=3]
