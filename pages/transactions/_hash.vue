@@ -82,7 +82,7 @@
                 <dd>{{ tx.data.amount | money }} {{ tx.data.coin }}</dd>
 
                 <dt>Fee</dt>
-                <dd>{{ tx.fee }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ tx.fee | money }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>Nonce</dt>
                 <dd>{{ tx.nonce }}</dd>
