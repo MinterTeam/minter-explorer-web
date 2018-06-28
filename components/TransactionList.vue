@@ -55,6 +55,9 @@
             isCurrentBlock(height) {
                 return height === this.currentBlock;
             },
+            hasAmount(tx) {
+                return typeof tx.data.amount !== 'undefined';
+            }
         }
     }
 </script>
@@ -96,12 +99,24 @@
                     </td>
                     <td>{{ tx.timeDistance }} ago</td>
                     <td>
-                        <TableLink :link-text="tx.data.from" :link-path="'/address/' + tx.data.from" :is-not-link="isCurrentAddress(tx.data.from)"/>
+                        <TableLink :link-text="tx.data.from"
+                                   :link-path="'/address/' + tx.data.from"
+                                   :is-not-link="isCurrentAddress(tx.data.from)"
+                                   v-if="tx.data.from"
+                        />
                     </td>
                     <td>
-                        <TableLink :link-text="tx.data.to" :link-path="'/address/' + tx.data.to" :is-not-link="isCurrentAddress(tx.data.to)"/>
+                        <TableLink :link-text="tx.data.to"
+                                   :link-path="'/address/' + tx.data.to"
+                                   :is-not-link="isCurrentAddress(tx.data.to)"
+                                   v-if="tx.data.to"
+                        />
                     </td>
-                    <td>{{ tx.data.amount | money }} {{ tx.data.coin }}</td>
+                    <td>
+                        <span v-if="hasAmount(tx)">
+                            {{ tx.data.amount | money }} {{ tx.data.coin }}
+                        </span>
+                    </td>
                     <td class="u-text-muted">{{ tx.fee | money }} {{ $store.state.COIN_NAME }}</td>
                 </tr>
                 </tbody>

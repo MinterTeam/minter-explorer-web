@@ -29,6 +29,11 @@
                 }) : [];
             },
         },
+        methods: {
+            hasAmount(tx) {
+                return typeof tx.data.amount !== 'undefined';
+            }
+        }
 
     }
 </script>
@@ -48,8 +53,8 @@
                     <div class="preview__transaction-row u-text-overflow">
                         TX# <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash | txHash }}</nuxt-link>
                     </div>
-                    <div class="preview__transaction-row u-grid">
-                        <div class="u-cell u-cell--large--1-2">
+                    <div class="preview__transaction-row u-grid" v-if="tx.data.from || tx.data.to">
+                        <div class="u-cell u-cell--large--1-2" v-if="tx.data.from">
                             From <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.from">{{ tx.data.from | addressHash }}</nuxt-link>
                         </div>
                         <div class="u-cell u-cell--large--1-2" v-if="tx.data.to">
@@ -57,7 +62,11 @@
                         </div>
                     </div>
                     <div class="preview__transaction-row preview__transaction-meta">
-                        <div>Amount {{ tx.data.amount | money }} {{ $store.state.COIN_NAME }}</div>
+                        <div>
+                            <span v-if="hasAmount(tx)">
+                                Amount {{ tx.data.amount | money }} {{ $store.state.COIN_NAME }}
+                            </span>
+                        </div>
                         <div>{{ tx.timeDistance }} ago</div>
                     </div>
                 </div>
