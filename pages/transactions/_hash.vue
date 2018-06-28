@@ -72,14 +72,14 @@
                 <dt>Block</dt>
                 <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.block">{{ tx.block }}</nuxt-link></dd>
 
-                <dt>From</dt>
-                <dd><nuxt-link class="link--default" :to="'/address/' + tx.data.from">{{ tx.data.from }}</nuxt-link></dd>
+                <dt v-if="tx.data.from">From</dt>
+                <dd v-if="tx.data.from"><nuxt-link class="link--default" :to="'/address/' + tx.data.from">{{ tx.data.from }}</nuxt-link></dd>
 
-                <dt>To</dt>
-                <dd><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
+                <dt v-if="tx.data.to">To</dt>
+                <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
 
-                <dt>Amount</dt>
-                <dd>{{ tx.data.amount | money }} {{ tx.data.coin }}</dd>
+                <dt v-if="tx.data.amount">Amount</dt>
+                <dd v-if="tx.data.amount">{{ tx.data.amount | money }} {{ tx.data.coin }}</dd>
 
                 <dt>Fee</dt>
                 <dd>{{ tx.fee | money }} {{ $store.state.COIN_NAME }}</dd>

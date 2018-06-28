@@ -102,6 +102,9 @@
 
                 <dt>Reward</dt>
                 <dd>{{ block.reward | money}} {{ $store.state.COIN_NAME }}</dd>
+
+                <dt>#Transactions</dt>
+                <dd>{{ block.txCount || txPaginationInfo.total || 0 }}</dd>
             </dl>
         </section>
         <div class="u-section navigation">

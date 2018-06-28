@@ -52,7 +52,7 @@
                         <div class="u-cell u-cell--large--1-2">
                             From <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.from">{{ tx.data.from | addressHash }}</nuxt-link>
                         </div>
-                        <div class="u-cell u-cell--large--1-2">
+                        <div class="u-cell u-cell--large--1-2" v-if="tx.data.to">
                             To <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.to">{{ tx.data.to | addressHash }}</nuxt-link>
                         </div>
                     </div>
