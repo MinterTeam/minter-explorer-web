@@ -64,7 +64,7 @@
                     <div class="preview__transaction-row preview__transaction-meta">
                         <div>
                             <span v-if="hasAmount(tx)">
-                                Amount {{ tx.data.amount | money }} {{ $store.state.COIN_NAME }}
+                                Amount {{ tx.data.amount | money }} {{ tx.data.coin }}
                             </span>
                         </div>
                         <div>{{ tx.timeDistance }} ago</div>

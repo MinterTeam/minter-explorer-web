@@ -65,21 +65,51 @@ hr {border: none; border-top: 1px solid @c-border;}
 
 
 // table
+@table-cell-padding: 10px;
+@table-cell-vertical-padding-large: 15px;
+@table-expand-button-size: (@table-cell-padding * 2 + 14px * 1.4);
+@table-expand-button-size-large: (@table-cell-vertical-padding-large * 2 + 14px * 1.4);
 .table-wrap {overflow: auto;}
-.table__cell-overflow--middle {}
 table {width: 100%; border-collapse: collapse;}
 th {background: #f6f6f6;}
 td, th {
-    border: 1px solid @c-border; padding: 10px; text-align: left;
+    border: 1px solid @c-border; padding: @table-cell-padding; text-align: left;
     &:first-child {border-left: none;}
     &:last-child {border-right: none;}
+}
+//td > table td {
+//    padding-top: 0; padding-bottom: 0; border: none;
+//    &:first-child {padding-left: 0;}
+//    &:last-child {padding-right: 0;}
+//}
+.table__inner-item {
+    &+& {margin-top: 10px;}
+}
+.is-expanded > td {background: #f6f6f6;}
+.table__row-expanded-data {
+    td {background: #f6f6f6; border-left: none; border-right: none;}
+}
+.table__expand-cell {padding: 0; width: @table-expand-button-size;}
+.table__expand-button {
+    width: @table-expand-button-size; height: @table-expand-button-size; font-size: 0; position: relative; left: 0; top: 0;
+    &::before, &::after {content: ''; width: 10px; height: 2px; position: absolute; top: 50%; margin-top: 3px; background: @c-black-light;}
+    &::before {transform: rotate(45deg); right: 50%; transform-origin: 100% 100%;}
+    &::after {transform: rotate(-45deg); left: 50%; transform-origin: 0 100%;}
+    &.is-expanded::before {transform: rotate(-45deg); transform-origin: 100% 0; margin-top: -4px;}
+    &.is-expanded::after {transform: rotate(45deg); transform-origin: 0 0; margin-top: -4px;}
 }
 @media (min-width: @breakpoint-medium-up) {
 
 }
 @media (min-width: @breakpoint-large-up) {
+    td, th {padding: @table-cell-vertical-padding-large 18px;}
+    .table__inner {display: flex;}
+    .table__inner-item {
+        &+& {margin-left: 24px; margin-top: 0;}
+    }
     .table__cell-overflow--middle {margin-left: -2px; margin-right: -2px;}
-    td, th {padding: 15px 18px;}
+    .table__expand-cell {width: @table-expand-button-size-large;}
+    .table__expand-button {width: @table-expand-button-size-large; height: @table-expand-button-size-large;}
 }
 
 // dl

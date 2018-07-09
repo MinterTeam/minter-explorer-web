@@ -30,6 +30,14 @@ export function shortFilter(value, endLength = 6, minLengthToShort) {
 
 }
 
+
+export function txTypeFilter(value) {
+    value = value.replace(/Data$/, ''); // remove "Data" from the end
+    value = value.replace( /([A-Z])/g, " $1" ); // add space before capital letters
+    value = value.charAt(0).toUpperCase() + value.slice(1); // capitalize the first letter
+    return value;
+}
+
 /**
  * @param {number} num
  * @param {number} [precision=3]
@@ -38,23 +46,28 @@ export function shortFilter(value, endLength = 6, minLengthToShort) {
 export function roundMoney(num, precision = 3) {
     let data = String(num).split(/[eE]/);
     if (data.length === 1) {
-        return reducePrecision(num).toString();
+        if (data[0].indexOf('.') === -1) {
+            return data[0];
+        } else {
+            return reducePrecision(num).toString();
+        }
     }
 
     let zeros = '';
     let sign = num < 0 ? '-' : '';
     let digits = data[0].replace('.', '');
-    let mag = Number(data[1]) + 1;
+    let power = Number(data[1]) + 1;
 
-    if (mag < 0) {
+
+    if (power < 0) {
         zeros = sign + '0.';
-        while (mag++) {
+        while (power++) {
             zeros += '0';
         }
-        return zeros + digits.replace(/^\-/,'').substr(0, precision);
+        return zeros + digits.replace(/^\-/,'').replace(/0$/, '').substr(0, precision);
     } else {
-        mag -= digits.length;
-        while (mag--) {
+        power -= digits.length;
+        while (power--) {
             zeros += '0';
         }
         return digits + zeros;

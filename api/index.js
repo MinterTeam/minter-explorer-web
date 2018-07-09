@@ -30,9 +30,39 @@
  * @property {number} type
  * @property {Object} data
  * @property {string} data.from
- * @property {string} data.too
- * @property {string} data.coin
- * @property {number} data.amount
+ * -- type: TX_TYPES.SEND
+ * @property {string} [data.to]
+ * @property {string} [data.coin]
+ * @property {number} [data.amount]
+ * -- type: TX_TYPES.CONVERT
+ * @property {string} [data.from_coin_symbol]
+ * @property {string} [data.to_coin_symbol]
+ * @property {number} [data.value]
+ * -- type: TX_TYPES.CREATE_COIN
+ * @property {string} [data.name]
+ * @property {string} [data.symbol]
+ * @property {number} [data.initial_amount]
+ * @property {number} [data.initial_reserve]
+ * @property {number} [data.constant_reserve_ratio]
+ * -- type: TX_TYPES.DECLARE_CANDIDACY
+ * @property {string} [data.address]
+ * @property {string} [data.pub_key]
+ * @property {number} [data.commission]
+ * @property {string} [data.coin]
+ * @property {number} [data.stake]
+ * -- type: TX_TYPES.DELEGATE
+ * @property {string} [data.pub_key]
+ * @property {string} [data.coin]
+ * @property {number} [data.stake]
+ * -- type: TX_TYPES.UNBOUND
+ * @property {string} [data.pub_key]
+ * @property {string} [data.coin]
+ * @property {number} [data.value]
+ * -- type: TX_TYPES.REDEEM_CHECK
+ * @property {string} [data.raw_check]
+ * @property {string} [data.proof]
+ * - type: TX_TYPES.SET_CANDIDATE_ONLINE, TX_TYPES.SET_CANDIDATE_OFFLINE
+ * @property {string} [data.pub_key]
  */
 
 import axios from '~/api/axios';
@@ -132,7 +162,17 @@ export function getTransactionList(params) {
     return axios.get('transactions', {
             params,
         })
-        .then((response) => response.data);
+        .then((response) => {
+            return {
+                ...response.data,
+                data: response.data.data.map((tx) => {
+                    if (tx.data.coin) {
+                        tx.data.coin = tx.data.coin.toUpperCase();
+                    }
+                    return tx;
+                }),
+            }
+        });
 }
 
 /**
@@ -153,7 +193,14 @@ export function getTransaction(hash) {
             if (!response.data.data || !response.data.data.hash) {
                 throw new Error('Not valid response from api');
             }
-            return response.data
+            let tx = response.data.data;
+            if (tx.data.coin) {
+                tx.data.coin = tx.data.coin.toUpperCase();
+            }
+            return {
+                ...response.data,
+                data: tx,
+            }
         });
 }
 

@@ -15,12 +15,16 @@
                 type: Boolean,
                 default: false,
             },
+            shouldNotShorten: {
+                type: Boolean,
+                default: false,
+            },
         },
         computed: {
             shortText() {
-                return shortFilter(this.linkText);
+                return this.shouldNotShorten ? this.linkText : shortFilter(this.linkText);
             },
-            isLong() {
+            isShorten() {
                 return this.linkText !== this.shortText;
             }
         },
@@ -29,7 +33,7 @@
                 this.isNotLink ? 'div' : 'nuxt-link',
                 {
                     class: {
-                        'table__cell-overflow--middle': this.isLong,
+                        'table__cell-overflow--middle': this.isShorten,
                         'link--default': !this.isNotLink,
                     },
                     props: this.isNotLink ? {} : {
