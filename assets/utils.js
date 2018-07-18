@@ -40,10 +40,13 @@ export function txTypeFilter(value) {
 
 /**
  * @param {number} num
- * @param {number} [precision=3]
+ * @param {number|string} [precision=3]
  * @return {string}
  */
 export function roundMoney(num, precision = 3) {
+    if (typeof num === 'string') {
+        num = num.replace(/\.?0+$/, '')
+    }
     let data = String(num).split(/[eE]/);
     if (data.length === 1) {
         if (data[0].indexOf('.') === -1) {
@@ -64,7 +67,7 @@ export function roundMoney(num, precision = 3) {
         while (power++) {
             zeros += '0';
         }
-        return zeros + digits.replace(/^\-/,'').replace(/0$/, '').substr(0, precision);
+        return zeros + digits.replace(/^\-/,'').substr(0, precision);
     } else {
         power -= digits.length;
         while (power--) {

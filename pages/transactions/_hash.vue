@@ -104,11 +104,11 @@
                 <dt v-if="tx.data.symbol">Symbol</dt>
                 <dd v-if="tx.data.symbol">{{ tx.data.symbol }}</dd>
                 <dt v-if="tx.data.initial_amount">Initial Amount</dt>
-                <dd v-if="tx.data.initial_amount">{{ tx.data.initial_amount }}</dd>
+                <dd v-if="tx.data.initial_amount">{{ tx.data.initial_amount }} {{ tx.data.symbol }}</dd>
                 <dt v-if="tx.data.initial_reserve">Initial Reserve</dt>
-                <dd v-if="tx.data.initial_reserve">{{ tx.data.initial_reserve }}</dd>
+                <dd v-if="tx.data.initial_reserve">{{ tx.data.initial_reserve }} {{ $store.state.COIN_NAME }}</dd>
                 <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
-                <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }}</dd>
+                <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }} %</dd>
 
                 <!-- DELEGATE, UNBOUND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="tx.data.pub_key">Public Key</dt>
