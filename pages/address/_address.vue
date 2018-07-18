@@ -20,7 +20,6 @@
         key: (to) => to.fullPath,
         asyncData({ params, error }) {
             return getAddress(params.address)
-                .then((address) => address)
                 .catch((e) => {
                     error({ statusCode: 404, message: 'Address not found' });
                 });
@@ -39,8 +38,10 @@
             return {
                 bipTotal: 0,
                 usdTotal: 0,
+                txCount: 0,
                 txList: [],
                 txPaginationInfo: {},
+                isTxListLoading: true,
             }
         },
         mounted() {
@@ -50,6 +51,10 @@
                         this.txList = txListInfo.data;
                         this.txPaginationInfo = txListInfo.meta;
                     }
+                    this.isTxListLoading = false;
+                })
+                .catch(() => {
+                    this.isTxListLoading = false;
                 });
         },
     }
@@ -68,16 +73,17 @@
                 <dt>Address</dt>
                 <dd>{{ $route.params.address }}</dd>
 
-                <dt>Balance</dt>
+                <dt>Total Balance</dt>
                 <dd>{{ bipTotal | money | thousands }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>USD Value</dt>
                 <dd>${{ usdTotal | money | thousands }}</dd>
 
                 <dt>#Transactions</dt>
-                <dd>{{ txPaginationInfo.total || 0 }}</dd>
+                <dd>{{ txCount }}</dd>
             </dl>
         </section>
+        <p class="u-section" v-if="isTxListLoading && txCount">Loading TX...</p>
         <TransactionList :tx-list="txList"
                          :current-address="$route.params.address"
                          :pagination-info="txPaginationInfo"

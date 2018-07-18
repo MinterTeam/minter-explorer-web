@@ -39,14 +39,24 @@ export function txTypeFilter(value) {
 }
 
 /**
+ * Strip unnecessary last zeros after dot
+ * @param num
+ * @return {*}
+ */
+export function stripZeros(num) {
+    if (typeof num === 'string') {
+        num = num.replace(/\.?0+$/, '')
+    }
+    return num;
+}
+
+/**
  * @param {number} num
  * @param {number|string} [precision=3]
  * @return {string}
  */
 export function roundMoney(num, precision = 3) {
-    if (typeof num === 'string') {
-        num = num.replace(/\.?0+$/, '')
-    }
+    num = stripZeros(num);
     let data = String(num).split(/[eE]/);
     if (data.length === 1) {
         if (data[0].indexOf('.') === -1) {

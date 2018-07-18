@@ -206,5 +206,16 @@ export function getTransaction(hash) {
 
 export function getAddress(address) {
     return axios.get('address/' + address)
-        .then((response) => response.data.data);
+        .then((response) => {
+            const addressData = response.data.data;
+            addressData.bipTotal = 0;
+            addressData.usdTotal = 0;
+            if (addressData.coins) {
+                addressData.coins.forEach((coin) => {
+                    addressData.bipTotal += coin.baseCoinAmount;
+                    addressData.usdTotal += coin.usdAmount;
+                })
+            }
+            return addressData;
+        });
 }

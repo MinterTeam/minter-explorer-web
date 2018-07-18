@@ -1,6 +1,6 @@
 <script>
     import {getTransaction} from "~/api";
-    import {getTimeDistance, getTimeUTC, roundMoney, txTypeFilter} from "~/assets/utils";
+    import {getTimeDistance, getTimeUTC, stripZeros, txTypeFilter} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import BackButton from '~/components/BackButton';
 
@@ -9,7 +9,7 @@
             BackButton,
         },
         filters: {
-            money: roundMoney,
+            money: stripZeros,
             txType: txTypeFilter,
         },
         asyncData({ params, error }) {
@@ -116,7 +116,7 @@
                 <dt v-if="isDefined(tx.data.stake)">Stake</dt>
                 <dd v-if="isDefined(tx.data.stake)">{{ tx.data.stake | money }} {{ tx.data.coin }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
-                <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission | money }} {{ tx.data.coin }}</dd>
+                <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }} %</dd>
 
                 <!-- REDEEM_CHECK -->
                 <dt v-if="tx.data.raw_check">Check</dt>
