@@ -43,7 +43,7 @@
         },
         data() {
             return {
-                isTxExpanded: {/* {txHash: boolean} */},
+                isTxExpanded: {/* {txn: boolean} */},
             }
         },
         computed: {
@@ -66,8 +66,8 @@
             isDefined(value) {
                 return typeof value !== 'undefined';
             },
-            toggleTx(txHash) {
-                this.$set(this.isTxExpanded, txHash, !this.isTxExpanded[txHash]);
+            toggleTx(txn) {
+                this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
             },
         }
     }
@@ -102,7 +102,7 @@
                 </thead>
                 <tbody>
                 <template v-for="tx in txListFormatted">
-                    <tr :class="{'is-expanded': isTxExpanded[tx.hash]}" :key="tx.hash">
+                    <tr :class="{'is-expanded': isTxExpanded[tx.txn]}" :key="tx.txn">
                         <!-- hash -->
                         <td>
                             <TableLink :link-text="tx.hash" :link-path="'/transactions/' + tx.hash"/>
@@ -127,10 +127,10 @@
                         <td class="u-text-muted">{{ tx.fee | money }} {{ $store.state.COIN_NAME }}</td>
                         <!--expand button -->
                         <td class="table__expand-cell">
-                            <button class="table__expand-button u-semantic-button" :class="{'is-expanded': isTxExpanded[tx.hash]}" @click="toggleTx(tx.hash)">Show Tx Data</button>
+                            <button class="table__expand-button u-semantic-button" :class="{'is-expanded': isTxExpanded[tx.txn]}" @click="toggleTx(tx.txn)">Show Tx Data</button>
                         </td>
                     </tr>
-                    <tr class="table__row-expanded-data" :key="tx.hash" v-if="isTxExpanded[tx.hash]">
+                    <tr class="table__row-expanded-data" :key="tx.txn" v-if="isTxExpanded[tx.txn]">
                         <td colspan="7">
                             <div class="table__inner">
                                 <!-- type SEND -->

@@ -21,6 +21,7 @@
 
 /**
  * @typedef {Object} Transaction
+ * @property {number} txn
  * @property {string} hash
  * @property {string} status
  * @property {number} nonce

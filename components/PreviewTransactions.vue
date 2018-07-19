@@ -49,7 +49,7 @@
         </div>
         <transition name="v-transition-fade">
             <div class="preview__content" v-if="txListFormatted.length">
-                <div class="preview__transaction panel__section" v-for="tx in txListFormatted" :key="tx.hash">
+                <div class="preview__transaction panel__section" v-for="tx in txListFormatted" :key="tx.txn">
                     <div class="preview__transaction-row u-text-overflow">
                         TX# <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash | txHash }}</nuxt-link>
                     </div>
