@@ -36,8 +36,8 @@
  * @property {string} [data.coin]
  * @property {number} [data.amount]
  * -- type: TX_TYPES.CONVERT
- * @property {string} [data.from_coin_symbol]
- * @property {string} [data.to_coin_symbol]
+ * @property {string} [data.coin_to_sell]
+ * @property {string} [data.coin_to_buy]
  * @property {number} [data.value]
  * -- type: TX_TYPES.CREATE_COIN
  * @property {string} [data.name]

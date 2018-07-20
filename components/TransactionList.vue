@@ -1,5 +1,6 @@
 <script>
     import {getTimeDistance, roundMoney, txTypeFilter} from '~/assets/utils';
+    import {TX_TYPES} from '~/assets/variables';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
     import TableLink from '~/components/TableLink';
@@ -68,6 +69,22 @@
             },
             toggleTx(txn) {
                 this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
+            },
+            getConvertCoinSymbol(tx) {
+                if (tx.type === TX_TYPES.SELL_COIN) {
+                    return tx.data.coin_to_sell;
+                }
+                if (tx.type === TX_TYPES.BUY_COIN) {
+                    return tx.data.coin_to_buy;
+                }
+            },
+            getConvertCoinText(tx) {
+                if (tx.type === TX_TYPES.SELL_COIN) {
+                    return 'to Sell';
+                }
+                if (tx.type === TX_TYPES.BUY_COIN) {
+                    return 'to Buy';
+                }
             },
         }
     }
@@ -148,18 +165,17 @@
                                 </div>
 
                                 <!-- type CONVERT -->
-                                <div class="table__inner-item" v-if="tx.data.from_coin_symbol">
-                                    <strong>From Coin</strong> <br>
-                                    {{ tx.data.from_coin_symbol }}
+                                <div class="table__inner-item" v-if="tx.data.coin_to_sell">
+                                    <strong>Coin to Sell</strong> <br>
+                                    {{ tx.data.coin_to_sell }}
                                 </div>
-                                <div class="table__inner-item" v-if="tx.data.to_coin_symbol">
-                                    <strong>To Coin</strong> <br>
-                                    {{ tx.data.to_coin_symbol }}
-                                </div>
-                                <!--@TODO move coin name to value-->
                                 <div class="table__inner-item" v-if="isDefined(tx.data.value)">
-                                    <strong>Value</strong> <br>
-                                    {{ tx.data.value | money }}
+                                    <strong>Value {{ getConvertCoinText(tx) }}</strong> <br>
+                                    {{ tx.data.value | money }} {{ getConvertCoinSymbol(tx) }}
+                                </div>
+                                <div class="table__inner-item" v-if="tx.data.coin_to_buy">
+                                    <strong>Coin to Buy</strong> <br>
+                                    {{ tx.data.coin_to_buy }}
                                 </div>
 
                                 <!-- type CREATE_COIN -->

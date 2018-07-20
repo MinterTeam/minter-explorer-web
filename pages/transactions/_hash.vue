@@ -2,6 +2,7 @@
     import {getTransaction} from "~/api";
     import {getTimeDistance, getTimeUTC, stripZeros, txTypeFilter} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
+    import {TX_TYPES} from "~/assets/variables";
     import BackButton from '~/components/BackButton';
 
     export default {
@@ -52,6 +53,22 @@
             isDefined(value) {
                 return typeof value !== 'undefined';
             },
+            getConvertCoinSymbol(tx) {
+                if (tx.type === TX_TYPES.SELL_COIN) {
+                    return tx.data.coin_to_sell;
+                }
+                if (tx.type === TX_TYPES.BUY_COIN) {
+                    return tx.data.coin_to_buy;
+                }
+            },
+            getConvertCoinText(tx) {
+                if (tx.type === TX_TYPES.SELL_COIN) {
+                    return 'to Sell';
+                }
+                if (tx.type === TX_TYPES.BUY_COIN) {
+                    return 'to Buy';
+                }
+            },
         }
     }
 </script>
@@ -91,12 +108,12 @@
                 <dd v-if="isDefined(tx.data.amount)">{{ tx.data.amount | money }} {{ tx.data.coin }}</dd>
 
                 <!-- CONVERT -->
-                <dt v-if="tx.data.from_coin_symbol">From Coin</dt>
-                <dd v-if="tx.data.from_coin_symbol">{{ tx.data.from_coin_symbol }}</dd>
-                <dt v-if="tx.data.to_coin_symbol">To Coin</dt>
-                <dd v-if="tx.data.to_coin_symbol">{{ tx.data.to_coin_symbol }}</dd>
-                <dt v-if="isDefined(tx.data.value)">Value</dt>
-                <dd v-if="isDefined(tx.data.value)">{{ tx.data.value | money }} {{ tx.data.coin }}</dd>
+                <dt v-if="tx.data.coin_to_sell">Coin to Sell</dt>
+                <dd v-if="tx.data.coin_to_sell">{{ tx.data.coin_to_sell }}</dd>
+                <dt v-if="isDefined(tx.data.value)">Value {{ getConvertCoinText(tx) }}</dt>
+                <dd v-if="isDefined(tx.data.value)">{{ tx.data.value | money }} {{ getConvertCoinSymbol(tx) }}</dd>
+                <dt v-if="tx.data.coin_to_buy">Coin to Buy</dt>
+                <dd v-if="tx.data.coin_to_buy">{{ tx.data.coin_to_buy }}</dd>
 
                 <!-- CREATE_COIN-->
                 <dt v-if="tx.data.name">Name</dt>
