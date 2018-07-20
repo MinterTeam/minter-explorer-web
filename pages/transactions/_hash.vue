@@ -67,7 +67,7 @@
             </div>
             <dl>
                 <dt>Hash</dt>
-                <dd>{{ tx.hash }}</dd>
+                <dd class="u-select-all">{{ tx.hash }}</dd>
 
                 <dt>TimeStamp</dt>
                 <dd>{{ tx.timeDistance }} ago ({{ tx.timeUTC }})</dd>
@@ -104,15 +104,15 @@
                 <dt v-if="tx.data.symbol">Symbol</dt>
                 <dd v-if="tx.data.symbol">{{ tx.data.symbol }}</dd>
                 <dt v-if="tx.data.initial_amount">Initial Amount</dt>
-                <dd v-if="tx.data.initial_amount">{{ tx.data.initial_amount }} {{ tx.data.symbol }}</dd>
+                <dd v-if="tx.data.initial_amount">{{ tx.data.initial_amount | money }} {{ tx.data.symbol }}</dd>
                 <dt v-if="tx.data.initial_reserve">Initial Reserve</dt>
-                <dd v-if="tx.data.initial_reserve">{{ tx.data.initial_reserve }} {{ $store.state.COIN_NAME }}</dd>
+                <dd v-if="tx.data.initial_reserve">{{ tx.data.initial_reserve | money }} {{ $store.state.COIN_NAME }}</dd>
                 <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
                 <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }} %</dd>
 
                 <!-- DELEGATE, UNBOUND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="tx.data.pub_key">Public Key</dt>
-                <dd v-if="tx.data.pub_key">{{ tx.data.pub_key }}</dd>
+                <dd v-if="tx.data.pub_key" class="u-select-all">{{ tx.data.pub_key }}</dd>
                 <dt v-if="isDefined(tx.data.stake)">Stake</dt>
                 <dd v-if="isDefined(tx.data.stake)">{{ tx.data.stake | money }} {{ tx.data.coin }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
@@ -120,9 +120,9 @@
 
                 <!-- REDEEM_CHECK -->
                 <dt v-if="tx.data.raw_check">Check</dt>
-                <dd v-if="tx.data.raw_check">{{ tx.data.raw_check }}</dd>
+                <dd v-if="tx.data.raw_check" class="u-select-all">{{ tx.data.raw_check }}</dd>
                 <dt v-if="tx.data.proof">Proof</dt>
-                <dd v-if="tx.data.proof">{{ tx.data.proof }}</dd>
+                <dd v-if="tx.data.proof" class="u-select-all">{{ tx.data.proof }}</dd>
 
                 <dt>Fee</dt>
                 <dd>{{ tx.fee | money }} {{ $store.state.COIN_NAME }}</dd>
@@ -134,9 +134,12 @@
                 <dd :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? tx.payload : 'Blank' }}</dd>
             </dl>
         </section>
+        <!--
+        // no navigation data from explorer
         <div class="u-section navigation">
-            <nuxt-link class="button button--ghost-main" :class="{'u-visually-hidden': !navigation.prevTxHash}" :to="'/transactions/' + navigation.prevTxHash">Prev Tx</nuxt-link>
-            <nuxt-link class="button button--ghost-main" :class="{'u-visually-hidden': !navigation.prevTxHash}" :to="'/transactions/' + navigation.nextTxHash">Next Tx</nuxt-link>
+            <nuxt-link class="button button&#45;&#45;ghost-main" :class="{'u-visually-hidden': !navigation.prevTxHash}" :to="'/transactions/' + navigation.prevTxHash">Prev Tx</nuxt-link>
+            <nuxt-link class="button button&#45;&#45;ghost-main" :class="{'u-visually-hidden': !navigation.prevTxHash}" :to="'/transactions/' + navigation.nextTxHash">Next Tx</nuxt-link>
         </div>
+        -->
     </div>
 </template>

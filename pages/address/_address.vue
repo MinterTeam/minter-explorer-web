@@ -71,7 +71,7 @@
             </div>
             <dl>
                 <dt>Address</dt>
-                <dd>{{ $route.params.address }}</dd>
+                <dd class="u-select-all">{{ $route.params.address }}</dd>
 
                 <dt>Total Balance</dt>
                 <dd>{{ bipTotal | money | thousands }} {{ $store.state.COIN_NAME }}</dd>

@@ -88,7 +88,7 @@
                 <dd>{{ block.timeDistance }} ago ({{ block.timeUTC }})</dd>
 
                 <dt>Hash</dt>
-                <dd>{{ block.hash }}</dd>
+                <dd class="u-select-all">{{ block.hash }}</dd>
 
                 <dt>Validator</dt>
                 <dd>
