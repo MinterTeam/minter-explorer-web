@@ -40,7 +40,7 @@ module.exports = {
         ],
     },
     plugins: [
-        //'~/plugins/history',
+        { src: '~/plugins/seo-gtag.js', ssr: false },
     ],
     env: envConfig.error ? {} : envConfig.parsed,
     /*
