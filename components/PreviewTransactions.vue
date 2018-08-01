@@ -1,16 +1,11 @@
 <script>
-    import {getTimeDistance, roundMoney, shortFilter} from '~/assets/utils';
+    import {getTimeDistance, prettyRound, shortFilter} from '~/assets/utils';
 
     export default {
         filters: {
-            money: roundMoney,
+            prettyRound,
             addressHash: (value) => shortFilter(value, 7),
             txHash: (value) => shortFilter(value, 13),
-            // bipAmount: (value) => {
-            //     const result = roundMoney(value);
-            //     const isReducedPrecision = parseFloat(result) !== value;
-            //     return isReducedPrecision ? '~ ' + result : result;
-            // },
         },
         props: {
             /** @type Array<Transaction>*/
@@ -64,7 +59,7 @@
                     <div class="preview__transaction-row preview__transaction-meta">
                         <div>
                             <span v-if="hasAmount(tx)">
-                                Amount {{ tx.data.amount | money }} {{ tx.data.coin }}
+                                Amount {{ tx.data.amount | prettyRound }} {{ tx.data.coin }}
                             </span>
                         </div>
                         <div>{{ tx.timeDistance }} ago</div>

@@ -1,7 +1,7 @@
 <script>
     import {getAddress, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
-    import {roundMoney, thousandsFilter} from "~/assets/utils";
+    import {prettyExact, prettyRoundUsd} from "~/assets/utils";
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -13,8 +13,8 @@
             Pagination,
         },
         filters: {
-            money: roundMoney,
-            thousands: thousandsFilter,
+            prettyExact,
+            prettyRoundUsd,
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
@@ -74,10 +74,10 @@
                 <dd class="u-select-all">{{ $route.params.address }}</dd>
 
                 <dt>Total Balance</dt>
-                <dd>{{ bipTotal | money | thousands }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ bipTotal | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>USD Value</dt>
-                <dd>${{ usdTotal | money | thousands }}</dd>
+                <dd>${{ usdTotal | prettyRoundUsd }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ txCount }}</dd>

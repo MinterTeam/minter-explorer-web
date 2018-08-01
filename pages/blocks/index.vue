@@ -1,6 +1,6 @@
 <script>
     import {getBlockList} from "~/api";
-    import {getTimeDistance, roundMoney} from '~/assets/utils';
+    import {getTimeDistance, prettyRound} from '~/assets/utils';
     import getTitle from '~/assets/get-title';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -11,7 +11,7 @@
             BackButton,
         },
         filters: {
-            money: (value) => roundMoney(value),
+            prettyRound,
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
@@ -96,7 +96,7 @@
                         <td>{{ block.timeDistance}} ago</td>
                         <td>{{ block.validators.length && block.validators[0].address }}</td>
                         <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.txCount }}</nuxt-link></td>
-                        <td>{{ block.reward | money }} {{ $store.state.COIN_NAME }}</td>
+                        <td>{{ block.reward | prettyRound }} {{ $store.state.COIN_NAME }}</td>
                     </tr>
                     </tbody>
                 </table>

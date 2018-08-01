@@ -1,10 +1,10 @@
 <script>
-    import {thousandsFilter, roundMoney, round} from "~/assets/utils";
+    import {prettyRound, prettyRoundUsd, round} from "~/assets/utils";
 
     export default {
         filters: {
-            thousands: thousandsFilter,
-            money: (value) => roundMoney(value),
+            prettyRound,
+            prettyRoundUsd,
             marketCap: (value) => {
                 const ROUND_POWER = 3;
                 if (value > Math.pow(10, 9)) {
@@ -33,7 +33,7 @@
                 <div class="u-cell">
                     <h3 class="index-stats__name panel__title">Market cap of ${{ stats.marketCap | marketCap }}</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">${{ stats.bipPriceUsd | money }} @&nbsp;{{ stats.bipPriceBtc | money }}&nbsp;{{ $store.state.COIN_NAME }}/BTC</span>
+                        <span class="index-stats__value-text">${{ stats.bipPriceUsd | prettyRoundUsd }} @&nbsp;{{ stats.bipPriceBtc | prettyRound }}&nbsp;{{ $store.state.COIN_NAME }}/BTC</span>
                         <span class="index-stats__sub-value index-stats__sub-value--dynamic" :class="stats.bipPriceChange >= 0 ? 'index-stats__green' : 'index-stats__red'">
                             <img src="/img/icon-dynamic-up.svg" alt="Up" v-if="stats.bipPriceChange >= 0">
                             <img src="/img/icon-dynamic-down.svg" alt="Down" v-else>
@@ -44,15 +44,15 @@
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Last block</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">{{ stats.latestBlockHeight | thousands }}</span>
-                        <span class="index-stats__sub-value">({{ stats.averageBlockTime | money }}s)</span>
+                        <span class="index-stats__value-text">{{ stats.latestBlockHeight | prettyRound }}</span>
+                        <span class="index-stats__sub-value">({{ stats.averageBlockTime | prettyRound }}s)</span>
                     </div>
                 </div>
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Transactions</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">{{ stats.totalTransactions | thousands }}</span>
-                        <span class="index-stats__sub-value">({{ stats.transactionsPerSecond | money }} TPS)</span>
+                        <span class="index-stats__value-text">{{ stats.totalTransactions | prettyRound }}</span>
+                        <span class="index-stats__sub-value">({{ stats.transactionsPerSecond | prettyRound }} TPS)</span>
                     </div>
                 </div>
             </div>

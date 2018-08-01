@@ -1,6 +1,6 @@
 <script>
     import {getBlock, getTransactionList} from "~/api";
-    import {getTimeDistance, getTimeUTC, roundMoney} from "~/assets/utils";
+    import {getTimeDistance, getTimeUTC, prettyExact} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
@@ -13,7 +13,7 @@
             Pagination,
         },
         filters: {
-            money: (value) => roundMoney(value),
+            prettyExact,
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
@@ -82,7 +82,7 @@
             </div>
             <dl>
                 <dt>Height</dt>
-                <dd>{{ block.height }}</dd>
+                <dd>{{ block.height | prettyExact }}</dd>
 
                 <dt>TimeStamp</dt>
                 <dd>{{ block.timeDistance }} ago ({{ block.timeUTC }})</dd>
@@ -98,10 +98,10 @@
                 </dd>
 
                 <dt>Size</dt>
-                <dd>{{ block.size }} bytes</dd>
+                <dd>{{ block.size | prettyExact }} bytes</dd>
 
                 <dt>Reward</dt>
-                <dd>{{ block.reward | money}} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ block.reward | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ block.txCount || txPaginationInfo.total || 0 }}</dd>

@@ -18,13 +18,14 @@
   "dependencies": {
     "axios": "^0.18.0",
     "chart.js": "^2.7.2",
-    "date-fns": "^2.0.0-alpha.11",
+    "date-fns": "^2.0.0-alpha.16",
     "entity-decode": "^1.0.1",
-    "nuxt-edge": "^2.0.0-25523369.7c85202",
+    "nuxt-edge": "^2.0.0-25552332.ff32dbd",
+    "pretty-num": "0.0.1",
     "thousands": "^1.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "^9.0.1",
+    "autoprefixer": "^9.0.2",
     "babel-eslint": "^8.2.6",
     "beeper": "^1.1.1",
     "cross-env": "^5.2.0",

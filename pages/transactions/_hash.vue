@@ -1,6 +1,6 @@
 <script>
     import {getTransaction} from "~/api";
-    import {getTimeDistance, getTimeUTC, stripZeros, txTypeFilter} from "~/assets/utils";
+    import {getTimeDistance, getTimeUTC, prettyExact, txTypeFilter} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {TX_TYPES} from "~/assets/variables";
     import BackButton from '~/components/BackButton';
@@ -10,7 +10,7 @@
             BackButton,
         },
         filters: {
-            money: stripZeros,
+            prettyExact,
             txType: txTypeFilter,
         },
         asyncData({ params, error }) {
@@ -105,13 +105,13 @@
                 <dt v-if="tx.data.to">To</dt>
                 <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
                 <dt v-if="isDefined(tx.data.amount)">Amount</dt>
-                <dd v-if="isDefined(tx.data.amount)">{{ tx.data.amount | money }} {{ tx.data.coin }}</dd>
+                <dd v-if="isDefined(tx.data.amount)">{{ tx.data.amount | prettyExact }} {{ tx.data.coin }}</dd>
 
                 <!-- CONVERT -->
                 <dt v-if="tx.data.coin_to_sell">Coin to Sell</dt>
                 <dd v-if="tx.data.coin_to_sell">{{ tx.data.coin_to_sell }}</dd>
                 <dt v-if="isDefined(tx.data.value)">Value {{ getConvertCoinText(tx) }}</dt>
-                <dd v-if="isDefined(tx.data.value)">{{ tx.data.value | money }} {{ getConvertCoinSymbol(tx) }}</dd>
+                <dd v-if="isDefined(tx.data.value)">{{ tx.data.value | prettyExact }} {{ getConvertCoinSymbol(tx) }}</dd>
                 <dt v-if="tx.data.coin_to_buy">Coin to Buy</dt>
                 <dd v-if="tx.data.coin_to_buy">{{ tx.data.coin_to_buy }}</dd>
 
@@ -121,9 +121,9 @@
                 <dt v-if="tx.data.symbol">Symbol</dt>
                 <dd v-if="tx.data.symbol">{{ tx.data.symbol }}</dd>
                 <dt v-if="tx.data.initial_amount">Initial Amount</dt>
-                <dd v-if="tx.data.initial_amount">{{ tx.data.initial_amount | money }} {{ tx.data.symbol }}</dd>
+                <dd v-if="tx.data.initial_amount">{{ tx.data.initial_amount | prettyExact }} {{ tx.data.symbol }}</dd>
                 <dt v-if="tx.data.initial_reserve">Initial Reserve</dt>
-                <dd v-if="tx.data.initial_reserve">{{ tx.data.initial_reserve | money }} {{ $store.state.COIN_NAME }}</dd>
+                <dd v-if="tx.data.initial_reserve">{{ tx.data.initial_reserve | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
                 <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
                 <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }} %</dd>
 
@@ -131,7 +131,7 @@
                 <dt v-if="tx.data.pub_key">Public Key</dt>
                 <dd v-if="tx.data.pub_key" class="u-select-all">{{ tx.data.pub_key }}</dd>
                 <dt v-if="isDefined(tx.data.stake)">Stake</dt>
-                <dd v-if="isDefined(tx.data.stake)">{{ tx.data.stake | money }} {{ tx.data.coin }}</dd>
+                <dd v-if="isDefined(tx.data.stake)">{{ tx.data.stake | prettyExact }} {{ tx.data.coin }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }} %</dd>
 
@@ -142,7 +142,7 @@
                 <dd v-if="tx.data.proof" class="u-select-all">{{ tx.data.proof }}</dd>
 
                 <dt>Fee</dt>
-                <dd>{{ tx.fee | money }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ tx.fee | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>Nonce</dt>
                 <dd>{{ tx.nonce }}</dd>
