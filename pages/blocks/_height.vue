@@ -3,12 +3,14 @@
     import {getTimeDistance, getTimeUTC, prettyExact} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import TransactionList from '~/components/TransactionList';
+    import ValidatorList from '~/components/ValidatorList';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
     export default {
         components: {
             TransactionList,
+            ValidatorList,
             BackButton,
             Pagination,
         },
@@ -90,13 +92,6 @@
                 <dt>Hash</dt>
                 <dd class="u-select-all">{{ block.hash }}</dd>
 
-                <dt>Validator</dt>
-                <dd>
-                    <nuxt-link class="link--default" :to="'/address/' + block.validators[0].address" v-if="block.validators[0]">
-                        {{ block.validators[0].address }}
-                    </nuxt-link>
-                </dd>
-
                 <dt>Size</dt>
                 <dd>{{ block.size | prettyExact }} bytes</dd>
 
@@ -105,6 +100,9 @@
 
                 <dt>#Transactions</dt>
                 <dd>{{ block.txCount || txPaginationInfo.total || 0 }}</dd>
+
+                <dt>#Validators</dt>
+                <dd>{{ block.validators.length }}</dd>
             </dl>
         </section>
         <div class="u-section navigation">
@@ -117,5 +115,6 @@
                          v-if="txList.length"
         />
         <Pagination :pagination-info="txPaginationInfo"/>
+        <ValidatorList id="validators" :validator-list="block.validators" v-if="block.validators && block.validators.length"/>
     </div>
 </template>
