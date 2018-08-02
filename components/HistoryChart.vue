@@ -45,7 +45,7 @@
                                         autoSkipPadding: 4,
                                         callback: (value, index, values) => {
                                             let date = new Date(value);
-                                            return date.getDate() + '/' + (date.getMonth() + 1);
+                                            return date.getUTCDate() + '/' + (date.getUTCMonth() + 1);
                                         }
                                     },
                                 }],
@@ -84,7 +84,7 @@
 <template>
     <transition name="v-transition-fade">
         <div class="history panel panel__section" v-show="hasData">
-            <div class="history__title panel__title">14 day {{ $store.state.COIN_NAME }} Transaction History</div>
+            <div class="history__title panel__title">14 day <!--{{ $store.state.COIN_NAME }}--> Transaction History</div>
             <div class="history__chart-wrap">
                 <canvas class="history__chart" data-history-chart></canvas>
             </div>

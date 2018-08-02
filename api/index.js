@@ -99,7 +99,26 @@ export function getTxChartData() {
                 //chartData = [];
             }
 
-            let lastData = chartData.length > 14 ? chartData.slice(0, 14 - 1) : chartData;
+            const COUNT_DISPLAY_DAYS = 15;
+
+            let lastData = chartData.length > COUNT_DISPLAY_DAYS ? chartData.slice(0, COUNT_DISPLAY_DAYS - 1) : chartData;
+
+            // prepend empty days if they are not present in the API response
+            let daysToAdd = new Array(COUNT_DISPLAY_DAYS - lastData.length);
+            if (daysToAdd.length) {
+                const DAY_MS = 24 * 60 * 60 * 1000;
+                const dataDate = lastData.length ? new Date(lastData[0].date) : new Date();
+                const firstDate = dataDate - daysToAdd.length * DAY_MS;
+                for (let i = 0; i < daysToAdd.length; i++) {
+                    const iterationDate = new Date(firstDate + i * DAY_MS);
+                    daysToAdd[i] = {
+                        date: iterationDate.getUTCFullYear() + '-' + (iterationDate.getUTCMonth() + 1) + '-' + iterationDate.getUTCDate(),
+                        txCount: 0,
+                    }
+                }
+                lastData = daysToAdd.concat(lastData);
+            }
+
 
             // format data for line chart.js
             return lastData.reduce((accum, item) => {
