@@ -40,7 +40,9 @@ module.exports = {
         ],
     },
     plugins: [
+        { src: '~/plugins/click-blur.js', ssr: false },
         { src: '~/plugins/seo-gtag.js', ssr: false },
+        { src: '~/plugins/seo-ym.js', ssr: false },
     ],
     env: envConfig.error ? {} : envConfig.parsed,
     /*
