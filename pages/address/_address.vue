@@ -36,12 +36,21 @@
         },
         data() {
             return {
-                bipTotal: 0,
-                usdTotal: 0,
                 txCount: 0,
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: true,
+            }
+        },
+        computed: {
+            baseCoin() {
+                // coins goes from asyncData
+                return this.coins && this.coins.length ? this.coins.reduce((result, coin) => {
+                    if (coin.coin.toUpperCase() === this.$store.state.COIN_NAME) {
+                        result = coin;
+                    }
+                    return result;
+                }, null) : null
             }
         },
         mounted() {
@@ -73,11 +82,11 @@
                 <dt>Address</dt>
                 <dd class="u-select-all">{{ $route.params.address }}</dd>
 
-                <dt>Total Balance</dt>
-                <dd>{{ bipTotal | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
+                <dt>Balance</dt>
+                <dd>{{ baseCoin ? baseCoin.amount : 0 | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>USD Value</dt>
-                <dd>${{ usdTotal | prettyRoundUsd }}</dd>
+                <dd>${{ baseCoin ? baseCoin.usdAmount : 0 | prettyRoundUsd }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ txCount }}</dd>

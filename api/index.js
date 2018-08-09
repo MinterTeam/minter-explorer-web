@@ -228,14 +228,15 @@ export function getAddress(address) {
     return axios.get('address/' + address)
         .then((response) => {
             const addressData = response.data.data;
-            addressData.bipTotal = 0;
-            addressData.usdTotal = 0;
-            if (addressData.coins) {
-                addressData.coins.forEach((coin) => {
-                    addressData.bipTotal += coin.baseCoinAmount;
-                    addressData.usdTotal += coin.usdAmount;
-                })
-            }
+            // @TODO add to explorer api or make correct string sum
+            // addressData.bipTotal = 0;
+            // addressData.usdTotal = 0;
+            // if (addressData.coins) {
+            //     addressData.coins.forEach((coin) => {
+            //         addressData.bipTotal += coin.baseCoinAmount;
+            //         addressData.usdTotal += coin.usdAmount;
+            //     })
+            // }
             return addressData;
         });
 }
