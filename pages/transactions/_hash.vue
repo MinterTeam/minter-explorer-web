@@ -125,7 +125,7 @@
                 <dt v-if="tx.data.initial_reserve">Initial Reserve</dt>
                 <dd v-if="tx.data.initial_reserve">{{ tx.data.initial_reserve | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
                 <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
-                <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }} %</dd>
+                <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }}&thinsp;%</dd>
 
                 <!-- DELEGATE, UNBOUND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="tx.data.pub_key">Public Key</dt>
@@ -133,7 +133,7 @@
                 <dt v-if="isDefined(tx.data.stake)">Stake</dt>
                 <dd v-if="isDefined(tx.data.stake)">{{ tx.data.stake | prettyExact }} {{ tx.data.coin }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
-                <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }} %</dd>
+                <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
 
                 <!-- REDEEM_CHECK -->
                 <dt v-if="tx.data.raw_check">Check</dt>

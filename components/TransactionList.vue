@@ -192,7 +192,7 @@
                                 </div>
                                 <div class="table__inner-item" v-if="tx.data.constant_reserve_ratio">
                                     <strong>CRR</strong> <br>
-                                    {{ tx.data.constant_reserve_ratio }}
+                                    {{ tx.data.constant_reserve_ratio }}&thinsp;%
                                 </div>
 
                                 <!-- type DECLARE_CANDIDACY, DELEGATE, UNBOUND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
@@ -206,7 +206,7 @@
                                 </div>
                                 <div class="table__inner-item" v-if="isDefined(tx.data.commission)">
                                     <strong>Commission</strong> <br>
-                                    {{ tx.data.commission | prettyRound }} {{ tx.data.coin }}
+                                    {{ tx.data.commission | prettyRound }}&thinsp;%
                                 </div>
 
                                 <!-- type REDEEM_CHECK -->
