@@ -206,7 +206,7 @@
                                 </div>
                                 <div class="table__inner-item" v-if="isDefined(tx.data.commission)">
                                     <strong>Commission</strong> <br>
-                                    {{ tx.data.commission | prettyRound }}&thinsp;%
+                                    {{ tx.data.commission }}&thinsp;%
                                 </div>
 
                                 <!-- type REDEEM_CHECK -->
