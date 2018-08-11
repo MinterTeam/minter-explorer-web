@@ -1,11 +1,13 @@
 <script>
-    import {getTimeDistance, prettyRound, shortFilter} from '~/assets/utils';
+    import {TX_TYPES} from '~/assets/variables';
+    import {getTimeDistance, prettyRound, shortFilter, txTypeFilter} from '~/assets/utils';
 
     export default {
         filters: {
             prettyRound,
             addressHash: (value) => shortFilter(value, 7),
             txHash: (value) => shortFilter(value, 13),
+            txType: (value) => txTypeFilter(value).replace(/ Coin$/, ''),
         },
         props: {
             /** @type Array<Transaction>*/
@@ -26,8 +28,19 @@
         },
         methods: {
             hasAmount(tx) {
-                return typeof tx.data.amount !== 'undefined';
-            }
+                return typeof tx.data.amount !== 'undefined'
+                    || typeof tx.data.value !== 'undefined'
+                    || typeof tx.data.stake !== 'undefined'
+                    || typeof tx.data.initial_amount !== 'undefined';
+            },
+            getConvertCoinSymbol(tx) {
+                if (tx.type === TX_TYPES.SELL_COIN) {
+                    return tx.data.coin_to_sell;
+                }
+                if (tx.type === TX_TYPES.BUY_COIN) {
+                    return tx.data.coin_to_buy;
+                }
+            },
         }
 
     }
@@ -58,8 +71,10 @@
                     </div>
                     <div class="preview__transaction-row preview__transaction-meta">
                         <div>
+                            {{ tx.type | txType }}
                             <span v-if="hasAmount(tx)">
-                                Amount {{ tx.data.amount | prettyRound }} {{ tx.data.coin }}
+                                {{ tx.data.amount || tx.data.value || tx.data.stake || tx.data.initial_amount || 0 | prettyRound }}
+                                {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) }}
                             </span>
                         </div>
                         <div>{{ tx.timeDistance }} ago</div>

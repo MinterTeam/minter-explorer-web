@@ -195,7 +195,7 @@
                                     {{ tx.data.constant_reserve_ratio }}&thinsp;%
                                 </div>
 
-                                <!-- type DECLARE_CANDIDACY, DELEGATE, UNBOUND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
+                                <!-- type DECLARE_CANDIDACY, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                                 <div class="table__inner-item" v-if="tx.data.pub_key">
                                     <strong>Public Key</strong> <br>
                                     {{ tx.data.pub_key }}

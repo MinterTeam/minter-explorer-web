@@ -11,7 +11,7 @@ export const TX_TYPES = {
     CREATE_COIN: 'createCoin',
     DECLARE_CANDIDACY: 'declareCandidacy',
     DELEGATE: 'delegate',
-    UNBOUND: 'unbond',
+    UNBOND: 'unbond',
     REDEEM_CHECK: 'redeemCheckData',
     SET_CANDIDATE_ONLINE: 'setCandidateOnData',
     SET_CANDIDATE_OFFLINE: 'setCandidateOffData',

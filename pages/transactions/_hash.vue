@@ -127,7 +127,7 @@
                 <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
                 <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }}&thinsp;%</dd>
 
-                <!-- DELEGATE, UNBOUND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
+                <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="tx.data.pub_key">Public Key</dt>
                 <dd v-if="tx.data.pub_key" class="u-select-all">{{ tx.data.pub_key }}</dd>
                 <dt v-if="isDefined(tx.data.stake)">Stake</dt>

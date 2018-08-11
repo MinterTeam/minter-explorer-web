@@ -55,7 +55,7 @@
  * @property {string} [data.pub_key]
  * @property {string} [data.coin]
  * @property {number} [data.stake]
- * -- type: TX_TYPES.UNBOUND
+ * -- type: TX_TYPES.UNBOND
  * @property {string} [data.pub_key]
  * @property {string} [data.coin]
  * @property {number} [data.value]
