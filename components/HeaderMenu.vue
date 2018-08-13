@@ -1,16 +1,16 @@
 <script>
-    import {MAINNET_URL, TESTNET_URL, CURRENT_URL} from "~/assets/variables";
+    import {MAINNET_WEB_URL, TESTNET_WEB_URL, NETWORK} from "~/assets/variables";
 
     export default {
         computed: {
             isMain() {
-                return CURRENT_URL === MAINNET_URL;
+                return NETWORK === 'mainnet';
             },
             mainnetUrl() {
-                return this.isMain ? false : MAINNET_URL;
+                return this.isMain ? false : MAINNET_WEB_URL;
             },
             testnetUrl() {
-                return !this.isMain ? false : TESTNET_URL;
+                return !this.isMain ? false : TESTNET_WEB_URL;
             }
         }
     }
