@@ -7,6 +7,7 @@ export const EXPLORER_URL = process.env.APP_EXPLORER_URL || 'https://explorer.mi
 export const TX_TYPES = {
     SEND: 'send',
     SELL_COIN: 'sellCoin',
+    SELL_ALL_COIN: 'sellAllCoin',
     BUY_COIN: 'buyCoin',
     CREATE_COIN: 'createCoin',
     DECLARE_CANDIDACY: 'declareCandidacy',

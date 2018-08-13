@@ -7,7 +7,7 @@
             prettyRound,
             addressHash: (value) => shortFilter(value, 7),
             txHash: (value) => shortFilter(value, 13),
-            txType: (value) => txTypeFilter(value).replace(/ Coin$/, ''),
+            txType: (value) => txTypeFilter(value).replace(/ coin$/, ''),
         },
         props: {
             /** @type Array<Transaction>*/
@@ -34,7 +34,7 @@
                     || typeof tx.data.initial_amount !== 'undefined';
             },
             getConvertCoinSymbol(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN) {
+                if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
                     return tx.data.coin_to_sell;
                 }
                 if (tx.type === TX_TYPES.BUY_COIN) {

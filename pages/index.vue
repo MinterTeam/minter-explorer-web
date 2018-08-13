@@ -87,5 +87,5 @@
             <PreviewTransactions :tx-list="txList"/>
         </section>
     </div>
-    <h1 class="u-text-center" style="margin-top: 50px" v-else-if="!isDataLoading">{{ network }} is not available</h1>
+    <h1 class="u-text-center" style="margin-top: 50px" v-else-if="!isDataLoading">{{ network === 'Mainnet' ? 'Mainnet' : 'Explorer' }} is not available</h1>
 </template>

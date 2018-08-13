@@ -29,6 +29,7 @@ export function shortFilter(value, endLength = 6, minLengthToShort) {
 export function txTypeFilter(value) {
     value = value.replace(/Data$/, ''); // remove "Data" from the end
     value = value.replace( /([A-Z])/g, " $1" ); // add space before capital letters
+    value = value.toLowerCase(); // convert capitalized words to lower case
     value = value.charAt(0).toUpperCase() + value.slice(1); // capitalize the first letter
     return value;
 }

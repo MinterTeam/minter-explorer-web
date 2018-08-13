@@ -52,6 +52,7 @@
                                 yAxes: [{
                                     ticks: {
                                         // callback: (value, index, values) => value + 'k',
+                                        min: 0,
                                     },
                                 }]
                             },
