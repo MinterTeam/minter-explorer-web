@@ -1,4 +1,5 @@
 export const BASE_TITLE = 'Minter Explorer';
+export const BASE_DESCRIPTION = '';
 export const NETWORK = process.env.APP_ENV === 'production' ? 'mainnet' : 'testnet';
 export const COIN_NAME = process.env.APP_ENV === 'production' ? 'BIP' : 'MNT';
 export const MAINNET_WEB_URL = 'https://explorer.minter.network';

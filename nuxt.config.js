@@ -1,10 +1,18 @@
+const path = require('path');
+const fs = require('fs');
 const nodeExternals = require('webpack-node-externals');
 const dotenv = require('dotenv');
 
-const envConfig = dotenv.config();
+const dotEnvConfig = dotenv.config();
+const dotEnv = dotEnvConfig.error ? {} : dotEnvConfig.parsed;
+const dotEnvExample = dotenv.parse(fs.readFileSync(path.resolve(process.cwd(), '.env.example')));
+const processEnv = {};
+// copy process.env values by .env.example keys
+Object.keys(dotEnvExample).forEach((key) => {
+    processEnv[key] = process.env[key];
+});
 
-import {BASE_TITLE} from "./assets/variables";
-const BASE_DESCRIPTION = '';
+import {BASE_TITLE, BASE_DESCRIPTION} from "./assets/variables";
 
 module.exports = {
     /*
@@ -44,7 +52,7 @@ module.exports = {
         { src: '~/plugins/seo-gtag.js', ssr: false },
         { src: '~/plugins/seo-ym.js', ssr: false },
     ],
-    env: envConfig.error ? {} : envConfig.parsed,
+    env: Object.assign({}, processEnv, dotEnv),
     /*
     ** Build configuration
     */
