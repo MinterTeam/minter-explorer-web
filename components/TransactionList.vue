@@ -26,6 +26,9 @@
             currentAddress: {
                 type: String,
             },
+            currentValidator: {
+                type: String,
+            },
             currentBlock: {
                 type: Number,
             },
@@ -55,6 +58,9 @@
         methods: {
             isCurrentAddress(address) {
                 return address === this.currentAddress;
+            },
+            isCurrentValidator(publicKey) {
+                return publicKey === this.currentValidator;
             },
             isCurrentBlock(height) {
                 return height === this.currentBlock;
@@ -198,7 +204,11 @@
                                 <!-- type DECLARE_CANDIDACY, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                                 <div class="table__inner-item" v-if="tx.data.pub_key">
                                     <strong>Public Key</strong> <br>
-                                    {{ tx.data.pub_key }}
+                                    <TableLink :link-text="tx.data.pub_key"
+                                               :link-path="'/validator/' + tx.data.pub_key"
+                                               :is-not-link="isCurrentValidator(tx.data.pub_key)"
+                                               :should-not-shorten="true"
+                                    />
                                 </div>
                                 <div class="table__inner-item" v-if="isDefined(tx.data.stake)">
                                     <strong>Stake</strong> <br>

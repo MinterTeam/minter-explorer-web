@@ -14,6 +14,8 @@
 
                 if (query.slice(0, 2) === 'Mx') {
                     this.$router.push('/address/' + query);
+                } else if (query.slice(0, 2) === 'Mp') {
+                    this.$router.push('/validator/' + query);
                 } else if (/^\d+$/.test(query)) {
                     this.$router.push('/blocks/' + query);
                 } else {
@@ -35,7 +37,7 @@
     <form class="header__search" @submit.prevent="submit">
         <img class="header__search-icon" src="/img/icon-search.svg" alt="" role="presentation">
         <div class="header__search-input-wrap">
-            <input class="header__search-input" type="text" placeholder="Search by Address / Txhash / Block"
+            <input class="header__search-input" type="text" placeholder="Address / Txhash / Block / Public key"
                    v-model="query"
                    @focus="inputFocus"
                    @blur="inputBlur"
