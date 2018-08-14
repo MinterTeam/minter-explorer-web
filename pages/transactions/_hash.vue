@@ -129,7 +129,7 @@
 
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="tx.data.pub_key">Public Key</dt>
-                <dd v-if="tx.data.pub_key" class="u-select-all">{{ tx.data.pub_key }}</dd>
+                <dd v-if="tx.data.pub_key"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pub_key">{{ tx.data.pub_key }}</nuxt-link></dd>
                 <dt v-if="isDefined(tx.data.stake)">Stake</dt>
                 <dd v-if="isDefined(tx.data.stake)">{{ tx.data.stake | prettyExact }} {{ tx.data.coin }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
