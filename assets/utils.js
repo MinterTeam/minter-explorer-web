@@ -55,3 +55,12 @@ export function round(value, power) {
     let tenPower = Math.pow(10, power);
     return Math.round(value * tenPower) / tenPower;
 }
+
+export function padZero(value) {
+    value = value.toString();
+    if (value.length === 1) {
+        value = '0' + value;
+    }
+
+    return value;
+}

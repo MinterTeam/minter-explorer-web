@@ -1,73 +1,5 @@
-/**
- * @typedef {Object} Block
- * @property {number} height
- * @property {string} timestamp
- * @property {number} txCount
- * @property {number} size
- * @property {string} hash
- * @property {number} reward
- * @property {number} blockTime
- * @property {string} timestamp
- * @property {Array<Validator>} validators
- */
-
-/**
- * @typedef {Object} Validator
- * @property {number} id
- * @property {string} name
- * @property {string} address
- * @property {string} publicKey
- */
-
-/**
- * @typedef {Object} Transaction
- * @property {number} txn
- * @property {string} hash
- * @property {string} status
- * @property {number} nonce
- * @property {number} block
- * @property {string} timestamp
- * @property {number} fee
- * @property {number} type
- * @property {Object} data
- * @property {string} data.from
- * -- type: TX_TYPES.SEND
- * @property {string} [data.to]
- * @property {string} [data.coin]
- * @property {number} [data.amount]
- * -- type: TX_TYPES.CONVERT
- * @property {string} [data.coin_to_sell]
- * @property {string} [data.coin_to_buy]
- * @property {number} [data.value]
- * -- type: TX_TYPES.CREATE_COIN
- * @property {string} [data.name]
- * @property {string} [data.symbol]
- * @property {number} [data.initial_amount]
- * @property {number} [data.initial_reserve]
- * @property {number} [data.constant_reserve_ratio]
- * -- type: TX_TYPES.DECLARE_CANDIDACY
- * @property {string} [data.address]
- * @property {string} [data.pub_key]
- * @property {number} [data.commission]
- * @property {string} [data.coin]
- * @property {number} [data.stake]
- * -- type: TX_TYPES.DELEGATE
- * @property {string} [data.pub_key]
- * @property {string} [data.coin]
- * @property {number} [data.stake]
- * -- type: TX_TYPES.UNBOND
- * @property {string} [data.pub_key]
- * @property {string} [data.coin]
- * @property {number} [data.value]
- * -- type: TX_TYPES.REDEEM_CHECK
- * @property {string} [data.raw_check]
- * @property {string} [data.proof]
- * - type: TX_TYPES.SET_CANDIDATE_ONLINE, TX_TYPES.SET_CANDIDATE_OFFLINE
- * @property {string} [data.pub_key]
- */
-
 import axios from '~/api/axios';
-
+import {padZero} from '~/assets/utils';
 
 
 /**
@@ -112,7 +44,7 @@ export function getTxChartData() {
                 for (let i = 0; i < daysToAdd.length; i++) {
                     const iterationDate = new Date(firstDate + i * DAY_MS);
                     daysToAdd[i] = {
-                        date: iterationDate.getUTCFullYear() + '-' + (iterationDate.getUTCMonth() + 1) + '-' + iterationDate.getUTCDate(),
+                        date: iterationDate.getUTCFullYear() + '-' + padZero(iterationDate.getUTCMonth() + 1) + '-' + padZero(iterationDate.getUTCDate()),
                         txCount: 0,
                     }
                 }
@@ -240,3 +172,72 @@ export function getAddress(address) {
             return addressData;
         });
 }
+
+
+/**
+ * @typedef {Object} Block
+ * @property {number} height
+ * @property {string} timestamp
+ * @property {number} txCount
+ * @property {number} size
+ * @property {string} hash
+ * @property {number} reward
+ * @property {number} blockTime
+ * @property {string} timestamp
+ * @property {Array<Validator>} validators
+ */
+
+/**
+ * @typedef {Object} Validator
+ * @property {number} id
+ * @property {string} name
+ * @property {string} address
+ * @property {string} publicKey
+ */
+
+/**
+ * @typedef {Object} Transaction
+ * @property {number} txn
+ * @property {string} hash
+ * @property {string} status
+ * @property {number} nonce
+ * @property {number} block
+ * @property {string} timestamp
+ * @property {number} fee
+ * @property {number} type
+ * @property {Object} data
+ * @property {string} data.from
+ * -- type: TX_TYPES.SEND
+ * @property {string} [data.to]
+ * @property {string} [data.coin]
+ * @property {number} [data.amount]
+ * -- type: TX_TYPES.CONVERT
+ * @property {string} [data.coin_to_sell]
+ * @property {string} [data.coin_to_buy]
+ * @property {number} [data.value]
+ * -- type: TX_TYPES.CREATE_COIN
+ * @property {string} [data.name]
+ * @property {string} [data.symbol]
+ * @property {number} [data.initial_amount]
+ * @property {number} [data.initial_reserve]
+ * @property {number} [data.constant_reserve_ratio]
+ * -- type: TX_TYPES.DECLARE_CANDIDACY
+ * @property {string} [data.address]
+ * @property {string} [data.pub_key]
+ * @property {number} [data.commission]
+ * @property {string} [data.coin]
+ * @property {number} [data.stake]
+ * -- type: TX_TYPES.DELEGATE
+ * @property {string} [data.pub_key]
+ * @property {string} [data.coin]
+ * @property {number} [data.stake]
+ * -- type: TX_TYPES.UNBOND
+ * @property {string} [data.pub_key]
+ * @property {string} [data.coin]
+ * @property {number} [data.value]
+ * -- type: TX_TYPES.REDEEM_CHECK
+ * @property {string} [data.raw_check]
+ * @property {string} [data.proof]
+ * - type: TX_TYPES.SET_CANDIDATE_ONLINE, TX_TYPES.SET_CANDIDATE_OFFLINE
+ * @property {string} [data.pub_key]
+ */
