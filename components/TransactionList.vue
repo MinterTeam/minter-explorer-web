@@ -1,5 +1,5 @@
 <script>
-    import {getTimeDistance, prettyRound, txTypeFilter} from '~/assets/utils';
+    import {getTimeDistance, pretty, txTypeFilter} from '~/assets/utils';
     import {TX_TYPES} from '~/assets/variables';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -13,7 +13,7 @@
             TableLink,
         },
         filters: {
-            prettyRound,
+            pretty,
             // transform "camelCaseText" to "Sentence Case Text"
             txType: txTypeFilter,
         },
@@ -142,7 +142,7 @@
                         <!-- type -->
                         <td>{{ tx.type | txType }}</td>
                         <!-- fee -->
-                        <td class="u-text-muted">{{ tx.fee | prettyRound }} {{ $store.state.COIN_NAME }}</td>
+                        <td class="u-text-muted">{{ tx.fee | pretty }} {{ $store.state.COIN_NAME }}</td>
                         <!--expand button -->
                         <td class="table__expand-cell">
                             <button class="table__expand-button u-semantic-button" :class="{'is-expanded': isTxExpanded[tx.txn]}" @click="toggleTx(tx.txn)">Show Tx Data</button>
@@ -162,7 +162,7 @@
                                 </div>
                                 <div class="table__inner-item" v-if="isDefined(tx.data.amount)">
                                     <strong>Value</strong> <br>
-                                    {{ tx.data.amount | prettyRound }} {{ tx.data.coin }}
+                                    {{ tx.data.amount | pretty }} {{ tx.data.coin }}
                                 </div>
 
                                 <!-- type CONVERT -->
@@ -172,7 +172,7 @@
                                 </div>
                                 <div class="table__inner-item" v-if="isDefined(tx.data.value)">
                                     <strong>Value {{ getConvertCoinText(tx) }}</strong> <br>
-                                    {{ tx.data.value | prettyRound }} {{ getConvertCoinSymbol(tx) }}
+                                    {{ tx.data.value | pretty }} {{ getConvertCoinSymbol(tx) }}
                                 </div>
                                 <div class="table__inner-item" v-if="tx.data.coin_to_buy">
                                     <strong>Coin to Buy</strong> <br>
@@ -190,11 +190,11 @@
                                 </div>
                                 <div class="table__inner-item" v-if="tx.data.initial_amount">
                                     <strong>Initial Amount</strong> <br>
-                                    {{ tx.data.initial_amount | prettyRound }}
+                                    {{ tx.data.initial_amount | pretty }}
                                 </div>
                                 <div class="table__inner-item" v-if="tx.data.initial_reserve">
                                     <strong>Initial Reserve</strong> <br>
-                                    {{ tx.data.initial_reserve | prettyRound }}
+                                    {{ tx.data.initial_reserve | pretty }}
                                 </div>
                                 <div class="table__inner-item" v-if="tx.data.constant_reserve_ratio">
                                     <strong>CRR</strong> <br>
@@ -212,7 +212,7 @@
                                 </div>
                                 <div class="table__inner-item" v-if="isDefined(tx.data.stake)">
                                     <strong>Stake</strong> <br>
-                                    {{ tx.data.stake | prettyRound }} {{ tx.data.coin }}
+                                    {{ tx.data.stake | pretty }} {{ tx.data.coin }}
                                 </div>
                                 <div class="table__inner-item" v-if="isDefined(tx.data.commission)">
                                     <strong>Commission</strong> <br>

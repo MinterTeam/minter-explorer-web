@@ -45,7 +45,6 @@
                                         autoSkipPadding: 4,
                                         callback: (value, index, values) => {
                                             let date = new Date(value);
-                                            console.log(value, date)
                                             return date.getUTCDate() + '/' + (date.getUTCMonth() + 1);
                                         }
                                     },

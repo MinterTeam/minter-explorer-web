@@ -1,7 +1,7 @@
 <script>
     import {getAddress, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
-    import {prettyExact, prettyRoundUsd} from "~/assets/utils";
+    import {prettyExact, prettyUsd} from "~/assets/utils";
     import TransactionList from '~/components/TransactionList';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -14,7 +14,7 @@
         },
         filters: {
             prettyExact,
-            prettyRoundUsd,
+            prettyUsd,
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
@@ -86,7 +86,7 @@
                 <dd>{{ baseCoin ? baseCoin.amount : 0 | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>USD Value</dt>
-                <dd>${{ baseCoin ? baseCoin.usdAmount : 0 | prettyRoundUsd }}</dd>
+                <dd>${{ baseCoin ? baseCoin.usdAmount : 0 | prettyUsd }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ txCount }}</dd>

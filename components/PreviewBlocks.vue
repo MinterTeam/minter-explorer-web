@@ -1,9 +1,9 @@
 <script>
-    import {getTimeDistance, prettyRound} from '~/assets/utils';
+    import {getTimeDistance, pretty} from '~/assets/utils';
 
     export default {
         filters: {
-            prettyRound,
+            pretty,
         },
         props: {
             /** @type Array<Block> */
@@ -51,7 +51,7 @@
                             <div class="preview__block-reward">
                                 <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime }} secs
                                 <br>
-                                Block Reward {{ block.reward | prettyRound }} {{ $store.state.COIN_NAME }}
+                                Block Reward {{ block.reward | pretty }} {{ $store.state.COIN_NAME }}
                             </div>
                         </div>
                     </div>

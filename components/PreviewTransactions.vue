@@ -1,10 +1,10 @@
 <script>
     import {TX_TYPES} from '~/assets/variables';
-    import {getTimeDistance, prettyRound, shortFilter, txTypeFilter} from '~/assets/utils';
+    import {getTimeDistance, pretty, shortFilter, txTypeFilter} from '~/assets/utils';
 
     export default {
         filters: {
-            prettyRound,
+            pretty,
             addressHash: (value) => shortFilter(value, 7),
             txHash: (value) => shortFilter(value, 13),
             txType: (value) => txTypeFilter(value).replace(/ coin$/, ''),
@@ -73,7 +73,7 @@
                         <div>
                             {{ tx.type | txType }}
                             <span v-if="hasAmount(tx)">
-                                {{ tx.data.amount || tx.data.value || tx.data.stake || tx.data.initial_amount || 0 | prettyRound }}
+                                {{ tx.data.amount || tx.data.value || tx.data.stake || tx.data.initial_amount || 0 | pretty }}
                                 {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) }}
                             </span>
                         </div>

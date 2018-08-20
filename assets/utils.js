@@ -34,12 +34,16 @@ export function txTypeFilter(value) {
     return value;
 }
 
-export function prettyRound(value) {
+export function pretty(value) {
     return decode(prettyNum(value, {precision: 3, thousandsSeparator: '&thinsp;'}));
 }
 
-export function prettyRoundUsd(value) {
+export function prettyUsd(value) {
     return decode(prettyNum(value, {precision: 2, thousandsSeparator: '&thinsp;'}));
+}
+
+export function prettyRound(value) {
+    return decode(prettyNum(value, {precision: 0, thousandsSeparator: '&thinsp;'}));
 }
 
 export function prettyExact(value) {
