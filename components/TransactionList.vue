@@ -1,5 +1,5 @@
 <script>
-    import {getTimeDistance, pretty, txTypeFilter} from '~/assets/utils';
+    import {getTimeDistance, pretty, txTypeFilter, shortFilter} from '~/assets/utils';
     import {TX_TYPES} from '~/assets/variables';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -16,6 +16,7 @@
             pretty,
             // transform "camelCaseText" to "Sentence Case Text"
             txType: txTypeFilter,
+            short: shortFilter,
         },
         props: {
             /** @type Array<Transaction>*/
@@ -222,11 +223,12 @@
                                 <!-- type REDEEM_CHECK -->
                                 <div class="table__inner-item" v-if="tx.data.raw_check">
                                     <strong>Check</strong> <br>
-                                    {{ tx.data.raw_check }}
+                                    <!--<TableLink :link-text="tx.data.raw_check" :is-not-link="true"/>-->
+                                    {{ tx.data.raw_check | short}}
                                 </div>
                                 <div class="table__inner-item" v-if="tx.data.proof">
                                     <strong>Proof</strong> <br>
-                                    {{ tx.data.proof }}
+                                    {{ tx.data.proof | short}}
                                 </div>
                             </div>
                         </td>
