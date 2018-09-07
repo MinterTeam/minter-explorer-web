@@ -51,6 +51,8 @@ module.exports = {
         { src: '~/plugins/click-blur.js', ssr: false },
         { src: '~/plugins/seo-gtag.js', ssr: false },
         { src: '~/plugins/seo-ym.js', ssr: false },
+        { src: '~/plugins/seo-fb.js', ssr: false },
+        { src: '~/plugins/seo-vk.js', ssr: false },
     ],
     env: Object.assign({}, processEnv, dotEnv),
     /*
