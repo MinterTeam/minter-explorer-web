@@ -41,6 +41,14 @@
                     return tx.data.coin_to_buy;
                 }
             },
+            getConvertValue(tx) {
+                if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
+                    return tx.data.value_to_sell;
+                }
+                if (tx.type === TX_TYPES.BUY_COIN) {
+                    return tx.data.value_to_buy;
+                }
+            },
         }
 
     }
@@ -73,7 +81,7 @@
                         <div>
                             {{ tx.type | txType }}
                             <span v-if="hasAmount(tx)">
-                                {{ tx.data.amount || tx.data.value || tx.data.stake || tx.data.initial_amount || 0 | pretty }}
+                                {{ tx.data.amount || getConvertValue(tx) || tx.data.stake || tx.data.initial_amount || 0 | pretty }}
                                 {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) }}
                             </span>
                         </div>

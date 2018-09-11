@@ -72,21 +72,11 @@
             toggleTx(txn) {
                 this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
             },
-            getConvertCoinSymbol(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN) {
-                    return tx.data.coin_to_sell;
-                }
-                if (tx.type === TX_TYPES.BUY_COIN) {
-                    return tx.data.coin_to_buy;
-                }
+            isSell(tx) {
+                return tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN;
             },
-            getConvertCoinText(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN) {
-                    return 'to Sell';
-                }
-                if (tx.type === TX_TYPES.BUY_COIN) {
-                    return 'to Buy';
-                }
+            isBuy(tx) {
+                return tx.type === TX_TYPES.BUY_COIN;
             },
         }
     }
@@ -166,18 +156,23 @@
                                     {{ tx.data.amount | pretty }} {{ tx.data.coin }}
                                 </div>
 
-                                <!-- type CONVERT -->
-                                <div class="table__inner-item" v-if="tx.data.coin_to_sell">
-                                    <strong>Coin to Sell</strong> <br>
-                                    {{ tx.data.coin_to_sell }}
+                                <!-- SELL -->
+                                <div class="table__inner-item" v-if="isSell(tx)">
+                                    <strong>Sell coins</strong> <br>
+                                    {{ tx.data.value_to_sell | pretty }} {{ tx.data.coin_to_sell }}
                                 </div>
-                                <div class="table__inner-item" v-if="isDefined(tx.data.value)">
-                                    <strong>Value {{ getConvertCoinText(tx) }}</strong> <br>
-                                    {{ tx.data.value | pretty }} {{ getConvertCoinSymbol(tx) }}
+                                <div class="table__inner-item" v-if="isSell(tx)">
+                                    <strong>Get coins</strong> <br>
+                                    {{ tx.data.value_to_buy | pretty  }} {{ tx.data.coin_to_buy }}
                                 </div>
-                                <div class="table__inner-item" v-if="tx.data.coin_to_buy">
-                                    <strong>Coin to Buy</strong> <br>
-                                    {{ tx.data.coin_to_buy }}
+                                <!-- BUY -->
+                                <div class="table__inner-item" v-if="isBuy(tx)">
+                                    <strong>Buy coins</strong> <br>
+                                    {{ tx.data.value_to_buy | pretty }} {{ tx.data.coin_to_buy }}
+                                </div>
+                                <div class="table__inner-item" v-if="isBuy(tx)">
+                                    <strong>Spend coins</strong> <br>
+                                    {{ tx.data.value_to_sell | pretty }} {{ tx.data.coin_to_sell }}
                                 </div>
 
                                 <!-- type CREATE_COIN -->

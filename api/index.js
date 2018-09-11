@@ -214,7 +214,8 @@ export function getAddress(address) {
  * -- type: TX_TYPES.CONVERT
  * @property {string} [data.coin_to_sell]
  * @property {string} [data.coin_to_buy]
- * @property {number} [data.value]
+ * @property {number} [data.value_to_sell]
+ * @property {number} [data.value_to_buy]
  * -- type: TX_TYPES.CREATE_COIN
  * @property {string} [data.name]
  * @property {string} [data.symbol]

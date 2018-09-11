@@ -43,6 +43,8 @@
         },
         data() {
             return {
+                /** @type Transaction */
+                tx: {},
                 navigation: {
                     prevTxHash: null,
                     nextTxHash: null,
@@ -53,21 +55,11 @@
             isDefined(value) {
                 return typeof value !== 'undefined';
             },
-            getConvertCoinSymbol(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN) {
-                    return tx.data.coin_to_sell;
-                }
-                if (tx.type === TX_TYPES.BUY_COIN) {
-                    return tx.data.coin_to_buy;
-                }
+            isSell(tx) {
+                return tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN;
             },
-            getConvertCoinText(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN) {
-                    return 'to Sell';
-                }
-                if (tx.type === TX_TYPES.BUY_COIN) {
-                    return 'to Buy';
-                }
+            isBuy(tx) {
+                return tx.type === TX_TYPES.BUY_COIN;
             },
         }
     }
@@ -107,13 +99,16 @@
                 <dt v-if="isDefined(tx.data.amount)">Amount</dt>
                 <dd v-if="isDefined(tx.data.amount)">{{ tx.data.amount | prettyExact }} {{ tx.data.coin }}</dd>
 
-                <!-- CONVERT -->
-                <dt v-if="tx.data.coin_to_sell">Coin to Sell</dt>
-                <dd v-if="tx.data.coin_to_sell">{{ tx.data.coin_to_sell }}</dd>
-                <dt v-if="isDefined(tx.data.value)">Value {{ getConvertCoinText(tx) }}</dt>
-                <dd v-if="isDefined(tx.data.value)">{{ tx.data.value | prettyExact }} {{ getConvertCoinSymbol(tx) }}</dd>
-                <dt v-if="tx.data.coin_to_buy">Coin to Buy</dt>
-                <dd v-if="tx.data.coin_to_buy">{{ tx.data.coin_to_buy }}</dd>
+                <!-- SELL -->
+                <dt v-if="isSell(tx)">Sell coins</dt>
+                <dd v-if="isSell(tx)">{{ tx.data.value_to_sell | prettyExact }} {{ tx.data.coin_to_sell }}</dd>
+                <dt v-if="isSell(tx)">Get coins</dt>
+                <dd v-if="isSell(tx)">{{ tx.data.value_to_buy | prettyExact }} {{ tx.data.coin_to_buy }}</dd>
+                <!-- BUY -->
+                <dt v-if="isBuy(tx)">Buy coins</dt>
+                <dd v-if="isBuy(tx)">{{ tx.data.value_to_buy | prettyExact }} {{ tx.data.coin_to_buy }}</dd>
+                <dt v-if="isBuy(tx)">Spend coins</dt>
+                <dd v-if="isBuy(tx)">{{ tx.data.value_to_sell | prettyExact }} {{ tx.data.coin_to_sell }}</dd>
 
                 <!-- CREATE_COIN-->
                 <dt v-if="tx.data.name">Name</dt>
