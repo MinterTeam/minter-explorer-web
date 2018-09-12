@@ -173,6 +173,11 @@ export function getAddress(address) {
         });
 }
 
+export function getWebSocketConnectData() {
+    return axios.get('settings/get-ws-data').then((response) => ({
+        ...response.data.data
+    }));
+}
 
 /**
  * @typedef {Object} Block
