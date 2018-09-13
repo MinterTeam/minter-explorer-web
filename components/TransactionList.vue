@@ -124,10 +124,9 @@
                         <td>{{ tx.timeDistance }} ago</td>
                         <!-- from -->
                         <td>
-                            <TableLink :link-text="tx.data.from"
-                                       :link-path="'/address/' + tx.data.from"
-                                       :is-not-link="isCurrentAddress(tx.data.from)"
-                                       v-if="tx.data.from"
+                            <TableLink :link-text="tx.from"
+                                       :link-path="'/address/' + tx.from"
+                                       :is-not-link="isCurrentAddress(tx.from)"
                             />
                         </td>
                         <!-- type -->

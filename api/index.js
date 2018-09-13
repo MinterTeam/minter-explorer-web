@@ -206,11 +206,11 @@ export function getWebSocketConnectData() {
  * @property {string} status
  * @property {number} nonce
  * @property {number} block
+ * @property {string} from
  * @property {string} timestamp
  * @property {number} fee
  * @property {number} type
  * @property {Object} data
- * @property {string} data.from
  * -- type: TX_TYPES.SEND
  * @property {string} [data.to]
  * @property {string} [data.coin]

@@ -21,16 +21,16 @@
     "centrifuge": "^1.5.0",
     "chart.js": "^2.7.2",
     "date-fns": "^2.0.0-alpha.16",
-    "entity-decode": "^1.0.1",
+    "entity-decode": "^2.0.1",
     "minter-footer-links": "github:MinterTeam/minter-footer-links#v1.0.0",
     "nuxt-edge": "^2.0.0-25613854.2ee5a29",
-    "pretty-num": "0.0.1",
+    "pretty-num": "0.1.1",
     "sockjs-client": "^1.1.5",
     "thousands": "^1.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^9.1.5",
-    "babel-eslint": "^8.2.6",
+    "babel-eslint": "^9.0.0",
     "beeper": "^1.1.1",
     "del": "^3.0.0",
     "dotenv": "^6.0.0",
@@ -48,7 +48,7 @@
     "gulp-postcss": "^8.0.0",
     "gulp-rename": "^1.4.0",
     "imagemin-mozjpeg": "^7.0.0",
-    "postcss-normalize": "^6.0.0"
+    "postcss-normalize": "^7.0.1"
   },
   "browserslist": [
     "> 0.5%",

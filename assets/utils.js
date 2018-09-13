@@ -35,7 +35,12 @@ export function txTypeFilter(value) {
 }
 
 export function pretty(value) {
-    return decode(prettyNum(value, {precision: 3, thousandsSeparator: '&thinsp;'}));
+    if (value < 0 && value > -1) {
+        return decode(prettyNum(value, {precision: 4, thousandsSeparator: '&thinsp;'}));
+    } else {
+        return decode(prettyNum(value, {precision: 4, rounding: 'significant', thousandsSeparator: '&thinsp;'}));
+    }
+
 }
 
 export function prettyUsd(value) {

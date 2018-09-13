@@ -1,4 +1,4 @@
-export default ({ app }) => {
+export default function({ app }) {
     /*
     ** Only run on client-side and only in production mode
     */
@@ -34,4 +34,4 @@ export default ({ app }) => {
             window.yaCounter49878307.hit(to.fullPath);
         }
     });
-};
+}

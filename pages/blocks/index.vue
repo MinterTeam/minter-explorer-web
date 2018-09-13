@@ -11,7 +11,7 @@
             BackButton,
         },
         filters: {
-            prettyRound: pretty,
+            pretty,
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,

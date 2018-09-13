@@ -1,6 +1,6 @@
 const GA_ID = 'UA-110383571-4';
 
-export default ({ app }) => {
+export default function({ app }) {
     /*
     ** Only run on client-side and only in production mode
     */
@@ -33,4 +33,4 @@ export default ({ app }) => {
         */
         gtag('config', GA_ID, {'page_path': to.fullPath});
     });
-};
+}

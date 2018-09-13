@@ -1,4 +1,4 @@
-export default ({ app }) => {
+export default function({ app }) {
     /*
     ** Only run on client-side and only in production mode
     */
@@ -40,4 +40,4 @@ export default ({ app }) => {
     app.router.afterEach((to, from) => {
         fbq('track', 'PageView');
     });
-};
+}

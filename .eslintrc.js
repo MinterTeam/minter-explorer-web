@@ -30,4 +30,4 @@ module.exports = {
         'semi-spacing': "error",
         'space-before-function-paren': ["error", "never"],
     },
-}
+};

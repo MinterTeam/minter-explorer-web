@@ -9,6 +9,8 @@
     import PreviewTransactions from '~/components/PreviewTransactions';
 
     let centrifuge;
+    const BLOCK_LIST_LENGTH = 20;
+    const TX_LIST_LENGTH = 20;
 
     function getAllData() {
         const statsPromise = getStatus();
@@ -31,8 +33,8 @@
             return getAllData()
                 .then(([stats, blockList, txList]) => ({
                     stats,
-                    blockList,
-                    txList,
+                    blockList: blockList.slice(0, BLOCK_LIST_LENGTH),
+                    txList: txList.slice(0, TX_LIST_LENGTH),
                     isDataLoading: false,
                 }))
                 .catch((e) => {});
@@ -41,8 +43,8 @@
             return {
                 isDataLoading: true,
                 stats: null,
-                blockList: null,
-                txList: null,
+                blockList: [],
+                txList: [],
             };
         },
         beforeMount() {
@@ -51,8 +53,8 @@
                 getAllData()
                     .then(([stats, blockList, txList]) => {
                         this.stats = stats;
-                        this.blockList = blockList;
-                        this.txList = txList;
+                        this.blockList = blockList.slice(0, BLOCK_LIST_LENGTH);
+                        this.txList = txList.slice(0, TX_LIST_LENGTH);
                         this.isDataLoading = false;
                     })
                     .catch((e) => {
@@ -85,19 +87,23 @@
                 });
 
                 centrifuge.subscribe("blocks", (response) => {
-                    let exist = this.blockList.find(function(element) {
-                        return element.height === response.data.height;
+                    const newBlock = response.data;
+                    const isExist = this.blockList.some(function(item) {
+                        return item.height === newBlock.height;
                     });
-                    if (!exist) {
-                        this.blockList = [...[response.data], ...this.blockList];
+                    if (!isExist) {
+                        this.blockList.unshift(newBlock);
+                        this.blockList = this.blockList.slice(0, BLOCK_LIST_LENGTH);
                     }
                 });
-                centrifuge.subscribe("transactions", (txData) => {
-                    let exist = this.txList.find(function(element) {
-                        return element.hash === txData.data.hash;
+                centrifuge.subscribe("transactions", (response) => {
+                    const newTx = response.data;
+                    const isExist = this.txList.find(function(item) {
+                        return item.hash === newTx.hash;
                     });
-                    if (!exist) {
-                        this.txList = [...[txData.data], ...this.txList];
+                    if (!isExist) {
+                        this.txList.unshift(newTx);
+                        this.txList = this.txList.slice(0, TX_LIST_LENGTH);
                     }
                 });
                 centrifuge.subscribe("status-info", (statusData) => {

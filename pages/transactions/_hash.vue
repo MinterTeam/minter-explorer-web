@@ -91,7 +91,7 @@
                 <dd>{{ tx.type | txType }}</dd>
 
                 <dt>From</dt>
-                <dd><nuxt-link class="link--default" :to="'/address/' + tx.data.from">{{ tx.data.from }}</nuxt-link></dd>
+                <dd><nuxt-link class="link--default" :to="'/address/' + tx.from">{{ tx.from }}</nuxt-link></dd>
 
                 <!-- SEND -->
                 <dt v-if="tx.data.to">To</dt>

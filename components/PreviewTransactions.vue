@@ -18,7 +18,7 @@
         },
         computed: {
             txListFormatted() {
-                return this.txList ? this.txList.slice(0, 20).map((tx) => {
+                return this.txList ? this.txList.map((tx) => {
                     return {
                         ...tx,
                         timeDistance: getTimeDistance(tx.timestamp),
@@ -69,9 +69,9 @@
                     <div class="preview__transaction-row u-text-overflow">
                         TX# <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash | txHash }}</nuxt-link>
                     </div>
-                    <div class="preview__transaction-row u-grid" v-if="tx.data.from || tx.data.to">
-                        <div class="u-cell u-cell--large--1-2" v-if="tx.data.from">
-                            From <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.from">{{ tx.data.from | addressHash }}</nuxt-link>
+                    <div class="preview__transaction-row u-grid">
+                        <div class="u-cell u-cell--large--1-2">
+                            From <nuxt-link class="link--main link--hover" :to="'/address/' + tx.from">{{ tx.from | addressHash }}</nuxt-link>
                         </div>
                         <div class="u-cell u-cell--large--1-2" v-if="tx.data.to">
                             To <nuxt-link class="link--main link--hover" :to="'/address/' + tx.data.to">{{ tx.data.to | addressHash }}</nuxt-link>

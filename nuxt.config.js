@@ -53,6 +53,7 @@ module.exports = {
         { src: '~/plugins/seo-ym.js', ssr: false },
         { src: '~/plugins/seo-fb.js', ssr: false },
         { src: '~/plugins/seo-vk.js', ssr: false },
+        { src: '~/plugins/seo-tw.js', ssr: false },
     ],
     env: Object.assign({}, processEnv, dotEnv),
     /*
