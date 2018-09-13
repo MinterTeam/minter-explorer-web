@@ -6,12 +6,12 @@
         data() {
             return {
                 dataset: null,
-            }
+            };
         },
         computed: {
             hasData() {
                 return this.dataset && this.dataset.data && this.dataset.data.length > 1 && this.dataset.labels && this.dataset.labels.length > 1;
-            }
+            },
         },
         mounted() {
             getTxChartData()
@@ -32,7 +32,7 @@
                                 borderWidth: 2,
                                 fill: false,
                                 lineTension: 0,
-                            }]
+                            }],
                         },
                         options: {
                             responsive: true,
@@ -46,7 +46,7 @@
                                         callback: (value, index, values) => {
                                             let date = new Date(value);
                                             return date.getUTCDate() + '/' + (date.getUTCMonth() + 1);
-                                        }
+                                        },
                                     },
                                 }],
                                 yAxes: [{
@@ -54,7 +54,7 @@
                                         // callback: (value, index, values) => value + 'k',
                                         min: 0,
                                     },
-                                }]
+                                }],
                             },
                             legend: {
                                 display: false,
@@ -63,7 +63,7 @@
                                 point: {
                                     radius: 0,
                                     hitRadius: 10,
-                                }
+                                },
                             },
                             tooltips: {
                                 displayColors: false,
@@ -72,14 +72,14 @@
                                     title: () => '',
                                 },
                             },
-                        }
+                        },
                     });
                 })
                 .catch((e) => {
                     console.log('api error', 'txCountChartData', e);
-                })
-        }
-    }
+                });
+        },
+    };
 </script>
 
 <template>

@@ -13,7 +13,7 @@
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
-        asyncData ({ query }) {
+        asyncData({ query }) {
             return getTransactionList(query)
                 .then((txListInfo) => {
                     return {
@@ -30,16 +30,16 @@
                 meta: [
                     { hid: 'og-title', name: 'og:title', content: title },
                 ],
-            }
+            };
         },
         data() {
             return {
                 paginationInfo: {},
                 /** @type Array<Transaction> */
                 txList: [],
-            }
+            };
         },
-    }
+    };
 </script>
 
 <template>

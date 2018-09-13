@@ -24,5 +24,5 @@ export default ({ app }) => {
         if (typeof window.VK === 'object') {
             window.VK.Retargeting.Hit();
         }
-    })
-}
+    });
+};

@@ -12,7 +12,7 @@
         data() {
             return {
                 isSearchFocused: false,
-            }
+            };
         },
         methods: {
             inputFocus() {
@@ -22,8 +22,8 @@
                 this.isSearchFocused = false;
             },
 
-        }
-    }
+        },
+    };
 </script>
 
 <template>

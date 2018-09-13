@@ -1,4 +1,4 @@
-import axios from '~/api/axios';
+import explorer from '~/api/explorer';
 import {padZero} from '~/assets/utils';
 
 
@@ -18,12 +18,12 @@ import {padZero} from '~/assets/utils';
  * @return {Promise<Status>}
  */
 export function getStatus() {
-    return axios.get('status')
-        .then((response) => response.data)
+    return explorer.get('status')
+        .then((response) => response.data);
 }
 
 export function getTxChartData() {
-    return axios.get('txCountChartData')
+    return explorer.get('txCountChartData')
         .then((response) => {
             let chartData = response.data.data;
             if (!Array.isArray(chartData)) {
@@ -46,7 +46,7 @@ export function getTxChartData() {
                     daysToAdd[i] = {
                         date: iterationDate.getUTCFullYear() + '-' + padZero(iterationDate.getUTCMonth() + 1) + '-' + padZero(iterationDate.getUTCDate()),
                         txCount: 0,
-                    }
+                    };
                 }
                 lastData = daysToAdd.concat(lastData);
             }
@@ -73,7 +73,7 @@ export function getTxChartData() {
  * @return {Promise<BlockListInfo>}
  */
 export function getBlockList(params) {
-    return axios.get('blocks', {
+    return explorer.get('blocks', {
             params,
         })
         .then((response) => {
@@ -93,7 +93,7 @@ export function getBlockList(params) {
  * @return {Promise<Block>}
  */
 export function getBlock(height) {
-    return axios.get('block/' + height)
+    return explorer.get('block/' + height)
         .then((response) => response.data.data);
 }
 
@@ -111,7 +111,7 @@ export function getBlock(height) {
  * @return {Promise<TransactionListInfo>}
  */
 export function getTransactionList(params) {
-    return axios.get('transactions', {
+    return explorer.get('transactions', {
             params,
         })
         .then((response) => {
@@ -123,7 +123,7 @@ export function getTransactionList(params) {
                     }
                     return tx;
                 }),
-            }
+            };
         });
 }
 
@@ -140,7 +140,7 @@ export function getTransactionList(params) {
  * @return {Promise<TransactionInfo>}
  */
 export function getTransaction(hash) {
-    return axios.get('transaction/' + hash)
+    return explorer.get('transaction/' + hash)
         .then((response) => {
             if (!response.data.data || !response.data.data.hash) {
                 throw new Error('Not valid response from api');
@@ -152,12 +152,12 @@ export function getTransaction(hash) {
             return {
                 ...response.data,
                 data: tx,
-            }
+            };
         });
 }
 
 export function getAddress(address) {
-    return axios.get('address/' + address)
+    return explorer.get('address/' + address)
         .then((response) => {
             const addressData = response.data.data;
             // @TODO add to explorer api or make correct string sum
@@ -174,9 +174,8 @@ export function getAddress(address) {
 }
 
 export function getWebSocketConnectData() {
-    return axios.get('settings/get-ws-data').then((response) => ({
-        ...response.data.data
-    }));
+    return explorer.get('settings/get-ws-data')
+        .then((response) => response.data.data);
 }
 
 /**

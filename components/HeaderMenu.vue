@@ -11,9 +11,9 @@
             },
             testnetUrl() {
                 return !this.isMain ? false : TESTNET_WEB_URL;
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
 
 <template>

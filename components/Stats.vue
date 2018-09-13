@@ -14,16 +14,16 @@
                     return round(value / Math.pow(10, 6), ROUND_POWER) + ' million';
                 }
                 return prettyRound(value);
-            }
+            },
         },
         props: {
             /** @type Status */
             stats: {
                 type: Object,
                 required: true,
-            }
+            },
         },
-    }
+    };
 </script>
 
 <template>

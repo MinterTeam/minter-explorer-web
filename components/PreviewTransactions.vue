@@ -22,7 +22,7 @@
                     return {
                         ...tx,
                         timeDistance: getTimeDistance(tx.timestamp),
-                    }
+                    };
                 }) : [];
             },
         },
@@ -49,9 +49,9 @@
                     return tx.data.value_to_buy;
                 }
             },
-        }
+        },
 
-    }
+    };
 </script>
 
 <template>

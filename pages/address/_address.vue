@@ -32,7 +32,7 @@
                 meta: [
                     { hid: 'og-title', name: 'og:title', content: title },
                 ],
-            }
+            };
         },
         data() {
             return {
@@ -40,7 +40,7 @@
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: true,
-            }
+            };
         },
         computed: {
             baseCoin() {
@@ -50,8 +50,8 @@
                         result = coin;
                     }
                     return result;
-                }, null) : null
-            }
+                }, null) : null;
+            },
         },
         mounted() {
             getTransactionList(Object.assign({}, this.$route.params, this.$route.query))
@@ -66,7 +66,7 @@
                     this.isTxListLoading = false;
                 });
         },
-    }
+    };
 </script>
 
 <template>

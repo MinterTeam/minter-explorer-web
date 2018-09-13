@@ -15,7 +15,7 @@
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
-        asyncData ({ query }) {
+        asyncData({ query }) {
             return getBlockList(query)
                 .then((blockListInfo) => {
                     return {
@@ -32,14 +32,14 @@
                 meta: [
                     { hid: 'og-title', name: 'og:title', content: title },
                 ],
-            }
+            };
         },
         data() {
             return {
                 paginationInfo: {},
                 /** @type Array<Block> */
                 blockList: [],
-            }
+            };
         },
         computed: {
             blockListFormatted() {
@@ -56,8 +56,8 @@
             blockListToHeight() {
                 return this.blockList.length ? this.blockList[this.blockList.length - 1].height : false;
             },
-        }
-    }
+        },
+    };
 </script>
 
 <template>

@@ -44,7 +44,7 @@
         data() {
             return {
                 isTxExpanded: {/* {txn: boolean} */},
-            }
+            };
         },
         computed: {
             txListFormatted() {
@@ -52,7 +52,7 @@
                    return {
                        ...tx,
                        timeDistance:  getTimeDistance(tx.timestamp),
-                   }
+                   };
                 });
             },
         },
@@ -78,8 +78,8 @@
             isBuy(tx) {
                 return tx.type === TX_TYPES.BUY_COIN;
             },
-        }
-    }
+        },
+    };
 </script>
 
 <template>

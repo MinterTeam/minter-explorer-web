@@ -5,4 +5,4 @@ export default {
     POP_HISTORY: (state) => {
         state.history.pop();
     },
-}
+};

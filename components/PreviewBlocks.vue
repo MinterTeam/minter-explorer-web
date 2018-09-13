@@ -22,11 +22,11 @@
                         validatorName: validator.name || validator.address,
                         validatorUrl: '/address/' + validator.address,
                         timeDistance: getTimeDistance(block.timestamp),
-                    }
+                    };
                 }) : [];
             },
         },
-    }
+    };
 </script>
 
 <template>

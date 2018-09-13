@@ -1,10 +1,10 @@
-export default function ({from, to, store}) {
+export default function({from, to, store}) {
     if (process.server || !from) {
         return;
     }
     //console.log(from.fullPath, window.history.state);
 
-    let storeHistory = store.state.history
+    let storeHistory = store.state.history;
 
     if (storeHistory.length && storeHistory[storeHistory.length - 1].key === window.history.state.key) {
          // произведен history.back(), откатываем состояние

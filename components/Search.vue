@@ -3,7 +3,7 @@
         data() {
             return {
                 query: '',
-            }
+            };
         },
         methods: {
             submit() {
@@ -28,9 +28,9 @@
             },
             inputBlur() {
                 this.$emit('inputBlur');
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
 
 <template>

@@ -26,7 +26,7 @@
             },
             isShorten() {
                 return this.linkText !== this.shortText;
-            }
+            },
         },
         render(createElement) {
             return createElement(
@@ -38,12 +38,12 @@
                     },
                     props: this.isNotLink ? {} : {
                         to: this.linkPath,
-                    }
+                    },
                 },
                 [
                     this.shortText,
                 ]
-            )
-        }
-    }
+            );
+        },
+    };
 </script>

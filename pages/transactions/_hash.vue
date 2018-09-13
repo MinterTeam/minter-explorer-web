@@ -39,7 +39,7 @@
                 meta: [
                     { hid: 'og-title', name: 'og:title', content: title },
                 ],
-            }
+            };
         },
         data() {
             return {
@@ -49,7 +49,7 @@
                     prevTxHash: null,
                     nextTxHash: null,
                 },
-            }
+            };
         },
         methods: {
             isDefined(value) {
@@ -61,8 +61,8 @@
             isBuy(tx) {
                 return tx.type === TX_TYPES.BUY_COIN;
             },
-        }
-    }
+        },
+    };
 </script>
 
 <template>

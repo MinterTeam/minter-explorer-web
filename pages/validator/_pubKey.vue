@@ -33,14 +33,14 @@
                 meta: [
                     { hid: 'og-title', name: 'og:title', content: title },
                 ],
-            }
+            };
         },
         data() {
             return {
                 txCount: 0,
                 txList: [],
                 txPaginationInfo: {},
-            }
+            };
         },
         computed: {
             baseCoin() {
@@ -50,10 +50,10 @@
                         result = coin;
                     }
                     return result;
-                }, null) : null
-            }
+                }, null) : null;
+            },
         },
-    }
+    };
 </script>
 
 <template>

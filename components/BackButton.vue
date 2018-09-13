@@ -7,9 +7,9 @@
                 } else {
                     this.$router.push('/');
                 }
-            }
+            },
         },
-    }
+    };
 </script>
 
 <template>

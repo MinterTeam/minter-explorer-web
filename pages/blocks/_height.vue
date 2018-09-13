@@ -27,7 +27,7 @@
                             ...block,
                             timeDistance: getTimeDistance(block.timestamp),
                             timeUTC: getTimeUTC(block.timestamp),
-                        }
+                        },
                     };
                 })
                 .catch((e) => {
@@ -42,7 +42,7 @@
                 meta: [
                     { hid: 'og-title', name: 'og:title', content: title },
                 ],
-            }
+            };
         },
         data() {
             return {
@@ -51,7 +51,7 @@
                 //isTxListLoading: true,
                 txList: [],
                 txPaginationInfo: {},
-            }
+            };
         },
         computed: {
             prevUrl() {
@@ -69,8 +69,8 @@
                         this.txPaginationInfo = txListInfo.meta;
                     }
                 });
-        }
-    }
+        },
+    };
 </script>
 
 <template>

@@ -5,7 +5,7 @@
                 type: String,
                 default() {
                     return this.$route.path;
-                }
+                },
             },
             paginationInfo: {
                 type: Object,
@@ -13,7 +13,7 @@
                 default: () => ({
                     current_page: null,
                     last_page: null,
-                })
+                }),
             },
             paginationClass: {
                 type: String,
@@ -60,9 +60,9 @@
                 }
 
                 return location;
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
 
 <template>
