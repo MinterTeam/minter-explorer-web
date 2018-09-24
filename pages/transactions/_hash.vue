@@ -173,9 +173,15 @@
                 <dd :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? tx.payload : 'Blank' }}</dd>
             </dl>
         </section>
-        <h1 class="u-text-center" style="margin-top: 50px" v-else>
-            Transaction not found yet
+        <h1 class="u-text-center" style="margin-top: 50px;" v-else>
+            Transaction not found yet <br>
+            <span class="button is-loading" style="margin-top: 20px;">
+                <svg class="button-loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 42">
+                    <circle class="button-loader__path" cx="21" cy="21" r="12"></circle>
+                </svg>
+            </span>
         </h1>
+
         <!--
         // no navigation data from explorer
         <div class="u-section navigation">
