@@ -22,13 +22,19 @@
                             timeDistance: getTimeDistance(txInfo.data.timestamp),
                             timeUTC: getTimeUTC(txInfo.data.timestamp),
                         },
-                        navigation: {
-                            ...txInfo.meta,
-                        },
+                        navigation: txInfo.meta,
                     };
                 })
                 .catch((e) => {
-                    error({ statusCode: 404, message: 'Transaction not found' });
+                    if (e.response && e.response.status === 404) {
+                        // do nothing, wait for tx to appear in the blockchain
+                    } else {
+                        error({
+                            statusCode: e.response && e.response.status || e.request.status,
+                            message: e.response && (e.response.data.error || e.response.statusText) || e.request.statusText,
+                        });
+                    }
+
                 });
         },
         head() {
@@ -43,15 +49,36 @@
         },
         data() {
             return {
-                /** @type Transaction */
-                tx: {},
+                /** @type Transaction|null */
+                tx: null,
                 navigation: {
                     prevTxHash: null,
                     nextTxHash: null,
                 },
             };
         },
+        mounted() {
+            if (!this.tx) {
+                this.fetchTx();
+            }
+        },
         methods: {
+            fetchTx() {
+                getTransaction(this.$route.params.hash)
+                    .then((txInfo) => {
+                        this.tx = {
+                            ...txInfo.data,
+                            timeDistance: getTimeDistance(txInfo.data.timestamp),
+                            timeUTC: getTimeUTC(txInfo.data.timestamp),
+                        };
+                        this.navigation = txInfo.meta;
+                    })
+                    .catch((e) => {
+                        setTimeout(() => {
+                            this.fetchTx();
+                        }, 2500);
+                    });
+            },
             isDefined(value) {
                 return typeof value !== 'undefined';
             },
@@ -67,7 +94,7 @@
 
 <template>
     <div>
-        <section class="panel u-section">
+        <section class="panel u-section" v-if="tx">
             <div class="panel__section panel__header">
                 <h1 class="panel__header-title panel__title">
                     <BackButton/>
@@ -146,6 +173,9 @@
                 <dd :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? tx.payload : 'Blank' }}</dd>
             </dl>
         </section>
+        <h1 class="u-text-center" style="margin-top: 50px" v-else>
+            Transaction not found yet
+        </h1>
         <!--
         // no navigation data from explorer
         <div class="u-section navigation">
