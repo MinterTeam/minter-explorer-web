@@ -42,7 +42,7 @@
     <section class="panel u-section">
         <div class="panel__section panel__header">
             <h1 class="panel__title panel__header-title">
-                <img class="panel__header-title-icon" src="/img/icon-validator.svg" alt="" role="presentation">
+                <img class="panel__header-title-icon" src="/img/icon-validator.svg" width="40" height="40" alt="" role="presentation">
                 Validators
             </h1>
         </div>

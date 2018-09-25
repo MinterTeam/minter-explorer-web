@@ -175,11 +175,9 @@
         </section>
         <h1 class="u-text-center" style="margin-top: 50px;" v-else>
             Transaction not found yet <br>
-            <span class="button is-loading" style="margin-top: 20px;">
-                <svg class="button-loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 42">
-                    <circle class="button-loader__path" cx="21" cy="21" r="12"></circle>
-                </svg>
-            </span>
+            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28"  style="margin-top: 20px;">
+                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
+            </svg>
         </h1>
 
         <!--

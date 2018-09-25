@@ -25,10 +25,21 @@
     padding: 20px;
     &+& {border-top: 1px solid @c-border;}
 }
+.panel__content {border-top: 1px solid @c-border;}
 .panel__title {font: inherit; font-weight: 700; text-transform: uppercase; margin: 0;}
-.panel__header {padding: 18px; display: flex; justify-content: space-between; align-items: center;}
+.panel__header {display: flex; justify-content: space-between; align-items: center;}
 .panel__header-title {display: flex; align-items: center;}
 .panel__header-title-icon {margin: -8px 10px -8px -8px;}
+.panel__switcher {display: flex; align-items: center;}
+.panel__switcher-item {
+    flex-grow: 2; flex-basis: 1px; padding: 19px 20px 21px; justify-content: center; position: relative; margin-bottom: -1px;
+    &::after {content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: currentColor; opacity: 0; transition: 0.15s;}
+    &:hover::after, &:focus::after {opacity: 0.4;}
+    &.is-active {
+        cursor: default;
+        &::after {opacity: 1; background: @c-main;}
+    }
+}
 // common pagination
 .pagination {
     display: flex; align-items: center;
@@ -71,7 +82,7 @@
 .header__menu {display: flex; border-bottom: 1px solid @c-border;}
 .header__link {
     padding: 20px 20px; position: relative; font-size: 16px; line-height: 24px; font-family: @heading-font-family; font-weight: 700; text-transform: uppercase; text-decoration: none; width: 50%; text-align: center; margin-bottom: -1px;
-    &::after {content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: currentColor; opacity: 0; transition: 0.15s;}
+    &::after {content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: currentColor; opacity: 0; transition: 0.15s;}
     &:hover::after, &:focus::after {opacity: 0.4;}
     &.is-active {
         cursor: default;

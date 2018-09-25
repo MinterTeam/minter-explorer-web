@@ -111,20 +111,42 @@ export function getBlock(height) {
  * @return {Promise<TransactionListInfo>}
  */
 export function getTransactionList(params) {
-    return explorer.get('transactions', {
-            params,
-        })
-        .then((response) => {
-            return {
-                ...response.data,
-                data: response.data.data.map((tx) => {
-                    if (tx.data.coin) {
-                        tx.data.coin = tx.data.coin.toUpperCase();
-                    }
-                    return tx;
-                }),
-            };
-        });
+    return explorer.get('transactions', {params})
+        .then((response) => response.data);
+}
+
+/**
+ * @typedef {Object} RewardListInfo
+ * @property {Array<Reward>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
+ * @param {Object} [params]
+ * @param {number} [params.address]
+ * @param {number} [params.page]
+ * @return {Promise<RewardListInfo>}
+ */
+export function getRewardList(params) {
+    return explorer.get('events/rewards', {params})
+        .then((response) => response.data);
+}
+
+/**
+ * @typedef {Object} SlashListInfo
+ * @property {Array<Slash>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
+ * @param {Object} [params]
+ * @param {number} [params.address]
+ * @param {number} [params.page]
+ * @return {Promise<SlashListInfo>}
+ */
+export function getSlashList(params) {
+    return explorer.get('events/slashes', {params})
+        .then((response) => response.data);
 }
 
 /**
@@ -246,3 +268,25 @@ export function getWebSocketConnectData() {
  * - type: TX_TYPES.SET_CANDIDATE_ONLINE, TX_TYPES.SET_CANDIDATE_OFFLINE
  * @property {string} [data.pub_key]
  */
+
+
+/**
+ * @typedef {Object} Reward
+ * @property {number} block
+ * @property {string} timestamp
+ * @property {string} role
+ * @property {string} address
+ * @property {string} validator
+ * @property {number} amount
+ */
+
+/**
+ * @typedef {Object} Slash
+ * @property {number} block
+ * @property {string} timestamp
+ * @property {string} address
+ * @property {string} validator
+ * @property {number} amount
+ * @property {string} coin
+ */
+

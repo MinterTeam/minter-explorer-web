@@ -1,14 +1,23 @@
 <script>
-    import {getAddress, getTransactionList} from "~/api";
+    import {getAddress, getTransactionList, getRewardList, getSlashList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {prettyExact, prettyUsd} from "~/assets/utils";
-    import TransactionList from '~/components/TransactionList';
+    import TransactionListTable from '~/components/TransactionListTable';
+    import RewardSlashListTable from '~/components/RewardSlashListTable';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
+    const TAB_TYPES = {
+        TX: 'tx',
+        REWARD: 'reward',
+        SLASH: 'slash',
+    };
+
     export default {
+        TAB_TYPES,
         components: {
-            TransactionList,
+            TransactionListTable,
+            RewardSlashListTable,
             BackButton,
             Pagination,
         },
@@ -16,7 +25,7 @@
             prettyExact,
             prettyUsd,
         },
-        watchQuery: ['page'],
+        watchQuery: ['page', 'active_tab'],
         key: (to) => to.fullPath,
         asyncData({ params, error }) {
             return getAddress(params.address)
@@ -36,10 +45,17 @@
         },
         data() {
             return {
+                activeTab: Object.values(TAB_TYPES).indexOf(this.$route.query.active_tab) !== -1 ? this.$route.query.active_tab : TAB_TYPES.TX,
                 txCount: 0,
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: true,
+                rewardList: [],
+                rewardPaginationInfo: {},
+                isRewardListLoading: true,
+                slashList: [],
+                slashPaginationInfo: {},
+                isSlashListLoading: true,
             };
         },
         computed: {
@@ -52,9 +68,23 @@
                     return result;
                 }, null) : null;
             },
+            activePaginationInfo() {
+                if (this.activeTab === TAB_TYPES.TX) {
+                    return this.txPaginationInfo;
+                }
+                if (this.activeTab === TAB_TYPES.REWARD) {
+                    return this.rewardPaginationInfo;
+                }
+                if (this.activeTab === TAB_TYPES.SLASH) {
+                    return this.slashPaginationInfo;
+                }
+            },
         },
         mounted() {
-            getTransactionList(Object.assign({}, this.$route.params, this.$route.query))
+            getTransactionList({
+                address: this.$route.params.address,
+                page: this.$route.query.active_tab === TAB_TYPES.TX ? this.$route.query.page : undefined,
+            })
                 .then((txListInfo) => {
                     if (txListInfo.data && txListInfo.data.length) {
                         this.txList = txListInfo.data;
@@ -64,6 +94,34 @@
                 })
                 .catch(() => {
                     this.isTxListLoading = false;
+                });
+            getRewardList({
+                address: this.$route.params.address,
+                page: this.$route.query.active_tab === TAB_TYPES.REWARD ? this.$route.query.page : undefined,
+            })
+                .then((rewardListInfo) => {
+                    if (rewardListInfo.data && rewardListInfo.data.length) {
+                        this.rewardList = rewardListInfo.data;
+                        this.rewardPaginationInfo = rewardListInfo.meta;
+                    }
+                    this.isRewardListLoading = false;
+                })
+                .catch(() => {
+                    this.isRewardListLoading = false;
+                });
+            getSlashList({
+                address: this.$route.params.address,
+                page: this.$route.query.active_tab === TAB_TYPES.SLASH ? this.$route.query.page : undefined,
+            })
+                .then((slashListInfo) => {
+                    if (slashListInfo.data && slashListInfo.data.length) {
+                        this.slashList = slashListInfo.data;
+                        this.slashPaginationInfo = slashListInfo.meta;
+                    }
+                    this.isSlashListLoading = false;
+                })
+                .catch(() => {
+                    this.isSlashListLoading = false;
                 });
         },
     };
@@ -92,12 +150,34 @@
                 <dd>{{ txCount }}</dd>
             </dl>
         </section>
-        <p class="u-section" v-if="isTxListLoading && txCount">Loading TX...</p>
-        <TransactionList :tx-list="txList"
-                         :current-address="$route.params.address"
-                         :pagination-info="txPaginationInfo"
-                         v-if="txList.length"
-        />
-        <Pagination :pagination-info="txPaginationInfo"/>
+        <section class="panel u-section">
+            <div class="panel__switcher">
+                <button class="panel__switcher-item panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
+                        @click="activeTab = $options.TAB_TYPES.TX"
+                >
+                    <img class="panel__header-title-icon" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    Transactions
+                </button>
+                <button class="panel__switcher-item panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.REWARD}"
+                        @click="activeTab = $options.TAB_TYPES.REWARD"
+                >
+                    <img class="panel__header-title-icon" src="/img/icon-reward.svg" width="40" height="40" alt="" role="presentation">
+                    Rewards
+                </button>
+                <button class="panel__switcher-item panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.SLASH}"
+                        @click="activeTab = $options.TAB_TYPES.SLASH"
+                >
+                    <img class="panel__header-title-icon" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
+                    Slashes
+                </button>
+            </div>
+            <TransactionListTable :tx-list="txList" :current-address="$route.params.address" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
+            <RewardSlashListTable :data-list="rewardList" data-type="reward" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
+            <RewardSlashListTable :data-list="slashList" data-type="slash" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
+        </section>
+        <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab"/>
     </div>
 </template>

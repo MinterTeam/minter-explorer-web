@@ -19,8 +19,8 @@
 <template>
     <div class="header__menu">
         <a class="header__link" :href="mainnetUrl" v-if="mainnetUrl">Mainnet</a>
-        <nuxt-link class="header__link" to="/" v-else>Mainnet</nuxt-link>
+        <nuxt-link class="header__link is-active" to="/" v-else>Mainnet</nuxt-link>
         <a class="header__link" :href="testnetUrl" v-if="testnetUrl">Testnet</a>
-        <nuxt-link class="header__link" to="/" v-else>Testnet</nuxt-link>
+        <nuxt-link class="header__link is-active" to="/" v-else>Testnet</nuxt-link>
     </div>
 </template>

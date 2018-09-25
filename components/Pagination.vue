@@ -27,6 +27,9 @@
                 type: String,
                 default: 'u-visually-hidden',
             },
+            activeTab: {
+                type: String,
+            },
         },
         computed: {
             hasPrev() {
@@ -54,9 +57,13 @@
             getPageHref(page) {
                 let location = {
                     path: this.basePath,
+                    query: {},
                 };
                 if (page && page !== 1) {
-                    location.query = {page};
+                    location.query.page = page;
+                }
+                if (this.activeTab) {
+                    location.query.active_tab = this.activeTab;
                 }
 
                 return location;
