@@ -85,17 +85,22 @@
                     <tr>
                         <th>Height</th>
                         <th>Age</th>
-                        <th>Validator</th>
-                        <th>Tx</th>
+                        <th>Validators</th>
+                        <th>Txns</th>
+                        <th>Block size</th>
                         <th>Reward</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="block in blockListFormatted" :key="block.height">
+                    <tr v-for="block in blockListFormatted" :key="block.height" v-if="block.validators.length">
                         <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.height }}</nuxt-link></td>
                         <td>{{ block.timeDistance}} ago</td>
-                        <td>{{ block.validators.length && block.validators[0].address }}</td>
-                        <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.txCount }}</nuxt-link></td>
+                        <td>{{ block.validators.length }}</td>
+                        <td>
+                            <nuxt-link class="link--default" :to="'/blocks/' + block.height" v-if="block.txCount">{{ block.txCount }}</nuxt-link>
+                            <span v-else>{{ block.txCount }}</span>
+                        </td>
+                        <td>{{ block.size | pretty }} bytes</td>
                         <td>{{ block.reward | pretty }} {{ $store.state.COIN_NAME }}</td>
                     </tr>
                     </tbody>
