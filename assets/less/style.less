@@ -32,13 +32,19 @@
 .panel__header-title-icon {margin: -8px 10px -8px -8px;}
 .panel__switcher {display: flex; align-items: center;}
 .panel__switcher-item {
-    flex-grow: 2; flex-basis: 1px; padding: 19px 20px 21px; justify-content: center; position: relative; margin-bottom: -1px;
+    flex-grow: 2; flex-basis: 1px; padding: 19px 10px 21px; justify-content: center; position: relative; margin-bottom: -1px;
     &::after {content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: currentColor; opacity: 0; transition: 0.15s;}
     &:hover::after, &:focus::after {opacity: 0.4;}
     &.is-active {
         cursor: default;
         &::after {opacity: 1; background: @c-main;}
     }
+}
+@media (min-width: @breakpoint-mini-up) {
+    .panel__switcher-item {padding-left: 14px; padding-right: 14px;}
+}
+@media (min-width: @breakpoint-small-up) {
+    .panel__switcher-item {padding-left: 20px; padding-right: 20px;}
 }
 // common pagination
 .pagination {

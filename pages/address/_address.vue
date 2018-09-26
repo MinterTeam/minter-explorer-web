@@ -156,21 +156,21 @@
                         :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
                         @click="activeTab = $options.TAB_TYPES.TX"
                 >
-                    <img class="panel__header-title-icon" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
                     Transactions
                 </button>
                 <button class="panel__switcher-item panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.REWARD}"
                         @click="activeTab = $options.TAB_TYPES.REWARD"
                 >
-                    <img class="panel__header-title-icon" src="/img/icon-reward.svg" width="40" height="40" alt="" role="presentation">
+                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-reward.svg" width="40" height="40" alt="" role="presentation">
                     Rewards
                 </button>
                 <button class="panel__switcher-item panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.SLASH}"
                         @click="activeTab = $options.TAB_TYPES.SLASH"
                 >
-                    <img class="panel__header-title-icon" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
+                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
                     Slashes
                 </button>
             </div>
