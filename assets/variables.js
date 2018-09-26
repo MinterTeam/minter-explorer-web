@@ -19,3 +19,8 @@ export const TX_TYPES = {
     SET_CANDIDATE_ONLINE: 'setCandidateOnData',
     SET_CANDIDATE_OFFLINE: 'setCandidateOffData',
 };
+export const REWARD_CHART_TYPES = {
+    MONTH: 'month',
+    WEEK: 'week',
+    DAY: 'day',
+};

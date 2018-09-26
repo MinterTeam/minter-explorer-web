@@ -15,14 +15,13 @@
         },
         asyncData({ params, error }) {
             return getTransaction(params.hash)
-                .then((txInfo) => {
+                .then((tx) => {
                     return {
                         tx: {
-                            ...txInfo.data,
-                            timeDistance: getTimeDistance(txInfo.data.timestamp),
-                            timeUTC: getTimeUTC(txInfo.data.timestamp),
+                            ...tx,
+                            timeDistance: getTimeDistance(tx.timestamp),
+                            timeUTC: getTimeUTC(tx.timestamp),
                         },
-                        navigation: txInfo.meta,
                     };
                 })
                 .catch((e) => {
@@ -51,10 +50,6 @@
             return {
                 /** @type Transaction|null */
                 tx: null,
-                navigation: {
-                    prevTxHash: null,
-                    nextTxHash: null,
-                },
             };
         },
         mounted() {
@@ -65,13 +60,12 @@
         methods: {
             fetchTx() {
                 getTransaction(this.$route.params.hash)
-                    .then((txInfo) => {
+                    .then((tx) => {
                         this.tx = {
-                            ...txInfo.data,
-                            timeDistance: getTimeDistance(txInfo.data.timestamp),
-                            timeUTC: getTimeUTC(txInfo.data.timestamp),
+                            ...tx,
+                            timeDistance: getTimeDistance(tx.timestamp),
+                            timeUTC: getTimeUTC(tx.timestamp),
                         };
-                        this.navigation = txInfo.meta;
                     })
                     .catch((e) => {
                         setTimeout(() => {
@@ -179,13 +173,5 @@
                 <circle class="loader__path" cx="14" cy="14" r="12"></circle>
             </svg>
         </h1>
-
-        <!--
-        // no navigation data from explorer
-        <div class="u-section navigation">
-            <nuxt-link class="button button&#45;&#45;ghost-main" :class="{'u-visually-hidden': !navigation.prevTxHash}" :to="'/transactions/' + navigation.prevTxHash">Prev Tx</nuxt-link>
-            <nuxt-link class="button button&#45;&#45;ghost-main" :class="{'u-visually-hidden': !navigation.prevTxHash}" :to="'/transactions/' + navigation.nextTxHash">Next Tx</nuxt-link>
-        </div>
-        -->
     </div>
 </template>

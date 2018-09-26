@@ -41,7 +41,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="dataItem in dataList" :key="dataItem.timestamp">
+            <tr v-for="(dataItem, index) in dataList" :key="index">
                 <!-- Time -->
                 <td>{{ dataItem.timestamp | time }}</td>
                 <!-- block -->

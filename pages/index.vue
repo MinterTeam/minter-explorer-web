@@ -4,7 +4,7 @@
     import {getBlockList, getStatus, getTransactionList, getWebSocketConnectData} from "~/api";
     import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
     import Stats from '~/components/Stats';
-    import HistoryChart from '~/components/HistoryChart';
+    import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
     import PreviewTransactions from '~/components/PreviewTransactions';
 

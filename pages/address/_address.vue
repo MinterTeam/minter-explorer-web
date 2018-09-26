@@ -4,6 +4,7 @@
     import {prettyExact, prettyUsd} from "~/assets/utils";
     import TransactionListTable from '~/components/TransactionListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
+    import RewardChart from '~/components/RewardChart';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
@@ -18,6 +19,7 @@
         components: {
             TransactionListTable,
             RewardSlashListTable,
+            RewardChart,
             BackButton,
             Pagination,
         },
@@ -25,6 +27,7 @@
             prettyExact,
             prettyUsd,
         },
+        //@TODO page switching without route reload
         watchQuery: ['page', 'active_tab'],
         key: (to) => to.fullPath,
         asyncData({ params, error }) {
@@ -150,23 +153,24 @@
                 <dd>{{ txCount }}</dd>
             </dl>
         </section>
+        <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD"/>
         <section class="panel u-section">
             <div class="panel__switcher">
-                <button class="panel__switcher-item panel__title panel__header-title u-semantic-button"
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
                         @click="activeTab = $options.TAB_TYPES.TX"
                 >
                     <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
                     Transactions
                 </button>
-                <button class="panel__switcher-item panel__title panel__header-title u-semantic-button"
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.REWARD}"
                         @click="activeTab = $options.TAB_TYPES.REWARD"
                 >
                     <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-reward.svg" width="40" height="40" alt="" role="presentation">
                     Rewards
                 </button>
-                <button class="panel__switcher-item panel__title panel__header-title u-semantic-button"
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.SLASH}"
                         @click="activeTab = $options.TAB_TYPES.SLASH"
                 >

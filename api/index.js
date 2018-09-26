@@ -1,5 +1,6 @@
 import explorer from '~/api/explorer';
 import {padZero} from '~/assets/utils';
+import {REWARD_CHART_TYPES} from '~/assets/variables';
 
 
 /**
@@ -76,9 +77,7 @@ export function getBlockList(params) {
     return explorer.get('blocks', {
             params,
         })
-        .then((response) => {
-            return response.data;
-        });
+        .then((response) => response.data);
 }
 
 /**
@@ -150,49 +149,53 @@ export function getSlashList(params) {
 }
 
 /**
- * @typedef {Object} TransactionInfo
- * @property {Transaction} data
- * @property {Object} meta
- * @property {string} meta.prevTxHash
- * @property {string} meta.nextTxHash
+ * @param {string} address
+ * @param {string} type
+ * @return {Promise<Array>}
  */
+export function getRewardChartData(address, type = REWARD_CHART_TYPES.MONTH) {
+    let params;
+    if (type === REWARD_CHART_TYPES.MONTH) {
+        params = {scale: 'day'};
+    } else if (type === REWARD_CHART_TYPES.WEEK) {
+        params = {
+            scale: 'day',
+            startTime: (new Date(Date.now() - 6 * 24 * 60 * 60 *  1000)).toISOString(),
+        };
+    } else {
+        params = {
+            scale: 'hour',
+            startTime: (new Date(Date.now() - 23 * 60 * 60 * 1000)).toISOString(),
+        };
+    }
+    return explorer.get('events/rewards/chart/' + address, {params})
+        .then((response) => {
+            let chartData = response.data.data;
+            if (!Array.isArray(chartData)) {
+                throw new Error('Not valid response from api');
+            }
+
+            // format data for line chart.js
+            return chartData.reduce((accum, item) => {
+                accum.data.push(item.amount);
+                accum.labels.push(item.time.replace(' ', 'T') + ':00');
+                return accum;
+            }, {data: [], labels: []});
+        });
+}
 
 /**
  * @param {string} hash
- * @return {Promise<TransactionInfo>}
+ * @return {Promise<Transaction>}
  */
 export function getTransaction(hash) {
     return explorer.get('transaction/' + hash)
-        .then((response) => {
-            if (!response.data.data || !response.data.data.hash) {
-                throw new Error('Not valid response from api');
-            }
-            let tx = response.data.data;
-            if (tx.data.coin) {
-                tx.data.coin = tx.data.coin.toUpperCase();
-            }
-            return {
-                ...response.data,
-                data: tx,
-            };
-        });
+        .then((response) => response.data.data);
 }
 
 export function getAddress(address) {
     return explorer.get('address/' + address)
-        .then((response) => {
-            const addressData = response.data.data;
-            // @TODO add to explorer api or make correct string sum
-            // addressData.bipTotal = 0;
-            // addressData.usdTotal = 0;
-            // if (addressData.coins) {
-            //     addressData.coins.forEach((coin) => {
-            //         addressData.bipTotal += coin.baseCoinAmount;
-            //         addressData.usdTotal += coin.usdAmount;
-            //     })
-            // }
-            return addressData;
-        });
+        .then((response) => response.data.data);
 }
 
 export function getWebSocketConnectData() {
