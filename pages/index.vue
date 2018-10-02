@@ -2,6 +2,7 @@
     import SockJS from "sockjs-client";
     import Centrifuge from 'centrifuge';
     import {getBlockList, getStatus, getTransactionList, getWebSocketConnectData} from "~/api";
+    import getTitle from '~/assets/get-title';
     import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
@@ -38,6 +39,19 @@
                     isDataLoading: false,
                 }))
                 .catch((e) => {});
+        },
+        head() {
+            const title = getTitle(null);
+            const description = 'Blockchain explorer of the Minter test network. View info about blocks, transactions, and addresses.';
+
+            return {
+                title: title,
+                meta: [
+                    { hid: 'og-title', name: 'og:title', content: title },
+                    { hid: 'description', name: 'description', content: description },
+                    { hid: 'og-description', name: 'og:description', content: description },
+                ],
+            };
         },
         data() {
             return {

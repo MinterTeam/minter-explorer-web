@@ -1,4 +1,6 @@
-export const BASE_TITLE = 'Minter Explorer';
+export const BASE_TITLE_NETWORK = process.env.APP_ENV === 'production' ? '' : 'Testnet ';
+export const BASE_TITLE_END = ' — Minter';
+export const BASE_TITLE = BASE_TITLE_NETWORK + 'Explorer' + BASE_TITLE_END;
 export const BASE_DESCRIPTION = '';
 export const NETWORK = process.env.APP_ENV === 'production' ? 'mainnet' : 'testnet';
 export const COIN_NAME = process.env.APP_ENV === 'production' ? 'BIP' : 'MNT';
