@@ -5,7 +5,7 @@ import prettyNum from 'pretty-num';
 import decode from 'entity-decode';
 
 export function getTimeDistance(timestamp) {
-    const distance = formatDistanceStrict(toDate(timestamp), new Date());
+    const distance = formatDistanceStrict(toDate(timestamp), new Date(), {roundingMethod: 'floor'});
 
     return distance && distance !== 'Invalid Date' ? distance : false;
 }

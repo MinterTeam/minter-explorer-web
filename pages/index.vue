@@ -10,6 +10,7 @@
     import PreviewTransactions from '~/components/PreviewTransactions';
 
     let centrifuge;
+    let timeInterval = null;
     const BLOCK_LIST_LENGTH = 20;
     const TX_LIST_LENGTH = 20;
 
@@ -37,6 +38,8 @@
                     blockList: blockList.slice(0, BLOCK_LIST_LENGTH),
                     txList: txList.slice(0, TX_LIST_LENGTH),
                     isDataLoading: false,
+                    lastBlockTime: Date.now(),
+                    lastTxTime: Date.now(),
                 }))
                 .catch((e) => {});
         },
@@ -59,6 +62,8 @@
                 stats: null,
                 blockList: [],
                 txList: [],
+                lastBlockTime: 0,
+                lastTxTime: 0,
             };
         },
         beforeMount() {
@@ -70,6 +75,8 @@
                         this.blockList = blockList.slice(0, BLOCK_LIST_LENGTH);
                         this.txList = txList.slice(0, TX_LIST_LENGTH);
                         this.isDataLoading = false;
+                        this.lastBlockTime = Date.now();
+                        this.lastTxTime = Date.now();
                     })
                     .catch((e) => {
                         this.isDataLoading = false;
@@ -79,11 +86,22 @@
             getWebSocketConnectData()
                 .then((data) => this.subscribeWS(data));
 
+            // update timestamps if no new data from server
+            timeInterval = setInterval(() => {
+                if (Date.now() - this.lastBlockTime >= 10000) {
+                    this.blockList = this.blockList.slice(0);
+                }
+                if (Date.now() - this.lastTxTime >= 10000) {
+                    this.txList = this.txList.slice(0);
+                }
+            }, 10000);
+
         },
         destroyed() {
             if (centrifuge) {
                 centrifuge.disconnect();
             }
+            clearInterval(timeInterval);
         },
         computed: {
             network() {
@@ -108,6 +126,7 @@
                     if (!isExist) {
                         this.blockList.unshift(newBlock);
                         this.blockList = this.blockList.slice(0, BLOCK_LIST_LENGTH);
+                        this.lastBlockTime = Date.now();
                     }
                 });
                 centrifuge.subscribe("transactions", (response) => {
@@ -118,6 +137,7 @@
                     if (!isExist) {
                         this.txList.unshift(newTx);
                         this.txList = this.txList.slice(0, TX_LIST_LENGTH);
+                        this.lastTxTime = Date.now();
                     }
                 });
                 centrifuge.subscribe("status-info", (statusData) => {
