@@ -11,7 +11,7 @@ export function getTimeDistance(timestamp) {
 }
 
 export function getTimeUTC(timestamp) {
-    const time = format(toDate(timestamp), 'YYYY-MM-dd HH:mm:ss O');
+    const time = format(toDate(timestamp), 'yyyy-MM-dd HH:mm:ss O');
 
     return time && time !== 'Invalid Date' ? time : false;
 }

@@ -25,12 +25,13 @@
                     };
                 })
                 .catch((e) => {
+                    console.log({e})
                     if (e.response && e.response.status === 404) {
                         // do nothing, wait for tx to appear in the blockchain
                     } else {
                         error({
-                            statusCode: e.response && e.response.status || e.request.status,
-                            message: e.response && (e.response.data.error || e.response.statusText) || e.request.statusText,
+                            statusCode: e.response && e.response.status || e.request && e.request.status,
+                            message: e.response && (e.response.data.error || e.response.statusText) || e.request && e.request.statusText,
                         });
                     }
 
