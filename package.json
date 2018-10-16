@@ -9,7 +9,7 @@
     "production": "npm run build",
     "dev": "gulp & nuxt --spa",
     "build": "gulp once && nuxt build --spa",
-    "start": "nuxt start",
+    "start": "nuxt start --spa",
     "generate": "nuxt generate",
     "analyze": "gulp once && nuxt build --spa --analyze",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",

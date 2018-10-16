@@ -70,6 +70,28 @@
             isBuy(tx) {
                 return tx.type === TX_TYPES.BUY_COIN;
             },
+            hasAmount(tx) {
+                return typeof tx.data.amount !== 'undefined'
+                    || typeof tx.data.value !== 'undefined'
+                    || typeof tx.data.stake !== 'undefined'
+                    || typeof tx.data.initial_amount !== 'undefined';
+            },
+            getConvertCoinSymbol(tx) {
+                if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
+                    return tx.data.coin_to_sell;
+                }
+                if (tx.type === TX_TYPES.BUY_COIN) {
+                    return tx.data.coin_to_buy;
+                }
+            },
+            getConvertValue(tx) {
+                if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
+                    return tx.data.value_to_sell;
+                }
+                if (tx.type === TX_TYPES.BUY_COIN) {
+                    return tx.data.value_to_buy;
+                }
+            },
         },
     };
 </script>
@@ -84,7 +106,7 @@
                 <th>Age</th>
                 <th>From</th>
                 <th>Type</th>
-                <th>TxFee</th>
+                <th>Amount</th>
                 <th class="table__expand-cell"></th>
             </tr>
             </thead>
@@ -110,8 +132,13 @@
                     </td>
                     <!-- type -->
                     <td>{{ tx.type | txType }}</td>
-                    <!-- fee -->
-                    <td class="u-text-muted">{{ tx.fee | pretty }} {{ $store.state.COIN_NAME }}</td>
+                    <!-- amount -->
+                    <td>
+                        <div v-if="hasAmount(tx)">
+                            {{ tx.data.amount || getConvertValue(tx) || tx.data.stake || tx.data.initial_amount || 0 | pretty }}
+                            {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) }}
+                        </div>
+                    </td>
                     <!--expand button -->
                     <td class="table__expand-cell">
                         <button class="table__expand-button u-semantic-button" :class="{'is-expanded': isTxExpanded[tx.txn]}" @click="toggleTx(tx.txn)">Show Tx Data</button>
@@ -202,6 +229,12 @@
                             <div class="table__inner-item" v-if="tx.data.proof">
                                 <strong>Proof</strong> <br>
                                 {{ tx.data.proof | short}}
+                            </div>
+
+                            <!-- fee -->
+                            <div class="table__inner-item">
+                                <strong>Fee</strong> <br>
+                                {{ tx.fee | pretty }} {{ $store.state.COIN_NAME }}
                             </div>
                         </div>
                     </td>
