@@ -175,10 +175,25 @@ export function getRewardChartData(address, type = REWARD_CHART_TYPES.MONTH) {
                 throw new Error('Not valid response from api');
             }
 
+            // format date string to browsers can parse it
+            chartData.forEach((item) => {
+                item.time = item.time.replace(' ', 'T').replace(/(\+\d\d)$/, '$1:00');
+            });
+
+            // only 1 item, prepend it with empty one to chart can be constructed
+            if (chartData.length === 1) {
+                const firstDate = new Date(chartData[0].time);
+                const prevDate = type === REWARD_CHART_TYPES.MONTH || type === REWARD_CHART_TYPES.WEEK
+                    ? firstDate.setDate(firstDate.getDate() - 1)
+                    : firstDate.setHours(firstDate.getHours() - 1);
+                chartData.unshift({time: prevDate, amount: 0});
+
+            }
+
             // format data for line chart.js
             return chartData.reduce((accum, item) => {
                 accum.data.push(item.amount);
-                accum.labels.push(item.time.replace(' ', 'T') + ':00');
+                accum.labels.push(item.time);
                 return accum;
             }, {data: [], labels: []});
         });

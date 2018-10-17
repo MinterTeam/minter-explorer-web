@@ -2,9 +2,9 @@
     import Vue from 'vue';
     import Chart from 'chart.js/dist/Chart.min.js';
     import {getRewardChartData} from '~/api';
-    import {pretty} from '~/assets/utils';
+    import {pretty, padZero} from '~/assets/utils';
     import {REWARD_CHART_TYPES} from '~/assets/variables';
-    
+
     let chartInstance;
 
     export default {
@@ -52,9 +52,9 @@
                                     callback: (value, index, values) => {
                                         let date = new Date(value);
                                         if (this.chartType === REWARD_CHART_TYPES.MONTH || this.chartType === REWARD_CHART_TYPES.WEEK) {
-                                            return date.getUTCDate() + '/' + (date.getUTCMonth() + 1);
+                                            return date.getUTCDate() + '.' + (date.getUTCMonth() + 1);
                                         } else {
-                                            return date.getHours();
+                                            return date.getHours() + ':' + padZero(date.getMinutes());
                                         }
 
                                     },
