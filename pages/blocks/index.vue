@@ -92,10 +92,10 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="block in blockListFormatted" :key="block.height" v-if="block.validators.length">
+                    <tr v-for="block in blockListFormatted" :key="block.height">
                         <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.height }}</nuxt-link></td>
                         <td>{{ block.timeDistance}} ago</td>
-                        <td>{{ block.validators.length }}</td>
+                        <td><span v-if="block.validators.length">{{ block.validators.length }}</span></td>
                         <td>
                             <nuxt-link class="link--default" :to="'/blocks/' + block.height" v-if="block.txCount">{{ block.txCount }}</nuxt-link>
                             <span v-else>{{ block.txCount }}</span>
