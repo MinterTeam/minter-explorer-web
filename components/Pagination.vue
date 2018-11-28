@@ -57,10 +57,20 @@
             getPageHref(page) {
                 let location = {
                     path: this.basePath,
-                    query: {},
+                    query: Object.assign({}, this.$route.query),
                 };
                 if (page && page !== 1) {
-                    location.query.page = page;
+                    if (this.activeTab) {
+                        location.query.active_tab_page = page;
+                    } else {
+                        location.query.page = page;
+                    }
+                } else {
+                    if (this.activeTab) {
+                        delete location.query.active_tab_page;
+                    } else {
+                        delete location.query.page;
+                    }
                 }
                 if (this.activeTab) {
                     location.query.active_tab = this.activeTab;

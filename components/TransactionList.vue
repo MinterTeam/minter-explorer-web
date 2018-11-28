@@ -31,6 +31,9 @@
                 type: Boolean,
                 default: false,
             },
+            isLoading: {
+                type: Boolean,
+            },
         },
 
     };
@@ -50,6 +53,6 @@
                         button-disabled-class="u-hidden"
             />
         </div>
-        <TransactionListTable :tx-list="txList" :current-address="currentAddress" :current-validator="currentValidator" :current-block="currentBlock"/>
+        <TransactionListTable :tx-list="txList" :current-address="currentAddress" :current-validator="currentValidator" :current-block="currentBlock" :is-loading="isLoading"/>
     </section>
 </template>

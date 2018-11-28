@@ -17,6 +17,7 @@
         filters: {
             prettyExact,
         },
+        //@TODO page switching without route reload
         watchQuery: ['page'],
         key: (to) => to.fullPath,
         asyncData({ params, error }) {

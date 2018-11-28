@@ -59,6 +59,7 @@
     .button {
         &:hover, &:focus, &:active {z-index: 2;}
     }
+    & + .u-section {margin-top: 50px;}
 }
 .pagination--header {margin-left: 10px;}
 .pagination--bottom {
@@ -98,7 +99,6 @@
     &::after {content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: currentColor; opacity: 0; transition: 0.15s;}
     &:hover::after, &:focus::after {opacity: 0.4;}
     &.is-active {
-        cursor: default;
         &::after {opacity: 1; background: @c-main;}
     }
 }

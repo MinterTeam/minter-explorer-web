@@ -1,9 +1,10 @@
 <script>
     import {getTimeDistance, pretty, txTypeFilter, shortFilter} from '~/assets/utils';
-    import {TX_TYPES} from '~/assets/variables';
+    import {TX_TYPES, UNBOND_PERIOD} from '~/assets/variables';
     import TableLink from '~/components/TableLink';
 
     export default {
+        UNBOND_PERIOD,
         components: {
             TableLink,
         },
@@ -70,6 +71,9 @@
             isBuy(tx) {
                 return tx.type === TX_TYPES.BUY_COIN;
             },
+            isUnbond(tx) {
+                return tx.type === TX_TYPES.UNBOND;
+            },
             hasAmount(tx) {
                 return typeof tx.data.amount !== 'undefined'
                     || typeof tx.data.value !== 'undefined'
@@ -98,7 +102,12 @@
 
 <template>
     <div class="table-wrap">
-        <table class="u-text-nowrap" v-if="txList.length">
+        <div class="panel__content panel__section u-text-center" v-if="isLoading">
+            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
+                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
+            </svg>
+        </div>
+        <table class="u-text-nowrap" v-else-if="txList.length">
             <thead>
             <tr>
                 <th>TxHash</th>
@@ -119,7 +128,7 @@
                     </td>
                     <!-- block -->
                     <td>
-                        <TableLink :link-text="tx.block" :link-path="'/blocks/' + tx.block" :is-not-link="isCurrentBlock(tx.block)"/>
+                        <TableLink :link-text="tx.block" :link-path="'/blocks/' + tx.block" :is-not-link="isCurrentBlock(tx.block)" :should-not-shorten="true"/>
                     </td>
                     <!-- age -->
                     <td>{{ tx.timeDistance }} ago</td>
@@ -219,6 +228,10 @@
                                 <strong>Commission</strong> <br>
                                 {{ tx.data.commission }}&thinsp;%
                             </div>
+                            <div class="table__inner-item" v-if="isUnbond(tx)">
+                                <strong>Unbond Block</strong> <br>
+                                {{ tx.block + $options.UNBOND_PERIOD }}
+                            </div>
 
                             <!-- type REDEEM_CHECK -->
                             <div class="table__inner-item" v-if="tx.data.raw_check">
@@ -242,11 +255,6 @@
             </template>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else-if="isLoading">
-            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
-                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
-            </svg>
-        </div>
         <div class="panel__content panel__section u-text-center" v-else>No Transactions</div>
     </div>
 </template>

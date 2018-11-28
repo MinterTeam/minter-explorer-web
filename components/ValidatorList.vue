@@ -34,7 +34,7 @@
             getShouldShortenPublicKey() {
                 return process.client && window.innerWidth < 960;
             },
-        }
+        },
     };
 </script>
 
@@ -51,26 +51,26 @@
                 <thead>
                 <tr>
                     <!--<th>Name</th>-->
-                    <th>Address</th>
                     <th>Public Key</th>
+                    <th>Owner's Address</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="validator in validatorList" :key="validator.address">
+                <tr v-for="validator in validatorList" :key="validator.publicKey">
                     <!-- Name -->
                     <!--<td>{{ validator.name }}</td>-->
-                    <!-- Address -->
-                    <td>
-                        <TableLink :link-text="validator.address"
-                                   :link-path="'/address/' + validator.address"
-                                   :should-not-shorten="!shouldShortenAddress"
-                        />
-                    </td>
                     <!-- Public Key -->
                     <td>
                         <TableLink :link-text="validator.publicKey"
                                    :link-path="'/validator/' + validator.publicKey"
                                    :should-not-shorten="!shouldShortenPublicKey"
+                        />
+                    </td>
+                    <!-- Address -->
+                    <td>
+                        <TableLink :link-text="validator.address"
+                                   :link-path="'/address/' + validator.address"
+                                   :should-not-shorten="!shouldShortenAddress"
                         />
                     </td>
                 </tr>

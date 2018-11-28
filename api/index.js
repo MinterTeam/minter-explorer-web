@@ -213,6 +213,24 @@ export function getAddress(address) {
         .then((response) => response.data.data);
 }
 
+/**
+ * @param {string} address
+ * @return {Promise<Array<{coin: string, value: string, pub_key: string}>>}
+ */
+export function getAddressStakeList(address) {
+    return explorer.get('address/delegations/' + address)
+        .then((response) => response.data.data);
+}
+
+/**
+ * @param {string} pubKey
+ * @return {Promise<Validator>}
+ */
+export function getValidator(pubKey) {
+    return explorer.get('validator/' + pubKey)
+        .then((response) => response.data.data);
+}
+
 export function getWebSocketConnectData() {
     return explorer.get('settings/get-ws-data')
         .then((response) => response.data.data);
@@ -228,15 +246,24 @@ export function getWebSocketConnectData() {
  * @property {number} reward
  * @property {number} blockTime
  * @property {string} timestamp
- * @property {Array<Validator>} validators
+ * @property {Array<ValidatorListItem>} validators
+ */
+
+/**
+ * @typedef {Object} ValidatorListItem
+ * @property {number} id
+ * @property {string} name
+ * @property {string} address - owner's address
+ * @property {string} publicKey
  */
 
 /**
  * @typedef {Object} Validator
- * @property {number} id
- * @property {string} name
- * @property {string} address
- * @property {string} publicKey
+ * @property {number} status
+ * @property {string|number} stake
+ * @property {string|number} part
+ * @property {number} delegator_count
+ * @property {Array<{coin: string, value: string, address: string}>} delegator_list
  */
 
 /**

@@ -2,10 +2,11 @@
     import {getTransaction} from "~/api";
     import {getTimeDistance, getTimeUTC, prettyExact, txTypeFilter} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
-    import {TX_TYPES} from "~/assets/variables";
+    import {TX_TYPES, UNBOND_PERIOD} from "~/assets/variables";
     import BackButton from '~/components/BackButton';
 
     export default {
+        UNBOND_PERIOD,
         components: {
             BackButton,
         },
@@ -83,6 +84,9 @@
             isBuy(tx) {
                 return tx.type === TX_TYPES.BUY_COIN;
             },
+            isUnbond(tx) {
+                return tx.type === TX_TYPES.UNBOND;
+            },
         },
     };
 </script>
@@ -151,6 +155,8 @@
                 <dd v-if="isDefined(tx.data.stake)">{{ tx.data.stake | prettyExact }} {{ tx.data.coin }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
+                <dt v-if="isUnbond(tx)">Unbond Block</dt>
+                <dd v-if="isUnbond(tx)">{{ tx.block + $options.UNBOND_PERIOD }}</dd>
 
                 <!-- REDEEM_CHECK -->
                 <dt v-if="tx.data.raw_check">Check</dt>

@@ -29,7 +29,12 @@
 
 <template>
     <div class="table-wrap">
-        <table class="u-text-nowrap" v-if="dataList.length">
+        <div class="panel__content panel__section u-text-center" v-if="isLoading">
+            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
+                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
+            </svg>
+        </div>
+        <table class="u-text-nowrap" v-else-if="dataList.length">
             <thead>
             <tr>
                 <!--<th>Name</th>-->
@@ -65,11 +70,6 @@
             </tr>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else-if="isLoading">
-            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
-                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
-            </svg>
-        </div>
         <div class="panel__content panel__section u-text-center" v-else>No {{ dataType === 'reward' ? 'Rewards' : 'Slashes' }}</div>
     </div>
 </template>

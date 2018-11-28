@@ -33,14 +33,18 @@
                 return;
             }
             return getAllData()
-                .then(([stats, blockList, txList]) => ({
-                    stats,
-                    blockList: blockList.slice(0, BLOCK_LIST_LENGTH),
-                    txList: txList.slice(0, TX_LIST_LENGTH),
-                    isDataLoading: false,
-                    lastBlockTime: Date.now(),
-                    lastTxTime: Date.now(),
-                }))
+                .then(([stats, blockList, txList]) => {
+                    let dataObj = {
+                        stats,
+                        blockList: blockList.slice(0, BLOCK_LIST_LENGTH),
+                        txList: txList.slice(0, TX_LIST_LENGTH),
+                        isDataLoading: false,
+                        lastBlockTime: Date.now(),
+                        lastTxTime: Date.now(),
+                    };
+                    checkLastBlockIsSynced(dataObj);
+                    return dataObj;
+                })
                 .catch((e) => {});
         },
         head() {
@@ -77,6 +81,8 @@
                         this.isDataLoading = false;
                         this.lastBlockTime = Date.now();
                         this.lastTxTime = Date.now();
+
+                        this.checkLastBlockIsSynced();
                     })
                     .catch((e) => {
                         this.isDataLoading = false;
@@ -127,6 +133,8 @@
                         this.blockList.unshift(newBlock);
                         this.blockList = this.blockList.slice(0, BLOCK_LIST_LENGTH);
                         this.lastBlockTime = Date.now();
+
+                        this.checkLastBlockIsSynced();
                     }
                 });
                 centrifuge.subscribe("transactions", (response) => {
@@ -146,9 +154,18 @@
 
                 centrifuge.connect();
             },
+            checkLastBlockIsSynced,
         },
-
     };
+
+    function checkLastBlockIsSynced(dataObj) {
+        if (!dataObj) {
+            dataObj = this;
+        }
+        if (dataObj.stats.latestBlockHeight < dataObj.blockList[0].height) {
+            dataObj.stats.latestBlockHeight = dataObj.blockList[0].height;
+        }
+    }
 </script>
 
 <template>

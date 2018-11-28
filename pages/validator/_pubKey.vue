@@ -1,28 +1,40 @@
 <script>
-    import {getTransactionList} from "~/api";
+    import {getTransactionList, getValidator} from "~/api";
     import getTitle from '~/assets/get-title';
+    import {pretty} from '~/assets/utils';
     import TransactionList from '~/components/TransactionList';
+    import StakeListTable from '~/components/StakeListTable';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
+    const VALIDATOR_STATUS = {
+        1: 'off',
+        2: 'on',
+    };
+
     export default {
+        VALIDATOR_STATUS,
         components: {
+            StakeListTable,
             TransactionList,
             BackButton,
             Pagination,
+            },
+        filters: {
+            pretty,
         },
+        //@TODO page switching without route reload
         watchQuery: ['page'],
         key: (to) => to.fullPath,
         asyncData({ params, query, error }) {
-            return getTransactionList(Object.assign({}, params, query))
-                .then((txListInfo) => {
+            return getValidator(params.pubKey)
+                .then((validator) => {
                     return {
-                        txList: txListInfo.data,
-                        txPaginationInfo: txListInfo.meta,
+                        validator,
                     };
                 })
                 .catch(() => {
-                    error({ statusCode: 404, message: 'Public key not found' });
+                    error({ statusCode: 404, message: 'Validator not found' });
                 });
         },
         head() {
@@ -37,22 +49,30 @@
         },
         data() {
             return {
+                validator: null,
                 txCount: 0,
                 txList: [],
                 txPaginationInfo: {},
+                isTxListLoading: true,
             };
         },
         computed: {
-            baseCoin() {
-                // coins goes from asyncData
-                return this.coins && this.coins.length ? this.coins.reduce((result, coin) => {
-                    if (coin.coin.toUpperCase() === this.$store.state.COIN_NAME) {
-                        result = coin;
-                    }
-                    return result;
-                }, null) : null;
-            },
+
         },
+        mounted() {
+            getTransactionList(Object.assign({}, this.$route.params, this.$route.query))
+                .then((txListInfo) => {
+                    if (txListInfo.data && txListInfo.data.length) {
+                        this.txList = txListInfo.data;
+                        this.txPaginationInfo = txListInfo.meta;
+                    }
+                    this.isTxListLoading = false;
+                })
+                .catch(() => {
+                    this.isTxListLoading = false;
+                });
+        },
+
     };
 </script>
 
@@ -69,15 +89,43 @@
                 <dt>Public Key</dt>
                 <dd class="u-select-all">{{ $route.params.pubKey }}</dd>
 
+                <!-- @TODO owner address -->
+
+                <!-- @TODO validating status-->
+                <dt>Status</dt>
+                <dd>Set {{ $options.VALIDATOR_STATUS[validator.status] }}</dd>
+
+                <dt>Total Stake</dt>
+                <dd>{{ validator.stake | pretty }} {{ $store.state.COIN_NAME }}</dd>
+
+                <!--@TODO 0 if not validating-->
+                <dt>Voting Power</dt>
+                <dd>{{ validator.part * 100 }}&thinsp;%</dd>
+
+                <dt>#Delegators</dt>
+                <dd>{{ validator.delegator_count }}</dd>
+
                 <dt>#Transactions</dt>
                 <dd>{{ txPaginationInfo.total }}</dd>
             </dl>
         </section>
+
+        <section class="panel u-section">
+            <div class="panel__section panel__header">
+                <h1 class="panel__title panel__header-title">
+                    <img class="panel__header-title-icon" src="/img/icon-mining.svg" width="40" height="40" alt="" role="presentation">
+                    Delegated Stakes
+                </h1>
+            </div>
+            <StakeListTable :stake-list="validator.delegator_list" stake-item-type="delegator"/>
+        </section>
+
         <TransactionList :tx-list="txList"
                          :current-validator="$route.params.pubKey"
                          :pagination-info="txPaginationInfo"
-                         v-if="txList.length"
+                         :is-loading="isTxListLoading"
         />
+
         <Pagination :pagination-info="txPaginationInfo"/>
     </div>
 </template>

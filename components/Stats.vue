@@ -5,6 +5,7 @@
         filters: {
             pretty,
             prettyUsd,
+            prettyRound,
             marketCap: (value) => {
                 const ROUND_POWER = 3;
                 if (value > Math.pow(10, 9)) {
@@ -44,15 +45,15 @@
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Last block</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">{{ stats.latestBlockHeight | pretty }}</span>
-                        <span class="index-stats__sub-value">({{ stats.averageBlockTime | pretty }}s)</span>
+                        <span class="index-stats__value-text">{{ stats.latestBlockHeight | prettyRound }}</span>
+                        <span class="index-stats__sub-value">({{ stats.averageBlockTime | prettyUsd }}s)</span>
                     </div>
                 </div>
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Transactions</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">{{ stats.totalTransactions | pretty }}</span>
-                        <span class="index-stats__sub-value">({{ stats.transactionsPerSecond | pretty }} TPS)</span>
+                        <span class="index-stats__value-text">{{ stats.totalTransactions | prettyRound }}</span>
+                        <span class="index-stats__sub-value">({{ stats.transactionsPerSecond | prettyUsd }} TPS)</span>
                     </div>
                 </div>
             </div>

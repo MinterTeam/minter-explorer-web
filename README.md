@@ -3,7 +3,7 @@
 This repository contain the code for the official Minter Explorer website [explorer.minter.network](https://explorer.minter.network)
 
 
-## Deployment script
+## Deployment
 
 Build in Nuxt SPA mode
 ```
