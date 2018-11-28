@@ -153,7 +153,7 @@
                         <button class="table__expand-button u-semantic-button" :class="{'is-expanded': isTxExpanded[tx.txn]}" @click="toggleTx(tx.txn)">Show Tx Data</button>
                     </td>
                 </tr>
-                <tr class="table__row-expanded-data" :key="tx.txn" v-if="isTxExpanded[tx.txn]">
+                <tr class="table__row-expanded-data" :key="tx.txn + 'exp'" v-if="isTxExpanded[tx.txn]">
                     <td colspan="7">
                         <div class="table__inner">
                             <!-- type SEND -->

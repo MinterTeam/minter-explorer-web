@@ -3,7 +3,7 @@
     import Centrifuge from 'centrifuge';
     import {getBlockList, getStatus, getTransactionList, getWebSocketConnectData} from "~/api";
     import getTitle from '~/assets/get-title';
-    import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
+    import {EXPLORER_RTM_URL, NETWORK, NETWORK_EXPLORER_CHANNEL} from "~/assets/variables";
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
@@ -13,6 +13,7 @@
     let timeInterval = null;
     const BLOCK_LIST_LENGTH = 20;
     const TX_LIST_LENGTH = 20;
+    const NETWORK_WS_PREFIX = NETWORK_EXPLORER_CHANNEL ? NETWORK_EXPLORER_CHANNEL + '_' : '';
 
     function getAllData() {
         const statsPromise = getStatus();
@@ -124,7 +125,7 @@
                     sockjs: SockJS,
                 });
 
-                centrifuge.subscribe("blocks", (response) => {
+                centrifuge.subscribe(NETWORK_WS_PREFIX + "blocks", (response) => {
                     const newBlock = response.data;
                     const isExist = this.blockList.some(function(item) {
                         return item.height === newBlock.height;
@@ -137,7 +138,7 @@
                         this.checkLastBlockIsSynced();
                     }
                 });
-                centrifuge.subscribe("transactions", (response) => {
+                centrifuge.subscribe(NETWORK_WS_PREFIX + "transactions", (response) => {
                     const newTx = response.data;
                     const isExist = this.txList.find(function(item) {
                         return item.hash === newTx.hash;
@@ -148,7 +149,7 @@
                         this.lastTxTime = Date.now();
                     }
                 });
-                centrifuge.subscribe("status-info", (statusData) => {
+                centrifuge.subscribe(NETWORK_WS_PREFIX + "status-info", (statusData) => {
                     this.stats = statusData.data;
                 });
 

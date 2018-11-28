@@ -3,6 +3,7 @@ export const BASE_TITLE_END = ' — Minter';
 export const BASE_TITLE = BASE_TITLE_NETWORK + 'Explorer' + BASE_TITLE_END;
 export const BASE_DESCRIPTION = '';
 export const NETWORK = process.env.APP_ENV === 'production' ? 'mainnet' : 'testnet';
+export const NETWORK_EXPLORER_CHANNEL = process.env.APP_ENV === 'production' ? 'mainnet' : '';
 export const COIN_NAME = process.env.APP_ENV === 'production' ? 'BIP' : 'MNT';
 export const UNBOND_PERIOD = process.env.APP_ENV === 'production' ? 518400 : 720;
 export const MAINNET_WEB_URL = 'https://explorer.minter.network';
