@@ -17,9 +17,8 @@
         filters: {
             prettyExact,
         },
-        //@TODO page switching without route reload
-        watchQuery: ['page'],
-        key: (to) => to.fullPath,
+        // watchQuery: ['page'],
+        // key: (to) => to.fullPath,
         asyncData({ params, error }) {
             return getBlock(params.height)
                 .then((block) => {
@@ -49,10 +48,24 @@
             return {
                 /** @type Block */
                 block: {},
-                //isTxListLoading: true,
+                isTxListLoading: true,
                 txList: [],
                 txPaginationInfo: {},
             };
+        },
+        watch: {
+            //@TODO handle multiple page change
+            // update data on page change
+            '$route.query': {
+                handler(newVal, oldVal) {
+                    if (newVal.page !== oldVal.page) {
+                        this.isTxListLoading = true;
+                        this.fetchTxs();
+
+                        this.checkPanelPosition();
+                    }
+                },
+            },
         },
         computed: {
             prevUrl() {
@@ -63,13 +76,29 @@
             },
         },
         mounted() {
-            getTransactionList(Object.assign({block: this.block.height}, this.$route.query))
-                .then((txListInfo) => {
-                    if (txListInfo.data && txListInfo.data.length) {
-                        this.txList = txListInfo.data;
-                        this.txPaginationInfo = txListInfo.meta;
-                    }
-                });
+            this.fetchTxs();
+        },
+        methods: {
+            fetchTxs() {
+                getTransactionList(Object.assign({block: this.block.height}, this.$route.query))
+                    .then((txListInfo) => {
+                        if (txListInfo.data && txListInfo.data.length) {
+                            this.txList = txListInfo.data;
+                            this.txPaginationInfo = txListInfo.meta;
+                        }
+                        this.isTxListLoading = false;
+                    })
+                    .catch(() => {
+                        this.isTxListLoading = false;
+                    });
+            },
+            checkPanelPosition() {
+                const delegationPanelEl = document.querySelector('[data-tx-panel]');
+                // const delegationTableEl = document.querySelector('[data-delegation-panel]');
+                if (window.pageYOffset > delegationPanelEl.offsetTop) {
+                    window.scrollTo(0, delegationPanelEl.offsetTop - 15);
+                }
+            },
         },
     };
 </script>
@@ -110,10 +139,12 @@
             <nuxt-link class="button button--ghost-main" :to="prevUrl" v-if="prevUrl">Prev Block</nuxt-link>
             <nuxt-link class="button button--ghost-main" :to="nextUrl" v-if="nextUrl">Next Block</nuxt-link>
         </div>
-        <TransactionList :tx-list="txList"
+        <TransactionList data-tx-panel
+                         :tx-list="txList"
                          :current-block="block.height"
                          :pagination-info="txPaginationInfo"
-                         v-if="txList.length"
+                         :is-loading="isTxListLoading"
+                         v-if="isTxListLoading || txList.length"
         />
         <Pagination :pagination-info="txPaginationInfo"/>
         <ValidatorList id="validators" :validator-list="block.validators" v-if="block.validators && block.validators.length"/>

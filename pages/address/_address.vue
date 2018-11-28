@@ -67,6 +67,7 @@
             };
         },
         watch: {
+            //@TODO handle multiple page change
             // update data on page change
             '$route.query': {
                 handler(newVal, oldVal) {
@@ -269,7 +270,7 @@
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab"/>
 
         <!-- Transactions -->
-        <TransactionList :tx-list="txList" :current-address="$route.params.address" :is-loading="isTxListLoading"/>
+        <TransactionList :tx-list="txList" :current-address="$route.params.address" :pagination-info="txPaginationInfo" :is-loading="isTxListLoading"/>
         <Pagination :pagination-info="txPaginationInfo"/>
     </div>
 </template>

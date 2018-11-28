@@ -47,7 +47,8 @@
                 <img class="panel__header-title-icon" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation" v-else>
                 Transactions
             </h1>
-            <Pagination :pagination-info="paginationInfo"
+            <Pagination v-show="!isLoading"
+                        :pagination-info="paginationInfo"
                         pagination-class="pagination--header u-hidden-medium-down"
                         button-class="button--white"
                         button-disabled-class="u-hidden"

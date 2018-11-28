@@ -20,7 +20,7 @@
     "axios": "^0.18.0",
     "centrifuge": "^1.5.0",
     "chart.js": "^2.7.3",
-    "date-fns": "^2.0.0-alpha.22",
+    "date-fns": "^2.0.0-alpha.25",
     "entity-decode": "^2.0.1",
     "lodash-es": "^4.17.11",
     "minter-footer-links": "github:MinterTeam/minter-footer-links#v1.0.0",

@@ -23,9 +23,8 @@
         filters: {
             pretty,
         },
-        //@TODO page switching without route reload
-        watchQuery: ['page'],
-        key: (to) => to.fullPath,
+        // watchQuery: ['page'],
+        // key: (to) => to.fullPath,
         asyncData({ params, query, error }) {
             return getValidator(params.pubKey)
                 .then((validator) => {
@@ -56,21 +55,47 @@
                 isTxListLoading: true,
             };
         },
+        watch: {
+            //@TODO handle multiple page change
+            // update data on page change
+            '$route.query': {
+                handler(newVal, oldVal) {
+                    if (newVal.page !== oldVal.page) {
+                        this.isTxListLoading = true;
+                        this.fetchTxs();
+
+                        // this.checkPanelPosition();
+                    }
+                },
+            },
+        },
         computed: {
 
         },
         mounted() {
-            getTransactionList(Object.assign({}, this.$route.params, this.$route.query))
-                .then((txListInfo) => {
-                    if (txListInfo.data && txListInfo.data.length) {
-                        this.txList = txListInfo.data;
-                        this.txPaginationInfo = txListInfo.meta;
-                    }
-                    this.isTxListLoading = false;
-                })
-                .catch(() => {
-                    this.isTxListLoading = false;
-                });
+            this.fetchTxs();
+        },
+        methods: {
+            fetchTxs() {
+                getTransactionList(Object.assign({}, this.$route.params, this.$route.query))
+                    .then((txListInfo) => {
+                        if (txListInfo.data && txListInfo.data.length) {
+                            this.txList = txListInfo.data;
+                            this.txPaginationInfo = txListInfo.meta;
+                        }
+                        this.isTxListLoading = false;
+                    })
+                    .catch(() => {
+                        this.isTxListLoading = false;
+                    });
+            },
+            // checkPanelPosition() {
+            //     const delegationPanelEl = document.querySelector('[data-tx-panel]');
+            //     // const delegationTableEl = document.querySelector('[data-delegation-panel]');
+            //     if (window.pageYOffset > delegationPanelEl.offsetTop) {
+            //         window.scrollTo(0, delegationPanelEl.offsetTop - 15);
+            //     }
+            // },
         },
 
     };
@@ -120,7 +145,8 @@
             <StakeListTable :stake-list="validator.delegator_list" stake-item-type="delegator"/>
         </section>
 
-        <TransactionList :tx-list="txList"
+        <TransactionList data-tx-panel
+                         :tx-list="txList"
                          :current-validator="$route.params.pubKey"
                          :pagination-info="txPaginationInfo"
                          :is-loading="isTxListLoading"
