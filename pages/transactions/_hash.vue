@@ -11,6 +11,7 @@
             BackButton,
         },
         filters: {
+            //@TODO min precision: 4
             prettyExact,
             txType: txTypeFilter,
         },

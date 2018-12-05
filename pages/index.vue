@@ -114,8 +114,9 @@
                     });
             }
 
-            getWebSocketConnectData()
-                .then((data) => this.subscribeWS(data));
+            // getWebSocketConnectData()
+            //     .then((data) => this.subscribeWS(data));
+            this.subscribeWS();
 
             // update timestamps if no new data from server
             timeInterval = setInterval(() => {
@@ -141,11 +142,10 @@
         },
         methods: {
             subscribeWS(connectData) {
-                let centrifuge = new Centrifuge({
-                    url: EXPLORER_RTM_URL,
-                    user: connectData.user ? connectData.user : '',
-                    timestamp: connectData.timestamp.toString(),
-                    token: connectData.token,
+                let centrifuge = new Centrifuge(EXPLORER_RTM_URL, {
+                    // user: connectData.user ? connectData.user : '',
+                    // timestamp: connectData.timestamp.toString(),
+                    // token: connectData.token,
                     sockjs: SockJS,
                 });
 
