@@ -1,4 +1,5 @@
 <script>
+    import Vue from 'vue';
     import SockJS from "sockjs-client";
     import Centrifuge from 'centrifuge';
     import {getBlockList, getStatus, getTransactionList, getWebSocketConnectData} from "~/api";
@@ -19,7 +20,30 @@
         const statsPromise = getStatus();
         const blocksPromise = getBlockList().then((blockListInfo) => blockListInfo.data);
         const txPromise = getTransactionList().then((txListInfo) => txListInfo.data);
-        return Promise.all([statsPromise, blocksPromise, txPromise]);
+        const blocksTxPromise = Promise.all([blocksPromise, txPromise]);
+
+        return new Promise((resolve, reject) => {
+            let resolvedStats = {
+                bipPriceUsd: "0",
+                bipPriceBtc: 0,
+                bipPriceChange: 0,
+                marketCap: "0",
+                latestBlockHeight: 0,
+                latestBlockTime: "2000-01-01 00:00:00+0000",
+                totalTransactions: 0,
+                transactionsPerSecond: 0,
+                averageBlockTime: "5",
+            };
+            statsPromise.then((stats) => {
+                resolvedStats = stats;
+            });
+
+            blocksTxPromise.then(([blockList, txList]) => {
+                // don't wait stats, if stats not ready, it will be resolved with empty stats
+                // actual stats will be delivered a bit later by websocket
+                resolve([resolvedStats, blockList, txList]);
+            }).catch(reject);
+        });
     }
 
     export default {
@@ -151,6 +175,8 @@
                 });
                 centrifuge.subscribe(NETWORK_WS_PREFIX + "status-info", (statusData) => {
                     this.stats = statusData.data;
+
+                    this.checkLastBlockIsSynced();
                 });
 
                 centrifuge.connect();
@@ -160,11 +186,17 @@
     };
 
     function checkLastBlockIsSynced(dataObj) {
+        let isVmObj;
         if (!dataObj) {
             dataObj = this;
+            isVmObj = true;
         }
         if (dataObj.stats.latestBlockHeight < dataObj.blockList[0].height) {
             dataObj.stats.latestBlockHeight = dataObj.blockList[0].height;
+            // notify Vue reactivity system
+            if (isVmObj) {
+                Vue.set(dataObj, 'stats', dataObj.stats);
+            }
         }
     }
 </script>
