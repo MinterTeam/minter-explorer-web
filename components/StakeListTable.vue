@@ -34,6 +34,7 @@
                 if (this.stakeItemType === 'delegator') {
                     return 'Address';
                 }
+                return '';
             },
         },
         mounted() {

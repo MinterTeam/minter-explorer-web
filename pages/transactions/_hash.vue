@@ -27,7 +27,7 @@
                     };
                 })
                 .catch((e) => {
-                    console.log({e})
+                    console.log({e});
                     if (e.response && e.response.status === 404) {
                         // do nothing, wait for tx to appear in the blockchain
                     } else {

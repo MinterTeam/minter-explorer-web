@@ -9,7 +9,7 @@ export const UNBOND_PERIOD = process.env.APP_ENV === 'production' ? 518400 : 720
 export const MAINNET_WEB_URL = 'https://explorer.minter.network';
 export const TESTNET_WEB_URL = 'https://testnet.explorer.minter.network';
 export const EXPLORER_URL = process.env.APP_EXPLORER_URL || 'https://explorer.minter.network';
-export const EXPLORER_RTM_URL = process.env.APP_EXPLORER_RTM_URL || 'https://rtm.explorer.minter.network';
+export const EXPLORER_RTM_URL = process.env.APP_EXPLORER_RTM_URL || 'wss://rtm.explorer.minter.network/connection/websocket';
 export const TX_TYPES = {
     SEND: 'send',
     SELL_COIN: 'sellCoin',

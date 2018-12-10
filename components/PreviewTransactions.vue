@@ -12,7 +12,7 @@
         props: {
             /** @type Array<Transaction>*/
             txList: {
-                type: Array|null,
+                type: [Array, null],
                 required: true,
             },
         },

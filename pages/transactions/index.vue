@@ -2,13 +2,11 @@
     import {getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
     import TransactionList from '~/components/TransactionList';
-    import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
     export default {
         components: {
             TransactionList,
-            BackButton,
             Pagination,
         },
         watchQuery: ['page'],

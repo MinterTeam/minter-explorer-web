@@ -109,6 +109,7 @@
                 if (this.activeTab === TAB_TYPES.SLASH) {
                     return this.slashPaginationInfo;
                 }
+                return '';
             },
         },
         mounted() {

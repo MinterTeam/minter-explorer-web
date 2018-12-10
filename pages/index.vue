@@ -1,6 +1,6 @@
 <script>
     import Vue from 'vue';
-    import SockJS from "sockjs-client";
+    // import SockJS from "sockjs-client";
     import Centrifuge from 'centrifuge';
     import {getBlockList, getStatus, getTransactionList, getWebSocketConnectData} from "~/api";
     import getTitle from '~/assets/get-title';
@@ -146,7 +146,7 @@
                     // user: connectData.user ? connectData.user : '',
                     // timestamp: connectData.timestamp.toString(),
                     // token: connectData.token,
-                    sockjs: SockJS,
+                    // sockjs: SockJS,
                 });
 
                 centrifuge.subscribe(NETWORK_WS_PREFIX + "blocks", (response) => {

@@ -8,19 +8,19 @@
         props: {
             /** @type Array<Block> */
             blockList: {
-                type: Array|null,
+                type: [Array, null],
                 required: true,
             },
         },
         computed: {
             blockListFormatted() {
                 return this.blockList ? this.blockList.map((block) => {
-                    const validator = block.validators[0] || {};
+                    // const validator = block.validators && block.validators[0] || {};
                     return {
                         ...block,
                         url: '/blocks/' + block.height,
-                        validatorName: validator.name || validator.address,
-                        validatorUrl: '/address/' + validator.address,
+                        // validatorName: validator.name || validator.address,
+                        // validatorUrl: '/address/' + validator.address,
                         timeDistance: getTimeDistance(block.timestamp),
                     };
                 }) : [];
