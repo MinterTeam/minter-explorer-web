@@ -52,7 +52,7 @@
                 <tr>
                     <!--<th>Name</th>-->
                     <th>Public Key</th>
-                    <th>Owner's Address</th>
+                    <!--<th>Owner's Address</th>-->
                 </tr>
                 </thead>
                 <tbody>
@@ -67,12 +67,13 @@
                         />
                     </td>
                     <!-- Address -->
-                    <td>
+                    <!--@TODO add isSigned -->
+                    <!--<td>
                         <TableLink :link-text="validator.address"
                                    :link-path="'/address/' + validator.address"
                                    :should-not-shorten="!shouldShortenAddress"
                         />
-                    </td>
+                    </td>-->
                 </tr>
                 </tbody>
             </table>

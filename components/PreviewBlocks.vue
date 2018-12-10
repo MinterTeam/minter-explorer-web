@@ -1,9 +1,10 @@
 <script>
-    import {getTimeDistance, prettyRound} from '~/assets/utils';
+    import {getTimeDistance, prettyRound, prettyUsd} from '~/assets/utils';
 
     export default {
         filters: {
             prettyRound,
+            prettyUsd,
         },
         props: {
             /** @type Array<Block> */
@@ -49,7 +50,7 @@
                         <div class="u-cell u-cell--2-3">
                             <!--Mined by <nuxt-link class="link&#45;&#45;default" :to="block.validatorUrl">{{ block.validatorName }}</nuxt-link>-->
                             <div class="preview__block-reward">
-                                <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime }} secs
+                                <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime | prettyUsd }} secs
                                 <br>
                                 Block Reward {{ block.reward | prettyRound }} {{ $store.state.COIN_NAME }}
                             </div>
