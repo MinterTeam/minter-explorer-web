@@ -30,6 +30,8 @@
             hasAmount(tx) {
                 return typeof tx.data.amount !== 'undefined'
                     || typeof tx.data.value !== 'undefined'
+                    || typeof tx.data.value_to_sell !== 'undefined'
+                    || typeof tx.data.value_to_buy !== 'undefined'
                     || typeof tx.data.stake !== 'undefined'
                     || typeof tx.data.initial_amount !== 'undefined';
             },
@@ -50,7 +52,6 @@
                 }
             },
         },
-
     };
 </script>
 
