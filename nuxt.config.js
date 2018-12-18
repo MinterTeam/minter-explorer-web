@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const nodeExternals = require('webpack-node-externals');
 const dotenv = require('dotenv');
 
 const dotEnvConfig = dotenv.config();
@@ -66,6 +65,10 @@ module.exports = {
         //         name: true
         //     }
         // },
+        watch: [
+            './api/',
+            // `./lang/`, // this watcher dont-work yet
+        ],
         /*
         ** Run ESLint on save
         */
@@ -81,13 +84,27 @@ module.exports = {
             /*
             ** process some node_modules through webpack in server build
             */
-            if (isServer) {
-                config.externals = [
-                    nodeExternals({
-                        whitelist: [/^date-fns\/esm/],
-                    }),
-                ];
-            }
         },
+        babel: {
+            presets: ['@nuxt/babel-preset-app'],
+            // prevent @babel/plugin-transform-runtime from inserting `import` statement into commonjs files (bc. it breaks webpack)
+            sourceType: 'unambiguous',
+        },
+        transpile: [
+            /es6-promise|\.(?!(?:js|json)$).{1,5}$/i,
+            '/base-x/',
+            '@material/',
+            'date-fns/esm',
+            'lodash-es',
+            // 'nuxt-i18n/src',
+            'clipbrd/src',
+            'pretty-num/src',
+            'from-exponential/src',
+            'minterjs-util/src',
+            'minterjs-tx/src',
+            'minterjs-wallet/src',
+            'minter-js-sdk/src',
+            'minter-js-org/src',
+        ],
     },
 };

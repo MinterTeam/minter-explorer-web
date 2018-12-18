@@ -34,6 +34,10 @@ export function txTypeFilter(value) {
     return value;
 }
 
+/**
+ * @param {string|number} value
+ * @return {string}
+ */
 export function pretty(value) {
     if (value > 0.001 || value < -0.001) {
         return decode(prettyNum(value, {precision: 4, rounding: 'fixed', thousandsSeparator: '&thinsp;'}));
@@ -50,8 +54,13 @@ export function prettyRound(value) {
     return decode(prettyNum(value, {precision: 0, thousandsSeparator: '&thinsp;'}));
 }
 
+/**
+ * Ensure value to have minimum 4 decimal digits
+ * @param {string|number} value
+ * @return {string}
+ */
 export function prettyExact(value) {
-    return decode(prettyNum(value, {thousandsSeparator: '&thinsp;'}));
+    return decode(prettyNum(value, {precision: 4, rounding: 'increase', thousandsSeparator: '&thinsp;'}));
 }
 
 /**
