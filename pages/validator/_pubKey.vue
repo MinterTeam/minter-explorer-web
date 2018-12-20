@@ -125,7 +125,7 @@
 
                 <!--@TODO 0 if not validating-->
                 <dt>Voting Power</dt>
-                <dd>{{ validator.part * 100 }}&thinsp;%</dd>
+                <dd>{{ (validator.part * 100) | pretty }}&thinsp;%</dd>
 
                 <dt>#Delegators</dt>
                 <dd>{{ validator.delegator_count }}</dd>

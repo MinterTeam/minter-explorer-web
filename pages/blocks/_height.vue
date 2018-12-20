@@ -1,6 +1,6 @@
 <script>
     import {getBlock, getTransactionList} from "~/api";
-    import {getTimeDistance, getTimeUTC, prettyExact} from "~/assets/utils";
+    import {getTimeDistance, getTimeUTC, prettyRound} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import TransactionList from '~/components/TransactionList';
     import ValidatorList from '~/components/ValidatorList';
@@ -15,7 +15,7 @@
             Pagination,
         },
         filters: {
-            prettyExact,
+            prettyRound,
         },
         // watchQuery: ['page'],
         // key: (to) => to.fullPath,
@@ -114,7 +114,7 @@
             </div>
             <dl>
                 <dt>Height</dt>
-                <dd>{{ block.height | prettyExact }}</dd>
+                <dd>{{ block.height | prettyRound }}</dd>
 
                 <dt>TimeStamp</dt>
                 <dd>{{ block.timeDistance }} ago ({{ block.timeUTC }})</dd>
@@ -123,10 +123,10 @@
                 <dd class="u-select-all">{{ block.hash }}</dd>
 
                 <dt>Size</dt>
-                <dd>{{ block.size | prettyExact }} bytes</dd>
+                <dd>{{ block.size | prettyRound }} bytes</dd>
 
                 <dt>Reward</dt>
-                <dd>{{ block.reward | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ block.reward | prettyRound }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ block.txCount || txPaginationInfo.total || 0 }}</dd>
