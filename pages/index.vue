@@ -10,31 +10,36 @@
     import PreviewBlocks from '~/components/PreviewBlocks';
     import PreviewTransactions from '~/components/PreviewTransactions';
 
-    let centrifuge;
-    let timeInterval = null;
     const BLOCK_LIST_LENGTH = 20;
     const TX_LIST_LENGTH = 20;
     const NETWORK_WS_PREFIX = NETWORK_EXPLORER_CHANNEL ? NETWORK_EXPLORER_CHANNEL + '_' : '';
 
+    let centrifuge;
+    let timeInterval = null;
+    let statsPromise;
+
     function getAllData() {
-        const statsPromise = getStatus();
+        statsPromise = getStatus();
         const blocksPromise = getBlockList().then((blockListInfo) => blockListInfo.data);
         const txPromise = getTransactionList().then((txListInfo) => txListInfo.data);
         const blocksTxPromise = Promise.all([blocksPromise, txPromise]);
 
         return new Promise((resolve, reject) => {
+            //@TODO don't pass blank stats into mounted hook
             let resolvedStats = {
                 bipPriceUsd: "0",
                 bipPriceBtc: 0,
                 bipPriceChange: 0,
                 marketCap: "0",
                 latestBlockHeight: 0,
-                latestBlockTime: "2000-01-01 00:00:00+0000",
+                latestBlockTime: "2000-01-01T00:00:00+0000",
                 totalTransactions: 0,
                 transactionsPerSecond: 0,
                 averageBlockTime: "5",
+                isLoading: true,
             };
             statsPromise.then((stats) => {
+                console.log('get all data', stats);
                 resolvedStats = stats;
             });
 
@@ -96,22 +101,29 @@
             };
         },
         beforeMount() {
+            // in SPA mode data will be loaded in asyncData
             // get blocks, txs
-            if (this.isDataLoading) {
-                getAllData()
-                    .then(([stats, blockList, txList]) => {
-                        this.stats = stats;
-                        this.blockList = blockList.slice(0, BLOCK_LIST_LENGTH);
-                        this.txList = txList.slice(0, TX_LIST_LENGTH);
-                        this.isDataLoading = false;
-                        this.lastBlockTime = Date.now();
-                        this.lastTxTime = Date.now();
+            // if (this.isDataLoading) {
+            //     getAllData()
+            //         .then(([stats, blockList, txList]) => {
+            //             this.stats = stats;
+            //             this.blockList = blockList.slice(0, BLOCK_LIST_LENGTH);
+            //             this.txList = txList.slice(0, TX_LIST_LENGTH);
+            //             this.isDataLoading = false;
+            //             this.lastBlockTime = Date.now();
+            //             this.lastTxTime = Date.now();
+            //
+            //             this.checkLastBlockIsSynced();
+            //         })
+            //         .catch((e) => {
+            //             this.isDataLoading = false;
+            //         });
+            // }
 
-                        this.checkLastBlockIsSynced();
-                    })
-                    .catch((e) => {
-                        this.isDataLoading = false;
-                    });
+            if (!this.isDataLoading && this.stats.isLoading) {
+                statsPromise.then((stats) => {
+                    this.stats = stats;
+                });
             }
 
             // getWebSocketConnectData()
@@ -142,7 +154,7 @@
         },
         methods: {
             subscribeWS(connectData) {
-                let centrifuge = new Centrifuge(EXPLORER_RTM_URL, {
+                centrifuge = new Centrifuge(EXPLORER_RTM_URL, {
                     // user: connectData.user ? connectData.user : '',
                     // timestamp: connectData.timestamp.toString(),
                     // token: connectData.token,
@@ -173,6 +185,7 @@
                         this.lastTxTime = Date.now();
                     }
                 });
+                //@TODO no status-info updates more
                 centrifuge.subscribe(NETWORK_WS_PREFIX + "status-info", (statusData) => {
                     this.stats = statusData.data;
 
