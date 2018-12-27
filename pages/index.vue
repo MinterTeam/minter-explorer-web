@@ -1,8 +1,8 @@
 <script>
-    import Vue from 'vue';
+    // import Vue from 'vue';
     // import SockJS from "sockjs-client";
     import Centrifuge from 'centrifuge';
-    import {getBlockList, getStatus, getTransactionList, getWebSocketConnectData} from "~/api";
+    import {getBlockList, getStatus, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {EXPLORER_RTM_URL, NETWORK, NETWORK_EXPLORER_CHANNEL} from "~/assets/variables";
     import Stats from '~/components/Stats';
@@ -39,7 +39,6 @@
                 isLoading: true,
             };
             statsPromise.then((stats) => {
-                console.log('get all data', stats);
                 resolvedStats = stats;
             });
 
@@ -64,7 +63,7 @@
             }
             return getAllData()
                 .then(([stats, blockList, txList]) => {
-                    let dataObj = {
+                    return {
                         stats,
                         blockList: blockList.slice(0, BLOCK_LIST_LENGTH),
                         txList: txList.slice(0, TX_LIST_LENGTH),
@@ -72,8 +71,6 @@
                         lastBlockTime: Date.now(),
                         lastTxTime: Date.now(),
                     };
-                    checkLastBlockIsSynced(dataObj);
-                    return dataObj;
                 })
                 .catch((e) => {});
         },
@@ -94,14 +91,16 @@
             return {
                 isDataLoading: true,
                 stats: null,
+                /** @type Array<Block> */
                 blockList: [],
+                /*** @type Array<Transaction> */
                 txList: [],
                 lastBlockTime: 0,
                 lastTxTime: 0,
             };
         },
         beforeMount() {
-            // in SPA mode data will be loaded in asyncData
+            // in SPA mode data will be loaded in asyncData (mounted hook need only for generate mode)
             // get blocks, txs
             // if (this.isDataLoading) {
             //     getAllData()
@@ -112,8 +111,6 @@
             //             this.isDataLoading = false;
             //             this.lastBlockTime = Date.now();
             //             this.lastTxTime = Date.now();
-            //
-            //             this.checkLastBlockIsSynced();
             //         })
             //         .catch((e) => {
             //             this.isDataLoading = false;
@@ -151,6 +148,14 @@
             network() {
                 return NETWORK[0].toUpperCase() + NETWORK.slice(1);
             },
+            // take actual height from blocks first
+            latestBlockHeight() {
+                return (this.blockList[0] && this.blockList[0].height) || (this.stats && this.stats.latestBlockHeight) || 0;
+            },
+            // take actual count from blocks response first
+            totalTransactions() {
+                return (this.blockList[0] && this.blockList[0].txTotal) || (this.stats && this.stats.totalTransactions) || 0;
+            },
         },
         methods: {
             subscribeWS(connectData) {
@@ -171,7 +176,7 @@
                         this.blockList = this.blockList.slice(0, BLOCK_LIST_LENGTH);
                         this.lastBlockTime = Date.now();
 
-                        this.checkLastBlockIsSynced();
+                        // this.checkLastBlockIsSynced();
                     }
                 });
                 centrifuge.subscribe(NETWORK_WS_PREFIX + "transactions", (response) => {
@@ -185,39 +190,17 @@
                         this.lastTxTime = Date.now();
                     }
                 });
-                //@TODO no status-info updates more
-                centrifuge.subscribe(NETWORK_WS_PREFIX + "status-info", (statusData) => {
-                    this.stats = statusData.data;
-
-                    this.checkLastBlockIsSynced();
-                });
 
                 centrifuge.connect();
             },
-            checkLastBlockIsSynced,
         },
     };
-
-    function checkLastBlockIsSynced(dataObj) {
-        let isVmObj;
-        if (!dataObj) {
-            dataObj = this;
-            isVmObj = true;
-        }
-        if (dataObj.stats.latestBlockHeight < dataObj.blockList[0].height) {
-            dataObj.stats.latestBlockHeight = dataObj.blockList[0].height;
-            // notify Vue reactivity system
-            if (isVmObj) {
-                Vue.set(dataObj, 'stats', dataObj.stats);
-            }
-        }
-    }
 </script>
 
 <template>
     <div class="u-grid u-grid--vertical-margin" v-if="stats">
         <section class="u-cell u-cell--large--1-2">
-            <Stats :stats="stats"/>
+            <Stats :stats="stats" :latest-block-height="latestBlockHeight" :total-transactions="totalTransactions"/>
         </section>
         <section class="u-cell u-cell--large--1-2 history-cell">
             <HistoryChart/>

@@ -23,6 +23,14 @@
                 type: Object,
                 required: true,
             },
+            latestBlockHeight: {
+                type: [Number, String],
+                required: true,
+            },
+            totalTransactions: {
+                type: [Number, String],
+                required: true,
+            },
         },
     };
 </script>
@@ -45,14 +53,14 @@
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Last block</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">{{ stats.latestBlockHeight | prettyRound }}</span>
+                        <span class="index-stats__value-text">{{ latestBlockHeight | prettyRound }}</span>
                         <span class="index-stats__sub-value">({{ stats.averageBlockTime | prettyUsd }}s)</span>
                     </div>
                 </div>
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Transactions</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">{{ stats.totalTransactions | prettyRound }}</span>
+                        <span class="index-stats__value-text">{{ totalTransactions | prettyRound }}</span>
                         <span class="index-stats__sub-value">({{ stats.transactionsPerSecond | prettyUsd }} TPS)</span>
                     </div>
                 </div>
