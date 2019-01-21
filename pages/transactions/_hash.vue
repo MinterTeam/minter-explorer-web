@@ -158,6 +158,10 @@
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbond(tx)">Unbond Block</dt>
                 <dd v-if="isUnbond(tx)">{{ tx.block + $options.UNBOND_PERIOD }}</dd>
+                <dt v-if="tx.data.reward_address">Reward Address</dt>
+                <dd v-if="tx.data.reward_address"><nuxt-link class="link--default" :to="'/address/' + tx.data.reward_address">{{ tx.data.reward_address }}</nuxt-link></dd>
+                <dt v-if="tx.data.owner_address">Owner Address</dt>
+                <dd v-if="tx.data.owner_address"><nuxt-link class="link--default" :to="'/address/' + tx.data.owner_address">{{ tx.data.owner_address }}</nuxt-link></dd>
 
                 <!-- REDEEM_CHECK -->
                 <dt v-if="tx.data.raw_check">Check</dt>

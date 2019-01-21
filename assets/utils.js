@@ -1,17 +1,17 @@
-import toDate from 'date-fns/esm/toDate';
+import parseISO from 'date-fns/esm/parseISO';
 import format from 'date-fns/esm/format';
 import formatDistanceStrict from 'date-fns/esm/formatDistanceStrict';
 import prettyNum from 'pretty-num';
 import decode from 'entity-decode';
 
 export function getTimeDistance(timestamp) {
-    const distance = formatDistanceStrict(toDate(timestamp), new Date(), {roundingMethod: 'floor'});
+    const distance = formatDistanceStrict(parseISO(timestamp), new Date(), {roundingMethod: 'floor'});
 
     return distance && distance !== 'Invalid Date' ? distance : false;
 }
 
 export function getTimeUTC(timestamp) {
-    const time = format(toDate(timestamp), 'yyyy-MM-dd HH:mm:ss O');
+    const time = format(parseISO(timestamp), 'yyyy-MM-dd HH:mm:ss O');
 
     return time && time !== 'Invalid Date' ? time : false;
 }

@@ -213,7 +213,7 @@
                                 {{ tx.data.constant_reserve_ratio }}&thinsp;%
                             </div>
 
-                            <!-- type DECLARE_CANDIDACY, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
+                            <!-- type DECLARE_CANDIDACY, EDIT_CANDIDATE, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                             <div class="table__inner-item" v-if="tx.data.pub_key">
                                 <strong>Public Key</strong> <br>
                                 <TableLink :link-text="tx.data.pub_key"
@@ -233,6 +233,20 @@
                             <div class="table__inner-item" v-if="isUnbond(tx)">
                                 <strong>Unbond Block</strong> <br>
                                 {{ tx.block + $options.UNBOND_PERIOD }}
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.reward_address">
+                                <strong>Reward Address</strong> <br>
+                                <TableLink :link-text="tx.data.reward_address"
+                                           :link-path="'/address/' + tx.data.reward_address"
+                                           :is-not-link="isCurrentAddress(tx.data.reward_address)"
+                                />
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.owner_address">
+                                <strong>Owner Address</strong> <br>
+                                <TableLink :link-text="tx.data.owner_address"
+                                           :link-path="'/address/' + tx.data.owner_address"
+                                           :is-not-link="isCurrentAddress(tx.data.owner_address)"
+                                />
                             </div>
 
                             <!-- type REDEEM_CHECK -->

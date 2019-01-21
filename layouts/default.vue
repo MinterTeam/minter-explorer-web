@@ -14,6 +14,11 @@
                 isSearchFocused: false,
             };
         },
+        computed: {
+            locale() {
+                return 'en';
+            },
+        },
         methods: {
             inputFocus() {
                 this.isSearchFocused = true;
@@ -49,7 +54,7 @@
                 <img class="footer__logo" src="/img/minter-logo-white.svg" alt="Minter">
                 <div class="footer__menu">
                     <div class="footer__menu-item" v-for="link in $options.footerLinkList" :key="link.slug">
-                        <a class="footer__link link--hover" :href="link.url" target="_blank" rel="nofollow noopener">{{ link.title }}</a>
+                        <a class="footer__link link--hover" :href="link.url" target="_blank" rel="nofollow noopener">{{ link.title[locale] }}</a>
                     </div>
                 </div>
             </div>
