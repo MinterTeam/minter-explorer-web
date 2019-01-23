@@ -315,6 +315,12 @@ export function getValidator(pubKey) {
  * -- type: TX_TYPES.REDEEM_CHECK
  * @property {string} [data.raw_check]
  * @property {string} [data.proof]
+ * @property {Object} [data.check]
+ * @property {string} [data.check.sender]
+ * @property {number} [data.check.nonce]
+ * @property {number|string} [data.check.value]
+ * @property {string} [data.check.coin]
+ * @property {number} [data.check.due_block]
  * - type: TX_TYPES.SET_CANDIDATE_ONLINE, TX_TYPES.SET_CANDIDATE_OFFLINE
  * @property {string} [data.pub_key]
  */

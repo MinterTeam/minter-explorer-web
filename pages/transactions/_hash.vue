@@ -168,6 +168,14 @@
                 <dd v-if="tx.data.raw_check" class="u-select-all">{{ tx.data.raw_check }}</dd>
                 <dt v-if="tx.data.proof">Proof</dt>
                 <dd v-if="tx.data.proof" class="u-select-all">{{ tx.data.proof }}</dd>
+                <dt v-if="tx.data.check && tx.data.check.sender">Check Issuer</dt>
+                <dd v-if="tx.data.check && tx.data.check.sender"><nuxt-link class="link--default" :to="'/address/' + tx.data.check.sender">{{ tx.data.check.sender }}</nuxt-link></dd>
+                <dt v-if="tx.data.check && tx.data.check.nonce">Check Nonce</dt>
+                <dd v-if="tx.data.check && tx.data.check.nonce">{{ tx.data.check.nonce }}</dd>
+                <dt v-if="tx.data.check && tx.data.check.due_block">Due Block</dt>
+                <dd v-if="tx.data.check && tx.data.check.due_block">{{ tx.data.check.due_block }}</dd>
+                <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
+                <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.value | prettyExact }} {{ tx.data.check.coin }}</dd>
 
                 <dt>Fee</dt>
                 <dd>{{ tx.fee | prettyExact }} {{ $store.state.COIN_NAME }}</dd>

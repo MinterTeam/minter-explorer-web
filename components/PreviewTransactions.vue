@@ -33,7 +33,8 @@
                     || typeof tx.data.value_to_sell !== 'undefined'
                     || typeof tx.data.value_to_buy !== 'undefined'
                     || typeof tx.data.stake !== 'undefined'
-                    || typeof tx.data.initial_amount !== 'undefined';
+                    || typeof tx.data.initial_amount !== 'undefined'
+                    || (tx.data.check && typeof tx.data.check.value !== 'undefined');
             },
             getConvertCoinSymbol(tx) {
                 if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
@@ -83,8 +84,8 @@
                         <div>
                             {{ tx.type | txType }}
                             <span v-if="hasAmount(tx)">
-                                {{ tx.data.amount || getConvertValue(tx) || tx.data.stake || tx.data.initial_amount || 0 | pretty }}
-                                {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) }}
+                                {{ tx.data.amount || getConvertValue(tx) || tx.data.stake || tx.data.initial_amount || (tx.data.check && tx.data.check.value) || 0 | pretty }}
+                                {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) }}
                             </span>
                         </div>
                         <div>{{ tx.timeDistance }} ago</div>
