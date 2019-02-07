@@ -1,14 +1,17 @@
 <script>
+    import debounce from 'lodash-es/debounce';
     import {getTransaction} from "~/api";
     import {getTimeDistance, getTimeUTC, prettyExact, txTypeFilter} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {TX_TYPES, UNBOND_PERIOD} from "~/assets/variables";
     import BackButton from '~/components/BackButton';
+    import TableLink from '~/components/TableLink';
 
     export default {
         UNBOND_PERIOD,
         components: {
             BackButton,
+            TableLink,
         },
         filters: {
             //@TODO min precision: 4
@@ -53,11 +56,17 @@
             return {
                 /** @type Transaction|null */
                 tx: null,
+                shouldShortenAddress: this.getShouldShortenAddress(),
             };
         },
         mounted() {
             if (!this.tx) {
                 this.fetchTx();
+            }
+            if (process.client) {
+                window.addEventListener('resize', debounce(() => {
+                    this.shouldShortenAddress = this.getShouldShortenAddress();
+                }), 100);
             }
         },
         methods: {
@@ -87,6 +96,9 @@
             },
             isUnbond(tx) {
                 return tx.type === TX_TYPES.UNBOND;
+            },
+            getShouldShortenAddress() {
+                return process.client && window.innerWidth < 700;
             },
         },
     };
@@ -176,6 +188,28 @@
                 <dd v-if="tx.data.check && tx.data.check.due_block">{{ tx.data.check.due_block }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
                 <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.value | prettyExact }} {{ tx.data.check.coin }}</dd>
+
+                <!-- MULTISEND -->
+                <table class="table--recipient-list" v-if="tx.data.list && tx.data.list.length">
+                    <thead>
+                    <tr>
+                        <th>To</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(recipient, index) in tx.data.list" :key="index">
+                        <td>
+                            <TableLink
+                                :link-text="recipient.address"
+                                :link-path="'/address/' + recipient.address"
+                                :should-not-shorten="!shouldShortenAddress"
+                            />
+                        </td>
+                        <td>{{ recipient.value | prettyExact }} {{ recipient.coin }}</td>
+                    </tr>
+                    </tbody>
+                </table>
 
                 <dt>Fee</dt>
                 <dd>{{ tx.fee | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
