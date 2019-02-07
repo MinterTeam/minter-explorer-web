@@ -71,8 +71,8 @@
                         lastBlockTime: Date.now(),
                         lastTxTime: Date.now(),
                     };
-                })
-                .catch((e) => {});
+                });
+                // .catch((e) => {});
         },
         head() {
             const title = getTitle(null);

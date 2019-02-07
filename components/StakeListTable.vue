@@ -3,6 +3,8 @@
     import {pretty} from '~/assets/utils';
     import TableLink from "~/components/TableLink";
 
+    let resizeHandler;
+
     export default {
         name: 'StakeListTable',
         components: {
@@ -39,9 +41,15 @@
         },
         mounted() {
             if (process.client) {
-                window.addEventListener('resize', debounce(() => {
+                resizeHandler = debounce(() => {
                     this.shouldShortenAddress = this.getShouldShortenAddress();
-                }), 100);
+                });
+                window.addEventListener('resize', resizeHandler, 100);
+            }
+        },
+        destroyed() {
+            if (resizeHandler) {
+                window.removeEventListener('resize', resizeHandler);
             }
         },
         methods: {

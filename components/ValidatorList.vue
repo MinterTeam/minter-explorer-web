@@ -2,6 +2,8 @@
     import debounce from 'lodash-es/debounce';
     import TableLink from '~/components/TableLink';
 
+    let resizeHandler;
+
     export default {
         components: {
             TableLink,
@@ -21,10 +23,16 @@
         },
         mounted() {
             if (process.client) {
-                window.addEventListener('resize', debounce(() => {
+                resizeHandler = debounce(() => {
                     this.shouldShortenAddress = this.getShouldShortenAddress();
                     this.shouldShortenPublicKey = this.getShouldShortenPublicKey();
-                }), 100);
+                });
+                window.addEventListener('resize', resizeHandler, 100);
+            }
+        },
+        destroyed() {
+            if (resizeHandler) {
+                window.removeEventListener('resize', resizeHandler);
             }
         },
         methods: {

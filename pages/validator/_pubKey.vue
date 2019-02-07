@@ -1,6 +1,7 @@
 <script>
     import {getTransactionList, getValidator} from "~/api";
     import getTitle from '~/assets/get-title';
+    import {getErrorText} from '~/assets/server-error';
     import {pretty} from '~/assets/utils';
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
@@ -32,8 +33,13 @@
                         validator,
                     };
                 })
-                .catch(() => {
-                    error({ statusCode: 404, message: 'Validator not found' });
+                .catch((e) => {
+                    console.log({e});
+                    let statusCode = e.request && e.request.status;
+                    error({
+                        statusCode,
+                        message: statusCode === 404 ? 'Validator not found' : getErrorText(e),
+                    });
                 });
         },
         head() {

@@ -3,9 +3,14 @@
     import {getTransaction} from "~/api";
     import {getTimeDistance, getTimeUTC, prettyExact, txTypeFilter} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
+    import {getErrorText} from '~/assets/server-error';
     import {TX_TYPES, UNBOND_PERIOD} from "~/assets/variables";
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
+
+    let fetchTxTimer;
+    let fetchTxDestroy;
+    let resizeHandler;
 
     export default {
         UNBOND_PERIOD,
@@ -35,11 +40,10 @@
                         // do nothing, wait for tx to appear in the blockchain
                     } else {
                         error({
-                            statusCode: e.response && e.response.status || e.request && e.request.status,
-                            message: e.response && (e.response.data.error || e.response.statusText) || e.request && e.request.statusText,
+                            statusCode: e.request && e.request.status,
+                            message: getErrorText(e),
                         });
                     }
-
                 });
         },
         head() {
@@ -64,10 +68,20 @@
                 this.fetchTx();
             }
             if (process.client) {
-                window.addEventListener('resize', debounce(() => {
+                resizeHandler = debounce(() => {
                     this.shouldShortenAddress = this.getShouldShortenAddress();
-                }), 100);
+                });
+                window.addEventListener('resize', resizeHandler, 100);
             }
+        },
+        destroyed() {
+            if (fetchTxTimer) {
+                clearTimeout(fetchTxTimer);
+            }
+            if (resizeHandler) {
+                window.removeEventListener('resize', resizeHandler);
+            }
+            fetchTxDestroy = true;
         },
         methods: {
             fetchTx() {
@@ -78,9 +92,13 @@
                             timeDistance: getTimeDistance(tx.timestamp),
                             timeUTC: getTimeUTC(tx.timestamp),
                         };
+                        fetchTxTimer = null;
                     })
                     .catch((e) => {
-                        setTimeout(() => {
+                        if (fetchTxDestroy) {
+                            return;
+                        }
+                        fetchTxTimer = setTimeout(() => {
                             this.fetchTx();
                         }, 2500);
                     });

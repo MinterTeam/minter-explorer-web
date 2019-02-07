@@ -2,6 +2,7 @@
     import {getBlock, getTransactionList} from "~/api";
     import {getTimeDistance, getTimeUTC, prettyRound} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
+    import {getErrorText} from '~/assets/server-error';
     import TransactionList from '~/components/TransactionList';
     import ValidatorList from '~/components/ValidatorList';
     import BackButton from '~/components/BackButton';
@@ -31,7 +32,12 @@
                     };
                 })
                 .catch((e) => {
-                    error({ statusCode: 404, message: 'Block not found' });
+                    console.log({e});
+                    let statusCode = e.request && e.request.status;
+                    error({
+                        statusCode,
+                        message: statusCode === 404 ? 'Block not found' : getErrorText(e),
+                    });
                 });
         },
         head() {

@@ -1,6 +1,7 @@
 <script>
     import {getAddress, getTransactionList, getAddressStakeList, getRewardList, getSlashList} from "~/api";
     import getTitle from '~/assets/get-title';
+    import {getErrorText} from '~/assets/server-error';
     import {prettyExact, prettyUsd} from "~/assets/utils";
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
@@ -35,7 +36,12 @@
         asyncData({ params, error }) {
             return getAddress(params.address)
                 .catch((e) => {
-                    error({ statusCode: 404, message: 'Address not found' });
+                    console.log({e});
+                    let statusCode = e.request && e.request.status;
+                    error({
+                        statusCode,
+                        message: statusCode === 404 ? 'Address not found' : getErrorText(e),
+                    });
                 });
         },
         head() {
