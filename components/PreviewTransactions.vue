@@ -1,5 +1,5 @@
 <script>
-    import {TX_TYPES} from '~/assets/variables';
+    import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {getTimeDistance, pretty, shortFilter, txTypeFilter} from '~/assets/utils';
 
     export default {
@@ -37,18 +37,18 @@
                     || (tx.data.check && typeof tx.data.check.value !== 'undefined');
             },
             getConvertCoinSymbol(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN)) {
                     return tx.data.coin_to_sell;
                 }
-                if (tx.type === TX_TYPES.BUY_COIN) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN)) {
                     return tx.data.coin_to_buy;
                 }
             },
             getConvertValue(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN)) {
                     return tx.data.value_to_sell;
                 }
-                if (tx.type === TX_TYPES.BUY_COIN) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN)) {
                     return tx.data.value_to_buy;
                 }
             },

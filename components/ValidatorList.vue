@@ -1,5 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
+    import {SimpleSVG} from 'vue-simple-svg';
     import TableLink from '~/components/TableLink';
 
     let resizeHandler;
@@ -7,9 +8,10 @@
     export default {
         components: {
             TableLink,
+            SimpleSvg: SimpleSVG,
         },
         props: {
-            /** @type Array<Validator>*/
+            /** @type Array<ValidatorListItem>*/
             validatorList: {
                 type: Array,
                 required: true,
@@ -58,30 +60,27 @@
             <table class="u-text-nowrap">
                 <thead>
                 <tr>
-                    <!--<th>Name</th>-->
                     <th>Public Key</th>
-                    <!--<th>Owner's Address</th>-->
+                    <th>Block Sign</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="validator in validatorList" :key="validator.publicKey">
-                    <!-- Name -->
-                    <!--<td>{{ validator.name }}</td>-->
-                    <!-- Public Key -->
                     <td>
                         <TableLink :link-text="validator.publicKey"
                                    :link-path="'/validator/' + validator.publicKey"
                                    :should-not-shorten="!shouldShortenPublicKey"
                         />
                     </td>
-                    <!-- Address -->
-                    <!--@TODO add isSigned -->
-                    <!--<td>
-                        <TableLink :link-text="validator.address"
-                                   :link-path="'/address/' + validator.address"
-                                   :should-not-shorten="!shouldShortenAddress"
+                    <td>
+                        <SimpleSvg role="img"
+                            filepath="/img/icon-sign.svg"
+                            :aria-label="validator.signed ? 'Signed' : 'Not signed'"
+                            width="26px"
+                            height="26px"
+                            :fill="validator.signed ? '#6ECA2C' : ''"
                         />
-                    </td>-->
+                    </td>
                 </tr>
                 </tbody>
             </table>

@@ -1,7 +1,7 @@
 <script>
     import Vue from 'vue';
     import Chart from 'chart.js/dist/Chart.min.js';
-    import {getRewardChartData} from '~/api';
+    import {getAddressRewardChart} from '~/api';
     import {pretty, padZero} from '~/assets/utils';
     import {REWARD_CHART_TYPES} from '~/assets/variables';
 
@@ -135,7 +135,7 @@
                     return this.rewardRequest[type];
                 } else {
                     Vue.set(this.rewardLoading, type, true);
-                    const rewardPromise = getRewardChartData(this.$route.params.address, type)
+                    const rewardPromise = getAddressRewardChart(this.$route.params.address, type)
                         .then((dataset) => {
                             Vue.set(this.rewardData, type, dataset);
                             // this.rewardData[type] = dataset;

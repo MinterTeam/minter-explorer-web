@@ -1,6 +1,7 @@
 <script>
+    import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {getTimeDistance, pretty, txTypeFilter, shortFilter} from '~/assets/utils';
-    import {TX_TYPES, UNBOND_PERIOD} from '~/assets/variables';
+    import {UNBOND_PERIOD} from '~/assets/variables';
     import TableLink from '~/components/TableLink';
 
     export default {
@@ -66,13 +67,13 @@
                 this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
             },
             isSell(tx) {
-                return tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN;
+                return tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN);
             },
             isBuy(tx) {
-                return tx.type === TX_TYPES.BUY_COIN;
+                return tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN);
             },
             isUnbond(tx) {
-                return tx.type === TX_TYPES.UNBOND;
+                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
             },
             hasAmount(tx) {
                 return typeof tx.data.amount !== 'undefined'
@@ -84,18 +85,18 @@
                     || (tx.data.check && typeof tx.data.check.value !== 'undefined');
             },
             getConvertCoinSymbol(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN)) {
                     return tx.data.coin_to_sell;
                 }
-                if (tx.type === TX_TYPES.BUY_COIN) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN)) {
                     return tx.data.coin_to_buy;
                 }
             },
             getConvertValue(tx) {
-                if (tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN)) {
                     return tx.data.value_to_sell;
                 }
-                if (tx.type === TX_TYPES.BUY_COIN) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN)) {
                     return tx.data.value_to_buy;
                 }
             },

@@ -1,6 +1,6 @@
 <script>
     import Chart from 'chart.js/dist/Chart.min.js';
-    import {getTxChartData} from "~/api";
+    import {getTransactionChart} from "~/api";
 
     export default {
         data() {
@@ -14,7 +14,7 @@
             },
         },
         mounted() {
-            getTxChartData()
+            getTransactionChart()
                 .then((dataset) => {
                     this.dataset = dataset;
 

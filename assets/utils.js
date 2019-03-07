@@ -3,6 +3,7 @@ import format from 'date-fns/esm/format';
 import formatDistanceStrict from 'date-fns/esm/formatDistanceStrict';
 import prettyNum from 'pretty-num';
 import decode from 'entity-decode';
+import {txTypeList} from 'minterjs-tx/src/tx-types';
 
 export function getTimeDistance(timestamp) {
     const distance = formatDistanceStrict(parseISO(timestamp), new Date(), {roundingMethod: 'floor'});
@@ -27,6 +28,15 @@ export function shortFilter(value, endLength = 6, minLengthToShort) {
 
 
 export function txTypeFilter(value) {
+    if (typeof value === 'string') {
+        return txTypeFilterOld(value);
+    }
+    value = txTypeList[value].name; // get type name
+    value = value.charAt(0).toUpperCase() + value.slice(1); // capitalize the first letter
+    return value;
+}
+
+function txTypeFilterOld(value) {
     value = value.replace(/Data$/, ''); // remove "Data" from the end
     value = value.replace( /([A-Z])/g, " $1" ); // add space before capital letters
     value = value.toLowerCase(); // convert capitalized words to lower case
@@ -39,19 +49,19 @@ export function txTypeFilter(value) {
  * @return {string}
  */
 export function pretty(value) {
-    if (value > 0.001 || value < -0.001) {
-        return decode(prettyNum(value, {precision: 4, rounding: 'fixed', thousandsSeparator: '&thinsp;'}));
+    if (value > 0.001 || value < -0.001 || Number(value) === 0) {
+        return decode(prettyNum(value, {precision: 4, rounding: 'fixed', thousandsSeparator: '&#x202F;'}));
     } else {
-        return decode(prettyNum(value, {precision: 2, rounding: 'significant', thousandsSeparator: '&thinsp;'}));
+        return decode(prettyNum(value, {precision: 2, rounding: 'significant', thousandsSeparator: '&#x202F;'}));
     }
 }
 
 export function prettyUsd(value) {
-    return decode(prettyNum(value, {precision: 2, thousandsSeparator: '&thinsp;'}));
+    return decode(prettyNum(value, {precision: 2, thousandsSeparator: '&#x202F;'}));
 }
 
 export function prettyRound(value) {
-    return decode(prettyNum(value, {precision: 0, thousandsSeparator: '&thinsp;'}));
+    return decode(prettyNum(value, {precision: 0, thousandsSeparator: '&#x202F;'}));
 }
 
 /**
@@ -60,7 +70,7 @@ export function prettyRound(value) {
  * @return {string}
  */
 export function prettyExact(value) {
-    return decode(prettyNum(value, {precision: 4, rounding: 'increase', thousandsSeparator: '&thinsp;'}));
+    return decode(prettyNum(value, {precision: 4, rounding: 'increase', thousandsSeparator: '&#x202F;'}));
 }
 
 /**

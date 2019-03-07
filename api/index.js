@@ -20,11 +20,92 @@ import {REWARD_CHART_TYPES} from '~/assets/variables';
  */
 export function getStatus() {
     return explorer.get('status')
+        .then((response) => response.data.data);
+}
+
+/**
+ * @typedef {Object} BlockListInfo
+ * @property {Array<Block>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
+ * @param {Object} [params]
+ * @param {number} params.page
+ * @return {Promise<BlockListInfo>}
+ */
+export function getBlockList(params) {
+    return explorer.get('blocks', {
+            params,
+        })
         .then((response) => response.data);
 }
 
-export function getTxChartData() {
-    return explorer.get('txCountChartData')
+/**
+ * @typedef {Object} BlockInfo
+ * @property {Block} data
+ * @property {Object} meta
+ * @property {number} meta.latestBlockHeight
+ */
+
+/**
+ * @param {number} height
+ * @return {Promise<Block>}
+ */
+export function getBlock(height) {
+    return explorer.get(`blocks/${height}`)
+        .then((response) => response.data.data);
+}
+
+/**
+ * @param {number} height
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @return {Promise<TransactionListInfo>}
+ */
+export function getBlockTransactionList(height, params) {
+    return explorer.get(`blocks/${height}/transactions`, {params})
+        .then((response) => response.data);
+}
+
+
+
+
+/**
+ * @typedef {Object} TransactionListInfo
+ * @property {Array<Transaction>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @return {Promise<TransactionListInfo>}
+ */
+export function getTransactionList(params) {
+    return explorer.get('transactions', {params})
+        .then((response) => response.data);
+}
+
+/**
+ * @param {string} hash
+ * @return {Promise<Transaction>}
+ */
+export function getTransaction(hash) {
+    return explorer.get('transactions/' + hash)
+        .then((response) => {
+            if (response.status === 200) {
+                response.data.data.status = 'success';
+            }
+            if (response.status === 206) {
+                response.data.data.status = 'failure';
+            }
+            return response.data.data;
+        });
+}
+
+export function getTransactionChart() {
+    return explorer.get('statistics/transactions')
         .then((response) => {
             let chartData = response.data.data;
             if (!Array.isArray(chartData)) {
@@ -62,56 +143,36 @@ export function getTxChartData() {
         });
 }
 
-/**
- * @typedef {Object} BlockListInfo
- * @property {Array<Block>} data
- * @property {Object} meta - pagination
- */
 
 /**
- * @param {Object} [params]
- * @param {number} params.page
- * @return {Promise<BlockListInfo>}
+ *
+ * @param {string} address
+ * @return {Promise<Address>}
  */
-export function getBlockList(params) {
-    return explorer.get('blocks', {
-            params,
-        })
-        .then((response) => response.data);
-}
-
-/**
- * @typedef {Object} BlockInfo
- * @property {Block} data
- * @property {Object} meta
- * @property {number} meta.latestBlockHeight
- */
-
-/**
- * @param {number} height
- * @return {Promise<Block>}
- */
-export function getBlock(height) {
-    return explorer.get('block/' + height)
+export function getAddress(address) {
+    return explorer.get(`addresses/${address}`)
         .then((response) => response.data.data);
 }
 
 /**
- * @typedef {Object} TransactionListInfo
- * @property {Array<Transaction>} data
- * @property {Object} meta - pagination
- */
-
-/**
+ *
+ * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.block]
- * @param {number} [params.address]
  * @param {number} [params.page]
  * @return {Promise<TransactionListInfo>}
  */
-export function getTransactionList(params) {
-    return explorer.get('transactions', {params})
+export function getAddressTransactionList(address, params) {
+    return explorer.get(`addresses/${address}/transactions`, {params})
         .then((response) => response.data);
+}
+
+/**
+ * @param {string} address
+ * @return {Promise<Array<{coin: string, value: string, pub_key: string}>>}
+ */
+export function getAddressStakeList(address) {
+    return explorer.get(`addresses/${address}/delegations`)
+        .then((response) => response.data.data);
 }
 
 /**
@@ -121,13 +182,14 @@ export function getTransactionList(params) {
  */
 
 /**
+ * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.address]
  * @param {number} [params.page]
  * @return {Promise<RewardListInfo>}
  */
-export function getRewardList(params) {
-    return explorer.get('events/rewards', {params})
+export function getAddressRewardList(address, params) {
+    params.limit = 20; // set per_page
+    return explorer.get(`addresses/${address}/events/rewards`, {params})
         .then((response) => response.data);
 }
 
@@ -138,13 +200,14 @@ export function getRewardList(params) {
  */
 
 /**
+ * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.address]
  * @param {number} [params.page]
  * @return {Promise<SlashListInfo>}
  */
-export function getSlashList(params) {
-    return explorer.get('events/slashes', {params})
+export function getAddressSlashList(address, params) {
+    params.limit = 20; // set per_page
+    return explorer.get(`addresses/${address}/events/slashes`, {params})
         .then((response) => response.data);
 }
 
@@ -153,7 +216,7 @@ export function getSlashList(params) {
  * @param {string} type
  * @return {Promise<Array>}
  */
-export function getRewardChartData(address, type = REWARD_CHART_TYPES.MONTH) {
+export function getAddressRewardChart(address, type = REWARD_CHART_TYPES.MONTH) {
     let params;
     if (type === REWARD_CHART_TYPES.MONTH) {
         params = {scale: 'day'};
@@ -168,7 +231,7 @@ export function getRewardChartData(address, type = REWARD_CHART_TYPES.MONTH) {
             startTime: (new Date(Date.now() - 23 * 60 * 60 * 1000)).toISOString(),
         };
     }
-    return explorer.get('events/rewards/chart/' + address, {params})
+    return explorer.get(`addresses/${address}/statistics/rewards`, {params})
         .then((response) => {
             let chartData = response.data.data;
             if (!Array.isArray(chartData)) {
@@ -199,36 +262,28 @@ export function getRewardChartData(address, type = REWARD_CHART_TYPES.MONTH) {
         });
 }
 
-/**
- * @param {string} hash
- * @return {Promise<Transaction>}
- */
-export function getTransaction(hash) {
-    return explorer.get('transaction/' + hash)
-        .then((response) => response.data.data);
-}
 
-export function getAddress(address) {
-    return explorer.get('address/' + address)
-        .then((response) => response.data.data);
-}
 
-/**
- * @param {string} address
- * @return {Promise<Array<{coin: string, value: string, pub_key: string}>>}
- */
-export function getAddressStakeList(address) {
-    return explorer.get('address/delegations/' + address)
-        .then((response) => response.data.data);
-}
+
 
 /**
  * @param {string} pubKey
  * @return {Promise<Validator>}
  */
 export function getValidator(pubKey) {
-    return explorer.get('validator/' + pubKey)
+    return explorer.get(`validators/${pubKey}`)
         .then((response) => response.data.data);
+}
+
+/**
+ * @param {string} pubKey
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @return {Promise<TransactionListInfo>}
+ */
+export function getValidatorTransactionList(pubKey, params) {
+    return explorer.get(`validators/${pubKey}/transactions`, {params})
+        .then((response) => response.data);
 }
 
 // export function getWebSocketConnectData() {
@@ -251,11 +306,15 @@ export function getValidator(pubKey) {
  */
 
 /**
+ * @typedef {Object} Address
+ * @property {string} address
+ * @property {Array<Object>} balances
+ */
+
+/**
  * @typedef {Object} ValidatorListItem
- * @property {number} id
- * @property {string} name
- * @property {string} address - owner's address
  * @property {string} publicKey
+ * @property {boolean} signed
  */
 
 /**
@@ -279,40 +338,40 @@ export function getValidator(pubKey) {
  * @property {number} fee
  * @property {number} type
  * @property {Object} data
- * -- type: TX_TYPES.SEND
+ * -- type: TX_TYPE_SEND
  * @property {string} [data.to]
  * @property {string} [data.coin]
  * @property {number} [data.amount]
- * -- type: TX_TYPES.CONVERT
+ * -- type: TX_TYPE_CONVERT
  * @property {string} [data.coin_to_sell]
  * @property {string} [data.coin_to_buy]
  * @property {number} [data.value_to_sell]
  * @property {number} [data.value_to_buy]
- * -- type: TX_TYPES.CREATE_COIN
+ * -- type: TX_TYPE_CREATE_COIN
  * @property {string} [data.name]
  * @property {string} [data.symbol]
  * @property {number} [data.initial_amount]
  * @property {number} [data.initial_reserve]
  * @property {number} [data.constant_reserve_ratio]
- * -- type: TX_TYPES.DECLARE_CANDIDACY
+ * -- type: TX_TYPE_DECLARE_CANDIDACY
  * @property {string} [data.address]
  * @property {string} [data.pub_key]
  * @property {number} [data.commission]
  * @property {string} [data.coin]
  * @property {number} [data.stake]
- * -- type: TX_TYPES.EDIT_CANDIDATE
+ * -- type: TX_TYPE_EDIT_CANDIDATE
  * @property {string} [data.pub_key]
  * @property {string} [data.reward_address]
  * @property {string} [data.owner_address]
- * -- type: TX_TYPES.DELEGATE
+ * -- type: TX_TYPE_DELEGATE
  * @property {string} [data.pub_key]
  * @property {string} [data.coin]
  * @property {number} [data.stake]
- * -- type: TX_TYPES.UNBOND
+ * -- type: TX_TYPE_UNBOND
  * @property {string} [data.pub_key]
  * @property {string} [data.coin]
  * @property {number} [data.value]
- * -- type: TX_TYPES.REDEEM_CHECK
+ * -- type: TX_TYPE_REDEEM_CHECK
  * @property {string} [data.raw_check]
  * @property {string} [data.proof]
  * @property {Object} [data.check]
@@ -321,7 +380,7 @@ export function getValidator(pubKey) {
  * @property {number|string} [data.check.value]
  * @property {string} [data.check.coin]
  * @property {number} [data.check.due_block]
- * - type: TX_TYPES.SET_CANDIDATE_ONLINE, TX_TYPES.SET_CANDIDATE_OFFLINE
+ * - type: TX_TYPE_SET_CANDIDATE_ONLINE, TX_TYPE_SET_CANDIDATE_OFFLINE
  * @property {string} [data.pub_key]
  */
 

@@ -1,5 +1,5 @@
 <script>
-    import {getTransactionList, getValidator} from "~/api";
+    import {getValidatorTransactionList, getValidator} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty} from '~/assets/utils';
@@ -83,7 +83,7 @@
         },
         methods: {
             fetchTxs() {
-                getTransactionList(Object.assign({}, this.$route.params, this.$route.query))
+                getValidatorTransactionList(this.$route.params.pubKey, this.$route.query)
                     .then((txListInfo) => {
                         if (txListInfo.data && txListInfo.data.length) {
                             this.txList = txListInfo.data;
@@ -131,7 +131,7 @@
 
                 <!--@TODO 0 if not validating-->
                 <dt>Voting Power</dt>
-                <dd>{{ (validator.part * 100) | pretty }}&thinsp;%</dd>
+                <dd>{{ validator.part | pretty }}&thinsp;%</dd>
 
                 <dt>#Delegators</dt>
                 <dd>{{ validator.delegator_count }}</dd>

@@ -10,20 +10,6 @@ export const MAINNET_WEB_URL = 'https://explorer.minter.network';
 export const TESTNET_WEB_URL = 'https://testnet.explorer.minter.network';
 export const EXPLORER_URL = process.env.APP_EXPLORER_URL || 'https://explorer.minter.network';
 export const EXPLORER_RTM_URL = process.env.APP_EXPLORER_RTM_URL || 'wss://rtm.explorer.minter.network/connection/websocket';
-export const TX_TYPES = {
-    SEND: 'send',
-    SELL_COIN: 'sellCoin',
-    SELL_ALL_COIN: 'sellAllCoin',
-    BUY_COIN: 'buyCoin',
-    CREATE_COIN: 'createCoin',
-    DECLARE_CANDIDACY: 'declareCandidacy',
-    EDIT_CANDIDATE: 'editCandidate',
-    DELEGATE: 'delegate',
-    UNBOND: 'unbond',
-    REDEEM_CHECK: 'redeemCheckData',
-    SET_CANDIDATE_ONLINE: 'setCandidateOnData',
-    SET_CANDIDATE_OFFLINE: 'setCandidateOffData',
-};
 export const REWARD_CHART_TYPES = {
     MONTH: 'month',
     WEEK: 'week',

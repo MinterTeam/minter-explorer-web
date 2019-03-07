@@ -9,7 +9,7 @@
 <template>
     <div class="u-text-center">
         <h1 class="u-h1--xl error__title">Error {{ error.statusCode }}</h1>
-        <p v-if="error.statusCode === 504">Request failed with status code 504. <br> Gateway timeout.</p>
+        <p v-if="error.statusCode === 504">Request failed with status code 504. <br> Gateway time-out.</p>
         <p v-else-if="error.statusCode === 503">The webpage is currently unavailable. <br> It may be overloaded or down for maintenance.</p>
         <p v-else>{{ error.message }}</p>
         <!--<p v-if="error.statusCode === 404">К сожалению, здесь ничего нет. Проверьте правильность адреса или просто перейдите на главную страницу нашего журнала.</p>-->

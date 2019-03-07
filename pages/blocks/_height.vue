@@ -1,5 +1,5 @@
 <script>
-    import {getBlock, getTransactionList} from "~/api";
+    import {getBlock, getBlockTransactionList} from "~/api";
     import {getTimeDistance, getTimeUTC, prettyRound} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -86,7 +86,7 @@
         },
         methods: {
             fetchTxs() {
-                getTransactionList(Object.assign({block: this.block.height}, this.$route.query))
+                getBlockTransactionList(this.block.height, this.$route.query)
                     .then((txListInfo) => {
                         if (txListInfo.data && txListInfo.data.length) {
                             this.txList = txListInfo.data;

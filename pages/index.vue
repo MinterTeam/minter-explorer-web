@@ -22,32 +22,7 @@
         statsPromise = getStatus();
         const blocksPromise = getBlockList().then((blockListInfo) => blockListInfo.data);
         const txPromise = getTransactionList().then((txListInfo) => txListInfo.data);
-        const blocksTxPromise = Promise.all([blocksPromise, txPromise]);
-
-        return new Promise((resolve, reject) => {
-            //@TODO don't pass blank stats into mounted hook
-            let resolvedStats = {
-                bipPriceUsd: "0",
-                bipPriceBtc: 0,
-                bipPriceChange: 0,
-                marketCap: "0",
-                latestBlockHeight: 0,
-                latestBlockTime: "2000-01-01T00:00:00+0000",
-                totalTransactions: 0,
-                transactionsPerSecond: 0,
-                averageBlockTime: "5",
-                isLoading: true,
-            };
-            statsPromise.then((stats) => {
-                resolvedStats = stats;
-            });
-
-            blocksTxPromise.then(([blockList, txList]) => {
-                // don't wait stats, if stats not ready, it will be resolved with empty stats
-                // actual stats will be delivered a bit later by websocket
-                resolve([resolvedStats, blockList, txList]);
-            }).catch(reject);
-        });
+        return Promise.all([statsPromise, blocksPromise, txPromise]);
     }
 
     export default {

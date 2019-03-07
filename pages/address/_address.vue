@@ -1,5 +1,5 @@
 <script>
-    import {getAddress, getTransactionList, getAddressStakeList, getRewardList, getSlashList} from "~/api";
+    import {getAddress, getAddressTransactionList, getAddressStakeList, getAddressRewardList, getAddressSlashList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {prettyExact, prettyUsd} from "~/assets/utils";
@@ -115,7 +115,7 @@
                 if (this.activeTab === TAB_TYPES.SLASH) {
                     return this.slashPaginationInfo;
                 }
-                return '';
+                return false;
             },
         },
         mounted() {
@@ -159,50 +159,45 @@
                 }
             },
             fetchTxs() {
-                getTransactionList({
-                    address: this.$route.params.address,
-                    page: this.$route.query.page,
-                })
-                .then((txListInfo) => {
-                    if (txListInfo.data && txListInfo.data.length) {
-                        this.txList = txListInfo.data;
-                        this.txPaginationInfo = txListInfo.meta;
-                    }
-                    this.isTxListLoading = false;
-                })
-                .catch(() => {
-                    this.isTxListLoading = false;
-                });
+                getAddressTransactionList(this.$route.params.address, this.$route.query)
+                    .then((txListInfo) => {
+                        if (txListInfo.data && txListInfo.data.length) {
+                            this.txList = txListInfo.data;
+                            this.txPaginationInfo = txListInfo.meta;
+                        }
+                        this.isTxListLoading = false;
+                    })
+                    .catch(() => {
+                        this.isTxListLoading = false;
+                    });
             },
             fetchStakes() {
                 getAddressStakeList(this.$route.params.address)
-                .then((stakeList) => {
-                    this.stakeList = stakeList;
-                    this.isStakeListLoading = false;
-                })
-                .catch(() => {
-                    this.isStakeListLoading = false;
-                });
+                    .then((stakeList) => {
+                        this.stakeList = stakeList;
+                        this.isStakeListLoading = false;
+                    })
+                    .catch(() => {
+                        this.isStakeListLoading = false;
+                    });
             },
             fetchRewards() {
-                getRewardList({
-                    address: this.$route.params.address,
+                getAddressRewardList(this.$route.params.address, {
                     page: this.$route.query.active_tab === TAB_TYPES.REWARD ? this.$route.query.active_tab_page : undefined,
                 })
-                .then((rewardListInfo) => {
-                    if (rewardListInfo.data && rewardListInfo.data.length) {
-                        this.rewardList = rewardListInfo.data;
-                        this.rewardPaginationInfo = rewardListInfo.meta;
-                    }
-                    this.isRewardListLoading = false;
-                })
-                .catch(() => {
-                    this.isRewardListLoading = false;
-                });
+                    .then((rewardListInfo) => {
+                        if (rewardListInfo.data && rewardListInfo.data.length) {
+                            this.rewardList = rewardListInfo.data;
+                            this.rewardPaginationInfo = rewardListInfo.meta;
+                        }
+                        this.isRewardListLoading = false;
+                    })
+                    .catch(() => {
+                        this.isRewardListLoading = false;
+                    });
             },
             fetchSlashes() {
-                getSlashList({
-                    address: this.$route.params.address,
+                getAddressSlashList(this.$route.params.address, {
                     page: this.$route.query.active_tab === TAB_TYPES.SLASH ? this.$route.query.active_tab_page : undefined,
                 })
                 .then((slashListInfo) => {
@@ -245,7 +240,6 @@
         </section>
 
         <!-- Delegation -->
-        <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD"/>
         <section class="panel u-section" v-if="stakeList.length || rewardList.length" data-delegation-panel>
             <div class="panel__switcher">
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
@@ -274,7 +268,9 @@
             <RewardSlashListTable :data-list="rewardList" data-type="reward" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
             <RewardSlashListTable :data-list="slashList" data-type="slash" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
         </section>
-        <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab"/>
+        <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
+        <!-- Delegation Reward Chard-->
+        <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD"/>
 
         <!-- Transactions -->
         <TransactionList :tx-list="txList" :current-address="$route.params.address" :pagination-info="txPaginationInfo" :is-loading="isTxListLoading"/>

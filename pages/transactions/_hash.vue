@@ -1,10 +1,11 @@
 <script>
     import debounce from 'lodash-es/debounce';
+    import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {getTransaction} from "~/api";
     import {getTimeDistance, getTimeUTC, prettyExact, txTypeFilter} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {TX_TYPES, UNBOND_PERIOD} from "~/assets/variables";
+    import {UNBOND_PERIOD} from "~/assets/variables";
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
 
@@ -107,13 +108,13 @@
                 return typeof value !== 'undefined';
             },
             isSell(tx) {
-                return tx.type === TX_TYPES.SELL_COIN || tx.type === TX_TYPES.SELL_ALL_COIN;
+                return tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN);
             },
             isBuy(tx) {
-                return tx.type === TX_TYPES.BUY_COIN;
+                return tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN);
             },
             isUnbond(tx) {
-                return tx.type === TX_TYPES.UNBOND;
+                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
             },
             getShouldShortenAddress() {
                 return process.client && window.innerWidth < 700;
@@ -216,15 +217,15 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="(recipient, index) in tx.data.list" :key="index">
+                    <tr v-for="(transfer, index) in tx.data.list" :key="index">
                         <td>
                             <TableLink
-                                :link-text="recipient.address"
-                                :link-path="'/address/' + recipient.address"
+                                :link-text="transfer.to"
+                                :link-path="'/address/' + transfer.to"
                                 :should-not-shorten="!shouldShortenAddress"
                             />
                         </td>
-                        <td>{{ recipient.value | prettyExact }} {{ recipient.coin }}</td>
+                        <td>{{ transfer.value | prettyExact }} {{ transfer.coin }}</td>
                     </tr>
                     </tbody>
                 </table>
