@@ -2,7 +2,7 @@
     import debounce from 'lodash-es/debounce';
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {getTransaction} from "~/api";
-    import {getTimeDistance, getTimeUTC, prettyExact, txTypeFilter} from "~/assets/utils";
+    import {getTimeDistance, getTimeUTC, prettyExact, prettyRound, txTypeFilter} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {UNBOND_PERIOD} from "~/assets/variables";
@@ -20,8 +20,8 @@
             TableLink,
         },
         filters: {
-            //@TODO min precision: 4
             prettyExact,
+            prettyRound,
             txType: txTypeFilter,
         },
         asyncData({ params, error }) {
@@ -119,6 +119,9 @@
             getShouldShortenAddress() {
                 return process.client && window.innerWidth < 700;
             },
+            fromBase64(str) {
+                return decodeURIComponent(escape(window.atob(str)));
+            },
         },
     };
 </script>
@@ -143,7 +146,7 @@
                 <dd><strong :class="tx.status === 'success' ? 'tx__success' : 'tx__fail'">{{ tx.status }}</strong></dd>
 
                 <dt>Block</dt>
-                <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.block">{{ tx.block }}</nuxt-link></dd>
+                <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.block">{{ tx.block | prettyRound }}</nuxt-link></dd>
 
                 <dt>Type</dt>
                 <dd>{{ tx.type | txType }}</dd>
@@ -237,7 +240,7 @@
                 <dd>{{ tx.nonce }}</dd>
 
                 <dt>Message</dt>
-                <dd :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? tx.payload : 'Blank' }}</dd>
+                <dd :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
             </dl>
         </section>
         <h1 class="u-text-center" style="margin-top: 50px;" v-else>

@@ -1,6 +1,6 @@
 <script>
     import {getBlockList} from "~/api";
-    import {getTimeDistance, pretty} from '~/assets/utils';
+    import {getTimeDistance, pretty, prettyRound} from '~/assets/utils';
     import getTitle from '~/assets/get-title';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -12,6 +12,7 @@
         },
         filters: {
             pretty,
+            prettyRound,
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
@@ -93,7 +94,7 @@
                     </thead>
                     <tbody>
                     <tr v-for="block in blockListFormatted" :key="block.height">
-                        <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.height }}</nuxt-link></td>
+                        <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.height | prettyRound }}</nuxt-link></td>
                         <td>{{ block.timeDistance}} ago</td>
                         <td><span v-if="block.validators.length">{{ block.validators.length }}</span></td>
                         <td>

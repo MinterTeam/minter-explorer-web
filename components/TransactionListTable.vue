@@ -1,6 +1,6 @@
 <script>
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
-    import {getTimeDistance, pretty, txTypeFilter, shortFilter} from '~/assets/utils';
+    import {getTimeDistance, pretty, prettyRound, txTypeFilter, shortFilter} from '~/assets/utils';
     import {UNBOND_PERIOD} from '~/assets/variables';
     import TableLink from '~/components/TableLink';
 
@@ -11,6 +11,7 @@
         },
         filters: {
             pretty,
+            prettyRound,
             // transform "camelCaseText" to "Sentence Case Text"
             txType: txTypeFilter,
             short: shortFilter,
@@ -51,6 +52,7 @@
             },
         },
         methods: {
+            prettyRound,
             isCurrentAddress(address) {
                 return address === this.currentAddress;
             },
@@ -132,7 +134,7 @@
                     </td>
                     <!-- block -->
                     <td>
-                        <TableLink :link-text="tx.block" :link-path="'/blocks/' + tx.block" :is-not-link="isCurrentBlock(tx.block)" :should-not-shorten="true"/>
+                        <TableLink :link-text="prettyRound(tx.block)" :link-path="'/blocks/' + tx.block" :is-not-link="isCurrentBlock(tx.block)" :should-not-shorten="true"/>
                     </td>
                     <!-- age -->
                     <td>{{ tx.timeDistance }} ago</td>

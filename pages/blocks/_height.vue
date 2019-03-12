@@ -78,7 +78,7 @@
                 return this.block.height > 1 ? '/blocks/' + (this.block.height - 1) : false;
             },
             nextUrl() {
-                return this.block.height < this.block.latestBlockHeight ? '/blocks/' + (this.block.height + 1) : '';
+                return '/blocks/' + (this.block.height + 1);
             },
         },
         mounted() {
