@@ -157,8 +157,8 @@
                 <!-- SEND -->
                 <dt v-if="tx.data.to">To</dt>
                 <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
-                <dt v-if="isDefined(tx.data.amount)">Amount</dt>
-                <dd v-if="isDefined(tx.data.amount)">{{ tx.data.amount | prettyExact }} {{ tx.data.coin }}</dd>
+                <dt v-if="isDefined(tx.data.value)">Amount</dt>
+                <dd v-if="isDefined(tx.data.value)">{{ tx.data.value | prettyExact }} {{ tx.data.coin }}</dd>
 
                 <!-- SELL -->
                 <dt v-if="isSell(tx)">Sell coins</dt>

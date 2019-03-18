@@ -78,8 +78,7 @@
                 return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
             },
             hasAmount(tx) {
-                return typeof tx.data.amount !== 'undefined'
-                    || typeof tx.data.value !== 'undefined'
+                return typeof tx.data.value !== 'undefined'
                     || typeof tx.data.value_to_sell !== 'undefined'
                     || typeof tx.data.value_to_buy !== 'undefined'
                     || typeof tx.data.stake !== 'undefined'
@@ -150,7 +149,7 @@
                     <!-- amount -->
                     <td>
                         <div v-if="hasAmount(tx)">
-                            {{ tx.data.amount || getConvertValue(tx) || tx.data.stake || tx.data.initial_amount || (tx.data.check && tx.data.check.value) || 0 | pretty }}
+                            {{ tx.data.value || getConvertValue(tx) || tx.data.stake || tx.data.initial_amount || (tx.data.check && tx.data.check.value) || 0 | pretty }}
                             {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) }}
                         </div>
                     </td>
@@ -171,9 +170,9 @@
                                            :should-not-shorten="true"
                                 />
                             </div>
-                            <div class="table__inner-item" v-if="isDefined(tx.data.amount)">
+                            <div class="table__inner-item" v-if="isDefined(tx.data.value)">
                                 <strong>Value</strong> <br>
-                                {{ tx.data.amount | pretty }} {{ tx.data.coin }}
+                                {{ tx.data.value | pretty }} {{ tx.data.coin }}
                             </div>
 
                             <!-- SELL -->
