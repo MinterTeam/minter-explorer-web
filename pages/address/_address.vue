@@ -58,7 +58,6 @@
             return {
                 activeTab: Object.values(TAB_TYPES).indexOf(this.$route.query.active_tab) !== -1 ? this.$route.query.active_tab : TAB_TYPES.STAKE,
                 storedTabPages: {},
-                txCount: 0,
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: true,
@@ -235,7 +234,7 @@
                 <dd>${{ baseCoin ? baseCoin.usdAmount : 0 | prettyUsd }}</dd>
 
                 <dt>#Transactions</dt>
-                <dd>{{ txCount }}</dd>
+                <dd>{{ txPaginationInfo.total || 0 }}</dd>
             </dl>
         </section>
 

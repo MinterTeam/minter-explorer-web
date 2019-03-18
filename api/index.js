@@ -31,7 +31,8 @@ export function getStatus() {
 
 /**
  * @param {Object} [params]
- * @param {number} params.page
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
  * @return {Promise<BlockListInfo>}
  */
 export function getBlockList(params) {
@@ -61,6 +62,7 @@ export function getBlock(height) {
  * @param {number} height
  * @param {Object} [params]
  * @param {number} [params.page]
+ * @param {number} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getBlockTransactionList(height, params) {
@@ -80,6 +82,7 @@ export function getBlockTransactionList(height, params) {
 /**
  * @param {Object} [params]
  * @param {number} [params.page]
+ * @param {number} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getTransactionList(params) {
@@ -159,6 +162,7 @@ export function getAddress(address) {
  * @param {string} address
  * @param {Object} [params]
  * @param {number} [params.page]
+ * @param {number} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getAddressTransactionList(address, params) {
@@ -185,9 +189,10 @@ export function getAddressStakeList(address) {
  * @param {string} address
  * @param {Object} [params]
  * @param {number} [params.page]
+ * @param {number} [params.limit]
  * @return {Promise<RewardListInfo>}
  */
-export function getAddressRewardList(address, params) {
+export function getAddressRewardList(address, params = {}) {
     params.limit = 20; // set per_page
     return explorer.get(`addresses/${address}/events/rewards`, {params})
         .then((response) => response.data);
@@ -203,9 +208,10 @@ export function getAddressRewardList(address, params) {
  * @param {string} address
  * @param {Object} [params]
  * @param {number} [params.page]
+ * @param {number} [params.limit]
  * @return {Promise<SlashListInfo>}
  */
-export function getAddressSlashList(address, params) {
+export function getAddressSlashList(address, params = {}) {
     params.limit = 20; // set per_page
     return explorer.get(`addresses/${address}/events/slashes`, {params})
         .then((response) => response.data);
@@ -279,6 +285,7 @@ export function getValidator(pubKey) {
  * @param {string} pubKey
  * @param {Object} [params]
  * @param {number} [params.page]
+ * @param {number} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getValidatorTransactionList(pubKey, params) {

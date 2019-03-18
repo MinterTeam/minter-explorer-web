@@ -12,7 +12,6 @@
         filters: {
             pretty,
             prettyRound,
-            // transform "camelCaseText" to "Sentence Case Text"
             txType: txTypeFilter,
             short: shortFilter,
         },

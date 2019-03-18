@@ -55,7 +55,6 @@
         data() {
             return {
                 validator: null,
-                txCount: 0,
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: true,

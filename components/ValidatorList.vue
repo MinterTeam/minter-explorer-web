@@ -1,6 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
-    import {SimpleSVG} from 'vue-simple-svg';
+    import InlineSvg from 'vue-inline-svg';
     import TableLink from '~/components/TableLink';
 
     let resizeHandler;
@@ -8,7 +8,9 @@
     export default {
         components: {
             TableLink,
-            SimpleSvg: SimpleSVG,
+/*
+            InlineSvg,
+*/
         },
         props: {
             /** @type Array<ValidatorListItem>*/
@@ -61,7 +63,9 @@
                 <thead>
                 <tr>
                     <th>Public Key</th>
+<!--
                     <th>Block Sign</th>
+-->
                 </tr>
                 </thead>
                 <tbody>
@@ -72,15 +76,17 @@
                                    :should-not-shorten="!shouldShortenPublicKey"
                         />
                     </td>
+<!--
                     <td>
-                        <SimpleSvg role="img"
-                            filepath="/img/icon-sign.svg"
+                        <InlineSvg class="u-vertical-top" role="img"
+                            src="/img/icon-sign.svg"
                             :aria-label="validator.signed ? 'Signed' : 'Not signed'"
                             width="26px"
                             height="26px"
-                            :fill="validator.signed ? '#6ECA2C' : ''"
+                            :fill="validator.signed ? '#6ECA2C' : false"
                         />
                     </td>
+-->
                 </tr>
                 </tbody>
             </table>
