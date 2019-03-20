@@ -35,6 +35,11 @@
         // key: (to) => to.fullPath,
         asyncData({ params, error }) {
             return getAddress(params.address)
+                .then((address) => {
+                    return {
+                        balances: address.balances,
+                    };
+                })
                 .catch((e) => {
                     console.log({e});
                     let statusCode = e.request && e.request.status;
@@ -56,6 +61,7 @@
         },
         data() {
             return {
+                balances: [],
                 activeTab: Object.values(TAB_TYPES).indexOf(this.$route.query.active_tab) !== -1 ? this.$route.query.active_tab : TAB_TYPES.STAKE,
                 storedTabPages: {},
                 txList: [],
@@ -99,13 +105,12 @@
         },
         computed: {
             baseCoin() {
-                // coins goes from asyncData
-                return this.coins && this.coins.length ? this.coins.reduce((result, coin) => {
+                // balances goes from asyncData
+                return this.balances && this.balances.length ? this.balances.find((coin) => {
                     if (coin.coin.toUpperCase() === this.$store.state.COIN_NAME) {
-                        result = coin;
+                        return true;
                     }
-                    return result;
-                }, null) : null;
+                }) : null;
             },
             activePaginationInfo() {
                 if (this.activeTab === TAB_TYPES.REWARD) {
@@ -230,8 +235,10 @@
                 <dt>Balance</dt>
                 <dd>{{ baseCoin ? baseCoin.amount : 0 | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
 
+<!--
                 <dt>USD Value</dt>
                 <dd>${{ baseCoin ? baseCoin.usdAmount : 0 | prettyUsd }}</dd>
+-->
 
                 <dt>#Transactions</dt>
                 <dd>{{ txPaginationInfo.total || 0 }}</dd>

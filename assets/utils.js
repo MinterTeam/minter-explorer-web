@@ -63,6 +63,7 @@ export function prettyExact(value) {
 }
 
 /**
+ * Round to power
  * @param {number} value
  * @param {number} power
  * @return {number}
