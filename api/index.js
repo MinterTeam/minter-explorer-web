@@ -303,7 +303,6 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {number} height
  * @property {string} timestamp
  * @property {number} txCount - tx count in the block
- * @property {number} txTotal - overall tx count in the blockchain
  * @property {number} size
  * @property {string} hash
  * @property {number} reward

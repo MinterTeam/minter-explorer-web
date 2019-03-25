@@ -129,7 +129,7 @@
             },
             // take actual count from blocks response first
             totalTransactions() {
-                return (this.blockList[0] && this.blockList[0].txTotal) || (this.stats && this.stats.totalTransactions) || 0;
+                return (this.txList[0] && this.txList[0].txn) || (this.stats && this.stats.totalTransactions) || 0;
             },
         },
         methods: {
