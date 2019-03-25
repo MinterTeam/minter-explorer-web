@@ -139,7 +139,7 @@
                 <dt>Hash</dt>
                 <dd class="u-select-all">{{ tx.hash }}</dd>
 
-                <dt>TimeStamp</dt>
+                <dt>Timestamp</dt>
                 <dd>{{ tx.timeDistance }} ago ({{ tx.timeUTC }})</dd>
 
                 <dt>Status</dt>

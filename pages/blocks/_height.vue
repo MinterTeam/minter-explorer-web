@@ -122,7 +122,7 @@
                 <dt>Height</dt>
                 <dd>{{ block.height | prettyRound }}</dd>
 
-                <dt>TimeStamp</dt>
+                <dt>Timestamp</dt>
                 <dd>{{ block.timeDistance }} ago ({{ block.timeUTC }})</dd>
 
                 <dt>Hash</dt>

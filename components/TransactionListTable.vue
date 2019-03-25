@@ -1,6 +1,6 @@
 <script>
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
-    import {getTimeDistance, pretty, prettyRound, txTypeFilter, shortFilter} from '~/assets/utils';
+    import {getTimeDistance, getTimeUTC, pretty, prettyRound, txTypeFilter, shortFilter} from '~/assets/utils';
     import {UNBOND_PERIOD} from '~/assets/variables';
     import TableLink from '~/components/TableLink';
 
@@ -46,6 +46,7 @@
                    return {
                        ...tx,
                        timeDistance:  getTimeDistance(tx.timestamp),
+                       timeUTC: getTimeUTC(tx.timestamp),
                    };
                 });
             },
@@ -276,6 +277,12 @@
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.due_block">
                                 <strong>Due Block</strong> <br>
                                 {{ tx.data.check.due_block }}
+                            </div>
+
+                            <!-- timestamp -->
+                            <div class="table__inner-item">
+                                <strong>Timestamp</strong> <br>
+                                {{ tx.timeUTC }}
                             </div>
 
                             <!-- fee -->
