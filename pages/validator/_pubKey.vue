@@ -9,8 +9,9 @@
     import Pagination from "~/components/Pagination";
 
     const VALIDATOR_STATUS = {
-        1: 'off',
-        2: 'on',
+        0: 'Not declared',
+        1: 'Set off',
+        2: 'Set on',
     };
 
     export default {
@@ -123,14 +124,14 @@
 
                 <!-- @TODO validating status-->
                 <dt>Status</dt>
-                <dd>Set {{ $options.VALIDATOR_STATUS[validator.status] }}</dd>
+                <dd>{{ $options.VALIDATOR_STATUS[validator.status || 0] }}</dd>
 
                 <dt>Total Stake</dt>
                 <dd>{{ validator.stake | pretty }} {{ $store.state.COIN_NAME }}</dd>
 
                 <!--@TODO 0 if not validating-->
                 <dt>Voting Power</dt>
-                <dd>{{ validator.part | pretty }}&thinsp;%</dd>
+                <dd>{{ (validator.part || 0) | pretty }}&thinsp;%</dd>
 
                 <dt>#Delegators</dt>
                 <dd>{{ validator.delegator_count }}</dd>

@@ -120,7 +120,14 @@
                 return process.client && window.innerWidth < 700;
             },
             fromBase64(str) {
-                return decodeURIComponent(escape(window.atob(str)));
+                //@TODO utf8 https://github.com/dankogai/js-base64
+                const asci = window.atob(str);
+                try {
+                    return decodeURIComponent(escape(asci));
+                } catch (e) {
+                    return asci;
+                }
+
             },
         },
     };
