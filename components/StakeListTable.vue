@@ -93,18 +93,18 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="stake in stakeList" :key="getHash(stake) + stake.coin">
+            <tr v-for="stakeItem in stakeList" :key="getHash(stakeItem) + stakeItem.coin">
                 <td>
-                    <TableLink :link-text="getHash(stake)"
-                               :link-path="getUrl(stake)"
+                    <TableLink :link-text="getHash(stakeItem)"
+                               :link-path="getUrl(stakeItem)"
                                :should-not-shorten="!shouldShortenAddress"
                     />
                 </td>
                 <td>
-                    {{ stake.value | pretty }}
-                    <span class="u-hidden-medium-up">{{ stake.coin }}</span>
+                    {{ stakeItem.value | pretty }}
+                    <span class="u-hidden-medium-up">{{ stakeItem.coin }}</span>
                 </td>
-                <td class="u-hidden-medium-down">{{ stake.coin }}</td>
+                <td class="u-hidden-medium-down">{{ stakeItem.coin }}</td>
             </tr>
             </tbody>
         </table>

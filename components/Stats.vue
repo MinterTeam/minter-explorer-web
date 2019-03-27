@@ -1,4 +1,5 @@
 <script>
+    import prettyNum from 'pretty-num';
     import {pretty, prettyUsd, prettyRound, round} from "~/assets/utils";
 
     export default {
@@ -6,6 +7,7 @@
             pretty,
             prettyUsd,
             prettyRound,
+            coinPrice: (value) => prettyNum(value, {precision: 3}),
             marketCap: (value) => {
                 const ROUND_POWER = 3;
                 if (value > Math.pow(10, 9)) {
@@ -42,12 +44,12 @@
                 <div class="u-cell">
                     <h3 class="index-stats__name panel__title">Market cap of ${{ stats.marketCap | marketCap }}</h3>
                     <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">${{ stats.bipPriceUsd | prettyUsd }} <!--@&nbsp;{{ stats.bipPriceBtc | pretty }}&nbsp;{{ $store.state.COIN_NAME }}/BTC--></span>
-                        <span class="index-stats__sub-value index-stats__sub-value--dynamic" :class="stats.bipPriceChange >= 0 ? 'index-stats__green' : 'index-stats__red'">
+                        <span class="index-stats__value-text">${{ stats.bipPriceUsd | coinPrice }} <!--@&nbsp;{{ stats.bipPriceBtc | pretty }}&nbsp;{{ $store.state.COIN_NAME }}/BTC--></span>
+                        <!--<span class="index-stats__sub-value index-stats__sub-value&#45;&#45;dynamic" :class="stats.bipPriceChange >= 0 ? 'index-stats__green' : 'index-stats__red'">
                             <img src="/img/icon-dynamic-up.svg" alt="Up" v-if="stats.bipPriceChange >= 0">
                             <img src="/img/icon-dynamic-down.svg" alt="Down" v-else>
                             {{ stats.bipPriceChange }}%
-                        </span>
+                        </span>-->
                     </div>
                 </div>
                 <div class="u-cell u-cell--small--1-2">
