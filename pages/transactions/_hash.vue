@@ -108,10 +108,10 @@
                 return typeof value !== 'undefined';
             },
             isSell(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN);
+                return tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL);
             },
             isBuy(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN);
+                return tx.type === Number(TX_TYPES.TX_TYPE_BUY);
             },
             isUnbond(tx) {
                 return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);

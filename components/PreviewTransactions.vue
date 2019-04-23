@@ -36,18 +36,18 @@
                     || (tx.data.check && typeof tx.data.check.value !== 'undefined');
             },
             getConvertCoinSymbol(tx) {
-                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN)) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
                     return tx.data.coin_to_sell;
                 }
-                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN)) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY)) {
                     return tx.data.coin_to_buy;
                 }
             },
             getConvertValue(tx) {
-                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL_COIN) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL_COIN)) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
                     return tx.data.value_to_sell;
                 }
-                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY_COIN)) {
+                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY)) {
                     return tx.data.value_to_buy;
                 }
             },

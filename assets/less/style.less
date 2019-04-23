@@ -29,7 +29,7 @@
 .panel__title {font: inherit; font-weight: 700; line-height: 22px; text-transform: uppercase; margin: 0;}
 .panel__header {display: flex; justify-content: space-between; align-items: center;}
 .panel__header-title {display: flex; align-items: center;}
-.panel__header-title-icon {margin: -9px 10px -9px -8px;}
+.panel__header-title-icon {margin: -9px 10px -9px -8px; line-height: 40px;}
 .panel__switcher-section {padding: 0;}
 .panel__switcher {display: flex; align-items: center;}
 .panel__switcher-item {
@@ -153,7 +153,7 @@
 }
 .index-stats__name {opacity: 0.7; font-weight: 700;}
 .index-stats__value {font-size: 16px; font-weight: 700; margin-top: 2px;}
-.index-stats__value--primary {font-size: 22px; line-height: 25px; margin-top: 4px; display: flex; align-items: baseline; flex-wrap: wrap;}
+.index-stats__value--primary {font-size: 22px; line-height: 1; margin-top: 5px; /*display: flex; align-items: baseline; flex-wrap: wrap;*/}
 .index-stats__value-text {margin-right: 8px;}
 .index-stats__sub-value {font-size: 15px; line-height: 1.4;}
 .index-stats__sub-value--dynamic {align-self: center; display: flex; align-items: center; margin: 0 -4px;}
@@ -164,9 +164,9 @@
 .history-cell {display: flex;}
 .history {display: flex; flex-direction: column; width: 100%;}
 .history__title {text-align: center; margin-bottom: 5px; margin-top: -2px;}
-.history__chart-wrap {position: relative; flex-grow: 2; height: 200px; margin-right: -4px;}
+.history__chart-wrap {position: relative; flex-grow: 2; height: 160px; margin-right: 0 -5px;}
 .history__chart {width: 100%; position: absolute;}
-@media (min-width: @breakpoint-medium-up) {
+@media (min-width: @breakpoint-large-up) {
     .history__chart-wrap {height: auto; margin-bottom: -5px;}
 }
 

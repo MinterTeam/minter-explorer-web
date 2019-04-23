@@ -8,9 +8,7 @@
     export default {
         components: {
             TableLink,
-/*
             InlineSvg,
-*/
         },
         props: {
             /** @type Array<ValidatorListItem>*/
@@ -63,9 +61,7 @@
                 <thead>
                 <tr>
                     <th>Public Key</th>
-<!--
                     <th>Block Sign</th>
--->
                 </tr>
                 </thead>
                 <tbody>
@@ -76,7 +72,6 @@
                                    :should-not-shorten="!shouldShortenPublicKey"
                         />
                     </td>
-<!--
                     <td>
                         <InlineSvg class="u-vertical-top" role="img"
                             src="/img/icon-sign.svg"
@@ -86,7 +81,6 @@
                             :fill="validator.signed ? '#6ECA2C' : false"
                         />
                     </td>
--->
                 </tr>
                 </tbody>
             </table>
