@@ -5,7 +5,6 @@ export const BASE_TITLE_NETWORK = NETWORK === MAINNET ? '' : 'Testnet ';
 export const BASE_TITLE_END = ' — Minter';
 export const BASE_TITLE = BASE_TITLE_NETWORK + 'Explorer' + BASE_TITLE_END;
 export const BASE_DESCRIPTION = '';
-export const NETWORK_EXPLORER_CHANNEL = NETWORK === MAINNET ? 'mainnet' : '';
 export const COIN_NAME = NETWORK === MAINNET ? 'BIP' : 'MNT';
 export const UNBOND_PERIOD = NETWORK === MAINNET ? 518400 : 720;
 export const MAINNET_WEB_URL = 'https://explorer.minter.network';

@@ -4,7 +4,7 @@
     import Centrifuge from 'centrifuge';
     import {getBlockList, getStatus, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
-    import {EXPLORER_RTM_URL, NETWORK, NETWORK_EXPLORER_CHANNEL} from "~/assets/variables";
+    import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
@@ -12,7 +12,6 @@
 
     const BLOCK_LIST_LENGTH = 20;
     const TX_LIST_LENGTH = 20;
-    const NETWORK_WS_PREFIX = NETWORK_EXPLORER_CHANNEL ? NETWORK_EXPLORER_CHANNEL + '_' : '';
 
     let centrifuge;
     let timeInterval = null;
@@ -53,7 +52,7 @@
         },
         head() {
             const title = getTitle(null);
-            const description = 'Blockchain explorer of the Minter test network. View info about blocks, transactions, and addresses.';
+            const description = `Blockchain explorer of the Minter ${this.network}. View info about blocks, transactions, and addresses.`;
 
             return {
                 title: title,
@@ -143,7 +142,7 @@
                     // sockjs: SockJS,
                 });
 
-                centrifuge.subscribe(NETWORK_WS_PREFIX + "blocks", (response) => {
+                centrifuge.subscribe("blocks", (response) => {
                     const newBlock = response.data;
                     const isExist = this.blockList.some(function(item) {
                         return item.height === newBlock.height;
@@ -156,7 +155,7 @@
                         // this.checkLastBlockIsSynced();
                     }
                 });
-                centrifuge.subscribe(NETWORK_WS_PREFIX + "transactions", (response) => {
+                centrifuge.subscribe("transactions", (response) => {
                     const newTx = response.data;
                     const isExist = this.txList.find(function(item) {
                         return item.hash === newTx.hash;
@@ -189,5 +188,5 @@
             <PreviewTransactions :tx-list="txList"/>
         </section>
     </div>
-    <h1 class="u-text-center" style="margin-top: 50px" v-else>{{ network === 'Mainnet' ? 'Mainnet' : 'Explorer' }} is not available</h1>
+    <h1 class="u-text-center" style="margin-top: 50px" v-else>{{ network }} explorer is not available</h1>
 </template>
