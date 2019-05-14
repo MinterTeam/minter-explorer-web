@@ -46,8 +46,10 @@
                         lastBlockTime: Date.now(),
                         lastTxTime: Date.now(),
                     };
+                })
+                .catch((e) => {
+                    // don't throw error, availability message will be shown instead
                 });
-                // .catch((e) => {});
         },
         head() {
             const title = getTitle(null);
@@ -64,7 +66,7 @@
         },
         data() {
             return {
-                isDataLoading: true,
+                // isDataLoading: true,
                 stats: null,
                 /** @type Array<Block> */
                 blockList: [],
@@ -92,11 +94,11 @@
             //         });
             // }
 
-            if (!this.isDataLoading && this.stats.isLoading) {
-                statsPromise.then((stats) => {
-                    this.stats = stats;
-                });
-            }
+            // if (!this.isDataLoading && this.stats.isLoading) {
+            //     statsPromise.then((stats) => {
+            //         this.stats = stats;
+            //     });
+            // }
 
             // getWebSocketConnectData()
             //     .then((data) => this.subscribeWS(data));
@@ -173,7 +175,7 @@
 </script>
 
 <template>
-    <div class="u-grid u-grid--vertical-margin" v-if="stats">
+    <div class="u-grid u-grid--vertical-margin" v-if="stats || blockList.length || txList.length">
         <section class="u-cell u-cell--large--1-2">
             <Stats :stats="stats" :latest-block-height="latestBlockHeight" :total-transactions="totalTransactions"/>
         </section>
@@ -187,5 +189,5 @@
             <PreviewTransactions :tx-list="txList"/>
         </section>
     </div>
-    <h1 class="u-text-center" style="margin-top: 50px" v-else-if="!isDataLoading">{{ network === 'Mainnet' ? 'Mainnet' : 'Explorer' }} is not available</h1>
+    <h1 class="u-text-center" style="margin-top: 50px" v-else>{{ network === 'Mainnet' ? 'Mainnet' : 'Explorer' }} is not available</h1>
 </template>
