@@ -97,13 +97,17 @@ export function getTransactionList(params) {
 export function getTransaction(hash) {
     return explorer.get('transactions/' + hash)
         .then((response) => {
+            const tx = response.data.data;
+            if (!tx.data) {
+                tx.data = {};
+            }
             if (response.status === 200) {
-                response.data.data.status = 'success';
+                tx.status = 'success';
             }
             if (response.status === 206) {
-                response.data.data.status = 'failure';
+                tx.status = 'failure';
             }
-            return response.data.data;
+            return tx;
         });
 }
 

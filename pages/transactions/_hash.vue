@@ -240,11 +240,11 @@
                     </tbody>
                 </table>
 
-                <dt>Fee</dt>
-                <dd>{{ tx.fee | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
+                <dt v-if="tx.fee">Fee</dt>
+                <dd v-if="tx.fee">{{ tx.fee | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
 
-                <dt>Nonce</dt>
-                <dd>{{ tx.nonce }}</dd>
+                <dt v-if="tx.nonce">Nonce</dt>
+                <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
 
                 <dt>Message</dt>
                 <dd :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
