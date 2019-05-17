@@ -45,6 +45,7 @@ module.exports = {
         linkActiveClass: '',
         linkExactActiveClass: 'is-active',
         middleware: [
+            'hash-lowercase',
             'history',
         ],
     },
