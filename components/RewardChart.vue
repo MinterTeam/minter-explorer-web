@@ -52,7 +52,7 @@
                                     callback: (value, index, values) => {
                                         let date = new Date(value);
                                         if (this.chartType === REWARD_CHART_TYPES.MONTH || this.chartType === REWARD_CHART_TYPES.WEEK) {
-                                            return date.getUTCDate() + '.' + (date.getUTCMonth() + 1);
+                                            return padZero(date.getUTCDate()) + '.' + padZero(date.getUTCMonth() + 1);
                                         } else {
                                             return date.getHours() + ':' + padZero(date.getMinutes());
                                         }
