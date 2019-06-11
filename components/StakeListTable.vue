@@ -26,6 +26,12 @@
         data() {
             return {
                 shouldShortenAddress: this.getShouldShortenAddress(),
+                sort: {
+                    // 0 - no sort, -1 - ascending, 1 - descending
+                    hash: 0,
+                    value: 0,
+                    coin: 0,
+                },
             };
         },
         computed: {
@@ -37,6 +43,13 @@
                     return 'Address';
                 }
                 return '';
+            },
+            stakeListSorted() {
+                return this.stakeList.slice(0).sort(makeSortQueue([
+                    makeOrderedSortFn(this.sort.hash, this.hashSortFn),
+                    makeOrderedSortFn(this.sort.value, valueSortFn),
+                    makeOrderedSortFn(this.sort.coin, coinSortFn),
+                ]));
             },
         },
         mounted() {
@@ -76,10 +89,85 @@
                 if (this.stakeItemType === 'delegator') {
                     return process.client && window.innerWidth < 600;
                 }
-
+            },
+            toggleSort(field, inverseDirection) {
+                // remove other fields from sort
+                Object.keys(this.sort).forEach((key) => {
+                    if (key !== field && this.sort[key] !== 0) {
+                        this.sort[key] = 0;
+                    }
+                });
+                const step = inverseDirection ? -1 : 1;
+                // change field sort order between -1, 0, 1
+                if (this.sort[field] === step) {
+                    this.sort[field] = -1 * step;
+                } else {
+                    this.sort[field] += step;
+                }
+            },
+            getSortClass(field) {
+                switch (this.sort[field]) {
+                    case 1:
+                        return 'table__sort-button-icon--ascending';
+                    case -1:
+                        return 'table__sort-button-icon--descending';
+                    case 0:
+                        return '';
+                }
+            },
+            /**
+             * Default ascending: A -> B
+             */
+            hashSortFn(a, b) {
+                if (this.stakeItemType === 'validator') {
+                    return ('' + a.pub_key).localeCompare(b.pub_key);
+                }
+                if (this.stakeItemType === 'delegator') {
+                    return ('' + a.address).localeCompare(b.address);
+                }
             },
         },
     };
+
+    /**
+     * Default ascending: A -> B
+     */
+    function coinSortFn(a, b) {
+        return ('' + a.coin).localeCompare(b.coin);
+    }
+
+    /**
+     * Default ascending: 1 -> 2
+     */
+    function valueSortFn(a, b) {
+        return a.value - b.value;
+    }
+
+
+    /**
+     * Change sort order direction depending on `order` (-1, 0, 1)
+     * @param {number} order - 0: no sort, 1: default, -1: inverse
+     * @param {Function} sortFn
+     */
+    function makeOrderedSortFn(order, sortFn) {
+        return function(a, b) {
+            return order * sortFn(a, b);
+        };
+    }
+
+    /**
+     * Make sort function, which will apply every sortFn from array of sort functions, next sortFn applies only if previous returned `0`
+     * @param {Array<Function>} fnArray
+     * @return {Function} sort function
+     */
+    function makeSortQueue(fnArray) {
+        return function(a, b) {
+            return fnArray.reduce((result, sortFnItem) => {
+                // if result === 0 => apply sortFnItem
+                return result || sortFnItem(a, b);
+            }, 0);
+        };
+    }
 </script>
 
 <template>
@@ -87,13 +175,28 @@
         <table class="u-text-nowrap">
             <thead>
             <tr>
-                <th>{{ hashName }}</th>
-                <th>Amount</th>
-                <th class="u-hidden-medium-down">Coin</th>
+                <th>
+                    <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('hash')">
+                        <span class="table__sort-button-text">{{ hashName }}</span>
+                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('hash')" v-show="getSortClass('hash')">
+                    </button>
+                </th>
+                <th>
+                    <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('value', true)">
+                        <span class="table__sort-button-text">Amount</span>
+                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('value')" v-show="getSortClass('value')">
+                    </button>
+                </th>
+                <th class="u-hidden-medium-down">
+                    <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('coin')">
+                        <span class="table__sort-button-text">Coin</span>
+                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('coin')" v-show="getSortClass('coin')">
+                    </button>
+                </th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="stakeItem in stakeList" :key="getHash(stakeItem) + stakeItem.coin">
+            <tr v-for="stakeItem in stakeListSorted" :key="getHash(stakeItem) + stakeItem.coin">
                 <td>
                     <TableLink :link-text="getHash(stakeItem)"
                                :link-path="getUrl(stakeItem)"

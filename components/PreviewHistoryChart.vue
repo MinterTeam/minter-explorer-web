@@ -1,6 +1,7 @@
 <script>
     import Chart from 'chart.js/dist/Chart.min.js';
     import {getTransactionChart} from "~/api";
+    import {padZero} from '~/assets/utils';
 
     export default {
         data() {
@@ -45,7 +46,7 @@
                                         autoSkipPadding: 4,
                                         callback: (value, index, values) => {
                                             let date = new Date(value);
-                                            return date.getUTCDate() + '/' + (date.getUTCMonth() + 1);
+                                            return padZero(date.getUTCDate()) + '.' + padZero(date.getUTCMonth() + 1);
                                         },
                                     },
                                 }],

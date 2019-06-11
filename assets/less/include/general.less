@@ -103,6 +103,9 @@ td, th {
         border-left: none; border-right: none;
     }
 }
+.table__sort-button {display: flex; align-items: center; min-height: 24px;}
+.table__sort-button-icon {margin-left: 8px;}
+.table__sort-button-icon--descending {transform: rotateX(180deg);}
 @media (min-width: 0) and (max-width: @breakpoint-medium-down) {
     .table--recipient-list {
         margin: 15px -20px 0; width: calc(100% + 40px);
