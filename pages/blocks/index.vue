@@ -2,16 +2,17 @@
     import {getBlockList} from "~/api";
     import {getTimeDistance, pretty, prettyRound} from '~/assets/utils';
     import getTitle from '~/assets/get-title';
+    import Amount from '~/components/common/Amount';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
     export default {
         components: {
+            Amount,
             Pagination,
             BackButton,
         },
         filters: {
-            pretty,
             prettyRound,
         },
         watchQuery: ['page'],
@@ -58,6 +59,9 @@
                 return this.blockList.length ? this.blockList[this.blockList.length - 1].height : false;
             },
         },
+        methods: {
+            pretty,
+        },
     };
 </script>
 
@@ -101,8 +105,8 @@
                             <nuxt-link class="link--default" :to="'/blocks/' + block.height" v-if="block.txCount">{{ block.txCount }}</nuxt-link>
                             <span v-else>{{ block.txCount }}</span>
                         </td>
-                        <td>{{ block.size | pretty }} bytes</td>
-                        <td>{{ block.reward | pretty }} {{ $store.state.COIN_NAME }}</td>
+                        <td>{{ block.size | prettyRound }} bytes</td>
+                        <td><Amount :amount="pretty(block.reward)"/> {{ $store.state.COIN_NAME }}</td>
                     </tr>
                     </tbody>
                 </table>

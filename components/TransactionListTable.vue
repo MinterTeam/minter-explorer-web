@@ -1,12 +1,15 @@
 <script>
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
-    import {getTimeDistance, getTimeUTC, pretty, prettyRound, txTypeFilter, shortFilter} from '~/assets/utils';
+    import {getTimeDistance, getTimeUTC, pretty, prettyRound, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils';
     import {UNBOND_PERIOD} from '~/assets/variables';
+    import Amount from '~/components/common/Amount';
     import TableLink from '~/components/TableLink';
 
     export default {
+        ideFix: null,
         UNBOND_PERIOD,
         components: {
+            Amount,
             TableLink,
         },
         filters: {
@@ -43,16 +46,18 @@
         computed: {
             txListFormatted() {
                 return this.txList.map((tx) => {
-                   return {
-                       ...tx,
-                       timeDistance:  getTimeDistance(tx.timestamp),
-                       timeUTC: getTimeUTC(tx.timestamp),
-                   };
+                    return {
+                        ...tx,
+                        timeDistance:  getTimeDistance(tx.timestamp),
+                        timeUTC: getTimeUTC(tx.timestamp),
+                    };
                 });
             },
         },
         methods: {
+            pretty,
             prettyRound,
+            fromBase64,
             isCurrentAddress(address) {
                 return address === this.currentAddress;
             },
@@ -77,13 +82,15 @@
             isUnbond(tx) {
                 return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
             },
+            getAmount(tx) {
+                return tx.data.value
+                    || this.getConvertValue(tx)
+                    || tx.data.stake
+                    || tx.data.initial_amount
+                    || (tx.data.check && tx.data.check.value);
+            },
             hasAmount(tx) {
-                return typeof tx.data.value !== 'undefined'
-                    || typeof tx.data.value_to_sell !== 'undefined'
-                    || typeof tx.data.value_to_buy !== 'undefined'
-                    || typeof tx.data.stake !== 'undefined'
-                    || typeof tx.data.initial_amount !== 'undefined'
-                    || (tx.data.check && typeof tx.data.check.value !== 'undefined');
+                return typeof this.getAmount(tx) !== 'undefined';
             },
             getConvertCoinSymbol(tx) {
                 if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
@@ -149,7 +156,7 @@
                     <!-- amount -->
                     <td>
                         <div v-if="hasAmount(tx)">
-                            {{ tx.data.value || getConvertValue(tx) || tx.data.stake || tx.data.initial_amount || (tx.data.check && tx.data.check.value) || 0 | pretty }}
+                            <Amount :amount="pretty(getAmount(tx) || 0)"/>
                             {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) }}
                         </div>
                     </td>
@@ -172,26 +179,26 @@
                             </div>
                             <div class="table__inner-item" v-if="isDefined(tx.data.value)">
                                 <strong>Value</strong> <br>
-                                {{ tx.data.value | pretty }} {{ tx.data.coin }}
+                                <Amount :amount="pretty(tx.data.value)"/> {{ tx.data.coin }}
                             </div>
 
                             <!-- SELL -->
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Sell coins</strong> <br>
-                                {{ tx.data.value_to_sell | pretty }} {{ tx.data.coin_to_sell }}
+                                <Amount :amount="pretty(tx.data.value_to_sell)"/> {{ tx.data.coin_to_sell }}
                             </div>
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Get coins</strong> <br>
-                                {{ tx.data.value_to_buy | pretty  }} {{ tx.data.coin_to_buy }}
+                                <Amount :amount="pretty(tx.data.value_to_buy)"/> {{ tx.data.coin_to_buy }}
                             </div>
                             <!-- BUY -->
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Buy coins</strong> <br>
-                                {{ tx.data.value_to_buy | pretty }} {{ tx.data.coin_to_buy }}
+                                <Amount :amount="pretty(tx.data.value_to_buy)"/> {{ tx.data.coin_to_buy }}
                             </div>
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Spend coins</strong> <br>
-                                {{ tx.data.value_to_sell | pretty }} {{ tx.data.coin_to_sell }}
+                                <Amount :amount="pretty(tx.data.value_to_sell)"/> {{ tx.data.coin_to_sell }}
                             </div>
 
                             <!-- type CREATE_COIN -->
@@ -205,11 +212,11 @@
                             </div>
                             <div class="table__inner-item" v-if="tx.data.initial_amount">
                                 <strong>Initial Amount</strong> <br>
-                                {{ tx.data.initial_amount | pretty }}
+                                <Amount :amount="pretty(tx.data.initial_amount)"/>
                             </div>
                             <div class="table__inner-item" v-if="tx.data.initial_reserve">
                                 <strong>Initial Reserve</strong> <br>
-                                {{ tx.data.initial_reserve | pretty }}
+                                <Amount :amount="pretty(tx.data.initial_reserve)"/> {{ $store.state.COIN_NAME }}
                             </div>
                             <div class="table__inner-item" v-if="tx.data.constant_reserve_ratio">
                                 <strong>CRR</strong> <br>
@@ -227,7 +234,7 @@
                             </div>
                             <div class="table__inner-item" v-if="isDefined(tx.data.stake)">
                                 <strong>Stake</strong> <br>
-                                {{ tx.data.stake | pretty }} {{ tx.data.coin }}
+                                <Amount :amount="pretty(tx.data.stake)"/> {{ tx.data.coin }}
                             </div>
                             <div class="table__inner-item" v-if="isDefined(tx.data.commission)">
                                 <strong>Commission</strong> <br>
@@ -253,15 +260,6 @@
                             </div>
 
                             <!-- type REDEEM_CHECK -->
-                            <div class="table__inner-item" v-if="tx.data.raw_check">
-                                <strong>Check</strong> <br>
-                                <!--<TableLink :link-text="tx.data.raw_check" :is-not-link="true"/>-->
-                                {{ tx.data.raw_check | short}}
-                            </div>
-                            <div class="table__inner-item" v-if="tx.data.proof">
-                                <strong>Proof</strong> <br>
-                                {{ tx.data.proof | short}}
-                            </div>
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.sender">
                                 <strong>Check Issuer</strong> <br>
                                 <TableLink :link-text="tx.data.check.sender"
@@ -272,7 +270,7 @@
                             </div>
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.nonce">
                                 <strong>Check Nonce</strong> <br>
-                                {{ tx.data.check.nonce }}
+                                {{ fromBase64(tx.data.check.nonce) }}
                             </div>
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.due_block">
                                 <strong>Due Block</strong> <br>
@@ -288,7 +286,7 @@
                             <!-- fee -->
                             <div class="table__inner-item">
                                 <strong>Fee</strong> <br>
-                                {{ tx.fee | pretty }} {{ $store.state.COIN_NAME }}
+                                <Amount :amount="pretty(tx.fee)"/> {{ $store.state.COIN_NAME }}
                             </div>
                         </div>
                     </td>

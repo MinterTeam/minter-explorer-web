@@ -63,6 +63,15 @@ export function prettyExact(value) {
 }
 
 /**
+ * Ensure value to have minimum 4 decimal digits
+ * @param {string|number} value
+ * @return {string}
+ */
+export function prettyFull(value) {
+    return decode(prettyNum(value, {precision: 18, rounding: 'fixed', thousandsSeparator: '&#x202F;'}));
+}
+
+/**
  * Round to power
  * @param {number} value
  * @param {number} power
@@ -80,4 +89,15 @@ export function padZero(value) {
     }
 
     return value;
+}
+
+
+export function fromBase64(str) {
+    //@TODO utf8 https://github.com/dankogai/js-base64
+    const asci = window.atob(str);
+    try {
+        return decodeURIComponent(escape(asci));
+    } catch (e) {
+        return asci;
+    }
 }

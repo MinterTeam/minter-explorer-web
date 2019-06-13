@@ -1,10 +1,13 @@
 <script>
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {getTimeDistance, pretty, shortFilter, txTypeFilter} from '~/assets/utils';
+    import Amount from '~/components/common/Amount';
 
     export default {
+        components: {
+            Amount,
+        },
         filters: {
-            pretty,
             addressHash: (value) => shortFilter(value, 7),
             txHash: (value) => shortFilter(value, 13),
             txType: (value) => txTypeFilter(value).replace(/ coin$/, ''),
@@ -27,13 +30,16 @@
             },
         },
         methods: {
+            pretty,
+            getAmount(tx) {
+                return tx.data.value
+                    || this.getConvertValue(tx)
+                    || tx.data.stake
+                    || tx.data.initial_amount
+                    || (tx.data.check && tx.data.check.value);
+            },
             hasAmount(tx) {
-                return typeof tx.data.value !== 'undefined'
-                    || typeof tx.data.value_to_sell !== 'undefined'
-                    || typeof tx.data.value_to_buy !== 'undefined'
-                    || typeof tx.data.stake !== 'undefined'
-                    || typeof tx.data.initial_amount !== 'undefined'
-                    || (tx.data.check && typeof tx.data.check.value !== 'undefined');
+                return typeof this.getAmount(tx) !== 'undefined';
             },
             getConvertCoinSymbol(tx) {
                 if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
@@ -83,7 +89,7 @@
                         <div>
                             {{ tx.type | txType }}
                             <span v-if="hasAmount(tx)">
-                                {{ tx.data.value || getConvertValue(tx) || tx.data.stake || tx.data.initial_amount || (tx.data.check && tx.data.check.value) || 0 | pretty }}
+                                <Amount :amount="pretty(getAmount(tx) || 0)" decimal-class="u-amount__decimal--opaque"/>
                                 {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) }}
                             </span>
                         </div>
