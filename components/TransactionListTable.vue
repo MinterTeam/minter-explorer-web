@@ -253,15 +253,6 @@
                             </div>
 
                             <!-- type REDEEM_CHECK -->
-                            <div class="table__inner-item" v-if="tx.data.raw_check">
-                                <strong>Check</strong> <br>
-                                <!--<TableLink :link-text="tx.data.raw_check" :is-not-link="true"/>-->
-                                {{ tx.data.raw_check | short}}
-                            </div>
-                            <div class="table__inner-item" v-if="tx.data.proof">
-                                <strong>Proof</strong> <br>
-                                {{ tx.data.proof | short}}
-                            </div>
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.sender">
                                 <strong>Check Issuer</strong> <br>
                                 <TableLink :link-text="tx.data.check.sender"

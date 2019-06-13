@@ -205,14 +205,10 @@
                 <dd v-if="tx.data.owner_address"><nuxt-link class="link--default" :to="'/address/' + tx.data.owner_address">{{ tx.data.owner_address }}</nuxt-link></dd>
 
                 <!-- REDEEM_CHECK -->
-                <dt v-if="tx.data.raw_check">Check</dt>
-                <dd v-if="tx.data.raw_check" class="u-select-all">{{ tx.data.raw_check }}</dd>
-                <dt v-if="tx.data.proof">Proof</dt>
-                <dd v-if="tx.data.proof" class="u-select-all">{{ tx.data.proof }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.sender">Check Issuer</dt>
                 <dd v-if="tx.data.check && tx.data.check.sender"><nuxt-link class="link--default" :to="'/address/' + tx.data.check.sender">{{ tx.data.check.sender }}</nuxt-link></dd>
                 <dt v-if="tx.data.check && tx.data.check.nonce">Check Nonce</dt>
-                <dd v-if="tx.data.check && tx.data.check.nonce">{{ tx.data.check.nonce }}</dd>
+                <dd v-if="tx.data.check && tx.data.check.nonce">{{ fromBase64(tx.data.check.nonce) }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.due_block">Due Block</dt>
                 <dd v-if="tx.data.check && tx.data.check.due_block">{{ tx.data.check.due_block }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
@@ -247,7 +243,7 @@
                 <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
 
                 <dt>Message</dt>
-                <dd :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
+                <dd class="u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
             </dl>
         </section>
         <h1 class="u-text-center" style="margin-top: 50px;" v-else>
