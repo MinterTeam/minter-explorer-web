@@ -1,8 +1,9 @@
 <script>
-    import {getAddress, getAddressTransactionList, getAddressStakeList, getAddressRewardList, getAddressSlashList} from "~/api";
+    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardList, getAddressSlashList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {prettyExact, prettyUsd} from "~/assets/utils";
+    import {prettyExact, prettyUsd, prettyFull} from "~/assets/utils";
+    import Amount from '~/components/common/Amount';
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
@@ -20,6 +21,7 @@
     export default {
         TAB_TYPES,
         components: {
+            Amount,
             TransactionList,
             StakeListTable,
             RewardSlashListTable,
@@ -30,14 +32,15 @@
         filters: {
             prettyExact,
             prettyUsd,
+            prettyFull,
         },
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
         asyncData({ params, error }) {
-            return getAddress(params.address)
-                .then((address) => {
+            return getBalance(params.address)
+                .then((balanceList) => {
                     return {
-                        balances: address.balances,
+                        balanceList,
                     };
                 })
                 .catch((e) => {
@@ -61,7 +64,7 @@
         },
         data() {
             return {
-                balances: [],
+                balanceList: [],
                 activeTab: Object.values(TAB_TYPES).indexOf(this.$route.query.active_tab) !== -1 ? this.$route.query.active_tab : TAB_TYPES.STAKE,
                 storedTabPages: {},
                 txList: [],
@@ -104,14 +107,6 @@
             },
         },
         computed: {
-            baseCoin() {
-                // balances goes from asyncData
-                return this.balances && this.balances.length ? this.balances.find((coin) => {
-                    if (coin.coin.toUpperCase() === this.$store.state.COIN_NAME) {
-                        return true;
-                    }
-                }) : null;
-            },
             activePaginationInfo() {
                 if (this.activeTab === TAB_TYPES.REWARD) {
                     return this.rewardPaginationInfo;
@@ -129,6 +124,7 @@
             this.fetchSlashes();
         },
         methods: {
+            prettyFull,
             switchTab(newTab) {
                 // save previous active_tab_page
                 if (this.$route.query.active_tab) {
@@ -233,7 +229,14 @@
                 <dd class="u-select-all">{{ $route.params.address }}</dd>
 
                 <dt>Balance</dt>
-                <dd>{{ baseCoin ? baseCoin.amount : 0 | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>
+                    <table class="table--balance">
+                        <tr v-for="balance in balanceList" :key="balance.coin">
+                            <td><Amount :amount="prettyFull(balance.amount)"/></td>
+                            <td>{{ balance.coin }}</td>
+                        </tr>
+                    </table>
+                </dd>
 
 <!--
                 <dt>USD Value</dt>

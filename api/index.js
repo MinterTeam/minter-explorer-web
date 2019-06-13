@@ -1,6 +1,6 @@
 import explorer from '~/api/explorer';
 import {padZero} from '~/assets/utils';
-import {REWARD_CHART_TYPES} from '~/assets/variables';
+import {REWARD_CHART_TYPES, COIN_NAME} from '~/assets/variables';
 
 
 /**
@@ -154,11 +154,18 @@ export function getTransactionChart() {
 /**
  *
  * @param {string} address
- * @return {Promise<Address>}
+ * @return {Promise<Array<CoinItem>>}
  */
-export function getAddress(address) {
+export function getBalance(address) {
     return explorer.get(`addresses/${address}`)
-        .then((response) => response.data.data);
+        .then((response) => response.data.data.balances.sort((a, b) => {
+            // set base coin first
+            if (b.coin === COIN_NAME) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }));
 }
 
 /**
@@ -316,9 +323,9 @@ export function getValidatorTransactionList(pubKey, params) {
  */
 
 /**
- * @typedef {Object} Address
- * @property {string} address
- * @property {Array<Object>} balances
+ * @typedef {Object} CoinItem
+ * @property {string|number} amount
+ * @property {string} coin
  */
 
 /**

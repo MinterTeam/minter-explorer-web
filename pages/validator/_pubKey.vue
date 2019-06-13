@@ -2,7 +2,8 @@
     import {getValidatorTransactionList, getValidator} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {pretty} from '~/assets/utils';
+    import {pretty, prettyExact} from '~/assets/utils';
+    import Amount from '~/components/common/Amount';
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
     import BackButton from '~/components/BackButton';
@@ -15,13 +16,15 @@
     };
 
     export default {
+        ideFix: null,
         VALIDATOR_STATUS,
         components: {
+            Amount,
             StakeListTable,
             TransactionList,
             BackButton,
             Pagination,
-            },
+        },
         filters: {
             pretty,
         },
@@ -82,6 +85,7 @@
             this.fetchTxs();
         },
         methods: {
+            prettyExact,
             fetchTxs() {
                 getValidatorTransactionList(this.$route.params.pubKey, this.$route.query)
                     .then((txListInfo) => {
@@ -127,7 +131,7 @@
                 <dd>{{ $options.VALIDATOR_STATUS[validator.status || 0] }}</dd>
 
                 <dt>Total Stake</dt>
-                <dd>{{ validator.stake | pretty }} {{ $store.state.COIN_NAME }}</dd>
+                <dd><Amount :amount="prettyExact(validator.stake)"/> {{ $store.state.COIN_NAME }}</dd>
 
                 <!--@TODO 0 if not validating-->
                 <dt>Voting Power</dt>
