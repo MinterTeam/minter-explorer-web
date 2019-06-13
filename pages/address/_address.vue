@@ -1,4 +1,5 @@
 <script>
+    import {isValidAddress} from 'minterjs-util/src/prefix';
     import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardList, getAddressSlashList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -37,6 +38,12 @@
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
         asyncData({ params, error }) {
+            if (!isValidAddress(params.address)) {
+                return error({
+                    statusCode: 404,
+                    message: 'Invalid address',
+                });
+            }
             return getBalance(params.address)
                 .then((balanceList) => {
                     return {
