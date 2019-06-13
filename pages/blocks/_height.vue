@@ -23,6 +23,12 @@
         // watchQuery: ['page'],
         // key: (to) => to.fullPath,
         asyncData({ params, error }) {
+            if (parseInt(params.height).toString() !== params.height) {
+                return error({
+                    statusCode: 404,
+                    message: 'Invalid block height',
+                });
+            }
             return getBlock(params.height)
                 .then((block) => {
                     return {

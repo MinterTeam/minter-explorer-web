@@ -1,6 +1,7 @@
 <script>
     import debounce from 'lodash-es/debounce';
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
+    import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {getTransaction} from "~/api";
     import {getTimeDistance, getTimeUTC, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
@@ -27,6 +28,12 @@
             txType: txTypeFilter,
         },
         asyncData({ params, error }) {
+            if (!isValidTransaction(params.hash)) {
+                return error({
+                    statusCode: 404,
+                    message: 'Invalid transaction hash',
+                });
+            }
             return getTransaction(params.hash)
                 .then((tx) => {
                     return {

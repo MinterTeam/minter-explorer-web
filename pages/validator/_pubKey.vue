@@ -1,4 +1,5 @@
 <script>
+    import {isValidPublicKeyString} from 'minterjs-util/src/prefix';
     import {getValidatorTransactionList, getValidator} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -31,6 +32,12 @@
         // watchQuery: ['page'],
         // key: (to) => to.fullPath,
         asyncData({ params, query, error }) {
+            if (!isValidPublicKeyString(params.pubKey)) {
+                return error({
+                    statusCode: 404,
+                    message: 'Invalid public key',
+                });
+            }
             return getValidator(params.pubKey)
                 .then((validator) => {
                     return {
