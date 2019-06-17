@@ -1,4 +1,5 @@
 <script>
+    import Big from 'big.js';
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {getTimeDistance, getTimeUTC, pretty, prettyRound, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils';
     import {UNBOND_PERIOD} from '~/assets/variables';
@@ -78,15 +79,33 @@
             isUnbond(tx) {
                 return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
             },
+            isMultisend(tx) {
+                return tx.type === Number(TX_TYPES.TX_TYPE_MULTISEND);
+            },
+            isIncomeMultisend(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
+                }
+                const isOutcomeMultisend = this.currentAddress === tx.from;
+                return !isOutcomeMultisend;
+            },
             getAmount(tx) {
                 return tx.data.value
                     || this.getConvertValue(tx)
                     || tx.data.stake
                     || tx.data.initial_amount
-                    || (tx.data.check && tx.data.check.value);
+                    || (tx.data.check && tx.data.check.value)
+                    || this.getMultisendValue(tx);
             },
             hasAmount(tx) {
                 return typeof this.getAmount(tx) !== 'undefined';
+            },
+            getAmountWithCoin(tx) {
+                if (this.isMultisend(tx) && this.isMultisendMultipleCoin(tx)) {
+                    return 'Multiple coins';
+                } else {
+                    return pretty(this.getAmount(tx) || 0) + ' ' + (tx.data.coin || tx.data.symbol || this.getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) || this.getMultisendCoin(tx));
+                }
             },
             getConvertCoinSymbol(tx) {
                 if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
@@ -102,6 +121,43 @@
                 }
                 if (tx.type === Number(TX_TYPES.TX_TYPE_BUY)) {
                     return tx.data.value_to_buy;
+                }
+            },
+            getMultisendDeliveryList(tx) {
+                if (!this.currentAddress) {
+                    return tx.data.list || [];
+                }
+                const isOutcomeMultisend = !this.isIncomeMultisend(tx);
+                return isOutcomeMultisend ? tx.data.list : tx.data.list.filter((delivery) => {
+                    return this.currentAddress === delivery.to;
+                });
+            },
+            isMultisendMultipleCoin(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
+                }
+                const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
+                return currentUserDeliveryList.some((delivery) => {
+                    return delivery.coin !== currentUserDeliveryList[0].coin;
+                });
+            },
+            getMultisendCoin(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
+                }
+                if (!this.isMultisendMultipleCoin(tx)) {
+                    return this.getMultisendDeliveryList(tx)[0].coin;
+                }
+            },
+            getMultisendValue(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
+                }
+                const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
+                if (this.isMultisendMultipleCoin(tx)) {
+                    return '...';
+                } else {
+                    return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toFixed();
                 }
             },
         },
@@ -152,8 +208,7 @@
                     <!-- amount -->
                     <td>
                         <div v-if="hasAmount(tx)">
-                            {{ getAmount(tx) || 0 | pretty }}
-                            {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) }}
+                            {{ getAmountWithCoin(tx) }}
                         </div>
                     </td>
                     <!--expand button -->

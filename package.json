@@ -22,6 +22,7 @@
   "dependencies": {
     "@minterteam/footer-links": "^3.0.0",
     "axios": "^0.19.0",
+    "big.js": "^5.2.2",
     "centrifuge": "^2.2.1",
     "chart.js": "^2.8.0",
     "date-fns": "^2.0.0-alpha.27",
