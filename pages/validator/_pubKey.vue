@@ -4,7 +4,6 @@
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyExact} from '~/assets/utils';
-    import Amount from '~/components/common/Amount';
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
     import BackButton from '~/components/BackButton';
@@ -20,7 +19,6 @@
         ideFix: null,
         VALIDATOR_STATUS,
         components: {
-            Amount,
             StakeListTable,
             TransactionList,
             BackButton,
@@ -138,7 +136,7 @@
                 <dd>{{ $options.VALIDATOR_STATUS[validator.status || 0] }}</dd>
 
                 <dt>Total Stake</dt>
-                <dd><Amount :amount="prettyExact(validator.stake)"/> {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ validator.stake | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
 
                 <!--@TODO 0 if not validating-->
                 <dt>Voting Power</dt>

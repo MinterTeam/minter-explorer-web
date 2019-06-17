@@ -3,7 +3,6 @@
     import {getTimeDistance, getTimeUTC, pretty, prettyRound} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import Amount from '~/components/common/Amount';
     import TransactionList from '~/components/TransactionList';
     import ValidatorList from '~/components/ValidatorList';
     import BackButton from '~/components/BackButton';
@@ -11,13 +10,13 @@
 
     export default {
         components: {
-            Amount,
             TransactionList,
             ValidatorList,
             BackButton,
             Pagination,
         },
         filters: {
+            pretty,
             prettyRound,
         },
         // watchQuery: ['page'],
@@ -93,7 +92,6 @@
             this.fetchTxs();
         },
         methods: {
-            pretty,
             fetchTxs() {
                 getBlockTransactionList(this.block.height, this.$route.query)
                     .then((txListInfo) => {
@@ -141,7 +139,7 @@
                 <dd>{{ block.size | prettyRound }} bytes</dd>
 
                 <dt>Reward</dt>
-                <dd><Amount :amount="pretty(block.reward)"/> {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ block.reward | pretty }} {{ $store.state.COIN_NAME }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ block.txCount || txPaginationInfo.total || 0 }}</dd>

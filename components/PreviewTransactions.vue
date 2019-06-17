@@ -1,13 +1,10 @@
 <script>
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {getTimeDistance, pretty, shortFilter, txTypeFilter} from '~/assets/utils';
-    import Amount from '~/components/common/Amount';
 
     export default {
-        components: {
-            Amount,
-        },
         filters: {
+            pretty,
             addressHash: (value) => shortFilter(value, 7),
             txHash: (value) => shortFilter(value, 13),
             txType: (value) => txTypeFilter(value).replace(/ coin$/, ''),
@@ -30,7 +27,6 @@
             },
         },
         methods: {
-            pretty,
             getAmount(tx) {
                 return tx.data.value
                     || this.getConvertValue(tx)
@@ -89,7 +85,7 @@
                         <div>
                             {{ tx.type | txType }}
                             <span v-if="hasAmount(tx)">
-                                <Amount :amount="pretty(getAmount(tx) || 0)" decimal-class="u-amount__decimal--opaque"/>
+                                {{ getAmount(tx) || 0 | pretty }}
                                 {{ tx.data.coin || tx.data.symbol || getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) }}
                             </span>
                         </div>

@@ -1,14 +1,13 @@
 <script>
     import {getTimeUTC, pretty} from '~/assets/utils';
-    import Amount from '~/components/common/Amount';
     import TableLink from '~/components/TableLink';
 
     export default {
         components: {
-            Amount,
             TableLink,
         },
         filters: {
+            pretty,
             time: getTimeUTC,
         },
         props: {
@@ -24,9 +23,6 @@
                 type: Boolean,
                 default: false,
             },
-        },
-        methods: {
-            pretty,
         },
     };
 </script>
@@ -69,7 +65,7 @@
                 </td>
                 <!-- value -->
                 <td>
-                    <Amount :amount="pretty(dataItem.amount)"/> {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }}
+                    {{ dataItem.amount | pretty }} {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }}
                 </td>
             </tr>
             </tbody>
