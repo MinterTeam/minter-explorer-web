@@ -65,7 +65,7 @@
                 </td>
                 <!-- value -->
                 <td>
-                    {{ dataItem.amount | prettyExact }} {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }}
+                    {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }} {{ dataItem.amount | prettyExact }}
                 </td>
             </tr>
             </tbody>

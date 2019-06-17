@@ -234,12 +234,17 @@
 
                 <dt>Balance</dt>
                 <dd>
-                    <table class="table--balance">
+                    <div v-for="balance in balanceList" :key="balance.coin">
+                        {{ balance.coin }} {{ balance.amount | pretty }}
+                    </div>
+<!--
+                    <table class="table&#45;&#45;balance">
                         <tr v-for="balance in balanceList" :key="balance.coin">
-                            <td>{{ balance.amount | pretty }}</td>
                             <td>{{ balance.coin }}</td>
+                            <td>{{ balance.amount | pretty }}</td>
                         </tr>
                     </table>
+-->
                 </dd>
 
 <!--

@@ -181,16 +181,16 @@
                         <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('hash')" v-show="getSortClass('hash')">
                     </button>
                 </th>
-                <th>
-                    <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('value', true)">
-                        <span class="table__sort-button-text">Amount</span>
-                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('value')" v-show="getSortClass('value')">
-                    </button>
-                </th>
                 <th class="u-hidden-medium-down">
                     <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('coin')">
                         <span class="table__sort-button-text">Coin</span>
                         <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('coin')" v-show="getSortClass('coin')">
+                    </button>
+                </th>
+                <th>
+                    <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('value', true)">
+                        <span class="table__sort-button-text">Amount</span>
+                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('value')" v-show="getSortClass('value')">
                     </button>
                 </th>
             </tr>
@@ -203,11 +203,11 @@
                                :should-not-shorten="!shouldShortenAddress"
                     />
                 </td>
-                <td>
-                    {{ stakeItem.value | pretty }}
-                    <span class="u-hidden-medium-up">{{ stakeItem.coin }}</span>
-                </td>
                 <td class="u-hidden-medium-down">{{ stakeItem.coin }}</td>
+                <td>
+                    <span class="u-hidden-medium-up">{{ stakeItem.coin }}</span>
+                    {{ stakeItem.value | pretty }}
+                </td>
             </tr>
             </tbody>
         </table>

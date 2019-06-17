@@ -163,18 +163,18 @@
                 <dt v-if="tx.data.to">To</dt>
                 <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
                 <dt v-if="isDefined(tx.data.value)">Amount</dt>
-                <dd v-if="isDefined(tx.data.value)">{{ tx.data.value | prettyExact }} {{ tx.data.coin }}</dd>
+                <dd v-if="isDefined(tx.data.value)">{{ tx.data.coin }} {{ tx.data.value | prettyExact }}</dd>
 
                 <!-- SELL -->
                 <dt v-if="isSell(tx)">Sell coins</dt>
-                <dd v-if="isSell(tx)">{{ tx.data.value_to_sell | prettyExact }} {{ tx.data.coin_to_sell }}</dd>
+                <dd v-if="isSell(tx)">{{ tx.data.coin_to_sell }} {{ tx.data.value_to_sell | prettyExact }}</dd>
                 <dt v-if="isSell(tx)">Get coins</dt>
-                <dd v-if="isSell(tx)">{{ tx.data.value_to_buy | prettyExact }} {{ tx.data.coin_to_buy }}</dd>
+                <dd v-if="isSell(tx)">{{ tx.data.coin_to_buy }} {{ tx.data.value_to_buy | prettyExact }}</dd>
                 <!-- BUY -->
                 <dt v-if="isBuy(tx)">Buy coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.value_to_buy | prettyExact }} {{ tx.data.coin_to_buy }}</dd>
+                <dd v-if="isBuy(tx)">{{ tx.data.coin_to_buy }}{{ tx.data.value_to_buy | prettyExact }}</dd>
                 <dt v-if="isBuy(tx)">Spend coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.value_to_sell | prettyExact }} {{ tx.data.coin_to_sell }}</dd>
+                <dd v-if="isBuy(tx)">{{ tx.data.coin_to_sell }} {{ tx.data.value_to_sell | prettyExact }}</dd>
 
                 <!-- CREATE_COIN-->
                 <dt v-if="tx.data.name">Name</dt>
@@ -182,9 +182,9 @@
                 <dt v-if="tx.data.symbol">Symbol</dt>
                 <dd v-if="tx.data.symbol">{{ tx.data.symbol }}</dd>
                 <dt v-if="tx.data.initial_amount">Initial Amount</dt>
-                <dd v-if="tx.data.initial_amount">{{ tx.data.initial_amount | prettyExact }} {{ tx.data.symbol }}</dd>
+                <dd v-if="tx.data.initial_amount">{{ tx.data.symbol }} {{ tx.data.initial_amount | prettyExact }}</dd>
                 <dt v-if="tx.data.initial_reserve">Initial Reserve</dt>
-                <dd v-if="tx.data.initial_reserve">{{ tx.data.initial_reserve | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
+                <dd v-if="tx.data.initial_reserve">{{ $store.state.COIN_NAME }} {{ tx.data.initial_reserve | prettyExact }}</dd>
                 <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
                 <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }}&thinsp;%</dd>
 
@@ -192,7 +192,7 @@
                 <dt v-if="tx.data.pub_key">Public Key</dt>
                 <dd v-if="tx.data.pub_key"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pub_key">{{ tx.data.pub_key }}</nuxt-link></dd>
                 <dt v-if="isDefined(tx.data.stake)">Stake</dt>
-                <dd v-if="isDefined(tx.data.stake)">{{ tx.data.stake | prettyExact }} {{ tx.data.coin }}</dd>
+                <dd v-if="isDefined(tx.data.stake)">{{ tx.data.coin }} {{ tx.data.stake | prettyExact }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbond(tx)">Unbond Block</dt>
@@ -210,7 +210,7 @@
                 <dt v-if="tx.data.check && tx.data.check.due_block">Due Block</dt>
                 <dd v-if="tx.data.check && tx.data.check.due_block">{{ tx.data.check.due_block }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
-                <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.value | prettyExact }} {{ tx.data.check.coin }}</dd>
+                <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.coin }} {{ tx.data.check.value | prettyExact }}</dd>
 
                 <!-- MULTISEND -->
                 <table class="table--recipient-list" v-if="tx.data.list && tx.data.list.length">
@@ -229,13 +229,13 @@
                                 :should-not-shorten="!shouldShortenAddress"
                             />
                         </td>
-                        <td>{{ transfer.value | prettyExact }} {{ transfer.coin }}</td>
+                        <td>{{ transfer.coin }} {{ transfer.value | prettyExact }}</td>
                     </tr>
                     </tbody>
                 </table>
 
                 <dt v-if="tx.fee">Fee</dt>
-                <dd v-if="tx.fee">{{ tx.fee | prettyExact }} {{ $store.state.COIN_NAME }}</dd>
+                <dd v-if="tx.fee">{{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}</dd>
 
                 <dt v-if="tx.nonce">Nonce</dt>
                 <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
