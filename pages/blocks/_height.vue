@@ -139,7 +139,7 @@
                 <dd>{{ block.size | prettyRound }} bytes</dd>
 
                 <dt>Reward</dt>
-                <dd>{{ block.reward | pretty }} {{ $store.state.COIN_NAME }}</dd>
+                <dd>{{ $store.state.COIN_NAME }} {{ block.reward | pretty }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ block.txCount || txPaginationInfo.total || 0 }}</dd>

@@ -102,7 +102,7 @@
                             <span v-else>{{ block.txCount }}</span>
                         </td>
                         <td>{{ block.size | prettyRound }} bytes</td>
-                        <td>{{ block.reward | pretty }} {{ $store.state.COIN_NAME }}</td>
+                        <td>{{ $store.state.COIN_NAME }} {{ block.reward | pretty }}</td>
                     </tr>
                     </tbody>
                 </table>

@@ -61,17 +61,9 @@ export function prettyRound(value) {
  * @return {string}
  */
 export function prettyExact(value) {
-    return decode(prettyNum(value, {precision: 4, rounding: 'increase', thousandsSeparator: '&#x202F;'}));
+    return decode(prettyNum(value, {precision: 8, precisionSetting: PRECISION_SETTING.FIXED, thousandsSeparator: '&#x202F;'}));
 }
 
-/**
- * Ensure value to have minimum 4 decimal digits
- * @param {string|number} value
- * @return {string}
- */
-export function prettyFull(value) {
-    return decode(prettyNum(value, {precision: 18, rounding: 'fixed', thousandsSeparator: '&#x202F;'}));
-}
 
 /**
  * Round to power
