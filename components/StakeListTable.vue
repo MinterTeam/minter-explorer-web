@@ -1,6 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
-    import {pretty} from '~/assets/utils';
+    import {pretty, prettyExact} from '~/assets/utils';
     import TableLink from "~/components/TableLink";
 
     let resizeHandler;
@@ -66,6 +66,7 @@
             }
         },
         methods: {
+            prettyExact,
             getHash(stakeItem) {
                 if (this.stakeItemType === 'validator') {
                     return stakeItem.pub_key;
@@ -206,7 +207,8 @@
                 <td class="u-hidden-medium-down">{{ stakeItem.coin }}</td>
                 <td>
                     <span class="u-hidden-medium-up">{{ stakeItem.coin }}</span>
-                    {{ stakeItem.value | pretty }}
+
+                    <span :title="prettyExact(stakeItem.value)">{{ stakeItem.value | pretty }}</span>
                 </td>
             </tr>
             </tbody>

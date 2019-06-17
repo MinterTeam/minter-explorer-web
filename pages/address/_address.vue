@@ -129,6 +129,7 @@
             this.fetchSlashes();
         },
         methods: {
+            prettyExact,
             switchTab(newTab) {
                 // save previous active_tab_page
                 if (this.$route.query.active_tab) {
@@ -235,7 +236,7 @@
                 <dt>Balance</dt>
                 <dd>
                     <div v-for="balance in balanceList" :key="balance.coin">
-                        {{ balance.coin }} {{ balance.amount | pretty }}
+                        {{ balance.coin }} <span :title="prettyExact(balance.amount)">{{ balance.amount | pretty }}</span>
                     </div>
 <!--
                     <table class="table&#45;&#45;balance">

@@ -136,7 +136,7 @@
                 <dd>{{ $options.VALIDATOR_STATUS[validator.status || 0] }}</dd>
 
                 <dt>Total Stake</dt>
-                <dd>{{ $store.state.COIN_NAME }} {{ validator.stake | pretty }}</dd>
+                <dd>{{ $store.state.COIN_NAME }} <span :title="prettyExact(validator.stake)">{{ validator.stake | pretty }}</span></dd>
 
                 <!--@TODO 0 if not validating-->
                 <dt>Voting Power</dt>
