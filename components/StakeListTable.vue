@@ -1,7 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
     import {pretty} from '~/assets/utils';
-    import Amount from '~/components/common/Amount';
     import TableLink from "~/components/TableLink";
 
     let resizeHandler;
@@ -9,8 +8,10 @@
     export default {
         name: 'StakeListTable',
         components: {
-            Amount,
             TableLink,
+        },
+        filters: {
+            pretty,
         },
         props: {
             stakeList: {
@@ -65,7 +66,6 @@
             }
         },
         methods: {
-            pretty,
             getHash(stakeItem) {
                 if (this.stakeItemType === 'validator') {
                     return stakeItem.pub_key;
@@ -204,7 +204,7 @@
                     />
                 </td>
                 <td>
-                    <Amount :amount="pretty(stakeItem.value)"/>
+                    {{ stakeItem.value | pretty }}
                     <span class="u-hidden-medium-up">{{ stakeItem.coin }}</span>
                 </td>
                 <td class="u-hidden-medium-down">{{ stakeItem.coin }}</td>

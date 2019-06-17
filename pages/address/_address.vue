@@ -4,7 +4,6 @@
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {prettyExact, prettyUsd, prettyFull} from "~/assets/utils";
-    import Amount from '~/components/common/Amount';
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
@@ -22,7 +21,6 @@
     export default {
         TAB_TYPES,
         components: {
-            Amount,
             TransactionList,
             StakeListTable,
             RewardSlashListTable,
@@ -131,7 +129,6 @@
             this.fetchSlashes();
         },
         methods: {
-            prettyFull,
             switchTab(newTab) {
                 // save previous active_tab_page
                 if (this.$route.query.active_tab) {
@@ -239,7 +236,7 @@
                 <dd>
                     <table class="table--balance">
                         <tr v-for="balance in balanceList" :key="balance.coin">
-                            <td><Amount :amount="prettyFull(balance.amount)"/></td>
+                            <td>{{ balance.amount | prettyFull }}</td>
                             <td>{{ balance.coin }}</td>
                         </tr>
                     </table>
