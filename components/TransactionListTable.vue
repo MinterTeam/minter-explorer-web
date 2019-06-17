@@ -207,9 +207,9 @@
                     <td>{{ tx.type | txType }}</td>
                     <!-- amount -->
                     <td>
-                        <div v-if="hasAmount(tx)">
+                        <template v-if="hasAmount(tx)">
                             {{ getAmountWithCoin(tx) }}
-                        </div>
+                        </template>
                     </td>
                     <!--expand button -->
                     <td class="table__expand-cell">
@@ -230,7 +230,7 @@
                             </div>
                             <div class="table__inner-item" v-if="isDefined(tx.data.value)">
                                 <strong>Value</strong> <br>
-                                {{ tx.data.value | pretty }} {{ tx.data.coin }}
+                                {{ tx.data.coin }} {{ tx.data.value | pretty }}
                             </div>
 
                             <!-- SELL -->

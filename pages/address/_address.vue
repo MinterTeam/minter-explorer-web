@@ -3,7 +3,7 @@
     import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardList, getAddressSlashList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {prettyExact, prettyUsd, prettyFull} from "~/assets/utils";
+    import {pretty, prettyExact, prettyUsd} from "~/assets/utils";
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
@@ -29,9 +29,9 @@
             Pagination,
         },
         filters: {
+            pretty,
             prettyExact,
             prettyUsd,
-            prettyFull,
         },
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
@@ -236,7 +236,7 @@
                 <dd>
                     <table class="table--balance">
                         <tr v-for="balance in balanceList" :key="balance.coin">
-                            <td>{{ balance.amount | prettyFull }}</td>
+                            <td>{{ balance.amount | pretty }}</td>
                             <td>{{ balance.coin }}</td>
                         </tr>
                     </table>
