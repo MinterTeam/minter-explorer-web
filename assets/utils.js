@@ -43,8 +43,9 @@ export function pretty(value) {
     const PRECISION = 2;
     const parts = stripZeros(fromExponential(value)).split('.');
     const isReduced = parts[1] && parts[1].length > PRECISION;
+    const isSmall = parts[0] === '0';
     const formattedValue = decode(prettyNum(value, {precision: PRECISION, precisionSetting: PRECISION_SETTING.FIXED, thousandsSeparator: '&#x202F;'}));
-    return (isReduced ? '~' : '') + formattedValue;
+    return formattedValue + (isReduced && isSmall ? '…' : '');
 }
 
 export function prettyUsd(value) {
