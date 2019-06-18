@@ -160,7 +160,9 @@ export function getBalance(address) {
     return explorer.get(`addresses/${address}`)
         .then((response) => response.data.data.balances.sort((a, b) => {
             // set base coin first
-            if (b.coin === COIN_NAME) {
+            if (a.coin === COIN_NAME) {
+                return -1;
+            } else if (b.coin === COIN_NAME) {
                 return 1;
             } else {
                 return 0;
