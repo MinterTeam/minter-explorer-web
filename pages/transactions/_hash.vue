@@ -172,7 +172,7 @@
                 <dd v-if="isSell(tx)">{{ tx.data.coin_to_buy }} {{ tx.data.value_to_buy | prettyExact }}</dd>
                 <!-- BUY -->
                 <dt v-if="isBuy(tx)">Buy coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.coin_to_buy }}{{ tx.data.value_to_buy | prettyExact }}</dd>
+                <dd v-if="isBuy(tx)">{{ tx.data.coin_to_buy }} {{ tx.data.value_to_buy | prettyExact }}</dd>
                 <dt v-if="isBuy(tx)">Spend coins</dt>
                 <dd v-if="isBuy(tx)">{{ tx.data.coin_to_sell }} {{ tx.data.value_to_sell | prettyExact }}</dd>
 

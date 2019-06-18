@@ -235,17 +235,12 @@
 
                 <dt>Balance</dt>
                 <dd>
-                    <div v-for="balance in balanceList" :key="balance.coin">
-                        {{ balance.coin }} <span :title="prettyExact(balance.amount)">{{ balance.amount | pretty }}</span>
-                    </div>
-<!--
-                    <table class="table&#45;&#45;balance">
+                    <table class="table--balance">
                         <tr v-for="balance in balanceList" :key="balance.coin">
                             <td>{{ balance.coin }}</td>
                             <td>{{ balance.amount | pretty }}</td>
                         </tr>
                     </table>
--->
                 </dd>
 
 <!--
