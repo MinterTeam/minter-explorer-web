@@ -238,7 +238,7 @@
                     <table class="table--balance">
                         <tr v-for="balance in balanceList" :key="balance.coin">
                             <td>{{ balance.coin }}</td>
-                            <td>{{ balance.amount | pretty }}</td>
+                            <td :title="prettyExact(balance.amount)">{{ balance.amount | pretty }}</td>
                         </tr>
                     </table>
                 </dd>
