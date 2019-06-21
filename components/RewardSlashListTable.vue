@@ -1,5 +1,5 @@
 <script>
-    import {getTimeUTC, prettyExact} from '~/assets/utils';
+    import {getTimeUTC, prettyPrecise} from '~/assets/utils';
     import TableLink from '~/components/TableLink';
 
     export default {
@@ -7,7 +7,7 @@
             TableLink,
         },
         filters: {
-            prettyExact,
+            prettyPrecise,
             time: getTimeUTC,
         },
         props: {
@@ -65,7 +65,7 @@
                 </td>
                 <!-- value -->
                 <td>
-                    {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }} {{ dataItem.amount | prettyExact }}
+                    {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }} {{ dataItem.amount | prettyPrecise }}
                 </td>
             </tr>
             </tbody>
