@@ -45,11 +45,11 @@ export function pretty(value) {
         return decode(prettyNum(value, {precision: PRECISION, precisionSetting: PRECISION_SETTING.FIXED, thousandsSeparator: '&#x202F;'}));
     } else {
         value = decode(prettyNum(value, {precision: PRECISION, precisionSetting: PRECISION_SETTING.REDUCE_SIGNIFICANT, thousandsSeparator: '&#x202F;'}));
-        if (value.substr(0, 10) === '0.00000000') {
+        value = value.substr(0, 10);
+        if (value === '0.00000000') {
             return '0.00';
-        } else {
-            return value;
         }
+        return value;
     }
 }
 
@@ -62,18 +62,28 @@ export function prettyRound(value) {
 }
 
 /**
- * Ensure value to have minimum 4 decimal digits
+ * Ensure value to have from 2 to 8 decimal digits
  * @param {string|number} value
  * @return {string}
  */
-export function prettyExact(value) {
+export function prettyPrecise(value) {
     const parts = stripZeros(fromExponential(value)).split('.');
     const isReduced = parts[1] && parts[1].length > 2;
     if (isReduced) {
         return decode(prettyNum(value, {precision: 8, precisionSetting: PRECISION_SETTING.REDUCE, thousandsSeparator: '&#x202F;'}));
     } else {
+        // ensure at least 2 decimal digits
         return decode(prettyNum(value, {precision: 2, precisionSetting: PRECISION_SETTING.FIXED, thousandsSeparator: '&#x202F;'}));
     }
+}
+
+/**
+ * Ensure value to have minimum 2 decimal digits
+ * @param {string|number} value
+ * @return {string}
+ */
+export function prettyExact(value) {
+    return decode(prettyNum(value, {precision: 2, precisionSetting: PRECISION_SETTING.INCREASE, thousandsSeparator: '&#x202F;'}));
 }
 
 

@@ -3,7 +3,7 @@
     import {getValidatorTransactionList, getValidator} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {pretty, prettyExact} from '~/assets/utils';
+    import {pretty, prettyPrecise} from '~/assets/utils';
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
     import BackButton from '~/components/BackButton';
@@ -26,6 +26,7 @@
         },
         filters: {
             pretty,
+            prettyPrecise,
         },
         // watchQuery: ['page'],
         // key: (to) => to.fullPath,
@@ -90,7 +91,6 @@
             this.fetchTxs();
         },
         methods: {
-            prettyExact,
             fetchTxs() {
                 getValidatorTransactionList(this.$route.params.pubKey, this.$route.query)
                     .then((txListInfo) => {
@@ -136,7 +136,7 @@
                 <dd>{{ $options.VALIDATOR_STATUS[validator.status || 0] }}</dd>
 
                 <dt>Total Stake</dt>
-                <dd>{{ $store.state.COIN_NAME }} <span :title="prettyExact(validator.stake)">{{ validator.stake | pretty }}</span></dd>
+                <dd>{{ $store.state.COIN_NAME }} <span>{{ validator.stake | prettyPrecise }}</span></dd>
 
                 <!--@TODO 0 if not validating-->
                 <dt>Voting Power</dt>

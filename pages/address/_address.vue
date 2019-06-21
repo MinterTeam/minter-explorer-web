@@ -3,7 +3,7 @@
     import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardList, getAddressSlashList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {pretty, prettyExact, prettyUsd} from "~/assets/utils";
+    import {pretty, prettyPrecise} from "~/assets/utils";
     import TransactionList from '~/components/TransactionList';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
@@ -30,8 +30,6 @@
         },
         filters: {
             pretty,
-            prettyExact,
-            prettyUsd,
         },
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
@@ -129,7 +127,7 @@
             this.fetchSlashes();
         },
         methods: {
-            prettyExact,
+            prettyPrecise,
             switchTab(newTab) {
                 // save previous active_tab_page
                 if (this.$route.query.active_tab) {
@@ -238,7 +236,7 @@
                     <table class="table--balance">
                         <tr v-for="balance in balanceList" :key="balance.coin">
                             <td>{{ balance.coin }}</td>
-                            <td :title="prettyExact(balance.amount)">{{ balance.amount | pretty }}</td>
+                            <td :title="prettyPrecise(balance.amount)">{{ balance.amount | pretty }}</td>
                         </tr>
                     </table>
                 </dd>
