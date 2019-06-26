@@ -1,5 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
+    import Big from 'big.js';
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {getTransaction} from "~/api";
@@ -124,8 +125,42 @@
             isUnbond(tx) {
                 return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
             },
+            isMultisend(tx) {
+                return tx.type === Number(TX_TYPES.TX_TYPE_MULTISEND);
+            },
             getShouldShortenAddress() {
                 return process.client && window.innerWidth < 700;
+            },
+            getMultisendDeliveryList(tx) {
+                return tx.data.list || [];
+            },
+            isMultisendMultipleCoin(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
+                }
+                const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
+                return currentUserDeliveryList.some((delivery) => {
+                    return delivery.coin !== currentUserDeliveryList[0].coin;
+                });
+            },
+            getMultisendCoin(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
+                }
+                if (!this.isMultisendMultipleCoin(tx)) {
+                    return this.getMultisendDeliveryList(tx)[0].coin;
+                }
+            },
+            getMultisendValue(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
+                }
+                const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
+                if (this.isMultisendMultipleCoin(tx)) {
+                    return '...';
+                } else {
+                    return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toFixed();
+                }
             },
         },
     };
@@ -213,6 +248,24 @@
                 <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.coin }} {{ tx.data.check.value | prettyExact }}</dd>
 
                 <!-- MULTISEND -->
+                <dt v-if="tx.data.list">#Recipients</dt>
+                <dd v-if="tx.data.list">{{ tx.data.list.length }}</dd>
+                <dt v-if="isMultisend(tx)">Total</dt>
+                <dd v-if="isMultisend(tx)">
+                    <span v-if="isMultisendMultipleCoin(tx)">Multiple coins</span>
+                    <span v-else>{{ getMultisendCoin(tx) }} {{ getMultisendValue(tx) }}</span>
+                </dd>
+
+                <dt v-if="tx.fee">Fee</dt>
+                <dd v-if="tx.fee">{{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}</dd>
+
+                <dt v-if="tx.nonce">Nonce</dt>
+                <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
+
+                <dt>Message</dt>
+                <dd class="u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
+
+                <!-- MULTISEND -->
                 <table class="table--recipient-list" v-if="tx.data.list && tx.data.list.length">
                     <thead>
                     <tr>
@@ -233,15 +286,6 @@
                     </tr>
                     </tbody>
                 </table>
-
-                <dt v-if="tx.fee">Fee</dt>
-                <dd v-if="tx.fee">{{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}</dd>
-
-                <dt v-if="tx.nonce">Nonce</dt>
-                <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
-
-                <dt>Message</dt>
-                <dd class="u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
             </dl>
         </section>
         <h1 class="u-text-center" style="margin-top: 50px;" v-else>
