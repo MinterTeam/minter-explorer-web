@@ -185,7 +185,7 @@ export function getAddressTransactionList(address, params) {
 
 /**
  * @param {string} address
- * @return {Promise<Array<{coin: string, value: string, pub_key: string}>>}
+ * @return {Promise<Array<StakeItem>>}
  */
 export function getAddressStakeList(address) {
     return explorer.get(`addresses/${address}/delegations`)
@@ -327,6 +327,14 @@ export function getValidatorTransactionList(pubKey, params) {
 /**
  * @typedef {Object} CoinItem
  * @property {string|number} amount
+ * @property {string} coin
+ */
+
+/**
+ * @typedef {Object} StakeItem
+ * @property {string} pub_key
+ * @property {string|number} value
+ * @property {string|number} bip_value
  * @property {string} coin
  */
 

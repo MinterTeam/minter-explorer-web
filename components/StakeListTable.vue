@@ -14,6 +14,7 @@
             pretty,
         },
         props: {
+            /** @type Array<StakeItem> */
             stakeList: {
                 type: Array,
                 required: true,
@@ -29,7 +30,7 @@
                 sort: {
                     // 0 - no sort, -1 - ascending, 1 - descending
                     hash: 0,
-                    value: 0,
+                    value: -1,
                     coin: 0,
                 },
             };
@@ -44,6 +45,7 @@
                 }
                 return '';
             },
+            /** @type Array<StakeItem> */
             stakeListSorted() {
                 return this.stakeList.slice(0).sort(makeSortQueue([
                     makeOrderedSortFn(this.sort.hash, this.hashSortFn),
@@ -141,7 +143,8 @@
      * Default ascending: 1 -> 2
      */
     function valueSortFn(a, b) {
-        return a.value - b.value;
+        console.log(a.bip_value, a.bip_value>b.bip_value ? '>' : '<', b.bip_value);
+        return a.bip_value - b.bip_value;
     }
 
 
@@ -173,25 +176,25 @@
 
 <template>
     <div class="table-wrap">
-        <table class="u-text-nowrap">
+        <table class="u-text-nowrap table--vertical-top">
             <thead>
             <tr>
                 <th>
                     <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('hash')">
                         <span class="table__sort-button-text">{{ hashName }}</span>
-                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('hash')" v-show="getSortClass('hash')">
+                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('hash')">
                     </button>
                 </th>
                 <th class="u-hidden-medium-down">
                     <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('coin')">
                         <span class="table__sort-button-text">Coin</span>
-                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('coin')" v-show="getSortClass('coin')">
+                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('coin')">
                     </button>
                 </th>
                 <th>
                     <button class="table__sort-button u-semantic-button link--hover" @click="toggleSort('value', true)">
                         <span class="table__sort-button-text">Amount</span>
-                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('value')" v-show="getSortClass('value')">
+                        <img class="table__sort-button-icon" src="/img/icon-sort.svg" alt="Sort" :class="getSortClass('value')">
                     </button>
                 </th>
             </tr>
@@ -209,6 +212,8 @@
                     <span class="u-hidden-medium-up">{{ stakeItem.coin }}</span>
 
                     <span :title="prettyPrecise(stakeItem.value)">{{ stakeItem.value | pretty }}</span>
+
+                    <div class="u-text-muted" :title="prettyPrecise(stakeItem.bip_value)" v-if="stakeItem.coin !== $store.getters.COIN_NAME">{{ $store.getters.COIN_NAME }} {{ stakeItem.bip_value | pretty }}</div>
                 </td>
             </tr>
             </tbody>
