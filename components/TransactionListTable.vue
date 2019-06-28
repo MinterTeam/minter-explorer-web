@@ -1,7 +1,7 @@
 <script>
     import Big from 'big.js';
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
-    import {getTimeDistance, getTimeUTC, pretty, prettyRound, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils';
+    import {getTimeDistance, getTime, pretty, prettyRound, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils';
     import {UNBOND_PERIOD} from '~/assets/variables';
     import TableLink from '~/components/TableLink';
 
@@ -47,7 +47,7 @@
                     return {
                         ...tx,
                         timeDistance:  getTimeDistance(tx.timestamp),
-                        timeUTC: getTimeUTC(tx.timestamp),
+                        timeUTC: getTime(tx.timestamp),
                     };
                 });
             },
@@ -293,7 +293,7 @@
                             </div>
                             <div class="table__inner-item" v-if="isUnbond(tx)">
                                 <strong>Unbond Block</strong> <br>
-                                {{ tx.block + $options.UNBOND_PERIOD }}
+                                {{ prettyRound(tx.block + $options.UNBOND_PERIOD) }}
                             </div>
                             <div class="table__inner-item" v-if="tx.data.reward_address">
                                 <strong>Reward Address</strong> <br>

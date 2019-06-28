@@ -1,5 +1,5 @@
 <script>
-    import {getTimeUTC, prettyPrecise} from '~/assets/utils';
+    import {getTime, prettyPrecise} from '~/assets/utils';
     import TableLink from '~/components/TableLink';
 
     export default {
@@ -8,7 +8,7 @@
         },
         filters: {
             prettyPrecise,
-            time: getTimeUTC,
+            time: getTime,
         },
         props: {
             /** @type Array<Reward|Slash> */

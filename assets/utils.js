@@ -8,13 +8,28 @@ import decode from 'entity-decode';
 import {txTypeList} from 'minterjs-tx/src/tx-types';
 
 export function getTimeDistance(timestamp) {
-    const distance = formatDistanceStrict(parseISO(timestamp), new Date(), {roundingMethod: 'floor'});
+    if (typeof timestamp === 'string') {
+        timestamp = parseISO(timestamp);
+    }
+    const distance = formatDistanceStrict(timestamp, new Date(), {roundingMethod: 'floor'});
 
     return distance && distance !== 'Invalid Date' ? distance : false;
 }
 
-export function getTimeUTC(timestamp) {
-    const time = format(parseISO(timestamp), 'yyyy-MM-dd HH:mm:ss O');
+export function getTime(timestamp) {
+    if (typeof timestamp === 'string') {
+        timestamp = parseISO(timestamp);
+    }
+    const time = format(timestamp, 'yyyy-MM-dd HH:mm:ss O');
+
+    return time && time !== 'Invalid Date' ? time : false;
+}
+
+export function getTimeMinutes(timestamp) {
+    if (typeof timestamp === 'string') {
+        timestamp = parseISO(timestamp);
+    }
+    const time = format(timestamp, 'yyyy-MM-dd HH:mm O');
 
     return time && time !== 'Invalid Date' ? time : false;
 }

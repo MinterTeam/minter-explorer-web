@@ -143,7 +143,6 @@
      * Default ascending: 1 -> 2
      */
     function valueSortFn(a, b) {
-        console.log(a.bip_value, a.bip_value>b.bip_value ? '>' : '<', b.bip_value);
         return a.bip_value - b.bip_value;
     }
 
