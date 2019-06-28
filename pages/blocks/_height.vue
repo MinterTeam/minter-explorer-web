@@ -1,6 +1,6 @@
 <script>
     import {getBlock, getBlockTransactionList} from "~/api";
-    import {getTimeDistance, getTimeUTC, pretty, prettyRound} from "~/assets/utils";
+    import {getTimeDistance, getTime, pretty, prettyRound} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import TransactionList from '~/components/TransactionList';
@@ -34,7 +34,7 @@
                         block : {
                             ...block,
                             timeDistance: getTimeDistance(block.timestamp),
-                            timeUTC: getTimeUTC(block.timestamp),
+                            timeUTC: getTime(block.timestamp),
                         },
                     };
                 })

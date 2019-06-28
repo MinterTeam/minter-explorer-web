@@ -3,8 +3,8 @@
     import Big from 'big.js';
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
-    import {getTransaction} from "~/api";
-    import {getTimeDistance, getTimeUTC, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
+    import {getTransaction, getBlock, getBlockList} from "~/api";
+    import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {UNBOND_PERIOD} from "~/assets/variables";
@@ -25,6 +25,9 @@
             prettyExact,
             prettyRound,
             txType: txTypeFilter,
+            timeDistance: getTimeDistance,
+            time: getTime,
+            timeMinutes: getTimeMinutes,
         },
         asyncData({ params, error }) {
             if (!isValidTransaction(params.hash)) {
@@ -34,15 +37,6 @@
                 });
             }
             return getTransaction(params.hash)
-                .then((tx) => {
-                    return {
-                        tx: {
-                            ...tx,
-                            timeDistance: getTimeDistance(tx.timestamp),
-                            timeUTC: getTimeUTC(tx.timestamp),
-                        },
-                    };
-                })
                 .catch((e) => {
                     console.log({e});
                     if (e.response && e.response.status === 404) {
@@ -70,11 +64,39 @@
                 /** @type Transaction|null */
                 tx: null,
                 shouldShortenAddress: this.getShouldShortenAddress(),
+                unbondOrLastBlock: null,
             };
+        },
+        computed: {
+            unbondBlockHeight() {
+                if (!this.tx || !this.isUnbond(this.tx)) {
+                    return;
+                }
+                return this.tx.block + UNBOND_PERIOD;
+            },
+            isUnbondBlock() {
+                return this.unbondOrLastBlock && this.unbondOrLastBlock.height === this.unbondBlockHeight;
+            },
+            unbondTime() {
+                if (!this.unbondOrLastBlock) {
+                    return;
+                }
+                // unbondOrLastBlock is unbond block
+                if (this.isUnbondBlock) {
+                    return this.unbondOrLastBlock.timestamp;
+                }
+                // unbondOrLastBlock is last block => calculate difference
+                if (this.unbondOrLastBlock.height < this.unbondBlockHeight) {
+                    return (this.unbondBlockHeight - this.unbondOrLastBlock.height) * 5000 + Date.now();
+                }
+                return undefined;
+            },
         },
         mounted() {
             if (!this.tx) {
                 this.fetchTx();
+            } else {
+                this.fetchUnbondBlock();
             }
             if (process.client) {
                 resizeHandler = debounce(() => {
@@ -97,12 +119,9 @@
             fetchTx() {
                 getTransaction(this.$route.params.hash)
                     .then((tx) => {
-                        this.tx = {
-                            ...tx,
-                            timeDistance: getTimeDistance(tx.timestamp),
-                            timeUTC: getTimeUTC(tx.timestamp),
-                        };
+                        this.tx = tx;
                         fetchTxTimer = null;
+                        this.fetchUnbondBlock();
                     })
                     .catch((e) => {
                         if (fetchTxDestroy) {
@@ -112,6 +131,27 @@
                             this.fetchTx();
                         }, 2500);
                     });
+            },
+            fetchUnbondBlock() {
+                if (this.isUnbond(this.tx)) {
+                    getBlock(this.unbondBlockHeight)
+                        .then((block) => this.unbondOrLastBlock = block)
+                        .catch((e) => {
+                            if (e.request.status === 404) {
+                                return getBlockList();
+                            } else {
+                                throw e;
+                            }
+                        })
+                        .then((blockList) => {
+                            if (blockList && blockList.data) {
+                                this.unbondOrLastBlock = blockList.data[0];
+                            }
+                        })
+                        .catch((e) => {
+                            console.log('Unable to get block', e);
+                        });
+                }
             },
             isDefined(value) {
                 return typeof value !== 'undefined';
@@ -180,7 +220,7 @@
                 <dd class="u-select-all">{{ tx.hash }}</dd>
 
                 <dt>Timestamp</dt>
-                <dd>{{ tx.timeDistance }} ago ({{ tx.timeUTC }})</dd>
+                <dd>{{ tx.timestamp | timeDistance }} ago ({{ tx.timestamp | time }})</dd>
 
                 <dt>Status</dt>
                 <dd><strong :class="tx.status === 'success' ? 'tx__success' : 'tx__fail'">{{ tx.status }}</strong></dd>
@@ -231,7 +271,12 @@
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbond(tx)">Unbond Block</dt>
-                <dd v-if="isUnbond(tx)">{{ tx.block + $options.UNBOND_PERIOD }}</dd>
+                <dd v-if="isUnbond(tx)">{{ unbondBlockHeight | prettyRound }}</dd>
+                <dt v-if="isUnbond(tx) && unbondTime">Unbond Time</dt>
+                <dd v-if="isUnbond(tx) && unbondTime">
+                    <span v-if="isUnbondBlock">{{ unbondTime | timeDistance }} ago ({{ unbondTime | time }})</span>
+                    <span v-else>In {{ unbondTime | timeDistance }} ({{ unbondTime | timeMinutes }})</span>
+                </dd>
                 <dt v-if="tx.data.reward_address">Reward Address</dt>
                 <dd v-if="tx.data.reward_address"><nuxt-link class="link--default" :to="'/address/' + tx.data.reward_address">{{ tx.data.reward_address }}</nuxt-link></dd>
                 <dt v-if="tx.data.owner_address">Owner Address</dt>
