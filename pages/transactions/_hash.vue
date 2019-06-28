@@ -37,6 +37,11 @@
                 });
             }
             return getTransaction(params.hash)
+                .then((tx) => {
+                    return {
+                        tx,
+                    };
+                })
                 .catch((e) => {
                     console.log({e});
                     if (e.response && e.response.status === 404) {
@@ -165,6 +170,9 @@
             isUnbond(tx) {
                 return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
             },
+            isStake(tx) {
+                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND) || tx.type === Number(TX_TYPES.TX_TYPE_DELEGATE) || tx.type === Number(TX_TYPES.TX_TYPE_DECLARE_CANDIDACY);
+            },
             isMultisend(tx) {
                 return tx.type === Number(TX_TYPES.TX_TYPE_MULTISEND);
             },
@@ -237,8 +245,8 @@
                 <!-- SEND -->
                 <dt v-if="tx.data.to">To</dt>
                 <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
-                <dt v-if="isDefined(tx.data.value)">Amount</dt>
-                <dd v-if="isDefined(tx.data.value)">{{ tx.data.coin }} {{ tx.data.value | prettyExact }}</dd>
+                <dt v-if="isDefined(tx.data.value) && !isStake(tx)">Amount</dt>
+                <dd v-if="isDefined(tx.data.value) && !isStake(tx)">{{ tx.data.coin }} {{ tx.data.value | prettyExact }}</dd>
 
                 <!-- SELL -->
                 <dt v-if="isSell(tx)">Sell coins</dt>
@@ -266,8 +274,8 @@
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="tx.data.pub_key">Public Key</dt>
                 <dd v-if="tx.data.pub_key"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pub_key">{{ tx.data.pub_key }}</nuxt-link></dd>
-                <dt v-if="isDefined(tx.data.stake)">Stake</dt>
-                <dd v-if="isDefined(tx.data.stake)">{{ tx.data.coin }} {{ tx.data.stake | prettyExact }}</dd>
+                <dt v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
+                <dd v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">{{ tx.data.coin }} {{ (tx.data.stake || tx.data.value) | prettyExact }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbond(tx)">Unbond Block</dt>
