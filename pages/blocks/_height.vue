@@ -21,21 +21,27 @@
         },
         // watchQuery: ['page'],
         // key: (to) => to.fullPath,
-        asyncData({ params, error }) {
+        asyncData({ params, query, error }) {
             if (parseInt(params.height).toString() !== params.height) {
                 return error({
                     statusCode: 404,
                     message: 'Invalid block height',
                 });
             }
-            return getBlock(params.height)
-                .then((block) => {
+
+            const blockPromise = getBlock(params.height);
+            const txListPromise = getBlockTransactionList(params.height, query);
+
+            return Promise.all([blockPromise, txListPromise])
+                .then(([block, txListInfo]) => {
                     return {
                         block : {
                             ...block,
                             timeDistance: getTimeDistance(block.timestamp),
                             timeUTC: getTime(block.timestamp),
                         },
+                        txList: txListInfo.data,
+                        txPaginationInfo: txListInfo.meta,
                     };
                 })
                 .catch((e) => {
@@ -61,7 +67,7 @@
             return {
                 /** @type Block */
                 block: {},
-                isTxListLoading: true,
+                isTxListLoading: false,
                 txList: [],
                 txPaginationInfo: {},
             };
@@ -72,7 +78,6 @@
             '$route.query': {
                 handler(newVal, oldVal) {
                     if (newVal.page !== oldVal.page) {
-                        this.isTxListLoading = true;
                         this.fetchTxs();
 
                         this.checkPanelPosition();
@@ -88,17 +93,13 @@
                 return '/blocks/' + (this.block.height + 1);
             },
         },
-        mounted() {
-            this.fetchTxs();
-        },
         methods: {
             fetchTxs() {
+                this.isTxListLoading = true;
                 getBlockTransactionList(this.block.height, this.$route.query)
                     .then((txListInfo) => {
-                        if (txListInfo.data && txListInfo.data.length) {
-                            this.txList = txListInfo.data;
-                            this.txPaginationInfo = txListInfo.meta;
-                        }
+                        this.txList = txListInfo.data;
+                        this.txPaginationInfo = txListInfo.meta;
                         this.isTxListLoading = false;
                     })
                     .catch(() => {
@@ -107,7 +108,6 @@
             },
             checkPanelPosition() {
                 const delegationPanelEl = document.querySelector('[data-tx-panel]');
-                // const delegationTableEl = document.querySelector('[data-delegation-panel]');
                 if (window.pageYOffset > delegationPanelEl.offsetTop) {
                     window.scrollTo(0, delegationPanelEl.offsetTop - 15);
                 }
@@ -157,7 +157,6 @@
                          :current-block="block.height"
                          :pagination-info="txPaginationInfo"
                          :is-loading="isTxListLoading"
-                         v-if="isTxListLoading || txList.length"
         />
         <Pagination :pagination-info="txPaginationInfo"/>
         <ValidatorList id="validators" :validator-list="block.validators" v-if="block.validators && block.validators.length"/>

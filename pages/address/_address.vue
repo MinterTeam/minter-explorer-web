@@ -19,6 +19,7 @@
     };
 
     export default {
+        ideFix: null,
         TAB_TYPES,
         components: {
             TransactionList,
@@ -33,17 +34,59 @@
         },
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
-        asyncData({ params, error }) {
+        asyncData({ params, query, error }) {
             if (!isValidAddress(params.address)) {
                 return error({
                     statusCode: 404,
                     message: 'Invalid address',
                 });
             }
-            return getBalance(params.address)
-                .then((balanceList) => {
+
+            const activeTab = Object.values(TAB_TYPES).indexOf(query.active_tab) !== -1 ? query.active_tab : TAB_TYPES.STAKE;
+
+            const balancePromise = getBalance(params.address);
+            const txListPromise = getAddressTransactionList(params.address, query);
+            let tabPromise;
+            if (activeTab === TAB_TYPES.STAKE) {
+                tabPromise = getAddressStakeList(params.address);
+            } else if (activeTab === TAB_TYPES.REWARD) {
+                tabPromise = getAddressRewardList(params.address, {
+                    page: query.active_tab === TAB_TYPES.REWARD ? query.active_tab_page : undefined,
+                });
+            } else if (activeTab === TAB_TYPES.SLASH) {
+                tabPromise = getAddressSlashList(params.address, {
+                    page: query.active_tab === TAB_TYPES.SLASH ? query.active_tab_page : undefined,
+                });
+            }
+
+            return Promise.all([balancePromise, txListPromise, tabPromise])
+                .then(([balanceList, txListInfo, tabData]) => {
+                    let tabResult;
+                    if (activeTab === TAB_TYPES.STAKE) {
+                        tabResult = {
+                            stakeList: tabData,
+                            isStakeListLoaded: true,
+                        };
+                    } else if (activeTab === TAB_TYPES.REWARD) {
+                        tabResult = {
+                            rewardList: tabData.data,
+                            rewardPaginationInfo: tabData.meta,
+                            isRewardListLoaded: true,
+                        };
+                    } else if (activeTab === TAB_TYPES.SLASH) {
+                        tabResult = {
+                            slashList: tabData.data,
+                            slashPaginationInfo: tabData.meta,
+                            isSlashListLoaded: true,
+                        };
+                    }
+
                     return {
+                        ...tabResult,
+                        activeTab,
                         balanceList,
+                        txList: txListInfo.data,
+                        txPaginationInfo:  txListInfo.meta,
                     };
                 })
                 .catch((e) => {
@@ -68,19 +111,22 @@
         data() {
             return {
                 balanceList: [],
-                activeTab: Object.values(TAB_TYPES).indexOf(this.$route.query.active_tab) !== -1 ? this.$route.query.active_tab : TAB_TYPES.STAKE,
+                activeTab: TAB_TYPES.STAKE,
                 storedTabPages: {},
                 txList: [],
                 txPaginationInfo: {},
-                isTxListLoading: true,
+                isTxListLoading: false,
                 stakeList: [],
-                isStakeListLoading: true,
+                isStakeListLoading: false,
+                isStakeListLoaded: false,
                 rewardList: [],
                 rewardPaginationInfo: {},
-                isRewardListLoading: true,
+                isRewardListLoading: false,
+                isRewardListLoaded: false,
                 slashList: [],
                 slashPaginationInfo: {},
-                isSlashListLoading: true,
+                isSlashListLoading: false,
+                isSlashListLoaded: false,
             };
         },
         watch: {
@@ -89,18 +135,27 @@
             '$route.query': {
                 handler(newVal, oldVal) {
                     if (newVal.page !== oldVal.page) {
-                        this.isTxListLoading = true;
                         this.fetchTxs();
                     }
 
                     // same tab, new page
-                    if (newVal.active_tab === oldVal.active_tab && newVal.active_tab_page !== oldVal.active_tab_page) {
+                    if (newVal.active_tab !== oldVal.active_tab) {
+                        if (this.activeTab === TAB_TYPES.STAKE && !this.isStakeListLoaded) {
+                            this.fetchStakes();
+                        }
+                        if (this.activeTab === TAB_TYPES.REWARD && !this.isRewardListLoaded) {
+                            this.fetchRewards();
+                        }
+                        if (this.activeTab === TAB_TYPES.SLASH && !this.isSlashListLoaded) {
+                            this.fetchSlashes();
+                        }
+
+                        this.checkPanelPosition();
+                    } else if (newVal.active_tab === oldVal.active_tab && newVal.active_tab_page !== oldVal.active_tab_page) {
                         if (this.activeTab === TAB_TYPES.REWARD) {
-                            this.isRewardListLoading = true;
                             this.fetchRewards();
                         }
                         if (this.activeTab === TAB_TYPES.SLASH) {
-                            this.isSlashListLoading = true;
                             this.fetchSlashes();
                         }
 
@@ -119,12 +174,6 @@
                 }
                 return false;
             },
-        },
-        mounted() {
-            this.fetchTxs();
-            this.fetchStakes();
-            this.fetchRewards();
-            this.fetchSlashes();
         },
         methods: {
             prettyPrecise,
@@ -156,18 +205,16 @@
             },
             checkPanelPosition() {
                 const delegationPanelEl = document.querySelector('[data-delegation-panel]');
-                // const delegationTableEl = document.querySelector('[data-delegation-panel]');
                 if (window.pageYOffset > delegationPanelEl.offsetTop) {
                     window.scrollTo(0, delegationPanelEl.offsetTop - 15);
                 }
             },
             fetchTxs() {
+                this.isTxListLoading = true;
                 getAddressTransactionList(this.$route.params.address, this.$route.query)
                     .then((txListInfo) => {
-                        if (txListInfo.data && txListInfo.data.length) {
-                            this.txList = txListInfo.data;
-                            this.txPaginationInfo = txListInfo.meta;
-                        }
+                        this.txList = txListInfo.data;
+                        this.txPaginationInfo = txListInfo.meta;
                         this.isTxListLoading = false;
                     })
                     .catch(() => {
@@ -175,40 +222,42 @@
                     });
             },
             fetchStakes() {
+                this.isStakeListLoading = true;
                 getAddressStakeList(this.$route.params.address)
                     .then((stakeList) => {
                         this.stakeList = stakeList;
                         this.isStakeListLoading = false;
+                        this.isStakeListLoaded = true;
                     })
                     .catch(() => {
                         this.isStakeListLoading = false;
                     });
             },
             fetchRewards() {
+                this.isRewardListLoading = true;
                 getAddressRewardList(this.$route.params.address, {
                     page: this.$route.query.active_tab === TAB_TYPES.REWARD ? this.$route.query.active_tab_page : undefined,
                 })
                     .then((rewardListInfo) => {
-                        if (rewardListInfo.data && rewardListInfo.data.length) {
-                            this.rewardList = rewardListInfo.data;
-                            this.rewardPaginationInfo = rewardListInfo.meta;
-                        }
+                        this.rewardList = rewardListInfo.data;
+                        this.rewardPaginationInfo = rewardListInfo.meta;
                         this.isRewardListLoading = false;
+                        this.isRewardListLoaded = true;
                     })
                     .catch(() => {
                         this.isRewardListLoading = false;
                     });
             },
             fetchSlashes() {
+                this.isSlashListLoading = true;
                 getAddressSlashList(this.$route.params.address, {
                     page: this.$route.query.active_tab === TAB_TYPES.SLASH ? this.$route.query.active_tab_page : undefined,
                 })
                 .then((slashListInfo) => {
-                    if (slashListInfo.data && slashListInfo.data.length) {
-                        this.slashList = slashListInfo.data;
-                        this.slashPaginationInfo = slashListInfo.meta;
-                    }
+                    this.slashList = slashListInfo.data;
+                    this.slashPaginationInfo = slashListInfo.meta;
                     this.isSlashListLoading = false;
+                    this.isSlashListLoaded = true;
                 })
                 .catch(() => {
                     this.isSlashListLoading = false;
@@ -252,7 +301,7 @@
         </section>
 
         <!-- Delegation -->
-        <section class="panel u-section" v-if="stakeList.length || rewardList.length" data-delegation-panel>
+        <section class="panel u-section" data-delegation-panel>
             <div class="panel__switcher">
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.STAKE}"
