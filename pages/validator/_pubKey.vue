@@ -37,10 +37,16 @@
                     message: 'Invalid public key',
                 });
             }
-            return getValidator(params.pubKey)
-                .then((validator) => {
+
+            const validatorPromise = getValidator(params.pubKey);
+            const txListPromise = getValidatorTransactionList(params.pubKey, query);
+
+            return Promise.all([validatorPromise, txListPromise])
+                .then(([validator, txListInfo]) => {
                     return {
                         validator,
+                        txList: txListInfo.data,
+                        txPaginationInfo: txListInfo.meta,
                     };
                 })
                 .catch((e) => {
@@ -67,7 +73,7 @@
                 validator: null,
                 txList: [],
                 txPaginationInfo: {},
-                isTxListLoading: true,
+                isTxListLoading: false,
             };
         },
         watch: {
@@ -76,7 +82,6 @@
             '$route.query': {
                 handler(newVal, oldVal) {
                     if (newVal.page !== oldVal.page) {
-                        this.isTxListLoading = true;
                         this.fetchTxs();
 
                         // this.checkPanelPosition();
@@ -87,17 +92,13 @@
         computed: {
 
         },
-        mounted() {
-            this.fetchTxs();
-        },
         methods: {
             fetchTxs() {
+                this.isTxListLoading = true;
                 getValidatorTransactionList(this.$route.params.pubKey, this.$route.query)
                     .then((txListInfo) => {
-                        if (txListInfo.data && txListInfo.data.length) {
-                            this.txList = txListInfo.data;
-                            this.txPaginationInfo = txListInfo.meta;
-                        }
+                        this.txList = txListInfo.data;
+                        this.txPaginationInfo = txListInfo.meta;
                         this.isTxListLoading = false;
                     })
                     .catch(() => {
@@ -106,7 +107,6 @@
             },
             // checkPanelPosition() {
             //     const delegationPanelEl = document.querySelector('[data-tx-panel]');
-            //     // const delegationTableEl = document.querySelector('[data-delegation-panel]');
             //     if (window.pageYOffset > delegationPanelEl.offsetTop) {
             //         window.scrollTo(0, delegationPanelEl.offsetTop - 15);
             //     }

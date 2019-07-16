@@ -175,7 +175,7 @@
 
 <template>
     <div class="table-wrap">
-        <table class="u-text-nowrap table--vertical-top">
+        <table class="u-text-nowrap table--vertical-top" v-if="stakeListSorted.length">
             <thead>
             <tr>
                 <th>
@@ -217,5 +217,6 @@
             </tr>
             </tbody>
         </table>
+        <div class="panel__content panel__section u-text-center" v-else>No Stakes</div>
     </div>
 </template>
