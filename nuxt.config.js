@@ -46,16 +46,16 @@ module.exports = {
         linkExactActiveClass: 'is-active',
         middleware: [
             'hash-lowercase',
-            'history',
         ],
     },
     plugins: [
         { src: '~/plugins/click-blur.js', ssr: false },
         { src: '~/plugins/seo-gtag.js', ssr: false },
-        { src: '~/plugins/seo-ym.js', ssr: false },
-        { src: '~/plugins/seo-fb.js', ssr: false },
-        { src: '~/plugins/seo-vk.js', ssr: false },
-        { src: '~/plugins/seo-tw.js', ssr: false },
+        // { src: '~/plugins/seo-ym.js', ssr: false },
+        // { src: '~/plugins/seo-fb.js', ssr: false },
+        // { src: '~/plugins/seo-vk.js', ssr: false },
+        // { src: '~/plugins/seo-tw.js', ssr: false },
+        { src: '~/plugins/history.js', ssr: false },
     ],
     env: Object.assign({}, processEnv, dotEnv),
     /*
