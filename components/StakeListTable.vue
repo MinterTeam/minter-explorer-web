@@ -23,6 +23,10 @@
                 type: String,
                 default: 'validator',
             },
+            isLoading: {
+                type: Boolean,
+                default: false,
+            },
         },
         data() {
             return {
@@ -175,7 +179,12 @@
 
 <template>
     <div class="table-wrap">
-        <table class="u-text-nowrap table--vertical-top" v-if="stakeListSorted.length">
+        <div class="panel__content panel__section u-text-center" v-if="isLoading">
+            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
+                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
+            </svg>
+        </div>
+        <table class="u-text-nowrap table--vertical-top" v-else-if="stakeListSorted.length">
             <thead>
             <tr>
                 <th>

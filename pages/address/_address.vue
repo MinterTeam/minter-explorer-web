@@ -4,25 +4,23 @@
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise} from "~/assets/utils";
-    import TransactionList from '~/components/TransactionList';
+    import {TAB_TYPES} from '~/assets/variables';
+    import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
     import RewardChart from '~/components/RewardChart';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
-    const TAB_TYPES = {
-        TX: 'tx',
-        STAKE: 'stake',
-        REWARD: 'reward',
-        SLASH: 'slash',
-    };
+    function getActiveTab(val) {
+        return Object.values(TAB_TYPES).indexOf(val) !== -1 ? val : TAB_TYPES.TX;
+    }
 
     export default {
         ideFix: null,
         TAB_TYPES,
         components: {
-            TransactionList,
+            TransactionListTable,
             StakeListTable,
             RewardSlashListTable,
             RewardChart,
@@ -42,27 +40,30 @@
                 });
             }
 
-            const activeTab = Object.values(TAB_TYPES).indexOf(query.active_tab) !== -1 ? query.active_tab : TAB_TYPES.STAKE;
-
             const balancePromise = getBalance(params.address);
-            const txListPromise = getAddressTransactionList(params.address, query);
+
+            const activeTab = getActiveTab(query.active_tab);
             let tabPromise;
-            if (activeTab === TAB_TYPES.STAKE) {
+            if (activeTab === TAB_TYPES.TX) {
+                tabPromise = getAddressTransactionList(params.address, query);
+            } else if (activeTab === TAB_TYPES.STAKE) {
                 tabPromise = getAddressStakeList(params.address);
             } else if (activeTab === TAB_TYPES.REWARD) {
-                tabPromise = getAddressRewardList(params.address, {
-                    page: query.active_tab === TAB_TYPES.REWARD ? query.active_tab_page : undefined,
-                });
+                tabPromise = getAddressRewardList(params.address, query);
             } else if (activeTab === TAB_TYPES.SLASH) {
-                tabPromise = getAddressSlashList(params.address, {
-                    page: query.active_tab === TAB_TYPES.SLASH ? query.active_tab_page : undefined,
-                });
+                tabPromise = getAddressSlashList(params.address, query);
             }
 
-            return Promise.all([balancePromise, txListPromise, tabPromise])
-                .then(([balanceList, txListInfo, tabData]) => {
+            return Promise.all([balancePromise, tabPromise])
+                .then(([balanceList, tabData]) => {
                     let tabResult;
-                    if (activeTab === TAB_TYPES.STAKE) {
+                    if (activeTab === TAB_TYPES.TX) {
+                        tabResult = {
+                            txList: tabData.data,
+                            txPaginationInfo:  tabData.meta,
+                            isTxListLoaded: true,
+                        };
+                    } else if (activeTab === TAB_TYPES.STAKE) {
                         tabResult = {
                             stakeList: tabData,
                             isStakeListLoaded: true,
@@ -83,10 +84,7 @@
 
                     return {
                         ...tabResult,
-                        activeTab,
                         balanceList,
-                        txList: txListInfo.data,
-                        txPaginationInfo:  txListInfo.meta,
                     };
                 })
                 .catch((e) => {
@@ -111,11 +109,11 @@
         data() {
             return {
                 balanceList: [],
-                activeTab: TAB_TYPES.STAKE,
                 storedTabPages: {},
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: false,
+                isTxListLoaded: false,
                 stakeList: [],
                 isStakeListLoading: false,
                 isStakeListLoaded: false,
@@ -134,12 +132,11 @@
             // update data on page change
             '$route.query': {
                 handler(newVal, oldVal) {
-                    if (newVal.page !== oldVal.page) {
-                        this.fetchTxs();
-                    }
-
                     // same tab, new page
                     if (newVal.active_tab !== oldVal.active_tab) {
+                        if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
+                            this.fetchTxs();
+                        }
                         if (this.activeTab === TAB_TYPES.STAKE && !this.isStakeListLoaded) {
                             this.fetchStakes();
                         }
@@ -151,7 +148,10 @@
                         }
 
                         this.checkPanelPosition();
-                    } else if (newVal.active_tab === oldVal.active_tab && newVal.active_tab_page !== oldVal.active_tab_page) {
+                    } else if (newVal.active_tab === oldVal.active_tab && newVal.page !== oldVal.page) {
+                        if (this.activeTab === TAB_TYPES.TX) {
+                            this.fetchTxs();
+                        }
                         if (this.activeTab === TAB_TYPES.REWARD) {
                             this.fetchRewards();
                         }
@@ -165,7 +165,13 @@
             },
         },
         computed: {
+            activeTab() {
+                return getActiveTab(this.$route.query.active_tab);
+            },
             activePaginationInfo() {
+                if (this.activeTab === TAB_TYPES.TX) {
+                    return this.txPaginationInfo;
+                }
                 if (this.activeTab === TAB_TYPES.REWARD) {
                     return this.rewardPaginationInfo;
                 }
@@ -178,13 +184,11 @@
         methods: {
             prettyPrecise,
             switchTab(newTab) {
-                // save previous active_tab_page
+                // save previous page
                 if (this.$route.query.active_tab) {
-                    this.storedTabPages[this.$route.query.active_tab] = this.$route.query.active_tab_page;
+                    this.storedTabPages[this.$route.query.active_tab] = this.$route.query.page;
                 }
-                // set new tab
-                this.activeTab = newTab;
-                // restore saved active_tab_page
+                // restore saved page
                 let newTabPage;
                 if (this.storedTabPages[newTab]) {
                     newTabPage = this.storedTabPages[newTab];
@@ -196,7 +200,7 @@
                     query: {
                         ...this.$route.query,
                         active_tab: newTab,
-                        active_tab_page: newTabPage,
+                        page: newTabPage,
                     },
                 });
 
@@ -204,7 +208,7 @@
                 this.$nextTick(this.checkPanelPosition);
             },
             checkPanelPosition() {
-                const delegationPanelEl = document.querySelector('[data-delegation-panel]');
+                const delegationPanelEl = document.querySelector('[data-tab-panel]');
                 if (window.pageYOffset > delegationPanelEl.offsetTop) {
                     window.scrollTo(0, delegationPanelEl.offsetTop - 15);
                 }
@@ -216,6 +220,7 @@
                         this.txList = txListInfo.data;
                         this.txPaginationInfo = txListInfo.meta;
                         this.isTxListLoading = false;
+                        this.isTxListLoaded = true;
                     })
                     .catch(() => {
                         this.isTxListLoading = false;
@@ -235,9 +240,7 @@
             },
             fetchRewards() {
                 this.isRewardListLoading = true;
-                getAddressRewardList(this.$route.params.address, {
-                    page: this.$route.query.active_tab === TAB_TYPES.REWARD ? this.$route.query.active_tab_page : undefined,
-                })
+                getAddressRewardList(this.$route.params.address, this.$route.query)
                     .then((rewardListInfo) => {
                         this.rewardList = rewardListInfo.data;
                         this.rewardPaginationInfo = rewardListInfo.meta;
@@ -250,9 +253,7 @@
             },
             fetchSlashes() {
                 this.isSlashListLoading = true;
-                getAddressSlashList(this.$route.params.address, {
-                    page: this.$route.query.active_tab === TAB_TYPES.SLASH ? this.$route.query.active_tab_page : undefined,
-                })
+                getAddressSlashList(this.$route.params.address, this.$route.query)
                 .then((slashListInfo) => {
                     this.slashList = slashListInfo.data;
                     this.slashPaginationInfo = slashListInfo.meta;
@@ -290,25 +291,27 @@
                     </table>
                 </dd>
 
-<!--
-                <dt>USD Value</dt>
-                <dd>${{ baseCoin ? baseCoin.usdAmount : 0 | prettyUsd }}</dd>
--->
-
                 <dt>#Transactions</dt>
                 <dd>{{ txPaginationInfo.total || 0 }}</dd>
             </dl>
         </section>
 
-        <!-- Delegation -->
-        <section class="panel u-section" data-delegation-panel>
+        <section class="panel u-section" data-tab-panel>
             <div class="panel__switcher">
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
+                        @click="switchTab($options.TAB_TYPES.TX)"
+                >
+                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    <span class="u-hidden-medium-down">Transactions</span>
+                    <span class="u-hidden-medium-up">Txs</span>
+                </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.STAKE}"
                         @click="switchTab($options.TAB_TYPES.STAKE)"
                 >
                     <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-mining.svg" width="40" height="40" alt="" role="presentation">
-                    Delegate
+                    Stakes
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.REWARD}"
@@ -325,16 +328,15 @@
                     Slashes
                 </button>
             </div>
-            <StakeListTable :stake-list="stakeList" stake-item-type="validator" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
+            <!-- Transactions -->
+            <TransactionListTable :tx-list="txList" :current-address="$route.params.address" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
+            <!-- Delegation -->
+            <StakeListTable :stake-list="stakeList" stake-item-type="validator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
             <RewardSlashListTable :data-list="rewardList" data-type="reward" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
             <RewardSlashListTable :data-list="slashList" data-type="slash" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
         <!-- Delegation Reward Chard-->
-        <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD"/>
-
-        <!-- Transactions -->
-        <TransactionList :tx-list="txList" :current-address="$route.params.address" :pagination-info="txPaginationInfo" :is-loading="isTxListLoading"/>
-        <Pagination :pagination-info="txPaginationInfo"/>
+        <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
     </div>
 </template>
