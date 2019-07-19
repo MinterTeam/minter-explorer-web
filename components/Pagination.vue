@@ -60,17 +60,9 @@
                     query: Object.assign({}, this.$route.query),
                 };
                 if (page && page !== 1) {
-                    if (this.activeTab) {
-                        location.query.active_tab_page = page;
-                    } else {
-                        location.query.page = page;
-                    }
+                    location.query.page = page;
                 } else {
-                    if (this.activeTab) {
-                        delete location.query.active_tab_page;
-                    } else {
-                        delete location.query.page;
-                    }
+                    delete location.query.page;
                 }
                 if (this.activeTab) {
                     location.query.active_tab = this.activeTab;

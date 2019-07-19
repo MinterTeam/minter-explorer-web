@@ -16,3 +16,9 @@ export const REWARD_CHART_TYPES = {
     WEEK: 'week',
     DAY: 'day',
 };
+export const TAB_TYPES = {
+    TX: 'tx',
+    STAKE: 'stake',
+    REWARD: 'reward',
+    SLASH: 'slash',
+};
