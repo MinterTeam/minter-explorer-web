@@ -1,5 +1,5 @@
 <script>
-    import prettyNum from 'pretty-num';
+    import prettyNum, {PRECISION_SETTING} from 'pretty-num';
     import {pretty, prettyUsd, prettyRound, round} from "~/assets/utils";
 
     export default {
@@ -7,7 +7,7 @@
             pretty,
             prettyUsd,
             prettyRound,
-            coinPrice: (value) => prettyNum(value, {precision: 3}),
+            coinPrice: (value) => prettyNum(value, {precision: 4, precisionSetting: PRECISION_SETTING.FIXED}),
             marketCap: (value) => {
                 const ROUND_POWER = 3;
                 if (value > Math.pow(10, 9)) {

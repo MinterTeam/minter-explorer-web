@@ -63,12 +63,13 @@
                             elements: {
                                 point: {
                                     radius: 0,
-                                    hitRadius: 10,
+                                    hitRadius: 16,
                                 },
                             },
                             tooltips: {
                                 displayColors: false,
                                 bodyFontStyle: 'bold',
+                                intersect: false,
                                 callbacks: {
                                     title: () => '',
                                 },

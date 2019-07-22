@@ -203,9 +203,8 @@
                         @click="switchTab($options.TAB_TYPES.STAKE)"
                 >
                     <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-mining.svg" width="40" height="40" alt="" role="presentation">
-                    <span class="u-hidden-medium-down">Delegated</span> Stakes
+                    <span><span class="u-hidden-medium-down">Delegated</span> Stakes</span>
                 </button>
-
             </div>
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-validator="$route.params.pubKey" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
