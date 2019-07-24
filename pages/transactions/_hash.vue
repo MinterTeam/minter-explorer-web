@@ -196,7 +196,8 @@
                     return;
                 }
                 if (!this.isMultisendMultipleCoin(tx)) {
-                    return this.getMultisendDeliveryList(tx)[0].coin;
+                    const firstItem = this.getMultisendDeliveryList(tx)[0];
+                    return firstItem && firstItem.coin;
                 }
             },
             getMultisendValue(tx) {
