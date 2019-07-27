@@ -11,7 +11,12 @@ export function getTimeDistance(timestamp) {
     if (typeof timestamp === 'string') {
         timestamp = parseISO(timestamp);
     }
-    const distance = formatDistanceStrict(timestamp, new Date(), {roundingMethod: 'floor'});
+    const now = new Date();
+    // if timestamp from future
+    if (timestamp > now) {
+        timestamp = now;
+    }
+    const distance = formatDistanceStrict(timestamp, now, {roundingMethod: 'floor'});
 
     return distance && distance !== 'Invalid Date' ? distance : false;
 }
