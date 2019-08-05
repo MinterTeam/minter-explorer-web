@@ -1,17 +1,40 @@
 // normalize-css подключается с помощью postcss-normalize
+@import (inline) '../../node_modules/@material/snackbar/dist/mdc.snackbar.css';
 @import "include/variables";
 @import "include/utils";
 @import "include/general";
+@import "include/modal";
 @import "include/layout";
 
 
 
 // vendor
+// mdc
+.mdc-snackbar__surface {min-width: 300px;}
+.mdc-snackbar__label {font: inherit; font-size: 1rem; color: #fff;}
+.mdc-snackbar__dismiss {
+    /*width: 24px; height: 24px; */color: #fff; position: relative;  transition: 0.1s;
+    && {font-size: 0;}
+    &:hover, &:focus {opacity: 0.7;}
+}
+.mdc-snackbar__dismiss-icon {
+    &::before, &::after {content: ''; position: absolute; height: 2px; width: 16px; left: 50%; top: 50%; margin-left: -8px; margin-top: -1px; background: currentColor;}
+    &::before {transform: rotate(45deg);}
+    &::after {transform: rotate(-45deg);}
+}
+
 // nuxt page transition
 .__nuxt-error-page {z-index: 2;}
 .page-leave-active {transition: opacity .1s;}
 .page-enter-active {transition: opacity .25s;}
 .page-enter, .page-leave-to {opacity: 0;}
+
+// qr-modal
+.qr-modal {padding-left: 0; padding-right: 0; width: auto;}
+.qr-modal__layer {
+    padding: 20px; background: #fff;
+    canvas {vertical-align: top;}
+}
 
 
 
@@ -72,6 +95,16 @@
 .u-amount {font-variant: tabular-nums;}
 .u-amount__decimal {opacity: 0.6;}
 .u-amount__decimal--opaque {font-size: 85%;}
+
+
+.u-icon-wrap {display: flex; align-items: center;}
+.u-icon-text {flex: 0 1 auto; overflow-wrap: break-word; overflow: hidden;}
+.u-icon {
+    display: inline-block; vertical-align: middle; margin-top: -2px; margin-bottom: -2px; flex: 0 0 24px; width: 24px;
+    svg {fill: currentColor; vertical-align: top;}
+}
+.u-icon--copy--right {margin-left: 16px;}
+.u-icon--qr--right {margin-left: 8px;}
 
 
 

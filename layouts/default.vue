@@ -1,4 +1,5 @@
 <script>
+    import Snackbar from '~/components/common/Snackbar';
     import HeaderMenu from '~/components/HeaderMenu';
     import Search from '~/components/Search';
     import TestnetNotice from '~/components/TestnetNotice';
@@ -6,6 +7,7 @@
 
     export default {
         components: {
+            Snackbar,
             HeaderMenu,
             Search,
             TestnetNotice,
@@ -50,6 +52,8 @@
         </main>
 
         <Footer/>
+
+        <Snackbar/>
     </div>
 </template>
 

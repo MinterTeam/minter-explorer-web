@@ -5,6 +5,10 @@
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise} from "~/assets/utils";
     import {TAB_TYPES} from '~/assets/variables';
+    import QrcodeVue from 'qrcode.vue';
+    import InlineSvg from 'vue-inline-svg';
+    import ButtonCopyIcon from '~/components/common/ButtonCopyIcon';
+    import Modal from '~/components/common/Modal';
     import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
@@ -20,6 +24,10 @@
         ideFix: null,
         TAB_TYPES,
         components: {
+            QrcodeVue,
+            InlineSvg,
+            ButtonCopyIcon,
+            Modal,
             TransactionListTable,
             StakeListTable,
             RewardSlashListTable,
@@ -125,6 +133,7 @@
                 slashPaginationInfo: {},
                 isSlashListLoading: false,
                 isSlashListLoaded: false,
+                isNonceQrModalVisible: false,
             };
         },
         watch: {
@@ -165,6 +174,12 @@
             },
         },
         computed: {
+            nonce() {
+                if (typeof this.txPaginationInfo.total === 'undefined') {
+                    return;
+                }
+                return (this.txPaginationInfo.total + 1).toString();
+            },
             activeTab() {
                 return getActiveTab(this.$route.query.active_tab);
             },
@@ -293,6 +308,16 @@
 
                 <dt>#Transactions</dt>
                 <dd>{{ txPaginationInfo.total || 0 }}</dd>
+                <dt>Nonce for tx</dt>
+                <dd class="u-icon-wrap">
+                    <template v-if="nonce">
+                        {{ nonce }}
+                        <ButtonCopyIcon :copy-text="nonce"/>
+                        <button class="u-icon u-icon--qr--right u-semantic-button link--opacity" @click="isNonceQrModalVisible = true">
+                            <InlineSvg src="/img/icon-qr.svg" width="24" height="24"/>
+                        </button>
+                    </template>
+                </dd>
             </dl>
         </section>
 
@@ -338,5 +363,12 @@
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
         <!-- Delegation Reward Chard-->
         <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
+
+
+        <Modal class="qr-modal"
+               v-bind:isOpen.sync="isNonceQrModalVisible"
+        >
+            <QrcodeVue class="qr-modal__layer" :value="nonce" :size="280" level="L"></QrcodeVue>
+        </Modal>
     </div>
 </template>

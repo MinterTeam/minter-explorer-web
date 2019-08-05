@@ -7,5 +7,6 @@ export default function() {
         history: [],
         // history chain detached from main chain by popstate
         detachedHistory: [],
+        isSnackbarActive: false,
     };
 }
