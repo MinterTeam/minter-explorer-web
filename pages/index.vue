@@ -122,6 +122,7 @@
         },
         computed: {
             network() {
+                // capitalize
                 return NETWORK[0].toUpperCase() + NETWORK.slice(1);
             },
             // take actual height from blocks first
