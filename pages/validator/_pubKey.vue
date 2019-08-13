@@ -16,8 +16,11 @@
         2: 'Set on',
     };
 
-    function getActiveTab(val) {
+    function ensureTab(val) {
         return Object.values(TAB_TYPES).indexOf(val) !== -1 ? val : TAB_TYPES.TX;
+    }
+    function ensurePage(val) {
+        return val > 0 ? val : 1;
     }
 
     export default {
@@ -88,7 +91,12 @@
             // update data on page change
             '$route.query': {
                 handler(newVal, oldVal) {
-                    if (newVal.active_tab === oldVal.active_tab && newVal.page !== oldVal.page) {
+                    const oldTab = ensureTab(oldVal.active_tab);
+                    const newTab = ensureTab(newVal.active_tab);
+                    const oldPage = ensurePage(oldVal.page);
+                    const newPage = ensurePage(newVal.page);
+
+                    if (newTab === oldTab && oldPage !== newPage) {
                         if (this.activeTab === TAB_TYPES.TX) {
                             this.fetchTxs();
                         }
@@ -98,7 +106,7 @@
         },
         computed: {
             activeTab() {
-                return getActiveTab(this.$route.query.active_tab);
+                return ensureTab(this.$route.query.active_tab);
             },
             activePaginationInfo() {
                 if (this.activeTab === TAB_TYPES.TX) {

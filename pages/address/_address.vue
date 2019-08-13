@@ -16,8 +16,11 @@
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
-    function getActiveTab(val) {
+    function ensureTab(val) {
         return Object.values(TAB_TYPES).indexOf(val) !== -1 ? val : TAB_TYPES.TX;
+    }
+    function ensurePage(val) {
+        return val > 0 ? val : 1;
     }
 
     export default {
@@ -50,7 +53,7 @@
 
             const balancePromise = getBalance(params.address);
 
-            const activeTab = getActiveTab(query.active_tab);
+            const activeTab = ensureTab(query.active_tab);
             let tabPromise;
             if (activeTab === TAB_TYPES.TX) {
                 tabPromise = getAddressTransactionList(params.address, query);
@@ -141,8 +144,13 @@
             // update data on page change
             '$route.query': {
                 handler(newVal, oldVal) {
-                    // same tab, new page
-                    if (newVal.active_tab !== oldVal.active_tab) {
+                    const oldTab = ensureTab(oldVal.active_tab);
+                    const newTab = ensureTab(newVal.active_tab);
+                    const oldPage = ensurePage(oldVal.page);
+                    const newPage = ensurePage(newVal.page);
+
+                    // new tab
+                    if (newTab !== oldTab) {
                         if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
                             this.fetchTxs();
                         }
@@ -157,7 +165,9 @@
                         }
 
                         this.checkPanelPosition();
-                    } else if (newVal.active_tab === oldVal.active_tab && newVal.page !== oldVal.page) {
+
+                    // same tab, new page
+                    } else if (newTab === oldTab && newPage !== oldPage) {
                         if (this.activeTab === TAB_TYPES.TX) {
                             this.fetchTxs();
                         }
@@ -181,7 +191,7 @@
                 return (this.txPaginationInfo.total + 1).toString();
             },
             activeTab() {
-                return getActiveTab(this.$route.query.active_tab);
+                return ensureTab(this.$route.query.active_tab);
             },
             activePaginationInfo() {
                 if (this.activeTab === TAB_TYPES.TX) {
