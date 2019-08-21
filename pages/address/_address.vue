@@ -1,6 +1,7 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
     import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardList, getAddressSlashList} from "~/api";
+    import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise} from "~/assets/utils";
@@ -136,6 +137,7 @@
                 slashPaginationInfo: {},
                 isSlashListLoading: false,
                 isSlashListLoaded: false,
+                nonce: '',
                 isNonceQrModalVisible: false,
             };
         },
@@ -184,12 +186,6 @@
             },
         },
         computed: {
-            nonce() {
-                if (typeof this.txPaginationInfo.total === 'undefined') {
-                    return;
-                }
-                return (this.txPaginationInfo.total + 1).toString();
-            },
             activeTab() {
                 return ensureTab(this.$route.query.active_tab);
             },
@@ -205,6 +201,12 @@
                 }
                 return false;
             },
+        },
+        mounted() {
+            getNonce(this.$route.params.address)
+                .then((nonce) => {
+                    this.nonce = nonce.toString();
+                });
         },
         methods: {
             prettyPrecise,
