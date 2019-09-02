@@ -89,6 +89,12 @@
                 const isOutcomeMultisend = this.currentAddress === tx.from;
                 return !isOutcomeMultisend;
             },
+            isIncomeSend(tx) {
+                return this.currentAddress === tx.data.to;
+            },
+            isReceive(tx) {
+                return this.isIncomeSend(tx) || this.isIncomeMultisend(tx);
+            },
             getAmount(tx) {
                 return tx.data.value
                     || this.getConvertValue(tx)
@@ -204,7 +210,10 @@
                         />
                     </td>
                     <!-- type -->
-                    <td>{{ tx.type | txType }}</td>
+                    <td>
+                        <span v-if="isReceive(tx)">Receive</span>
+                        <span v-else>{{ tx.type | txType }}</span>
+                    </td>
                     <!-- amount -->
                     <td>
                         <template v-if="hasAmount(tx)">
