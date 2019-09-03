@@ -89,7 +89,12 @@
     justify-content: center;
     .button + .button {margin-left: 10px;}
 }
-.pagination__current {margin: 0 15px; display: inline-block; font-weight: 700; white-space: nowrap;}
+.pagination__current {margin: 0 15px; display: inline-block; white-space: nowrap; font-size: 16px; letter-spacing: 0.15px;}
+.pagination__current-input {
+    padding: 5px 0; text-align: center; font-size: inherit; line-height: 22px; font-weight: 700; letter-spacing: inherit; color: inherit; background: transparent; border: none; border-bottom: 1px solid #a1a3a4; transition: 0.15s; display: inline-block; width: 44px; border-radius: 0; opacity: 1; /* safari disabled fix */ -webkit-text-fill-color: currentcolor; /* safari disabled fix */
+    &:focus {border-color: @c-main;}
+    .is-error > & {border-color: @c-red;}
+}
 // common navigation
 .navigation {display: flex; justify-content: space-between;}
 .u-amount {font-variant: tabular-nums;}
