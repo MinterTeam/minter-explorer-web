@@ -3,7 +3,7 @@
     import {getValidatorTransactionList, getValidator} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {pretty, prettyPrecise} from '~/assets/utils';
+    import {pretty, prettyPrecise, prettyRound} from '~/assets/utils';
     import {TAB_TYPES} from '~/assets/variables';
     import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
@@ -36,6 +36,7 @@
         filters: {
             pretty,
             prettyPrecise,
+            prettyRound,
         },
         // watchQuery: ['page'],
         // key: (to) => to.fullPath,
@@ -79,6 +80,7 @@
         },
         data() {
             return {
+                /** @type Validator|null */
                 validator: null,
                 storedTabPages: {},
                 txList: [],
@@ -176,6 +178,15 @@
                 <dt>Public Key</dt>
                 <dd class="u-select-all">{{ $route.params.pubKey }}</dd>
 
+                <dt v-if="validator.meta && validator.meta.name">Name</dt>
+                <dd v-if="validator.meta && validator.meta.name">{{ validator.meta.name }}</dd>
+
+                <dt v-if="validator.meta && (validator.meta.description || validator.meta.site_url)">Description</dt>
+                <dd v-if="validator.meta && (validator.meta.description || validator.meta.site_url)">
+                    {{ validator.meta.description }} <br v-if="validator.meta.description">
+                    <a class="link--main link--hover" :href="validator.meta.site_url">{{ validator.meta.site_url }}</a>
+                </dd>
+
                 <!-- @TODO owner address -->
 
                 <!-- @TODO validating status-->
@@ -185,7 +196,6 @@
                 <dt>Total Stake</dt>
                 <dd>{{ $store.state.COIN_NAME }} <span>{{ validator.stake | prettyPrecise }}</span></dd>
 
-                <!--@TODO 0 if not validating-->
                 <dt>Voting Power</dt>
                 <dd>{{ (validator.part || 0) | pretty }}&thinsp;%</dd>
 
@@ -193,7 +203,7 @@
                 <dd>{{ validator.delegator_count }}</dd>
 
                 <dt>#Transactions</dt>
-                <dd>{{ txPaginationInfo.total }}</dd>
+                <dd>{{ txPaginationInfo.total | prettyRound }}</dd>
             </dl>
         </section>
 

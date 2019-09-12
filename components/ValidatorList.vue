@@ -19,17 +19,15 @@
         },
         data() {
             return {
-                shouldShortenAddress: this.getShouldShortenAddress(),
-                shouldShortenPublicKey: this.getShouldShortenPublicKey(),
+                isCollapsed: this.getIsCollapsed(),
             };
         },
         mounted() {
             if (process.client) {
                 resizeHandler = debounce(() => {
-                    this.shouldShortenAddress = this.getShouldShortenAddress();
-                    this.shouldShortenPublicKey = this.getShouldShortenPublicKey();
+                    this.isCollapsed = this.getIsCollapsed();
                 });
-                window.addEventListener('resize', resizeHandler, 100);
+                window.addEventListener('resize', resizeHandler);
             }
         },
         destroyed() {
@@ -38,11 +36,11 @@
             }
         },
         methods: {
-            getShouldShortenAddress() {
-                return process.client && window.innerWidth < 450;
-            },
-            getShouldShortenPublicKey() {
+            getIsCollapsed() {
                 return process.client && window.innerWidth < 960;
+            },
+            getName(validator) {
+                return validator.validator_meta && validator.validator_meta.name;
             },
         },
     };
@@ -60,16 +58,21 @@
             <table class="u-text-nowrap">
                 <thead>
                 <tr>
-                    <th>Public Key</th>
+                    <th v-show="!isCollapsed">Name</th>
+                    <th>{{ isCollapsed ? 'Validator' : 'Public Key' }}</th>
                     <th>Block Sign</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="validator in validatorList" :key="validator.publicKey">
+                    <td v-show="!isCollapsed">
+                        <span v-if="getName(validator)">{{ getName(validator) }}</span>
+                    </td>
                     <td>
-                        <TableLink :link-text="validator.publicKey"
+                        <TableLink class="u-text-tabular-nums"
+                                   :link-text="isCollapsed && getName(validator) ? getName(validator) : validator.publicKey"
                                    :link-path="'/validator/' + validator.publicKey"
-                                   :should-not-shorten="!shouldShortenPublicKey"
+                                   :should-not-shorten="!isCollapsed || getName(validator)"
                         />
                     </td>
                     <td>
