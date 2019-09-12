@@ -332,7 +332,9 @@ export function getValidatorTransactionList(pubKey, params) {
 
 /**
  * @typedef {Object} StakeItem
- * @property {string} pub_key
+ * @property {string} [pub_key]
+ * @property {ValidatorMeta} [validator_meta]
+ * @property {string} [address]
  * @property {string|number} value
  * @property {string|number} bip_value
  * @property {string} coin

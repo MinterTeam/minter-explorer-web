@@ -30,7 +30,7 @@
         },
         data() {
             return {
-                shouldShortenAddress: this.getShouldShortenAddress(),
+                shouldShortenLabel: this.getShouldShortenLabel(),
                 sort: {
                     // 0 - no sort, -1 - ascending, 1 - descending
                     hash: 0,
@@ -42,7 +42,7 @@
         computed: {
             hashName() {
                 if (this.stakeItemType === 'validator') {
-                    return 'Public Key';
+                    return 'Validator';
                 }
                 if (this.stakeItemType === 'delegator') {
                     return 'Address';
@@ -61,7 +61,7 @@
         mounted() {
             if (process.client) {
                 resizeHandler = debounce(() => {
-                    this.shouldShortenAddress = this.getShouldShortenAddress();
+                    this.shouldShortenLabel = this.getShouldShortenLabel();
                 });
                 window.addEventListener('resize', resizeHandler, 100);
             }
@@ -73,12 +73,16 @@
         },
         methods: {
             prettyPrecise,
-            getHash(stakeItem) {
+            getName(stakeItem) {
+                return stakeItem.validator_meta && stakeItem.validator_meta.name;
+            },
+            getLabel(stakeItem) {
                 if (this.stakeItemType === 'validator') {
-                    return stakeItem.pub_key;
+                    const name = this.getName(stakeItem) || stakeItem.pub_key;
+                    return name.toString();
                 }
                 if (this.stakeItemType === 'delegator') {
-                    return stakeItem.address;
+                    return stakeItem.address.toString();
                 }
             },
             getUrl(stakeItem) {
@@ -89,7 +93,7 @@
                     return '/address/' + stakeItem.address;
                 }
             },
-            getShouldShortenAddress() {
+            getShouldShortenLabel() {
                 if (this.stakeItemType === 'validator') {
                     return process.client && window.innerWidth < 700;
                 }
@@ -126,11 +130,16 @@
              * Default ascending: A -> B
              */
             hashSortFn(a, b) {
-                if (this.stakeItemType === 'validator') {
-                    return ('' + a.pub_key).localeCompare(b.pub_key);
-                }
-                if (this.stakeItemType === 'delegator') {
-                    return ('' + a.address).localeCompare(b.address);
+                const nameA = this.getName(a);
+                const nameB = this.getName(b);
+                if (!nameA && nameB) {
+                    return 1;
+                } else if (nameA && !nameB) {
+                    return -1;
+                } else {
+                    const labelA = this.getLabel(a);
+                    const labelB = this.getLabel(b);
+                    return labelA.localeCompare(labelB);
                 }
             },
         },
@@ -208,11 +217,11 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="stakeItem in stakeListSorted" :key="getHash(stakeItem) + stakeItem.coin">
+            <tr v-for="stakeItem in stakeListSorted" :key="getLabel(stakeItem) + stakeItem.coin">
                 <td>
-                    <TableLink :link-text="getHash(stakeItem)"
+                    <TableLink :link-text="getLabel(stakeItem)"
                                :link-path="getUrl(stakeItem)"
-                               :should-not-shorten="!shouldShortenAddress"
+                               :should-not-shorten="!shouldShortenLabel || getName(stakeItem)"
                     />
                 </td>
                 <td class="u-hidden-medium-down">{{ stakeItem.coin }}</td>
