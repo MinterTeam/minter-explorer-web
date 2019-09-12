@@ -341,16 +341,26 @@ export function getValidatorTransactionList(pubKey, params) {
 /**
  * @typedef {Object} ValidatorListItem
  * @property {string} publicKey
+ * @property {ValidatorMeta} validator_meta
  * @property {boolean} signed
  */
 
 /**
  * @typedef {Object} Validator
+ * @property {ValidatorMeta} validator_meta
  * @property {number} status
  * @property {string|number} stake
  * @property {string|number} part
  * @property {number} delegator_count
  * @property {Array<{coin: string, value: string, address: string}>} delegator_list
+ */
+
+/**
+ * @typedef {Object} ValidatorMeta
+ * @property {string} name
+ * @property {string} description
+ * @property {string} icon_url
+ * @property {string} site_url
  */
 
 /**
