@@ -93,7 +93,7 @@
                 return this.currentAddress === tx.data.to;
             },
             isReceive(tx) {
-                return this.isIncomeSend(tx) || this.isIncomeMultisend(tx);
+                return this.currentAddress && (this.isIncomeSend(tx) || this.isIncomeMultisend(tx));
             },
             getAmount(tx) {
                 return tx.data.value
