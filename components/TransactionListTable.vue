@@ -166,6 +166,13 @@
                     return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toFixed();
                 }
             },
+            getValidatorName(tx) {
+                if (!tx.data.pub_key) {
+                    return;
+                }
+                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.public_key === tx.data.pub_key);
+                return validator && validator.meta && validator.meta.name;
+            },
         },
     };
 </script>
@@ -284,6 +291,14 @@
                             </div>
 
                             <!-- type DECLARE_CANDIDACY, EDIT_CANDIDATE, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
+                            <div class="table__inner-item" v-if="getValidatorName(tx)">
+                                <strong>Validator</strong> <br>
+                                <TableLink :link-text="getValidatorName(tx)"
+                                           :link-path="'/validator/' + tx.data.pub_key"
+                                           :is-not-link="isCurrentValidator(tx.data.pub_key)"
+                                           :should-not-shorten="true"
+                                />
+                            </div>
                             <div class="table__inner-item" v-if="tx.data.pub_key">
                                 <strong>Public Key</strong> <br>
                                 <TableLink :link-text="tx.data.pub_key"

@@ -24,6 +24,15 @@
                 default: false,
             },
         },
+        methods: {
+            getValidatorName(item) {
+                return item.validator_meta && item.validator_meta.name;
+            },
+            getLabel(item) {
+                const name = this.getValidatorName(item) || item.validator;
+                return name.toString();
+            },
+        },
     };
 </script>
 
@@ -41,7 +50,7 @@
                 <th>Time</th>
                 <th>Block</th>
                 <th v-if="dataType === 'reward'">Reward Type</th>
-                <th>Validators' Public Key</th>
+                <th>Validator</th>
                 <th>Value</th>
             </tr>
             </thead>
@@ -59,8 +68,9 @@
                 </td>
                 <!-- public key -->
                 <td>
-                    <TableLink :link-text="dataItem.validator"
+                    <TableLink :link-text="getLabel(dataItem)"
                                :link-path="'/validator/' + dataItem.validator"
+                               :should-not-shorten="getValidatorName(dataItem)"
                     />
                 </td>
                 <!-- value -->

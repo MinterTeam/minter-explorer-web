@@ -73,16 +73,16 @@
         },
         methods: {
             prettyPrecise,
-            getName(stakeItem) {
-                return stakeItem.validator_meta && stakeItem.validator_meta.name;
+            getValidatorName(item) {
+                return item.validator_meta && item.validator_meta.name;
             },
-            getLabel(stakeItem) {
+            getLabel(item) {
                 if (this.stakeItemType === 'validator') {
-                    const name = this.getName(stakeItem) || stakeItem.pub_key;
+                    const name = this.getValidatorName(item) || item.pub_key;
                     return name.toString();
                 }
                 if (this.stakeItemType === 'delegator') {
-                    return stakeItem.address.toString();
+                    return item.address.toString();
                 }
             },
             getUrl(stakeItem) {
@@ -109,12 +109,18 @@
                     }
                 });
                 const step = inverseDirection ? -1 : 1;
-                // change field sort order between -1, 0, 1
-                if (this.sort[field] === step) {
-                    this.sort[field] = -1 * step;
-                } else {
+                // change field sort order between -1 and 1
+                if (this.sort[field] === 0) {
                     this.sort[field] += step;
+                } else {
+                    this.sort[field] = -1 * this.sort[field];
                 }
+                // change field sort order between -1, 0, 1
+                // if (this.sort[field] === step) {
+                //     this.sort[field] = -1 * step;
+                // } else {
+                //     this.sort[field] += step;
+                // }
             },
             getSortClass(field) {
                 switch (this.sort[field]) {
@@ -130,8 +136,8 @@
              * Default ascending: A -> B
              */
             hashSortFn(a, b) {
-                const nameA = this.getName(a);
-                const nameB = this.getName(b);
+                const nameA = this.getValidatorName(a);
+                const nameB = this.getValidatorName(b);
                 if (!nameA && nameB) {
                     return 1;
                 } else if (nameA && !nameB) {
@@ -221,7 +227,7 @@
                 <td>
                     <TableLink :link-text="getLabel(stakeItem)"
                                :link-path="getUrl(stakeItem)"
-                               :should-not-shorten="!shouldShortenLabel || getName(stakeItem)"
+                               :should-not-shorten="!shouldShortenLabel || getValidatorName(stakeItem)"
                     />
                 </td>
                 <td class="u-hidden-medium-down">{{ stakeItem.coin }}</td>

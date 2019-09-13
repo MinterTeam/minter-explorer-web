@@ -46,6 +46,7 @@ module.exports = {
         linkExactActiveClass: 'is-active',
         middleware: [
             'hash-lowercase',
+            'validator-meta',
         ],
     },
     plugins: [
