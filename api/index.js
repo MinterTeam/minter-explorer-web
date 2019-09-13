@@ -295,6 +295,14 @@ export function getValidator(pubKey) {
 }
 
 /**
+ * @return {Promise<Array<Validator>>}
+ */
+export function getValidatorList() {
+    return explorer.get(`validators`)
+        .then((response) => response.data.data);
+}
+
+/**
  * @param {string} pubKey
  * @param {Object} [params]
  * @param {number} [params.page]
@@ -349,7 +357,8 @@ export function getValidatorTransactionList(pubKey, params) {
 
 /**
  * @typedef {Object} Validator
- * @property {ValidatorMeta} validator_meta
+ * @property {string} [public_key]
+ * @property {ValidatorMeta} meta
  * @property {number} status
  * @property {string|number} stake
  * @property {string|number} part

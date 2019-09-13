@@ -3,7 +3,7 @@
     import Big from 'big.js';
     import * as TX_TYPES from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
-    import {getTransaction, getBlock, getBlockList, getValidator} from "~/api";
+    import {getTransaction, getBlock, getBlockList} from "~/api";
     import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -68,8 +68,6 @@
             return {
                 /** @type Transaction|null */
                 tx: null,
-                /** @type Validator|Object */
-                validator: {},
                 shouldShortenAddress: this.getShouldShortenAddress(),
                 unbondOrLastBlock: null,
             };
@@ -98,13 +96,20 @@
                 }
                 return undefined;
             },
+            validator() {
+                const tx = this.tx;
+                if (!tx.data.pub_key) {
+                    return {};
+                }
+                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.public_key === tx.data.pub_key);
+                return validator || {};
+            },
         },
         mounted() {
             if (!this.tx) {
                 this.fetchTx();
             } else {
                 this.fetchUnbondBlock();
-                this.fetchValidator();
             }
             if (process.client) {
                 resizeHandler = debounce(() => {
@@ -130,7 +135,6 @@
                         this.tx = tx;
                         fetchTxTimer = null;
                         this.fetchUnbondBlock();
-                        this.fetchValidator();
                     })
                     .catch((e) => {
                         if (fetchTxDestroy) {
@@ -159,14 +163,6 @@
                         })
                         .catch((e) => {
                             console.log('Unable to get block', e);
-                        });
-                }
-            },
-            fetchValidator() {
-                if (this.tx.data.pub_key) {
-                    getValidator(this.tx.data.pub_key)
-                        .then((validator) => {
-                            this.validator = validator;
                         });
                 }
             },
@@ -285,16 +281,10 @@
                 <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }}&thinsp;%</dd>
 
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
+                <dt v-if="validator.meta && validator.meta.name">Validator</dt>
+                <dd v-if="validator.meta && validator.meta.name"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pub_key">{{ validator.meta.name }}</nuxt-link></dd>
                 <dt v-if="tx.data.pub_key">Public Key</dt>
                 <dd v-if="tx.data.pub_key"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pub_key">{{ tx.data.pub_key }}</nuxt-link></dd>
-                <dt v-if="validator.meta && validator.meta.name">Validator</dt>
-                <dd v-if="validator.meta && validator.meta.name">{{ validator.meta.name }}</dd>
-
-                <dt v-if="validator.meta && (validator.meta.description || validator.meta.site_url)">Validator Description</dt>
-                <dd v-if="validator.meta && (validator.meta.description || validator.meta.site_url)">
-                    {{ validator.meta.description }} <br v-if="validator.meta.description">
-                    <a class="link--main link--hover" :href="validator.meta.site_url">{{ validator.meta.site_url }}</a>
-                </dd>
                 <dt v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
                 <dd v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">{{ tx.data.coin }} {{ (tx.data.stake || tx.data.value) | prettyExact }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>

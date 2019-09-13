@@ -1,4 +1,7 @@
 export default {
+    SET_VALIDATOR_LIST(state, validatorList) {
+        state.validatorList = validatorList;
+    },
     PUSH_HISTORY: (state, historyItem) => {
         // pushstate, clear detached chain
         state.history.push(historyItem);
