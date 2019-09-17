@@ -55,6 +55,14 @@ export function txTypeFilter(value) {
     return value;
 }
 
+export function getExplorerAddressUrl(address) {
+    return '/address/' + address;
+}
+
+export function getExplorerValidatorUrl(pubKey) {
+    return '/validator/' + pubKey;
+}
+
 /**
  * @param {string|number} value
  * @return {string}
