@@ -1,6 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
-    import {pretty, prettyPrecise} from '~/assets/utils';
+    import {pretty, prettyPrecise, getExplorerValidatorUrl, getExplorerAddressUrl} from '~/assets/utils';
     import TableLink from "~/components/TableLink";
 
     let resizeHandler;
@@ -78,8 +78,7 @@
             },
             getLabel(item) {
                 if (this.stakeItemType === 'validator') {
-                    const name = this.getValidatorName(item) || item.pub_key;
-                    return name.toString();
+                    return item.pub_key.toString();
                 }
                 if (this.stakeItemType === 'delegator') {
                     return item.address.toString();
@@ -87,10 +86,10 @@
             },
             getUrl(stakeItem) {
                 if (this.stakeItemType === 'validator') {
-                    return '/validator/' + stakeItem.pub_key;
+                    return getExplorerValidatorUrl(stakeItem.pub_key);
                 }
                 if (this.stakeItemType === 'delegator') {
-                    return '/address/' + stakeItem.address;
+                    return getExplorerAddressUrl(stakeItem.address);
                 }
             },
             getShouldShortenLabel() {
@@ -225,9 +224,12 @@
             <tbody>
             <tr v-for="stakeItem in stakeListSorted" :key="getLabel(stakeItem) + stakeItem.coin">
                 <td>
-                    <TableLink :link-text="getLabel(stakeItem)"
-                               :link-path="getUrl(stakeItem)"
-                               :should-not-shorten="!shouldShortenLabel || getValidatorName(stakeItem)"
+                    <div class="table__cell-title" v-if="getValidatorName(stakeItem)">{{ getValidatorName(stakeItem) }}</div>
+                    <TableLink
+                            class="table__cell-sub"
+                            :link-text="getLabel(stakeItem)"
+                            :link-path="getUrl(stakeItem)"
+                            :should-not-shorten="!shouldShortenLabel"
                     />
                 </td>
                 <td class="u-hidden-medium-down">{{ stakeItem.coin }}</td>
