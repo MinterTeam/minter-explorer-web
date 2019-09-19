@@ -184,7 +184,7 @@
                 <circle class="loader__path" cx="14" cy="14" r="12"></circle>
             </svg>
         </div>
-        <table class="u-text-nowrap" v-else-if="txList.length">
+        <table v-else-if="txList.length">
             <thead>
             <tr>
                 <th>TxHash</th>
@@ -198,7 +198,7 @@
             </thead>
             <tbody>
             <template v-for="tx in txListFormatted">
-                <tr :class="{'is-expanded': isTxExpanded[tx.txn]}" :key="tx.txn">
+                <tr class="u-text-nowrap" :class="{'is-expanded': isTxExpanded[tx.txn]}" :key="tx.txn">
                     <!-- hash -->
                     <td>
                         <TableLink :link-text="tx.hash" :link-path="'/transactions/' + tx.hash"/>
