@@ -26,6 +26,7 @@
             prettyRound,
             txType: txTypeFilter,
             timeDistance: getTimeDistance,
+            timeDistanceFuture: (value) => getTimeDistance(value, true),
             time: getTime,
             timeMinutes: getTimeMinutes,
         },
@@ -294,7 +295,7 @@
                 <dt v-if="isUnbond(tx) && unbondTime">Unbond Time</dt>
                 <dd v-if="isUnbond(tx) && unbondTime">
                     <span v-if="isUnbondBlock">{{ unbondTime | timeDistance }} ago ({{ unbondTime | time }})</span>
-                    <span v-else>In {{ unbondTime | timeDistance }} ({{ unbondTime | timeMinutes }})</span>
+                    <span v-else>In {{ unbondTime | timeDistanceFuture }} ({{ unbondTime | timeMinutes }})</span>
                 </dd>
                 <dt v-if="tx.data.reward_address">Reward Address</dt>
                 <dd v-if="tx.data.reward_address"><nuxt-link class="link--default" :to="'/address/' + tx.data.reward_address">{{ tx.data.reward_address }}</nuxt-link></dd>
