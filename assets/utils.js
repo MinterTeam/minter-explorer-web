@@ -7,13 +7,13 @@ import fromExponential from 'from-exponential';
 import decode from 'entity-decode';
 import {txTypeList} from 'minterjs-tx/src/tx-types';
 
-export function getTimeDistance(timestamp) {
+export function getTimeDistance(timestamp, allowFuture) {
     if (typeof timestamp === 'string') {
         timestamp = parseISO(timestamp);
     }
     const now = new Date();
     // if timestamp from future
-    if (timestamp > now) {
+    if (timestamp > now && !allowFuture) {
         timestamp = now;
     }
     const distance = formatDistanceStrict(timestamp, now, {roundingMethod: 'floor'});

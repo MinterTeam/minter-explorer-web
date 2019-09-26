@@ -7,7 +7,7 @@
         },
         methods: {
             submit() {
-                let query = this.query.trim();
+                let query = this.query.replace(/\s/g, '');
                 if (!query.length) {
                     return;
                 }
