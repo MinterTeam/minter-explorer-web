@@ -7,6 +7,21 @@ import fromExponential from 'from-exponential';
 import decode from 'entity-decode';
 import {txTypeList} from 'minterjs-tx/src/tx-types';
 
+function timeFormat(timestamp, pattern) {
+    if (typeof timestamp === 'string') {
+        timestamp = parseISO(timestamp);
+    }
+    const time = format(timestamp, pattern);
+
+    return time && time !== 'Invalid Date' ? time : false;
+}
+
+export function getTimeZone(timestamp) {
+    const formatted = timeFormat(timestamp, 'xxx');
+
+    return formatted && 'UTC' + formatted;
+}
+
 export function getTimeDistance(timestamp, allowFuture) {
     if (typeof timestamp === 'string') {
         timestamp = parseISO(timestamp);
@@ -22,21 +37,15 @@ export function getTimeDistance(timestamp, allowFuture) {
 }
 
 export function getTime(timestamp) {
-    if (typeof timestamp === 'string') {
-        timestamp = parseISO(timestamp);
-    }
-    const time = format(timestamp, 'yyyy-MM-dd HH:mm:ss O');
-
-    return time && time !== 'Invalid Date' ? time : false;
+    return timeFormat(timestamp, 'yyyy-MM-dd HH:mm:ss');
 }
 
 export function getTimeMinutes(timestamp) {
-    if (typeof timestamp === 'string') {
-        timestamp = parseISO(timestamp);
-    }
-    const time = format(timestamp, 'yyyy-MM-dd HH:mm O');
+    return timeFormat(timestamp, 'yyyy-MM-dd HH:mm');
+}
 
-    return time && time !== 'Invalid Date' ? time : false;
+export function getDate(timestamp) {
+    return timeFormat(timestamp, 'yyyy-MM-dd');
 }
 
 export function shortFilter(value, endLength = 6, minLengthToShort) {

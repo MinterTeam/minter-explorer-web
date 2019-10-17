@@ -1,6 +1,7 @@
 // register env before other imports @see https://www.npmjs.com/package/dotenv#how-do-i-use-dotenv-with-import-
 import 'dotenv/config';
 import dotenv from 'dotenv';
+import webpack from 'webpack';
 const path = require('path');
 const fs = require('fs');
 
@@ -59,6 +60,7 @@ module.exports = {
         { src: '~/plugins/history.js', ssr: false },
     ],
     env: Object.assign({}, processEnv, dotEnv),
+    modern: 'client',
     /*
     ** Build configuration
     */
@@ -77,6 +79,9 @@ module.exports = {
         ** Run ESLint on save
         */
         extend(config, { isDev, isClient, isServer }) {
+            /*
+            ** Run ESLint on save
+            */
             // if (isDev && isClient) {
             //     config.module.rules.push({
             //         enforce: 'pre',
@@ -85,10 +90,14 @@ module.exports = {
             //         exclude: /(node_modules)/,
             //     });
             // }
-            /*
-            ** process some node_modules through webpack in server build
-            */
+            if (!config.resolve) {
+                config.resolve = {};
+            }
+            config.resolve.mainFields =  ['module', 'browser', 'main'];
         },
+        plugins: [
+            new webpack.ContextReplacementPlugin(/moment[/]locale$/, /^\.\/(en|ru)$/),
+        ],
         babel: {
             presets: ['@nuxt/babel-preset-app'],
             // prevent @babel/plugin-transform-runtime from inserting `import` statement into commonjs files (bc. it breaks webpack)
@@ -100,6 +109,9 @@ module.exports = {
             '@material/',
             'date-fns/esm',
             'lodash-es',
+            'centrifuge/src',
+            // 'autonumeric/src',
+            // 'vue-autonumeric/src',
             // 'nuxt-i18n/src',
             'clipbrd/src',
             'pretty-num/src',

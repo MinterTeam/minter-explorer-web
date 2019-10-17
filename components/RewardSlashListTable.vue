@@ -1,14 +1,20 @@
 <script>
-    import {getTime, prettyPrecise} from '~/assets/utils';
+    import {getTimeMinutes, getDate, getTimeZone, prettyPrecise} from '~/assets/utils';
     import TableLink from '~/components/TableLink';
 
+    const TYPE_REWARD = 'reward';
+    const TYPE_SLASH = 'slash';
+
     export default {
+        ideFix: null,
+        TYPE_REWARD,
+        TYPE_SLASH,
+        getTimeMinutes,
+        getDate,
+        getTimeZone,
+        prettyPrecise,
         components: {
             TableLink,
-        },
-        filters: {
-            prettyPrecise,
-            time: getTime,
         },
         props: {
             /** @type Array<Reward|Slash> */
@@ -48,8 +54,8 @@
             <tr>
                 <!--<th>Name</th>-->
                 <th>Time</th>
-                <th>Block</th>
-                <th v-if="dataType === 'reward'">Reward Type</th>
+                <th v-if="dataType === $options.TYPE_SLASH">Block</th>
+                <th v-if="dataType === $options.TYPE_REWARD">Reward Type</th>
                 <th>Validator</th>
                 <th>Value</th>
             </tr>
@@ -57,25 +63,33 @@
             <tbody>
             <tr v-for="(dataItem, index) in dataList" :key="index">
                 <!-- Time -->
-                <td>{{ dataItem.timestamp | time }}</td>
-                <!-- block -->
                 <td>
+                    <template v-if="dataType === $options.TYPE_REWARD">
+                        {{ $options.getDate(dataItem.timestamp) }}
+                    </template>
+                    <template v-else>
+                        {{ $options.getTimeMinutes(dataItem.timestamp) }}
+                        <span class="u-text-muted">{{ $options.getTimeZone(dataItem.timestamp) }}</span>
+                    </template>
+                </td>
+                <!-- block -->
+                <td v-if="dataType === $options.TYPE_SLASH">
                     <TableLink :link-text="dataItem.block" :link-path="'/blocks/' + dataItem.block"/>
                 </td>
                 <!-- type -->
-                <td v-if="dataType === 'reward'">
+                <td v-if="dataType === $options.TYPE_REWARD">
                     {{ dataItem.role }}
                 </td>
                 <!-- public key -->
                 <td>
                     <TableLink :link-text="getLabel(dataItem)"
                                :link-path="'/validator/' + dataItem.validator"
-                               :should-not-shorten="getValidatorName(dataItem)"
+                               :should-not-shorten="!!getValidatorName(dataItem)"
                     />
                 </td>
                 <!-- value -->
                 <td>
-                    {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }} {{ dataItem.amount | prettyPrecise }}
+                    {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }} {{ $options.prettyPrecise(dataItem.amount) }}
                 </td>
             </tr>
             </tbody>

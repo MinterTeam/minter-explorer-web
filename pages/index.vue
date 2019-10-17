@@ -1,7 +1,7 @@
 <script>
     // import Vue from 'vue';
     // import SockJS from "sockjs-client";
-    import Centrifuge from 'centrifuge';
+    import Centrifuge from 'centrifuge/src';
     import {getBlockList, getStatus, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
