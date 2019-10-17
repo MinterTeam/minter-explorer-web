@@ -10,11 +10,14 @@ export default function({store}) {
         return Promise.resolve();
     }
 
-    return store.dispatch('FETCH_VALIDATOR_LIST')
+    // don't wait
+    store.dispatch('FETCH_VALIDATOR_LIST')
         .then(() => {
             isFetched = true;
         })
         .catch((e) => {
             console.log(e);
         });
+
+    return Promise.resolve();
 }

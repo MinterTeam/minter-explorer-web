@@ -211,6 +211,26 @@ export function getAddressRewardList(address, params = {}) {
         .then((response) => response.data);
 }
 
+
+/**
+ * @param {string} address
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<RewardListInfo>}
+ */
+export function getAddressRewardAggregatedList(address, params = {}) {
+    params.limit = 20; // set per_page
+    return explorer.get(`addresses/${address}/events/rewards/aggregated`, {params})
+        .then((response) => {
+            response.data.data.map((item) => {
+                item.timestamp = item.time_id;
+                return item;
+            });
+            return response.data;
+        });
+}
+
 /**
  * @typedef {Object} SlashListInfo
  * @property {Array<Slash>} data
@@ -431,7 +451,7 @@ export function getValidatorTransactionList(pubKey, params) {
 
 /**
  * @typedef {Object} Reward
- * @property {number} block
+ * @property {number} [block]
  * @property {string} timestamp
  * @property {string} role
  * @property {string} address

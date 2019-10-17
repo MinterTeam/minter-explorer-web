@@ -1,6 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
-    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardList, getAddressSlashList} from "~/api";
+    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressSlashList} from "~/api";
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -61,7 +61,7 @@
             } else if (activeTab === TAB_TYPES.STAKE) {
                 tabPromise = getAddressStakeList(params.address);
             } else if (activeTab === TAB_TYPES.REWARD) {
-                tabPromise = getAddressRewardList(params.address, query);
+                tabPromise = getAddressRewardAggregatedList(params.address, query);
             } else if (activeTab === TAB_TYPES.SLASH) {
                 tabPromise = getAddressSlashList(params.address, query);
             }
@@ -267,7 +267,7 @@
             },
             fetchRewards() {
                 this.isRewardListLoading = true;
-                getAddressRewardList(this.$route.params.address, this.$route.query)
+                getAddressRewardAggregatedList(this.$route.params.address, this.$route.query)
                     .then((rewardListInfo) => {
                         this.rewardList = rewardListInfo.data;
                         this.rewardPaginationInfo = rewardListInfo.meta;
