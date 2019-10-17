@@ -17,8 +17,10 @@
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
+    const DEFAULT_TAB = TAB_TYPES.TX;
+
     function ensureTab(val) {
-        return Object.values(TAB_TYPES).indexOf(val) !== -1 ? val : TAB_TYPES.TX;
+        return Object.values(TAB_TYPES).indexOf(val) !== -1 ? val : DEFAULT_TAB;
     }
     function ensurePage(val) {
         return val > 0 ? val : 1;
@@ -53,12 +55,12 @@
             }
 
             const balancePromise = getBalance(params.address);
+            // txList always needed for tx count
+            const txListPromise = getAddressTransactionList(params.address, query);
 
             const activeTab = ensureTab(query.active_tab);
             let tabPromise;
-            if (activeTab === TAB_TYPES.TX) {
-                tabPromise = getAddressTransactionList(params.address, query);
-            } else if (activeTab === TAB_TYPES.STAKE) {
+            if (activeTab === TAB_TYPES.STAKE) {
                 tabPromise = getAddressStakeList(params.address);
             } else if (activeTab === TAB_TYPES.REWARD) {
                 tabPromise = getAddressRewardAggregatedList(params.address, query);
@@ -66,16 +68,10 @@
                 tabPromise = getAddressSlashList(params.address, query);
             }
 
-            return Promise.all([balancePromise, tabPromise])
-                .then(([balanceList, tabData]) => {
+            return Promise.all([balancePromise, txListPromise, tabPromise])
+                .then(([balanceList, txListData, tabData]) => {
                     let tabResult;
-                    if (activeTab === TAB_TYPES.TX) {
-                        tabResult = {
-                            txList: tabData.data,
-                            txPaginationInfo:  tabData.meta,
-                            isTxListLoaded: true,
-                        };
-                    } else if (activeTab === TAB_TYPES.STAKE) {
+                    if (activeTab === TAB_TYPES.STAKE) {
                         tabResult = {
                             stakeList: tabData,
                             isStakeListLoaded: true,
@@ -96,6 +92,9 @@
 
                     return {
                         ...tabResult,
+                        txList: txListData.data,
+                        txPaginationInfo:  txListData.meta,
+                        isTxListLoaded: true,
                         balanceList,
                     };
                 })
@@ -221,14 +220,17 @@
                     newTabPage = this.storedTabPages[newTab];
                 }
 
+                let newQuery = {
+                    page: newTabPage,
+                };
+                if (newTab !== DEFAULT_TAB) {
+                    newQuery.active_tab = newTab;
+                }
+
                 // update route
                 this.$router.replace({
                     // path: this.$route.path,
-                    query: {
-                        ...this.$route.query,
-                        active_tab: newTab,
-                        page: newTabPage,
-                    },
+                    query: newQuery,
                 });
 
                 // wait for rewards chart to disappear
