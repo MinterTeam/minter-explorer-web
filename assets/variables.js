@@ -13,14 +13,30 @@ export const TESTNET_WEB_URL = 'https://testnet.explorer.minter.network';
 export const EXPLORER_API_URL = process.env.APP_EXPLORER_API_URL;
 export const EXPLORER_RTM_URL = process.env.APP_EXPLORER_RTM_URL;
 export const GATE_API_URL = process.env.APP_GATE_API_URL;
+/**
+ * @readonly
+ * @enum {string}
+ */
 export const REWARD_CHART_TYPES = {
     MONTH: 'month',
     WEEK: 'week',
     DAY: 'day',
 };
+/**
+ * @readonly
+ * @enum {string}
+ */
 export const TAB_TYPES = {
     TX: 'tx',
     STAKE: 'stake',
     REWARD: 'reward',
     SLASH: 'slash',
+};
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const TX_STATUS = {
+    SUCCESS: 'success',
+    FAILURE: 'failure',
 };

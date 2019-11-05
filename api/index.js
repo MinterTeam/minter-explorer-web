@@ -1,6 +1,6 @@
 import explorer from '~/api/explorer';
 import {padZero} from '~/assets/utils';
-import {REWARD_CHART_TYPES, COIN_NAME} from '~/assets/variables';
+import {REWARD_CHART_TYPES, COIN_NAME, TX_STATUS} from '~/assets/variables';
 
 
 /**
@@ -102,10 +102,10 @@ export function getTransaction(hash) {
                 tx.data = {};
             }
             if (response.status === 200) {
-                tx.status = 'success';
+                tx.status = TX_STATUS.SUCCESS;
             }
             if (response.status === 206) {
-                tx.status = 'failure';
+                tx.status = TX_STATUS.FAILURE;
             }
             return tx;
         });
