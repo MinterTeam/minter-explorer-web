@@ -154,8 +154,9 @@
     <section class="panel u-section">
         <div class="panel__switcher-section panel__section">
             <div class="panel__section panel__header">
-                <h1 class="panel__title panel__header-title">Total rewards by</h1>
+                <h1 class="panel__title panel__header-title">Total rewards</h1>
             </div>
+<!--
             <div class="panel__switcher">
                 <button class="panel__switcher-item panel__switcher-item--auto panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': chartType === $options.REWARD_CHART_TYPES.DAY}"
@@ -176,6 +177,7 @@
                     Month
                 </button>
             </div>
+-->
         </div>
         <div class="panel__section" v-show="hasData">
             <div class="reward__chart-wrap">

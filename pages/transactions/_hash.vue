@@ -7,7 +7,7 @@
     import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {UNBOND_PERIOD} from "~/assets/variables";
+    import {UNBOND_PERIOD, TX_STATUS} from "~/assets/variables";
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
 
@@ -17,6 +17,7 @@
 
     export default {
         UNBOND_PERIOD,
+        TX_STATUS,
         components: {
             BackButton,
             TableLink,
@@ -241,7 +242,7 @@
                 <dd>{{ tx.timestamp | timeDistance }} ago ({{ tx.timestamp | time }})</dd>
 
                 <dt>Status</dt>
-                <dd><strong :class="tx.status === 'success' ? 'tx__success' : 'tx__fail'">{{ tx.status }}</strong></dd>
+                <dd><strong :class="tx.status === $options.TX_STATUS.SUCCESS ? 'tx__success' : 'tx__fail'">{{ tx.status }}</strong></dd>
 
                 <dt>Block</dt>
                 <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.block">{{ tx.block | prettyRound }}</nuxt-link></dd>
@@ -251,6 +252,10 @@
 
                 <dt>From</dt>
                 <dd><nuxt-link class="link--default" :to="'/address/' + tx.from">{{ tx.from }}</nuxt-link></dd>
+
+                <template v-if="tx.status !== $options.TX_STATUS.FAILURE">
+
+
 
                 <!-- SEND -->
                 <dt v-if="tx.data.to">To</dt>
@@ -329,6 +334,8 @@
 
                 <dt>Message</dt>
                 <dd class="u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
+
+                </template>
 
                 <!-- MULTISEND -->
                 <table class="table--recipient-list" v-if="tx.data.list && tx.data.list.length">
