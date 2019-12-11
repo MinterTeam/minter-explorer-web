@@ -421,6 +421,7 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {number} [data.initial_amount]
  * @property {number} [data.initial_reserve]
  * @property {number} [data.constant_reserve_ratio]
+ * @property {number} [data.max_supply]
  * -- type: TX_TYPE_DECLARE_CANDIDACY
  * @property {string} [data.address]
  * @property {string} [data.pub_key]

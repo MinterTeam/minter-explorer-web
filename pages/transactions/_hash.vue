@@ -285,6 +285,8 @@
                 <dd v-if="tx.data.initial_reserve">{{ $store.state.COIN_NAME }} {{ tx.data.initial_reserve | prettyExact }}</dd>
                 <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
                 <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }}&thinsp;%</dd>
+                <dt v-if="tx.data.max_supply">Max supply</dt>
+                <dd v-if="tx.data.max_supply">{{ tx.data.max_supply | prettyRound }}</dd>
 
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="validator.meta && validator.meta.name">Validator</dt>
