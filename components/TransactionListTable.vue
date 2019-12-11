@@ -291,7 +291,7 @@
                             </div>
                             <div class="table__inner-item" v-if="tx.data.max_supply">
                                 <strong>Max Supply</strong> <br>
-                                {{ tx.data.max_supply }}&thinsp;%
+                                {{ prettyRound(tx.data.max_supply) }}
                             </div>
 
                             <!-- type DECLARE_CANDIDACY, EDIT_CANDIDATE, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
