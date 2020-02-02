@@ -286,7 +286,7 @@
                 <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
                 <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }}&thinsp;%</dd>
                 <dt v-if="tx.data.max_supply">Max supply</dt>
-                <dd v-if="tx.data.max_supply">{{ tx.data.max_supply | prettyRound }}</dd>
+                <dd v-if="tx.data.max_supply">{{ tx.data.max_supply | prettyExact }}</dd>
 
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="validator.meta && validator.meta.name">Validator</dt>
