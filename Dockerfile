@@ -1,7 +1,6 @@
 FROM node:lts-alpine as build
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh
+RUN apk update && apk upgrade && apk add --no-cache git
 
 ARG APP_ENV=${APP_ENV}
 ARG APP_EXPLORER_API_URL=${APP_EXPLORER_API_URL}
