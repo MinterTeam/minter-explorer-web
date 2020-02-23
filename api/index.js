@@ -1,3 +1,4 @@
+import stripZeros from 'pretty-num/src/strip-zeros';
 import explorer from '~/api/explorer';
 import {padZero} from '~/assets/utils';
 import {REWARD_CHART_TYPES, COIN_NAME, TX_STATUS} from '~/assets/variables';
@@ -154,11 +155,19 @@ export function getTransactionChart() {
 /**
  *
  * @param {string} address
- * @return {Promise<Array<CoinItem>>}
+ * @return {Promise<BalanceData>}
  */
 export function getBalance(address) {
-    return explorer.get(`addresses/${address}`)
-        .then((response) => response.data.data.balances.sort((a, b) => {
+    return explorer.get(`addresses/${address}?withSum=true`)
+        .then((response) => {
+            const data = response.data.data;
+            data.balances = prepareBalance(data.balances);
+            return data;
+        });
+}
+
+export function prepareBalance(balanceList) {
+    return balanceList.sort((a, b) => {
             // set base coin first
             if (a.coin === COIN_NAME) {
                 return -1;
@@ -166,8 +175,16 @@ export function getBalance(address) {
                 return 1;
             } else {
                 return 0;
+                // sort by name, instead of reserve
+                // return a.coin.localeCompare(b.coin);
             }
-        }));
+        })
+        .map((coinItem) => {
+            return {
+                ...coinItem,
+                amount: stripZeros(coinItem.amount),
+            };
+        });
 }
 
 /**
@@ -350,6 +367,13 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {number} blockTime
  * @property {string} timestamp
  * @property {Array<ValidatorListItem>} validators
+ */
+
+/**
+ * @typedef {Object} BalanceData
+ * @property {string} total_balance_sum
+ * @property {string} total_balance_sum_usd
+ * @property {Array<CoinItem>} balances
  */
 
 /**

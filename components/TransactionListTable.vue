@@ -193,7 +193,7 @@
                 <th>From</th>
                 <th>Type</th>
                 <th>Amount</th>
-                <th class="table__expand-cell"></th>
+                <th class="table__controls-cell"></th>
             </tr>
             </thead>
             <tbody>
@@ -228,8 +228,8 @@
                         </template>
                     </td>
                     <!--expand button -->
-                    <td class="table__expand-cell">
-                        <button class="table__expand-button u-semantic-button" :class="{'is-expanded': isTxExpanded[tx.txn]}" @click="toggleTx(tx.txn)">Show Tx Data</button>
+                    <td class="table__controls-cell">
+                        <button class="table__controls-button table__controls-button--expand u-semantic-button" :class="{'is-expanded': isTxExpanded[tx.txn]}" @click="toggleTx(tx.txn)">Show Tx Data</button>
                     </td>
                 </tr>
                 <tr class="table__row-expanded-data" :key="tx.txn + 'exp'" v-if="isTxExpanded[tx.txn]">
