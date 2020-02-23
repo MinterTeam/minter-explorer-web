@@ -1,0 +1,13 @@
+version: '3.6'
+
+services:
+  app:
+    build:
+      context: ./
+      args:
+        APP_ENV: ${APP_ENV}
+        APP_EXPLORER_API_URL: ${APP_EXPLORER_API_URL}
+        APP_EXPLORER_RTM_URL: ${APP_EXPLORER_RTM_URL}
+        APP_GATE_API_URL: ${APP_GATE_API_URL}
+    ports:
+      -  ${EXPLORER_WEB_PORT}:80

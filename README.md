@@ -30,3 +30,10 @@ $ npm run generate
 ```
 
 For detailed explanation on how things work, checkout the [Nuxt.js docs](https://github.com/nuxt/nuxt.js).
+
+## Docker
+
+Set env variables for `docker-compose.yml` and run 
+```bash
+docker-compose up
+```
