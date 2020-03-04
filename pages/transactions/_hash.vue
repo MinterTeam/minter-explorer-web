@@ -326,6 +326,16 @@
                     <span v-else>{{ getMultisendCoin(tx) }} {{ getMultisendValue(tx) }}</span>
                 </dd>
 
+                <!-- CREATE MULTISIG -->
+                <dt v-if="tx.data.multisig_address">Multisig</dt>
+                <dd v-if="tx.data.multisig_address">
+                    <nuxt-link class="link--default" :to="'/address/' + tx.data.multisig_address">{{ tx.data.multisig_address }}</nuxt-link>
+                </dd>
+                <dt v-if="tx.data.threshold">Threshold</dt>
+                <dd v-if="tx.data.threshold">{{ tx.data.threshold }}</dd>
+                <dt v-if="tx.data.weights">Weights Sum</dt>
+                <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
+
                 <dt v-if="tx.fee">Fee</dt>
                 <dd v-if="tx.fee">{{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}</dd>
 
@@ -355,6 +365,28 @@
                             />
                         </td>
                         <td>{{ transfer.coin }} {{ transfer.value | prettyExact }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- CREATE MULTISIG -->
+                <table class="table--recipient-list" v-if="tx.data.addresses && tx.data.addresses.length">
+                    <thead>
+                    <tr>
+                        <th>Participant Address</th>
+                        <th>Weight</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(address, index) in tx.data.addresses" :key="index">
+                        <td>
+                            <TableLink
+                                    :link-text="address"
+                                    :link-path="'/address/' + address"
+                                    :should-not-shorten="!shouldShortenAddress"
+                            />
+                        </td>
+                        <td>{{ tx.data.weights[index] }}</td>
                     </tr>
                     </tbody>
                 </table>

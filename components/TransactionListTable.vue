@@ -47,7 +47,7 @@
                     return {
                         ...tx,
                         timeDistance:  getTimeDistance(tx.timestamp),
-                        timeUTC: getTime(tx.timestamp),
+                        timeLocal: getTime(tx.timestamp),
                     };
                 });
             },
@@ -352,10 +352,19 @@
                                 {{ tx.data.check.due_block }}
                             </div>
 
+                            <!-- type CREATE_MULTISIG -->
+                            <div class="table__inner-item" v-if="tx.data.multisig_address">
+                                <strong>Multisig Address</strong> <br>
+                                <TableLink :link-text="tx.data.multisig_address"
+                                           :link-path="'/address/' + tx.data.multisig_address"
+                                           :should-not-shorten="true"
+                                />
+                            </div>
+
                             <!-- timestamp -->
                             <div class="table__inner-item">
                                 <strong>Timestamp</strong> <br>
-                                {{ tx.timeUTC }}
+                                {{ tx.timeLocal }}
                             </div>
 
                             <!-- fee -->
