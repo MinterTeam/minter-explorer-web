@@ -1,7 +1,7 @@
 <script>
     import debounce from 'lodash-es/debounce';
     import Big from 'big.js';
-    import * as TX_TYPES from 'minterjs-tx/src/tx-types';
+    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {getTransaction, getBlock, getBlockList} from "~/api";
     import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
@@ -172,19 +172,19 @@
                 return typeof value !== 'undefined';
             },
             isSell(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL);
+                return tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL);
             },
             isBuy(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_BUY);
+                return tx.type === Number(TX_TYPE.BUY);
             },
             isUnbond(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
+                return tx.type === Number(TX_TYPE.UNBOND);
             },
             isStake(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND) || tx.type === Number(TX_TYPES.TX_TYPE_DELEGATE) || tx.type === Number(TX_TYPES.TX_TYPE_DECLARE_CANDIDACY);
+                return tx.type === Number(TX_TYPE.UNBOND) || tx.type === Number(TX_TYPE.DELEGATE) || tx.type === Number(TX_TYPE.DECLARE_CANDIDACY);
             },
             isMultisend(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_MULTISEND);
+                return tx.type === Number(TX_TYPE.MULTISEND);
             },
             getShouldShortenAddress() {
                 return process.client && window.innerWidth < 700;

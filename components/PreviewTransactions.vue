@@ -1,6 +1,6 @@
 <script>
     import Big from 'big.js';
-    import * as TX_TYPES from 'minterjs-tx/src/tx-types';
+    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {getTimeDistance, pretty, shortFilter, txTypeFilter} from '~/assets/utils';
 
     export default {
@@ -47,23 +47,23 @@
                 }
             },
             getConvertCoinSymbol(tx) {
-                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
+                if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
                     return tx.data.coin_to_sell;
                 }
-                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY)) {
+                if (tx.type === Number(TX_TYPE.BUY)) {
                     return tx.data.coin_to_buy;
                 }
             },
             getConvertValue(tx) {
-                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
+                if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
                     return tx.data.value_to_sell;
                 }
-                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY)) {
+                if (tx.type === Number(TX_TYPE.BUY)) {
                     return tx.data.value_to_buy;
                 }
             },
             isMultisend(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_MULTISEND);
+                return tx.type === Number(TX_TYPE.MULTISEND);
             },
             getMultisendDeliveryList(tx) {
                 return tx.data.list || [];
