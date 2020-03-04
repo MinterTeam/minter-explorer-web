@@ -32,7 +32,7 @@
                 return tx.data.value
                     || this.getConvertValue(tx)
                     || tx.data.stake
-                    || tx.data.initial_amount
+                    || tx.data.initialAmount
                     || (tx.data.check && tx.data.check.value)
                     || this.getMultisendValue(tx);
             },
@@ -48,18 +48,18 @@
             },
             getConvertCoinSymbol(tx) {
                 if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
-                    return tx.data.coin_to_sell;
+                    return tx.data.coinToSell;
                 }
                 if (tx.type === Number(TX_TYPE.BUY)) {
-                    return tx.data.coin_to_buy;
+                    return tx.data.coinToBuy;
                 }
             },
             getConvertValue(tx) {
                 if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
-                    return tx.data.value_to_sell;
+                    return tx.data.valueToSell;
                 }
                 if (tx.type === Number(TX_TYPE.BUY)) {
-                    return tx.data.value_to_buy;
+                    return tx.data.valueToBuy;
                 }
             },
             isMultisend(tx) {

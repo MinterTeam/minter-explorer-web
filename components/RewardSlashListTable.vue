@@ -32,7 +32,7 @@
         },
         methods: {
             getValidatorName(item) {
-                return item.validator_meta && item.validator_meta.name;
+                return item.validatorMeta && item.validatorMeta.name;
             },
             getLabel(item) {
                 const name = this.getValidatorName(item) || item.validator;

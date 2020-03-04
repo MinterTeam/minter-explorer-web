@@ -97,8 +97,8 @@
                         txPaginationInfo:  txListData.meta,
                         isTxListLoaded: true,
                         balanceList: balanceData.balances,
-                        balanceTotal: balanceData.total_balance_sum,
-                        balanceTotalUsd: balanceData.total_balance_sum_usd,
+                        balanceTotal: balanceData.totalBalanceSum,
+                        balanceTotalUsd: balanceData.totalBalanceSumUsd,
 
                     };
                 })

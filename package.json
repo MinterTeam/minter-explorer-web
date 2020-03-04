@@ -24,6 +24,7 @@
     "@minterteam/footer-links": "^3.0.0",
     "axios": "^0.19.2",
     "big.js": "^5.2.2",
+    "camelcase-keys": "^6.1.2",
     "centrifuge": "^2.3.0",
     "chart.js": "^2.9.3",
     "clipbrd": "^1.0.2",

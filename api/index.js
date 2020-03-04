@@ -241,7 +241,7 @@ export function getAddressRewardAggregatedList(address, params = {}) {
     return explorer.get(`addresses/${address}/events/rewards/aggregated`, {params})
         .then((response) => {
             response.data.data.map((item) => {
-                item.timestamp = item.time_id;
+                item.timestamp = item.timeId;
                 return item;
             });
             return response.data;
@@ -371,8 +371,8 @@ export function getValidatorTransactionList(pubKey, params) {
 
 /**
  * @typedef {Object} BalanceData
- * @property {string} total_balance_sum
- * @property {string} total_balance_sum_usd
+ * @property {string} totalBalanceSum
+ * @property {string} totalBalanceSumUsd
  * @property {Array<CoinItem>} balances
  */
 
@@ -384,38 +384,38 @@ export function getValidatorTransactionList(pubKey, params) {
 
 /**
  * @typedef {Object} StakeItem
- * @property {string} [pub_key]
- * @property {ValidatorMeta} [validator_meta]
+ * @property {string} [pubKey]
+ * @property {ValidatorMeta} [validatorMeta]
  * @property {string} [address]
  * @property {string|number} value
- * @property {string|number} bip_value
+ * @property {string|number} bipValue
  * @property {string} coin
  */
 
 /**
  * @typedef {Object} ValidatorListItem
  * @property {string} publicKey
- * @property {ValidatorMeta} validator_meta
+ * @property {ValidatorMeta} validatorMeta
  * @property {boolean} signed
  */
 
 /**
  * @typedef {Object} Validator
- * @property {string} [public_key]
+ * @property {string} [publicKey]
  * @property {ValidatorMeta} meta
  * @property {number} status
  * @property {string|number} stake
  * @property {string|number} part
- * @property {number} delegator_count
- * @property {Array<{coin: string, value: string, address: string}>} delegator_list
+ * @property {number} delegatorCount
+ * @property {Array<{coin: string, value: string, address: string}>} delegatorList
  */
 
 /**
  * @typedef {Object} ValidatorMeta
  * @property {string} name
  * @property {string} description
- * @property {string} icon_url
- * @property {string} site_url
+ * @property {string} iconUrl
+ * @property {string} siteUrl
  */
 
 /**
@@ -435,46 +435,46 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {string} [data.coin]
  * @property {number} [data.amount]
  * -- type: TX_TYPE.CONVERT
- * @property {string} [data.coin_to_sell]
- * @property {string} [data.coin_to_buy]
- * @property {number} [data.value_to_sell]
- * @property {number} [data.value_to_buy]
+ * @property {string} [data.coinToSell]
+ * @property {string} [data.coinToBuy]
+ * @property {number} [data.valueToSell]
+ * @property {number} [data.valueToBuy]
  * -- type: TX_TYPE.CREATE_COIN
  * @property {string} [data.name]
  * @property {string} [data.symbol]
- * @property {number} [data.initial_amount]
- * @property {number} [data.initial_reserve]
- * @property {number} [data.constant_reserve_ratio]
- * @property {number} [data.max_supply]
+ * @property {number} [data.initialAmount]
+ * @property {number} [data.initialReserve]
+ * @property {number} [data.constantReserveRatio]
+ * @property {number} [data.maxSupply]
  * -- type: TX_TYPE.DECLARE_CANDIDACY
  * @property {string} [data.address]
- * @property {string} [data.pub_key]
+ * @property {string} [data.pubKey]
  * @property {number} [data.commission]
  * @property {string} [data.coin]
  * @property {number} [data.stake]
  * -- type: TX_TYPE.EDIT_CANDIDATE
- * @property {string} [data.pub_key]
- * @property {string} [data.reward_address]
- * @property {string} [data.owner_address]
+ * @property {string} [data.pubKey]
+ * @property {string} [data.rewardAddress]
+ * @property {string} [data.ownerAddress]
  * -- type: TX_TYPE.DELEGATE, TX_TYPE.UNBOND
- * @property {string} [data.pub_key]
+ * @property {string} [data.pubKey]
  * @property {string} [data.coin]
  * @property {number} [data.value]
  * -- type: TX_TYPE.REDEEM_CHECK
- * @property {string} [data.raw_check]
+ * @property {string} [data.rawCheck]
  * @property {string} [data.proof]
  * @property {Object} [data.check]
  * @property {string} [data.check.sender]
  * @property {number} [data.check.nonce]
  * @property {number|string} [data.check.value]
  * @property {string} [data.check.coin]
- * @property {number} [data.check.due_block]
+ * @property {number} [data.check.dueBlock]
  * - type: TX_TYPE.SET_CANDIDATE_ONLINE, TX_TYPE.SET_CANDIDATE_OFFLINE
- * @property {string} [data.pub_key]
+ * @property {string} [data.pubKey]
  * -- type: TX_TYPE.MULTISEND
  * @property {Array<{to: string, coin: string}>} [data.list]
  * -- type: TX_TYPE.CREATE_MULTISIG
- * @property {string|number} [data.multisig_address]
+ * @property {string|number} [data.multisigAddress]
  * @property {Array<string>} [data.addresses]
  * @property {Array<string|number>} [data.weights]
  * @property {string|number} [data.threshold]

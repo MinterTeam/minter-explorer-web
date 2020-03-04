@@ -181,10 +181,10 @@
                 <dt v-if="validator.meta && validator.meta.name">Name</dt>
                 <dd v-if="validator.meta && validator.meta.name">{{ validator.meta.name }}</dd>
 
-                <dt v-if="validator.meta && (validator.meta.description || validator.meta.site_url)">Description</dt>
-                <dd v-if="validator.meta && (validator.meta.description || validator.meta.site_url)">
+                <dt v-if="validator.meta && (validator.meta.description || validator.meta.siteUrl)">Description</dt>
+                <dd v-if="validator.meta && (validator.meta.description || validator.meta.siteUrl)">
                     {{ validator.meta.description }} <br v-if="validator.meta.description">
-                    <a class="link--main link--hover" :href="validator.meta.site_url">{{ validator.meta.site_url }}</a>
+                    <a class="link--main link--hover" :href="validator.meta.siteUrl">{{ validator.meta.siteUrl }}</a>
                 </dd>
 
                 <!-- @TODO owner address -->
@@ -200,7 +200,7 @@
                 <dd>{{ (validator.part || 0) | pretty }}&thinsp;%</dd>
 
                 <dt>#Delegators</dt>
-                <dd>{{ validator.delegator_count }}</dd>
+                <dd>{{ validator.delegatorCount }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ txPaginationInfo.total | prettyRound }}</dd>
@@ -227,7 +227,7 @@
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-validator="$route.params.pubKey" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
             <!-- Delegation -->
-            <StakeListTable :stake-list="validator.delegator_list" stake-item-type="delegator" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
+            <StakeListTable :stake-list="validator.delegatorList" stake-item-type="delegator" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
 

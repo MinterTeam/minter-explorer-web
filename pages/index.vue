@@ -5,6 +5,7 @@
     import {getBlockList, getStatus, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
+    import toCamel from '~/assets/to-camel.js';
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
@@ -144,7 +145,7 @@
                 });
 
                 centrifuge.subscribe("blocks", (response) => {
-                    const newBlock = response.data;
+                    const newBlock = toCamel(response.data);
                     const isExist = this.blockList.some(function(item) {
                         return item.height === newBlock.height;
                     });
@@ -157,7 +158,7 @@
                     }
                 });
                 centrifuge.subscribe("transactions", (response) => {
-                    const newTx = response.data;
+                    const newTx = toCamel(response.data);
                     const isExist = this.txList.find(function(item) {
                         return item.hash === newTx.hash;
                     });

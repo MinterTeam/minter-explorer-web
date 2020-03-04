@@ -99,7 +99,7 @@
                 return tx.data.value
                     || this.getConvertValue(tx)
                     || tx.data.stake
-                    || tx.data.initial_amount
+                    || tx.data.initialAmount
                     || (tx.data.check && tx.data.check.value)
                     || this.getMultisendValue(tx);
             },
@@ -115,18 +115,18 @@
             },
             getConvertCoinSymbol(tx) {
                 if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
-                    return tx.data.coin_to_sell;
+                    return tx.data.coinToSell;
                 }
                 if (tx.type === Number(TX_TYPE.BUY)) {
-                    return tx.data.coin_to_buy;
+                    return tx.data.coinToBuy;
                 }
             },
             getConvertValue(tx) {
                 if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
-                    return tx.data.value_to_sell;
+                    return tx.data.valueToSell;
                 }
                 if (tx.type === Number(TX_TYPE.BUY)) {
-                    return tx.data.value_to_buy;
+                    return tx.data.valueToBuy;
                 }
             },
             getMultisendDeliveryList(tx) {
@@ -167,10 +167,10 @@
                 }
             },
             getValidatorName(tx) {
-                if (!tx.data.pub_key) {
+                if (!tx.data.pubKey) {
                     return;
                 }
-                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.public_key === tx.data.pub_key);
+                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
                 return validator && validator.meta && validator.meta.name;
             },
         },
@@ -252,20 +252,20 @@
                             <!-- SELL -->
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Sell coins</strong> <br>
-                                {{ tx.data.coin_to_sell }} {{ tx.data.value_to_sell | pretty }}
+                                {{ tx.data.coinToSell }} {{ tx.data.valueToSell | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Get coins</strong> <br>
-                                {{ tx.data.coin_to_buy }} {{ tx.data.value_to_buy | pretty  }}
+                                {{ tx.data.coinToBuy }} {{ tx.data.valueToBuy | pretty  }}
                             </div>
                             <!-- BUY -->
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Buy coins</strong> <br>
-                                {{ tx.data.coin_to_buy }} {{ tx.data.value_to_buy | pretty }}
+                                {{ tx.data.coinToBuy }} {{ tx.data.valueToBuy | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Spend coins</strong> <br>
-                                {{ tx.data.coin_to_sell }} {{ tx.data.value_to_sell | pretty }}
+                                {{ tx.data.coinToSell }} {{ tx.data.valueToSell | pretty }}
                             </div>
 
                             <!-- type CREATE_COIN -->
@@ -277,37 +277,37 @@
                                 <strong>Symbol</strong> <br>
                                 {{ tx.data.symbol }}
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.initial_amount">
+                            <div class="table__inner-item" v-if="tx.data.initialAmount">
                                 <strong>Initial Amount</strong> <br>
-                                {{ tx.data.initial_amount | pretty }}
+                                {{ tx.data.initialAmount | pretty }}
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.initial_reserve">
+                            <div class="table__inner-item" v-if="tx.data.initialReserve">
                                 <strong>Initial Reserve</strong> <br>
-                                {{ tx.data.initial_reserve | pretty }}
+                                {{ tx.data.initialReserve | pretty }}
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.constant_reserve_ratio">
+                            <div class="table__inner-item" v-if="tx.data.constantReserveRatio">
                                 <strong>CRR</strong> <br>
-                                {{ tx.data.constant_reserve_ratio }}&thinsp;%
+                                {{ tx.data.constantReserveRatio }}&thinsp;%
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.max_supply">
+                            <div class="table__inner-item" v-if="tx.data.maxSupply">
                                 <strong>Max Supply</strong> <br>
-                                {{ prettyRound(tx.data.max_supply) }}
+                                {{ prettyRound(tx.data.maxSupply) }}
                             </div>
 
                             <!-- type DECLARE_CANDIDACY, EDIT_CANDIDATE, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                             <div class="table__inner-item" v-if="getValidatorName(tx)">
                                 <strong>Validator</strong> <br>
                                 <TableLink :link-text="getValidatorName(tx)"
-                                           :link-path="'/validator/' + tx.data.pub_key"
-                                           :is-not-link="isCurrentValidator(tx.data.pub_key)"
+                                           :link-path="'/validator/' + tx.data.pubKey"
+                                           :is-not-link="isCurrentValidator(tx.data.pubKey)"
                                            :should-not-shorten="true"
                                 />
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.pub_key">
+                            <div class="table__inner-item" v-if="tx.data.pubKey">
                                 <strong>Public Key</strong> <br>
-                                <TableLink :link-text="tx.data.pub_key"
-                                           :link-path="'/validator/' + tx.data.pub_key"
-                                           :is-not-link="isCurrentValidator(tx.data.pub_key)"
+                                <TableLink :link-text="tx.data.pubKey"
+                                           :link-path="'/validator/' + tx.data.pubKey"
+                                           :is-not-link="isCurrentValidator(tx.data.pubKey)"
                                            :should-not-shorten="true"
                                 />
                             </div>
@@ -323,18 +323,18 @@
                                 <strong>Unbond Block</strong> <br>
                                 {{ prettyRound(tx.block + $options.UNBOND_PERIOD) }}
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.reward_address">
+                            <div class="table__inner-item" v-if="tx.data.rewardAddress">
                                 <strong>Reward Address</strong> <br>
-                                <TableLink :link-text="tx.data.reward_address"
-                                           :link-path="'/address/' + tx.data.reward_address"
-                                           :is-not-link="isCurrentAddress(tx.data.reward_address)"
+                                <TableLink :link-text="tx.data.rewardAddress"
+                                           :link-path="'/address/' + tx.data.rewardAddress"
+                                           :is-not-link="isCurrentAddress(tx.data.rewardAddress)"
                                 />
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.owner_address">
+                            <div class="table__inner-item" v-if="tx.data.ownerAddress">
                                 <strong>Owner Address</strong> <br>
-                                <TableLink :link-text="tx.data.owner_address"
-                                           :link-path="'/address/' + tx.data.owner_address"
-                                           :is-not-link="isCurrentAddress(tx.data.owner_address)"
+                                <TableLink :link-text="tx.data.ownerAddress"
+                                           :link-path="'/address/' + tx.data.ownerAddress"
+                                           :is-not-link="isCurrentAddress(tx.data.ownerAddress)"
                                 />
                             </div>
 
@@ -351,16 +351,16 @@
                                 <strong>Check Nonce</strong> <br>
                                 {{ fromBase64(tx.data.check.nonce) }}
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.check && tx.data.check.due_block">
+                            <div class="table__inner-item" v-if="tx.data.check && tx.data.check.dueBlock">
                                 <strong>Due Block</strong> <br>
-                                {{ tx.data.check.due_block }}
+                                {{ tx.data.check.dueBlock }}
                             </div>
 
                             <!-- type CREATE_MULTISIG -->
-                            <div class="table__inner-item" v-if="tx.data.multisig_address">
+                            <div class="table__inner-item" v-if="tx.data.multisigAddress">
                                 <strong>Multisig Address</strong> <br>
-                                <TableLink :link-text="tx.data.multisig_address"
-                                           :link-path="'/address/' + tx.data.multisig_address"
+                                <TableLink :link-text="tx.data.multisigAddress"
+                                           :link-path="'/address/' + tx.data.multisigAddress"
                                            :should-not-shorten="true"
                                 />
                             </div>
