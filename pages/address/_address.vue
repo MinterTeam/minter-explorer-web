@@ -4,7 +4,7 @@
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {pretty, prettyPrecise} from "~/assets/utils";
+    import {pretty, prettyPrecise, prettyUsd} from "~/assets/utils";
     import {TAB_TYPES} from '~/assets/variables';
     import QrcodeVue from 'qrcode.vue';
     import InlineSvg from 'vue-inline-svg';
@@ -43,6 +43,7 @@
         },
         filters: {
             pretty,
+            prettyUsd,
         },
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
@@ -69,7 +70,7 @@
             }
 
             return Promise.all([balancePromise, txListPromise, tabPromise])
-                .then(([balanceList, txListData, tabData]) => {
+                .then(([balanceData, txListData, tabData]) => {
                     let tabResult;
                     if (activeTab === TAB_TYPES.STAKE) {
                         tabResult = {
@@ -95,7 +96,10 @@
                         txList: txListData.data,
                         txPaginationInfo:  txListData.meta,
                         isTxListLoaded: true,
-                        balanceList,
+                        balanceList: balanceData.balances,
+                        balanceTotal: balanceData.total_balance_sum,
+                        balanceTotalUsd: balanceData.total_balance_sum_usd,
+
                     };
                 })
                 .catch((e) => {
@@ -120,6 +124,8 @@
         data() {
             return {
                 balanceList: [],
+                balanceTotal: '',
+                balanceTotalUsd: '',
                 storedTabPages: {},
                 txList: [],
                 txPaginationInfo: {},
@@ -138,6 +144,7 @@
                 isSlashListLoaded: false,
                 nonce: '',
                 isNonceQrModalVisible: false,
+                isAddressQrModalVisible: false,
             };
         },
         watch: {
@@ -201,7 +208,7 @@
                 return false;
             },
         },
-        mounted() {
+        beforeMount() {
             getNonce(this.$route.params.address)
                 .then((nonce) => {
                     this.nonce = nonce.toString();
@@ -222,6 +229,7 @@
 
                 let newQuery = {
                     page: newTabPage,
+                    active_tab: undefined, // fix: uncaught exception: Object
                 };
                 if (newTab !== DEFAULT_TAB) {
                     newQuery.active_tab = newTab;
@@ -308,7 +316,13 @@
             </div>
             <dl>
                 <dt>Address</dt>
-                <dd class="u-select-all">{{ $route.params.address }}</dd>
+                <dd>
+                    <span class="u-select-all">{{ $route.params.address }}</span>
+                    <ButtonCopyIcon :copy-text="$route.params.address"/>
+                    <button class="u-icon u-icon--qr--right u-semantic-button link--opacity" @click="isAddressQrModalVisible = true">
+                        <InlineSvg src="/img/icon-qr.svg" width="24" height="24"/>
+                    </button>
+                </dd>
 
                 <dt>Balance</dt>
                 <dd>
@@ -318,6 +332,12 @@
                             <td :title="prettyPrecise(balance.amount)">{{ balance.amount | pretty }}</td>
                         </tr>
                     </table>
+                </dd>
+
+                <dt>Total</dt>
+                <dd>
+                    <span :title="prettyPrecise(balanceTotal)">{{ $store.getters.COIN_NAME }} {{ balanceTotal | pretty }}</span> <br>
+                    <span class="u-text-muted">${{ balanceTotalUsd | prettyUsd }}</span>
                 </dd>
 
                 <dt>#Transactions</dt>
@@ -383,6 +403,11 @@
                v-bind:isOpen.sync="isNonceQrModalVisible"
         >
             <QrcodeVue class="qr-modal__layer" :value="nonce" :size="280" level="L"></QrcodeVue>
+        </Modal>
+        <Modal class="qr-modal"
+               v-bind:isOpen.sync="isAddressQrModalVisible"
+        >
+            <QrcodeVue class="qr-modal__layer" :value="$route.params.address" :size="280" level="L"></QrcodeVue>
         </Modal>
     </div>
 </template>

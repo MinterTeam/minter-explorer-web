@@ -1,7 +1,7 @@
 <script>
     import debounce from 'lodash-es/debounce';
     import Big from 'big.js';
-    import * as TX_TYPES from 'minterjs-tx/src/tx-types';
+    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {getTransaction, getBlock, getBlockList} from "~/api";
     import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
@@ -172,19 +172,19 @@
                 return typeof value !== 'undefined';
             },
             isSell(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL);
+                return tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL);
             },
             isBuy(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_BUY);
+                return tx.type === Number(TX_TYPE.BUY);
             },
             isUnbond(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
+                return tx.type === Number(TX_TYPE.UNBOND);
             },
             isStake(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND) || tx.type === Number(TX_TYPES.TX_TYPE_DELEGATE) || tx.type === Number(TX_TYPES.TX_TYPE_DECLARE_CANDIDACY);
+                return tx.type === Number(TX_TYPE.UNBOND) || tx.type === Number(TX_TYPE.DELEGATE) || tx.type === Number(TX_TYPE.DECLARE_CANDIDACY);
             },
             isMultisend(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_MULTISEND);
+                return tx.type === Number(TX_TYPE.MULTISEND);
             },
             getShouldShortenAddress() {
                 return process.client && window.innerWidth < 700;
@@ -328,6 +328,16 @@
                     <span v-else>{{ getMultisendCoin(tx) }} {{ getMultisendValue(tx) }}</span>
                 </dd>
 
+                <!-- CREATE MULTISIG -->
+                <dt v-if="tx.data.multisig_address">Multisig</dt>
+                <dd v-if="tx.data.multisig_address">
+                    <nuxt-link class="link--default" :to="'/address/' + tx.data.multisig_address">{{ tx.data.multisig_address }}</nuxt-link>
+                </dd>
+                <dt v-if="tx.data.threshold">Threshold</dt>
+                <dd v-if="tx.data.threshold">{{ tx.data.threshold }}</dd>
+                <dt v-if="tx.data.weights">Weights Sum</dt>
+                <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
+
                 <dt v-if="tx.fee">Fee</dt>
                 <dd v-if="tx.fee">{{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}</dd>
 
@@ -357,6 +367,28 @@
                             />
                         </td>
                         <td>{{ transfer.coin }} {{ transfer.value | prettyExact }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- CREATE MULTISIG -->
+                <table class="table--recipient-list" v-if="tx.data.addresses && tx.data.addresses.length">
+                    <thead>
+                    <tr>
+                        <th>Participant Address</th>
+                        <th>Weight</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(address, index) in tx.data.addresses" :key="index">
+                        <td>
+                            <TableLink
+                                    :link-text="address"
+                                    :link-path="'/address/' + address"
+                                    :should-not-shorten="!shouldShortenAddress"
+                            />
+                        </td>
+                        <td>{{ tx.data.weights[index] }}</td>
                     </tr>
                     </tbody>
                 </table>

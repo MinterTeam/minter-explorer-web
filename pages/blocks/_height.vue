@@ -38,7 +38,7 @@
                         block : {
                             ...block,
                             timeDistance: getTimeDistance(block.timestamp),
-                            timeUTC: getTime(block.timestamp),
+                            timeLocal: getTime(block.timestamp),
                         },
                         txList: txListInfo.data,
                         txPaginationInfo: txListInfo.meta,
@@ -130,7 +130,7 @@
                 <dd>{{ block.height | prettyRound }}</dd>
 
                 <dt>Timestamp</dt>
-                <dd>{{ block.timeDistance }} ago ({{ block.timeUTC }})</dd>
+                <dd>{{ block.timeDistance }} ago ({{ block.timeLocal }})</dd>
 
                 <dt>Hash</dt>
                 <dd class="u-select-all">{{ block.hash }}</dd>

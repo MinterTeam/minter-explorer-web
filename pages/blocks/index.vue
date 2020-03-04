@@ -1,6 +1,6 @@
 <script>
     import {getBlockList} from "~/api";
-    import {getTimeDistance, pretty, prettyRound} from '~/assets/utils';
+    import {getTime, pretty, prettyRound} from '~/assets/utils';
     import getTitle from '~/assets/get-title';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -47,7 +47,7 @@
                 return this.blockList.map((block) => {
                     return {
                         ...block,
-                        timeDistance: getTimeDistance(block.timestamp),
+                        timeLocal: getTime(block.timestamp),
                     };
                 });
             },
@@ -85,7 +85,7 @@
                     <thead>
                     <tr>
                         <th>Height</th>
-                        <th>Age</th>
+                        <th>Time</th>
                         <th>Validators</th>
                         <th>Txns</th>
                         <th>Block size</th>
@@ -95,7 +95,7 @@
                     <tbody>
                     <tr v-for="block in blockListFormatted" :key="block.height">
                         <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.height | prettyRound }}</nuxt-link></td>
-                        <td>{{ block.timeDistance}} ago</td>
+                        <td>{{ block.timeLocal}}</td>
                         <td><span v-if="block.validators.length">{{ block.validators.length }}</span></td>
                         <td>
                             <nuxt-link class="link--default" :to="'/blocks/' + block.height" v-if="block.txCount">{{ block.txCount }}</nuxt-link>
