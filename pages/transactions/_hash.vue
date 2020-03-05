@@ -1,7 +1,7 @@
 <script>
     import debounce from 'lodash-es/debounce';
     import Big from 'big.js';
-    import * as TX_TYPES from 'minterjs-tx/src/tx-types';
+    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {getTransaction, getBlock, getBlockList} from "~/api";
     import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
@@ -100,10 +100,10 @@
             },
             validator() {
                 const tx = this.tx;
-                if (!tx.data.pub_key) {
+                if (!tx.data.pubKey) {
                     return {};
                 }
-                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.public_key === tx.data.pub_key);
+                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
                 return validator || {};
             },
         },
@@ -172,19 +172,19 @@
                 return typeof value !== 'undefined';
             },
             isSell(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL);
+                return tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL);
             },
             isBuy(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_BUY);
+                return tx.type === Number(TX_TYPE.BUY);
             },
             isUnbond(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND);
+                return tx.type === Number(TX_TYPE.UNBOND);
             },
             isStake(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_UNBOND) || tx.type === Number(TX_TYPES.TX_TYPE_DELEGATE) || tx.type === Number(TX_TYPES.TX_TYPE_DECLARE_CANDIDACY);
+                return tx.type === Number(TX_TYPE.UNBOND) || tx.type === Number(TX_TYPE.DELEGATE) || tx.type === Number(TX_TYPE.DECLARE_CANDIDACY);
             },
             isMultisend(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_MULTISEND);
+                return tx.type === Number(TX_TYPE.MULTISEND);
             },
             getShouldShortenAddress() {
                 return process.client && window.innerWidth < 700;
@@ -265,32 +265,34 @@
 
                 <!-- SELL -->
                 <dt v-if="isSell(tx)">Sell coins</dt>
-                <dd v-if="isSell(tx)">{{ tx.data.coin_to_sell }} {{ tx.data.value_to_sell | prettyExact }}</dd>
+                <dd v-if="isSell(tx)">{{ tx.data.coinToSell }} {{ tx.data.valueToSell | prettyExact }}</dd>
                 <dt v-if="isSell(tx)">Get coins</dt>
-                <dd v-if="isSell(tx)">{{ tx.data.coin_to_buy }} {{ tx.data.value_to_buy | prettyExact }}</dd>
+                <dd v-if="isSell(tx)">{{ tx.data.coinToBuy }} {{ tx.data.valueToBuy | prettyExact }}</dd>
                 <!-- BUY -->
                 <dt v-if="isBuy(tx)">Buy coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.coin_to_buy }} {{ tx.data.value_to_buy | prettyExact }}</dd>
+                <dd v-if="isBuy(tx)">{{ tx.data.coinToBuy }} {{ tx.data.valueToBuy | prettyExact }}</dd>
                 <dt v-if="isBuy(tx)">Spend coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.coin_to_sell }} {{ tx.data.value_to_sell | prettyExact }}</dd>
+                <dd v-if="isBuy(tx)">{{ tx.data.coinToSell }} {{ tx.data.valueToSell | prettyExact }}</dd>
 
                 <!-- CREATE_COIN-->
                 <dt v-if="tx.data.name">Name</dt>
                 <dd v-if="tx.data.name">{{ tx.data.name }}</dd>
                 <dt v-if="tx.data.symbol">Symbol</dt>
                 <dd v-if="tx.data.symbol">{{ tx.data.symbol }}</dd>
-                <dt v-if="tx.data.initial_amount">Initial Amount</dt>
-                <dd v-if="tx.data.initial_amount">{{ tx.data.symbol }} {{ tx.data.initial_amount | prettyExact }}</dd>
-                <dt v-if="tx.data.initial_reserve">Initial Reserve</dt>
-                <dd v-if="tx.data.initial_reserve">{{ $store.state.COIN_NAME }} {{ tx.data.initial_reserve | prettyExact }}</dd>
-                <dt v-if="tx.data.constant_reserve_ratio">CRR</dt>
-                <dd v-if="tx.data.constant_reserve_ratio">{{ tx.data.constant_reserve_ratio }}&thinsp;%</dd>
+                <dt v-if="tx.data.initialAmount">Initial Amount</dt>
+                <dd v-if="tx.data.initialAmount">{{ tx.data.symbol }} {{ tx.data.initialAmount | prettyExact }}</dd>
+                <dt v-if="tx.data.initialReserve">Initial Reserve</dt>
+                <dd v-if="tx.data.initialReserve">{{ $store.state.COIN_NAME }} {{ tx.data.initialReserve | prettyExact }}</dd>
+                <dt v-if="tx.data.constantReserveRatio">CRR</dt>
+                <dd v-if="tx.data.constantReserveRatio">{{ tx.data.constantReserveRatio }}&thinsp;%</dd>
+                <dt v-if="tx.data.maxSupply">Max supply</dt>
+                <dd v-if="tx.data.maxSupply">{{ tx.data.maxSupply | prettyExact }}</dd>
 
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
                 <dt v-if="validator.meta && validator.meta.name">Validator</dt>
-                <dd v-if="validator.meta && validator.meta.name"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pub_key">{{ validator.meta.name }}</nuxt-link></dd>
-                <dt v-if="tx.data.pub_key">Public Key</dt>
-                <dd v-if="tx.data.pub_key"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pub_key">{{ tx.data.pub_key }}</nuxt-link></dd>
+                <dd v-if="validator.meta && validator.meta.name"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pubKey">{{ validator.meta.name }}</nuxt-link></dd>
+                <dt v-if="tx.data.pubKey">Public Key</dt>
+                <dd v-if="tx.data.pubKey"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pubKey">{{ tx.data.pubKey }}</nuxt-link></dd>
                 <dt v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
                 <dd v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">{{ tx.data.coin }} {{ (tx.data.stake || tx.data.value) | prettyExact }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
@@ -302,18 +304,18 @@
                     <span v-if="isUnbondBlock">{{ unbondTime | timeDistance }} ago ({{ unbondTime | time }})</span>
                     <span v-else>In {{ unbondTime | timeDistanceFuture }} ({{ unbondTime | timeMinutes }})</span>
                 </dd>
-                <dt v-if="tx.data.reward_address">Reward Address</dt>
-                <dd v-if="tx.data.reward_address"><nuxt-link class="link--default" :to="'/address/' + tx.data.reward_address">{{ tx.data.reward_address }}</nuxt-link></dd>
-                <dt v-if="tx.data.owner_address">Owner Address</dt>
-                <dd v-if="tx.data.owner_address"><nuxt-link class="link--default" :to="'/address/' + tx.data.owner_address">{{ tx.data.owner_address }}</nuxt-link></dd>
+                <dt v-if="tx.data.rewardAddress">Reward Address</dt>
+                <dd v-if="tx.data.rewardAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.rewardAddress">{{ tx.data.rewardAddress }}</nuxt-link></dd>
+                <dt v-if="tx.data.ownerAddress">Owner Address</dt>
+                <dd v-if="tx.data.ownerAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.ownerAddress">{{ tx.data.ownerAddress }}</nuxt-link></dd>
 
                 <!-- REDEEM_CHECK -->
                 <dt v-if="tx.data.check && tx.data.check.sender">Check Issuer</dt>
                 <dd v-if="tx.data.check && tx.data.check.sender"><nuxt-link class="link--default" :to="'/address/' + tx.data.check.sender">{{ tx.data.check.sender }}</nuxt-link></dd>
                 <dt v-if="tx.data.check && tx.data.check.nonce">Check Nonce</dt>
                 <dd v-if="tx.data.check && tx.data.check.nonce">{{ fromBase64(tx.data.check.nonce) }}</dd>
-                <dt v-if="tx.data.check && tx.data.check.due_block">Due Block</dt>
-                <dd v-if="tx.data.check && tx.data.check.due_block">{{ tx.data.check.due_block }}</dd>
+                <dt v-if="tx.data.check && tx.data.check.dueBlock">Due Block</dt>
+                <dd v-if="tx.data.check && tx.data.check.dueBlock">{{ tx.data.check.dueBlock }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
                 <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.coin }} {{ tx.data.check.value | prettyExact }}</dd>
 
@@ -325,6 +327,16 @@
                     <span v-if="isMultisendMultipleCoin(tx)">Multiple coins</span>
                     <span v-else>{{ getMultisendCoin(tx) }} {{ getMultisendValue(tx) }}</span>
                 </dd>
+
+                <!-- CREATE MULTISIG -->
+                <dt v-if="tx.data.multisigAddress">Multisig</dt>
+                <dd v-if="tx.data.multisigAddress">
+                    <nuxt-link class="link--default" :to="'/address/' + tx.data.multisigAddress">{{ tx.data.multisigAddress }}</nuxt-link>
+                </dd>
+                <dt v-if="tx.data.threshold">Threshold</dt>
+                <dd v-if="tx.data.threshold">{{ tx.data.threshold }}</dd>
+                <dt v-if="tx.data.weights">Weights Sum</dt>
+                <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
 
                 <dt v-if="tx.fee">Fee</dt>
                 <dd v-if="tx.fee">{{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}</dd>
@@ -355,6 +367,28 @@
                             />
                         </td>
                         <td>{{ transfer.coin }} {{ transfer.value | prettyExact }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- CREATE MULTISIG -->
+                <table class="table--recipient-list" v-if="tx.data.addresses && tx.data.addresses.length">
+                    <thead>
+                    <tr>
+                        <th>Participant Address</th>
+                        <th>Weight</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(address, index) in tx.data.addresses" :key="index">
+                        <td>
+                            <TableLink
+                                    :link-text="address"
+                                    :link-path="'/address/' + address"
+                                    :should-not-shorten="!shouldShortenAddress"
+                            />
+                        </td>
+                        <td>{{ tx.data.weights[index] }}</td>
                     </tr>
                     </tbody>
                 </table>

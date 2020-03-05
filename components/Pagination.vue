@@ -11,8 +11,8 @@
                 type: Object,
                 required: true,
                 default: () => ({
-                    current_page: null,
-                    last_page: null,
+                    currentPage: null,
+                    lastPage: null,
                 }),
             },
             paginationClass: {
@@ -33,12 +33,12 @@
         },
         data() {
             return {
-                currentPage: this.paginationInfo.current_page,
-                inputPage: this.paginationInfo.current_page,
+                currentPage: this.paginationInfo.currentPage,
+                inputPage: this.paginationInfo.currentPage,
             };
         },
         watch: {
-            'paginationInfo.current_page': function(newVal) {
+            'paginationInfo.currentPage': function(newVal) {
                 this.currentPage = newVal;
                 this.inputPage = newVal;
             },
@@ -48,7 +48,7 @@
                 return this.currentPage > 1;
             },
             hasNext() {
-                return this.currentPage < this.paginationInfo.last_page;
+                return this.currentPage < this.paginationInfo.lastPage;
             },
             buttonClassPrev() {
                 let classList = this.buttonClass.split(' ');
@@ -112,7 +112,7 @@
 </script>
 
 <template>
-    <div class="pagination" :class="paginationClass" v-if="currentPage && paginationInfo.last_page > 1">
+    <div class="pagination" :class="paginationClass" v-if="currentPage && paginationInfo.lastPage > 1">
         <nuxt-link class="button button--icon"
                    :class="buttonClassPrev"
                    :to="getPageHref(1)"
@@ -130,7 +130,7 @@
                    v-model="inputPage"
                    @blur="handleBlur"
             >
-            of {{ paginationInfo.last_page }}
+            of {{ paginationInfo.lastPage }}
         </form>
         <nuxt-link class="button button--icon"
                    :class="buttonClassNext"
@@ -140,9 +140,9 @@
         > ></nuxt-link>
         <nuxt-link class="button button--icon"
                    :class="buttonClassNext"
-                   :to="getPageHref(paginationInfo.last_page)"
+                   :to="getPageHref(paginationInfo.lastPage)"
                    :event="!hasNext ? '' : 'click'"
-                   @click.native="handleNext(paginationInfo.last_page)"
+                   @click.native="handleNext(paginationInfo.lastPage)"
         > >></nuxt-link>
     </div>
 </template>

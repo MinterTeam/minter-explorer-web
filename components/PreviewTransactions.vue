@@ -1,6 +1,6 @@
 <script>
     import Big from 'big.js';
-    import * as TX_TYPES from 'minterjs-tx/src/tx-types';
+    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {getTimeDistance, pretty, shortFilter, txTypeFilter} from '~/assets/utils';
 
     export default {
@@ -32,7 +32,7 @@
                 return tx.data.value
                     || this.getConvertValue(tx)
                     || tx.data.stake
-                    || tx.data.initial_amount
+                    || tx.data.initialAmount
                     || (tx.data.check && tx.data.check.value)
                     || this.getMultisendValue(tx);
             },
@@ -47,23 +47,23 @@
                 }
             },
             getConvertCoinSymbol(tx) {
-                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
-                    return tx.data.coin_to_sell;
+                if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
+                    return tx.data.coinToSell;
                 }
-                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY)) {
-                    return tx.data.coin_to_buy;
+                if (tx.type === Number(TX_TYPE.BUY)) {
+                    return tx.data.coinToBuy;
                 }
             },
             getConvertValue(tx) {
-                if (tx.type === Number(TX_TYPES.TX_TYPE_SELL) || tx.type === Number(TX_TYPES.TX_TYPE_SELL_ALL)) {
-                    return tx.data.value_to_sell;
+                if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
+                    return tx.data.valueToSell;
                 }
-                if (tx.type === Number(TX_TYPES.TX_TYPE_BUY)) {
-                    return tx.data.value_to_buy;
+                if (tx.type === Number(TX_TYPE.BUY)) {
+                    return tx.data.valueToBuy;
                 }
             },
             isMultisend(tx) {
-                return tx.type === Number(TX_TYPES.TX_TYPE_MULTISEND);
+                return tx.type === Number(TX_TYPE.MULTISEND);
             },
             getMultisendDeliveryList(tx) {
                 return tx.data.list || [];

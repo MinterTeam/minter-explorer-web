@@ -75,7 +75,7 @@
                     // sort stakes
                     .map((item) => {
                         item.stakeList.sort((a, b) => {
-                            return b.bip_value - a.bip_value;
+                            return b.bipValue - a.bipValue;
                         });
                         return item;
                     });
@@ -123,7 +123,7 @@
             },
             getGroupBipValue(stakeGroup) {
                 return stakeGroup.stakeList.reduce((accumulator, item) => {
-                    return accumulator + Number(item.bip_value);
+                    return accumulator + Number(item.bipValue);
                 }, 0);
             },
             isGroupCanExpand(stakeGroup) {
@@ -134,11 +134,11 @@
                 // this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
             },
             getValidatorName(stakeItem) {
-                return stakeItem.validator_meta && stakeItem.validator_meta.name;
+                return stakeItem.validatorMeta && stakeItem.validatorMeta.name;
             },
             getLabel(stakeItem) {
                 if (this.stakeItemType === 'validator') {
-                    return stakeItem.pub_key.toString();
+                    return stakeItem.pubKey.toString();
                 }
                 if (this.stakeItemType === 'delegator') {
                     return stakeItem.address.toString();
@@ -146,7 +146,7 @@
             },
             getUrl(stakeItem) {
                 if (this.stakeItemType === 'validator') {
-                    return getExplorerValidatorUrl(stakeItem.pub_key);
+                    return getExplorerValidatorUrl(stakeItem.pubKey);
                 }
                 if (this.stakeItemType === 'delegator') {
                     return getExplorerAddressUrl(stakeItem.address);
@@ -223,7 +223,7 @@
      * Default ascending: 1 -> 2
      */
     function valueSortFn(a, b) {
-        return a.bip_value - b.bip_value;
+        return a.bipValue - b.bipValue;
     }
 
 
@@ -332,8 +332,8 @@
                         </span>
                         <template v-else>
                             <span :title="$options.prettyPrecise(stakeGroup.stakeList[0].value)">{{ $options.pretty(stakeGroup.stakeList[0].value) }}</span>
-                            <div class="u-text-muted" :title="$options.prettyPrecise(stakeGroup.stakeList[0].bip_value)" v-if="stakeGroup.stakeList[0].coin !== $store.getters.COIN_NAME">
-                                {{ $store.getters.COIN_NAME }} {{ $options.pretty(stakeGroup.stakeList[0].bip_value) }}
+                            <div class="u-text-muted" :title="$options.prettyPrecise(stakeGroup.stakeList[0].bipValue)" v-if="stakeGroup.stakeList[0].coin !== $store.getters.COIN_NAME">
+                                {{ $store.getters.COIN_NAME }} {{ $options.pretty(stakeGroup.stakeList[0].bipValue) }}
                             </div>
                         </template>
                     </td>
@@ -373,8 +373,8 @@
                             <span class="u-hidden-medium-up">{{ stakeItem.coin }}</span>
 
                             <span :title="$options.prettyPrecise(stakeItem.value)">{{ $options.pretty(stakeItem.value) }}</span>
-                            <div class="u-text-muted" :title="$options.prettyPrecise(stakeItem.bip_value)" v-if="stakeItem.coin !== $store.getters.COIN_NAME">
-                                {{ $store.getters.COIN_NAME }} {{ $options.pretty(stakeItem.bip_value) }}
+                            <div class="u-text-muted" :title="$options.prettyPrecise(stakeItem.bipValue)" v-if="stakeItem.coin !== $store.getters.COIN_NAME">
+                                {{ $store.getters.COIN_NAME }} {{ $options.pretty(stakeItem.bipValue) }}
                             </div>
                         </td>
                     </tr>

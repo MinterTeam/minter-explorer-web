@@ -40,7 +40,7 @@
                 return process.client && window.innerWidth < 960;
             },
             getName(validator) {
-                return validator.validator_meta && validator.validator_meta.name;
+                return validator.validatorMeta && validator.validatorMeta.name;
             },
         },
     };
