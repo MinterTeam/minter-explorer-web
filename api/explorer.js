@@ -11,7 +11,9 @@ instance.interceptors.response.use(function(response) {
     response.data = toCamel(response.data);
     return response;
 }, function(error) {
-    error.data = toCamel(error.data);
+    if (error.response && error.response.data) {
+        error.response.data = toCamel(error.response.data);
+    }
     return Promise.reject(error);
 });
 
