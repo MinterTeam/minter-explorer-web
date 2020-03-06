@@ -1,11 +1,9 @@
 <script>
     // import Vue from 'vue';
     // import SockJS from "sockjs-client";
-    import Centrifuge from 'centrifuge/src';
     import {getBlockList, getStatus, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
-    import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
-    import toCamel from '~/assets/to-camel.js';
+    import {NETWORK} from "~/assets/variables";
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
@@ -100,10 +98,6 @@
             //     });
             // }
 
-            // getWebSocketConnectData()
-            //     .then((data) => this.subscribeWS(data));
-            this.subscribeWS();
-
             // update timestamps if no new data from server
             timeInterval = setInterval(() => {
                 if (Date.now() - this.lastBlockTime >= 10000) {
@@ -136,41 +130,6 @@
             },
         },
         methods: {
-            subscribeWS(connectData) {
-                centrifuge = new Centrifuge(EXPLORER_RTM_URL, {
-                    // user: connectData.user ? connectData.user : '',
-                    // timestamp: connectData.timestamp.toString(),
-                    // token: connectData.token,
-                    // sockjs: SockJS,
-                });
-
-                centrifuge.subscribe("blocks", (response) => {
-                    const newBlock = toCamel(response.data);
-                    const isExist = this.blockList.some(function(item) {
-                        return item.height === newBlock.height;
-                    });
-                    if (!isExist) {
-                        this.blockList.unshift(newBlock);
-                        this.blockList = this.blockList.slice(0, BLOCK_LIST_LENGTH);
-                        this.lastBlockTime = Date.now();
-
-                        // this.checkLastBlockIsSynced();
-                    }
-                });
-                centrifuge.subscribe("transactions", (response) => {
-                    const newTx = toCamel(response.data);
-                    const isExist = this.txList.find(function(item) {
-                        return item.hash === newTx.hash;
-                    });
-                    if (!isExist) {
-                        this.txList.unshift(newTx);
-                        this.txList = this.txList.slice(0, TX_LIST_LENGTH);
-                        this.lastTxTime = Date.now();
-                    }
-                });
-
-                centrifuge.connect();
-            },
         },
     };
 </script>

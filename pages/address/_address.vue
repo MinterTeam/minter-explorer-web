@@ -1,7 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
     import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressSlashList} from "~/api";
-    import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise, prettyUsd} from "~/assets/utils";
@@ -142,8 +141,6 @@
                 slashPaginationInfo: {},
                 isSlashListLoading: false,
                 isSlashListLoaded: false,
-                nonce: '',
-                isNonceQrModalVisible: false,
                 isAddressQrModalVisible: false,
             };
         },
@@ -209,10 +206,6 @@
             },
         },
         beforeMount() {
-            getNonce(this.$route.params.address)
-                .then((nonce) => {
-                    this.nonce = nonce.toString();
-                });
         },
         methods: {
             prettyPrecise,
@@ -342,16 +335,6 @@
 
                 <dt>#Transactions</dt>
                 <dd>{{ txPaginationInfo.total || 0 }}</dd>
-                <dt>Nonce for tx</dt>
-                <dd class="u-icon-wrap">
-                    <template v-if="nonce">
-                        {{ nonce }}
-                        <ButtonCopyIcon :copy-text="nonce"/>
-                        <button class="u-icon u-icon--qr--right u-semantic-button link--opacity" @click="isNonceQrModalVisible = true">
-                            <InlineSvg src="/img/icon-qr.svg" width="24" height="24"/>
-                        </button>
-                    </template>
-                </dd>
             </dl>
         </section>
 
@@ -399,11 +382,6 @@
         <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
 
 
-        <Modal class="qr-modal"
-               v-bind:isOpen.sync="isNonceQrModalVisible"
-        >
-            <QrcodeVue class="qr-modal__layer" :value="nonce" :size="280" level="L"></QrcodeVue>
-        </Modal>
         <Modal class="qr-modal"
                v-bind:isOpen.sync="isAddressQrModalVisible"
         >
