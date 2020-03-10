@@ -5,7 +5,6 @@
     import getTitle from '~/assets/get-title';
     import {NETWORK} from "~/assets/variables";
     import Stats from '~/components/Stats';
-    import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
     import PreviewTransactions from '~/components/PreviewTransactions';
 
@@ -26,7 +25,6 @@
     export default {
         components: {
             Stats,
-            HistoryChart,
             PreviewBlocks,
             PreviewTransactions,
         },
@@ -139,9 +137,7 @@
         <section class="u-cell u-cell--large--1-2">
             <Stats :stats="stats" :latest-block-height="latestBlockHeight" :total-transactions="totalTransactions"/>
         </section>
-        <section class="u-cell u-cell--large--1-2 history-cell">
-            <HistoryChart/>
-        </section>
+        <section class="u-cell u-cell--large--1-2"></section>
         <section class="u-cell u-cell--large--1-2">
             <PreviewBlocks :block-list="blockList"/>
         </section>

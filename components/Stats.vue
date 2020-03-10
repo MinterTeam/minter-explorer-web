@@ -41,29 +41,16 @@
     <div class="index-stats panel">
         <div class="index-stats__section panel__section">
             <div class="u-grid u-grid--vertical-margin">
-                <div class="u-cell">
-                    <h3 class="index-stats__name panel__title">Market cap of ${{ stats.marketCap | marketCap }}</h3>
-                    <div class="index-stats__value index-stats__value--primary">
-                        <span class="index-stats__value-text">${{ stats.bipPriceUsd | coinPrice }} <!--@&nbsp;{{ stats.bipPriceBtc | pretty }}&nbsp;{{ $store.state.COIN_NAME }}/BTC--></span>
-                        <!--<span class="index-stats__sub-value index-stats__sub-value&#45;&#45;dynamic" :class="stats.bipPriceChange >= 0 ? 'index-stats__green' : 'index-stats__red'">
-                            <img src="/img/icon-dynamic-up.svg" alt="Up" v-if="stats.bipPriceChange >= 0">
-                            <img src="/img/icon-dynamic-down.svg" alt="Down" v-else>
-                            {{ stats.bipPriceChange }}%
-                        </span>-->
-                    </div>
-                </div>
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Last block</h3>
                     <div class="index-stats__value index-stats__value--primary">
                         <span class="index-stats__value-text">{{ latestBlockHeight | prettyRound }}</span> <br>
-                        <span class="index-stats__sub-value">{{ stats.averageBlockTime | prettyUsd }}s</span>
                     </div>
                 </div>
                 <div class="u-cell u-cell--small--1-2">
                     <h3 class="index-stats__name panel__title">Transactions</h3>
                     <div class="index-stats__value index-stats__value--primary">
                         <span class="index-stats__value-text">{{ totalTransactions | prettyRound }}</span> <br>
-                        <span class="index-stats__sub-value">{{ stats.transactionsPerSecond | prettyUsd }} TPS</span>
                     </div>
                 </div>
             </div>
