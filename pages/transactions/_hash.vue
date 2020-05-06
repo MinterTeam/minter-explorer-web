@@ -339,7 +339,14 @@
                 <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
 
                 <dt v-if="tx.fee">Fee</dt>
-                <dd v-if="tx.fee">{{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}</dd>
+                <dd v-if="tx.fee">
+                    <template v-if="tx.gasCoin === $store.state.COIN_NAME">
+                        {{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}
+                    </template>
+                    <template v-else>
+                        {{ tx.gasCoin }} <span class="u-text-muted">({{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }})</span>
+                    </template>
+                </dd>
 
                 <dt v-if="tx.nonce">Nonce</dt>
                 <dd v-if="tx.nonce">{{ tx.nonce }}</dd>

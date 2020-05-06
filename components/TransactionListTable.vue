@@ -90,7 +90,7 @@
                 return !isOutcomeMultisend;
             },
             isIncomeSend(tx) {
-                return this.currentAddress === tx.data.to;
+                return this.currentAddress === tx.data.to && tx.from !== tx.data.to;
             },
             isReceive(tx) {
                 return this.currentAddress && (this.isIncomeSend(tx) || this.isIncomeMultisend(tx));

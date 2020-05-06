@@ -53,7 +53,7 @@
                             <div class="preview__block-reward">
                                 <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime | prettyUsd }} secs
                                 <br>
-                                Block Reward {{ $store.state.COIN_NAME }} {{ block.reward | pretty }}
+                                Block Reward {{ block.reward | pretty }} {{ $store.state.COIN_NAME }}
                             </div>
                         </div>
                     </div>

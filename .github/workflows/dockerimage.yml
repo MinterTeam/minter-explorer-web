@@ -21,4 +21,4 @@ jobs:
           PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
           IMAGE_NAME: "minterteam/explorer-web"
           LATEST: "false"
-          TAG_NAME: "v1.1.0"
+          TAG_NAME: "v1.2.0"
