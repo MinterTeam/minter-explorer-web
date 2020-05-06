@@ -427,6 +427,7 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {number} block
  * @property {string} from
  * @property {string} timestamp
+ * @property {string} gasCoin
  * @property {number} fee
  * @property {number} type
  * @property {Object} data
