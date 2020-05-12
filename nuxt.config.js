@@ -62,6 +62,8 @@ module.exports = {
     */
     build: {
         extractCSS: true,
+        // optimizeCSS: false,
+        // postcss: false,
         // optimization: {
         //     splitChunks: {
         //         name: true
