@@ -378,7 +378,7 @@
                             </div>
 
                             <!-- message -->
-                            <div class="table__inner-item" v-if="tx.payload">
+                            <div class="table__inner-item u-text-wrap-anywhere" v-if="tx.payload">
                                 <strong>Message</strong> <br>
                                 {{ fromBase64(tx.payload) }}
                             </div>
