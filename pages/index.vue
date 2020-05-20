@@ -5,7 +5,7 @@
     import {getBlockList, getStatus, getTransactionList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
-    import toCamel from '~/assets/to-camel.js';
+    import {toCamel} from '~/assets/to-camel.js';
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
