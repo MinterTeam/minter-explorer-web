@@ -244,10 +244,6 @@
                                            :should-not-shorten="true"
                                 />
                             </div>
-                            <div class="table__inner-item" v-if="isDefined(tx.data.value)">
-                                <strong>Value</strong> <br>
-                                {{ tx.data.coin }} {{ tx.data.value | pretty }}
-                            </div>
 
                             <!-- SELL -->
                             <div class="table__inner-item" v-if="isSell(tx)">

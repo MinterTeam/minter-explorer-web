@@ -6,6 +6,7 @@ import stripZeros from 'pretty-num/src/strip-zeros';
 import fromExponential from 'from-exponential';
 import decode from 'entity-decode';
 import {txTypeList} from 'minterjs-tx/src/tx-types';
+import {getTimeOffset} from '~/assets/time-offset.js';
 
 function timeFormat(timestamp, pattern) {
     if (typeof timestamp === 'string') {
@@ -26,7 +27,7 @@ export function getTimeDistance(timestamp, allowFuture) {
     if (typeof timestamp === 'string') {
         timestamp = parseISO(timestamp);
     }
-    const now = new Date();
+    const now = new Date(Date.now() + getTimeOffset());
     // if timestamp from future
     if (timestamp > now && !allowFuture) {
         timestamp = now;

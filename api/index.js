@@ -470,7 +470,7 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {number|string} [data.check.value]
  * @property {string} [data.check.coin]
  * @property {number} [data.check.dueBlock]
- * - type: TX_TYPE.SET_CANDIDATE_ONLINE, TX_TYPE.SET_CANDIDATE_OFFLINE
+ * - type: TX_TYPE.SET_CANDIDATE_ON, TX_TYPE.SET_CANDIDATE_OFF
  * @property {string} [data.pubKey]
  * -- type: TX_TYPE.MULTISEND
  * @property {Array<{to: string, coin: string}>} [data.list]
