@@ -1,6 +1,11 @@
 let averageOffset = 0;
 let offsetArray = [];
 
+// minimum offsets count to calculate average
+const MIN_OFFSET_COUNT = 3;
+// maximum offsets count to store
+const MAX_OFFSET_COUNT = 100;
+
 export function getTimeOffset() {
     return averageOffset;
 }
@@ -12,7 +17,6 @@ export function addTimeInterceptor(instance) {
     });
 
     instance.interceptors.response.use((response) => {
-        console.log(response.headers);
         const responseTime = new Date(response.headers.date).getTime();
         updateOffset(response.config.ts, responseTime);
         return response;
@@ -25,9 +29,12 @@ function updateOffset(requestTime, responseTime) {
         return;
     }
     const currentOffset = ntpOffset(requestTime, responseTime, responseTime, Date.now());
+    if (offsetArray.length === MAX_OFFSET_COUNT) {
+        offsetArray.shift();
+    }
     offsetArray.push(currentOffset);
 
-    if (offsetArray.length >= 3) {
+    if (offsetArray.length >= MIN_OFFSET_COUNT) {
         const offsetSum = offsetArray.reduce((a, b) => a + b);
         averageOffset = Math.round(offsetSum / offsetArray.length);
     }
