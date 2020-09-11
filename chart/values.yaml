@@ -1,0 +1,33 @@
+replicaCount: 1
+
+image:
+  repository: registry.minter.network/explorer-web
+  pullPolicy: Always
+  tag: latest
+
+imagePullSecrets:
+  - name: registry.minter.network
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  port: 80
+
+ingress:
+  domain: explorer.chilinet.minter.network
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
