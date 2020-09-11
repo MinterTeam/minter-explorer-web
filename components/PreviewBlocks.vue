@@ -51,7 +51,7 @@
                         <div class="u-cell u-cell--2-3">
                             <!--Mined by <nuxt-link class="link&#45;&#45;default" :to="block.validatorUrl">{{ block.validatorName }}</nuxt-link>-->
                             <div class="preview__block-reward">
-                                <nuxt-link class="link--default" :to="block.url">{{ block.txCount }} txns</nuxt-link> in {{ block.blockTime | prettyUsd }} secs
+                                <nuxt-link class="link--default" :to="block.url">{{ block.transactionCount }} txns</nuxt-link> in {{ block.blockTime | prettyUsd }} secs
                                 <br>
                                 Block Reward {{ block.reward | pretty }} {{ $store.state.COIN_NAME }}
                             </div>

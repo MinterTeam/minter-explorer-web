@@ -39,8 +39,8 @@
             getIsCollapsed() {
                 return process.client && window.innerWidth < 960;
             },
-            getName(validator) {
-                return validator.validatorMeta && validator.validatorMeta.name;
+            getName(validatorListItem) {
+                return validatorListItem.validator.name;
             },
         },
     };
@@ -64,24 +64,24 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="validator in validatorList" :key="validator.publicKey">
+                <tr v-for="item in validatorList" :key="item.validator.publicKey">
                     <td v-show="!isCollapsed">
-                        <span v-if="getName(validator)">{{ getName(validator) }}</span>
+                        <span v-if="item.validator.name">{{ item.validator.name }}</span>
                     </td>
                     <td>
                         <TableLink class="u-text-tabular-nums"
-                                   :link-text="isCollapsed && getName(validator) ? getName(validator) : validator.publicKey"
-                                   :link-path="'/validator/' + validator.publicKey"
-                                   :should-not-shorten="!isCollapsed || getName(validator)"
+                                   :link-text="isCollapsed && item.validator.name ? item.validator.name : item.validator.publicKey"
+                                   :link-path="'/validator/' + item.validator.publicKey"
+                                   :should-not-shorten="!isCollapsed || item.validator.name"
                         />
                     </td>
                     <td>
                         <InlineSvg class="u-vertical-top" role="img"
                             src="/img/icon-sign.svg"
-                            :aria-label="validator.signed ? 'Signed' : 'Not signed'"
+                            :aria-label="item.signed ? 'Signed' : 'Not signed'"
                             width="26px"
                             height="26px"
-                            :fill="validator.signed ? '#6ECA2C' : false"
+                            :fill="item.signed ? '#6ECA2C' : false"
                         />
                     </td>
                 </tr>

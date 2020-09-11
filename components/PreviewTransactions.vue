@@ -43,15 +43,15 @@
                 if (this.isMultisend(tx) && this.isMultisendMultipleCoin(tx)) {
                     return 'Multiple coins';
                 } else {
-                    return pretty(this.getAmount(tx) || 0) + ' ' + (tx.data.coin || tx.data.symbol || this.getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) || this.getMultisendCoin(tx));
+                    return pretty(this.getAmount(tx) || 0) + ' ' + (tx.data.coin?.symbol || tx.data.symbol || this.getConvertCoinSymbol(tx) || tx.data.check?.coin?.symbol || this.getMultisendCoin(tx));
                 }
             },
             getConvertCoinSymbol(tx) {
                 if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
-                    return tx.data.coinToSell;
+                    return tx.data.coinToSell.symbol;
                 }
                 if (tx.type === Number(TX_TYPE.BUY)) {
-                    return tx.data.coinToBuy;
+                    return tx.data.coinToBuy.symbol;
                 }
             },
             getConvertValue(tx) {
@@ -74,7 +74,7 @@
                 }
                 const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
                 return currentUserDeliveryList.some((delivery) => {
-                    return delivery.coin !== currentUserDeliveryList[0].coin;
+                    return delivery.coin.id !== currentUserDeliveryList[0].coin.id;
                 });
             },
             getMultisendCoin(tx) {
@@ -82,7 +82,7 @@
                     return;
                 }
                 if (!this.isMultisendMultipleCoin(tx)) {
-                    return this.getMultisendDeliveryList(tx)[0].coin;
+                    return this.getMultisendDeliveryList(tx)[0].coin.symbol;
                 }
             },
             getMultisendValue(tx) {

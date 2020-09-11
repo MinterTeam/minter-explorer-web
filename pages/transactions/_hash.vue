@@ -198,7 +198,7 @@
                 }
                 const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
                 return currentUserDeliveryList.some((delivery) => {
-                    return delivery.coin !== currentUserDeliveryList[0].coin;
+                    return delivery.coin.id !== currentUserDeliveryList[0].coin.id;
                 });
             },
             getMultisendCoin(tx) {
@@ -207,7 +207,7 @@
                 }
                 if (!this.isMultisendMultipleCoin(tx)) {
                     const firstItem = this.getMultisendDeliveryList(tx)[0];
-                    return firstItem && firstItem.coin;
+                    return firstItem && firstItem.coin.symbol;
                 }
             },
             getMultisendValue(tx) {
@@ -245,7 +245,7 @@
                 <dd><strong :class="tx.status === $options.TX_STATUS.SUCCESS ? 'tx__success' : 'tx__fail'">{{ tx.status }}</strong></dd>
 
                 <dt>Block</dt>
-                <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.block">{{ tx.block | prettyRound }}</nuxt-link></dd>
+                <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.height">{{ tx.height | prettyRound }}</nuxt-link></dd>
 
                 <dt>Type</dt>
                 <dd>{{ tx.type | txType }}</dd>
@@ -261,18 +261,18 @@
                 <dt v-if="tx.data.to">To</dt>
                 <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
                 <dt v-if="isDefined(tx.data.value) && !isStake(tx)">Amount</dt>
-                <dd v-if="isDefined(tx.data.value) && !isStake(tx)">{{ tx.data.coin }} {{ tx.data.value | prettyExact }}</dd>
+                <dd v-if="isDefined(tx.data.value) && !isStake(tx)">{{ tx.data.coin.symbol }} {{ tx.data.value | prettyExact }}</dd>
 
                 <!-- SELL -->
                 <dt v-if="isSell(tx)">Sell coins</dt>
-                <dd v-if="isSell(tx)">{{ tx.data.coinToSell }} {{ tx.data.valueToSell | prettyExact }}</dd>
+                <dd v-if="isSell(tx)">{{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | prettyExact }}</dd>
                 <dt v-if="isSell(tx)">Get coins</dt>
-                <dd v-if="isSell(tx)">{{ tx.data.coinToBuy }} {{ tx.data.valueToBuy | prettyExact }}</dd>
+                <dd v-if="isSell(tx)">{{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | prettyExact }}</dd>
                 <!-- BUY -->
                 <dt v-if="isBuy(tx)">Buy coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.coinToBuy }} {{ tx.data.valueToBuy | prettyExact }}</dd>
+                <dd v-if="isBuy(tx)">{{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | prettyExact }}</dd>
                 <dt v-if="isBuy(tx)">Spend coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.coinToSell }} {{ tx.data.valueToSell | prettyExact }}</dd>
+                <dd v-if="isBuy(tx)">{{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | prettyExact }}</dd>
 
                 <!-- CREATE_COIN-->
                 <dt v-if="tx.data.name">Name</dt>
@@ -294,7 +294,7 @@
                 <dt v-if="tx.data.pubKey">Public Key</dt>
                 <dd v-if="tx.data.pubKey"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pubKey">{{ tx.data.pubKey }}</nuxt-link></dd>
                 <dt v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
-                <dd v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">{{ tx.data.coin }} {{ (tx.data.stake || tx.data.value) | prettyExact }}</dd>
+                <dd v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">{{ tx.data.coin.symbol }} {{ (tx.data.stake || tx.data.value) | prettyExact }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbond(tx)">Unbond Block</dt>
@@ -340,11 +340,11 @@
 
                 <dt v-if="tx.fee">Fee</dt>
                 <dd v-if="tx.fee">
-                    <template v-if="tx.gasCoin === $store.state.COIN_NAME">
+                    <template v-if="tx.gasCoin.symbol === $store.state.COIN_NAME">
                         {{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}
                     </template>
                     <template v-else>
-                        {{ tx.gasCoin }} <span class="u-text-muted">({{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }})</span>
+                        {{ tx.gasCoin.symbol }} <span class="u-text-muted">({{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }})</span>
                     </template>
                 </dd>
 
@@ -373,7 +373,7 @@
                                 :should-not-shorten="!shouldShortenAddress"
                             />
                         </td>
-                        <td>{{ transfer.coin }} {{ transfer.value | prettyExact }}</td>
+                        <td>{{ transfer.coin.symbol }} {{ transfer.value | prettyExact }}</td>
                     </tr>
                     </tbody>
                 </table>

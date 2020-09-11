@@ -110,15 +110,15 @@
                 if (this.isMultisend(tx) && this.isMultisendMultipleCoin(tx)) {
                     return 'Multiple coins';
                 } else {
-                    return (tx.data.coin || tx.data.symbol || this.getConvertCoinSymbol(tx) || (tx.data.check && tx.data.check.coin) || this.getMultisendCoin(tx)) + ' ' + pretty(this.getAmount(tx) || 0);
+                    return (tx.data.coin?.symbol || tx.data.symbol || this.getConvertCoinSymbol(tx) || tx.data.check?.coin.symbol || this.getMultisendCoin(tx)) + ' ' + pretty(this.getAmount(tx) || 0);
                 }
             },
             getConvertCoinSymbol(tx) {
                 if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
-                    return tx.data.coinToSell;
+                    return tx.data.coinToSell.symbol;
                 }
                 if (tx.type === Number(TX_TYPE.BUY)) {
-                    return tx.data.coinToBuy;
+                    return tx.data.coinToBuy.symbol;
                 }
             },
             getConvertValue(tx) {
@@ -144,7 +144,7 @@
                 }
                 const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
                 return currentUserDeliveryList.some((delivery) => {
-                    return delivery.coin !== currentUserDeliveryList[0].coin;
+                    return delivery.coin.id !== currentUserDeliveryList[0].coin.id;
                 });
             },
             getMultisendCoin(tx) {
@@ -152,7 +152,7 @@
                     return;
                 }
                 if (!this.isMultisendMultipleCoin(tx)) {
-                    return this.getMultisendDeliveryList(tx)[0].coin;
+                    return this.getMultisendDeliveryList(tx)[0].coin.symbol;
                 }
             },
             getMultisendValue(tx) {
@@ -205,7 +205,7 @@
                     </td>
                     <!-- block -->
                     <td>
-                        <TableLink :link-text="prettyRound(tx.block)" :link-path="'/blocks/' + tx.block" :is-not-link="isCurrentBlock(tx.block)" :should-not-shorten="true"/>
+                        <TableLink :link-text="prettyRound(tx.height)" :link-path="'/blocks/' + tx.height" :is-not-link="isCurrentBlock(tx.height)" :should-not-shorten="true"/>
                     </td>
                     <!-- age -->
                     <td>{{ tx.timeDistance }} ago</td>
@@ -248,20 +248,20 @@
                             <!-- SELL -->
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Sell coins</strong> <br>
-                                {{ tx.data.coinToSell }} {{ tx.data.valueToSell | pretty }}
+                                {{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Get coins</strong> <br>
-                                {{ tx.data.coinToBuy }} {{ tx.data.valueToBuy | pretty  }}
+                                {{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | pretty  }}
                             </div>
                             <!-- BUY -->
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Buy coins</strong> <br>
-                                {{ tx.data.coinToBuy }} {{ tx.data.valueToBuy | pretty }}
+                                {{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Spend coins</strong> <br>
-                                {{ tx.data.coinToSell }} {{ tx.data.valueToSell | pretty }}
+                                {{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | pretty }}
                             </div>
 
                             <!-- type CREATE_COIN -->
@@ -309,7 +309,7 @@
                             </div>
                             <div class="table__inner-item" v-if="isDefined(tx.data.stake)">
                                 <strong>Stake</strong> <br>
-                                {{ tx.data.coin }} {{ tx.data.stake | pretty }}
+                                {{ tx.data.coin.symbol }} {{ tx.data.stake | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="isDefined(tx.data.commission)">
                                 <strong>Commission</strong> <br>
@@ -317,7 +317,7 @@
                             </div>
                             <div class="table__inner-item" v-if="isUnbond(tx)">
                                 <strong>Unbond Block</strong> <br>
-                                {{ prettyRound(tx.block + $options.UNBOND_PERIOD) }}
+                                {{ prettyRound(tx.height + $options.UNBOND_PERIOD) }}
                             </div>
                             <div class="table__inner-item" v-if="tx.data.rewardAddress">
                                 <strong>Reward Address</strong> <br>

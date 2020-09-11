@@ -56,7 +56,7 @@
                     <h3 class="index-stats__name panel__title">Last block</h3>
                     <div class="index-stats__value index-stats__value--primary">
                         <span class="index-stats__value-text">{{ latestBlockHeight | prettyRound }}</span> <br>
-                        <span class="index-stats__sub-value">{{ stats.averageBlockTime | prettyUsd }}s</span>
+                        <span class="index-stats__sub-value">{{ stats.avgBlockTime | prettyUsd }}s</span>
                     </div>
                 </div>
                 <div class="u-cell u-cell--small--1-2">

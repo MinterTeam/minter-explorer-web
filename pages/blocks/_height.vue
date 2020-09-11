@@ -142,7 +142,7 @@
                 <dd>{{ $store.state.COIN_NAME }} {{ block.reward | pretty }}</dd>
 
                 <dt>#Transactions</dt>
-                <dd>{{ block.txCount || txPaginationInfo.total || 0 }}</dd>
+                <dd>{{ block.transactionCount || txPaginationInfo.total || 0 }}</dd>
 
                 <dt>#Validators</dt>
                 <dd>{{ block.validators.length }}</dd>
