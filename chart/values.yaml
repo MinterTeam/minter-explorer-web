@@ -1,12 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: registry.minter.network/explorer-web
+  repository: minterteam/explorer-web
   pullPolicy: Always
   tag: latest
-
-imagePullSecrets:
-  - name: registry.minter.network
 
 nameOverride: ""
 fullnameOverride: ""
