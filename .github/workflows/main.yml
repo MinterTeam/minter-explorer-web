@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: set branch prefix env to be used during docker build, .e.g. "refs/heads/testnet" => ".testnet"
         if: github.ref != 'refs/heads/master'
-        run: echo ::set-env name=BUILD_BRANCH_ENV_PREFIX::$(echo "$GITHUB_REF" | sed -e "s!/refs/heads/!.!")
+        run: echo ::set-env name=BUILD_BRANCH_ENV_PREFIX::$(echo "$GITHUB_REF" | sed "s\refs/heads/\.\g")
 
       - uses: actions/checkout@v2
       - name: build and push to registry
