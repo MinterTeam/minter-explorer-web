@@ -23,6 +23,7 @@ jobs:
           LATEST: "true"
           TAG_NAME: ${{ github.sha }}
           DOCKERFILE: ".docker/Dockerfile"
+          DOCKER_BUILD_ARGS: --build-arg BUILD_BRANCH_ENV_PREFIX=$BUILD_BRANCH_ENV_PREFIX
       
       - name: deploy to cluster
         uses: wahyd4/kubectl-helm-action@master
