@@ -114,7 +114,7 @@
                 <!-- fixed duplicated txn key, can be removed later-->
                 <div class="preview__transaction panel__section" v-for="tx in txListFormatted" :key="tx.txn + tx.hash">
                     <div class="preview__transaction-row u-text-overflow">
-                        TX# <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash | txHash }}</nuxt-link>
+                        TX <nuxt-link class="link--main link--hover" :to="'/transactions/' + tx.hash">{{ tx.hash | txHash }}</nuxt-link>
                     </div>
                     <div class="preview__transaction-row u-grid">
                         <div class="u-cell u-cell--large--1-2">

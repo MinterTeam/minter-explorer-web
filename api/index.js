@@ -476,6 +476,10 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {string} [data.pubKey]
  * @property {string} [data.rewardAddress]
  * @property {string} [data.ownerAddress]
+ * @property {string} [data.controlAddress]
+ * -- type: TX_TYPE.EDIT_CANDIDATE_PUBLIC_KEY
+ * @property {string} [data.pubKey]
+ * @property {string} [data.newPubKey]
  * -- type: TX_TYPE.DELEGATE, TX_TYPE.UNBOND
  * @property {string} [data.pubKey]
  * @property {string} [data.coin]

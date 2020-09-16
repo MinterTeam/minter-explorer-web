@@ -171,7 +171,7 @@
                     return;
                 }
                 const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
-                return validator && validator.meta && validator.meta.name;
+                return validator && validator.name;
             },
         },
     };
