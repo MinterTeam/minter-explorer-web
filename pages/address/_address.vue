@@ -327,8 +327,8 @@
                 <dt>Balance</dt>
                 <dd>
                     <table class="table--balance">
-                        <tr v-for="balance in balanceList" :key="balance.coin">
-                            <td>{{ balance.coin }}</td>
+                        <tr v-for="balance in balanceList" :key="balance.coin.id">
+                            <td>{{ balance.coin.symbol }}</td>
                             <td :title="prettyPrecise(balance.amount)">{{ balance.amount | pretty }}</td>
                         </tr>
                     </table>

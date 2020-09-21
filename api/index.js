@@ -11,7 +11,7 @@ import {REWARD_CHART_TYPES, COIN_NAME, TX_STATUS} from '~/assets/variables';
  * @property {number} bipPriceBtc
  * @property {number} bipPriceChange - in %
  * @property {number} latestBlockHeight - block count
- * @property {number} averageBlockTime - in seconds
+ * @property {number} avgBlockTime - in seconds
  * @property {number} totalTransactions - tx count
  * @property {number} transactionsPerSecond - tps
  */
@@ -135,7 +135,7 @@ export function getTransactionChart() {
                     const iterationDate = new Date(firstDate + i * DAY_MS);
                     daysToAdd[i] = {
                         date: iterationDate.getUTCFullYear() + '-' + padZero(iterationDate.getUTCMonth() + 1) + '-' + padZero(iterationDate.getUTCDate()),
-                        txCount: 0,
+                        transactionCount: 0,
                     };
                 }
                 lastData = daysToAdd.concat(lastData);
@@ -144,7 +144,7 @@ export function getTransactionChart() {
 
             // format data for line chart.js
             return lastData.reduce((accum, item) => {
-                accum.data.push(item.txCount);
+                accum.data.push(item.transactionCount);
                 accum.labels.push(item.date);
                 return accum;
             }, {data: [], labels: []});
@@ -158,7 +158,7 @@ export function getTransactionChart() {
  * @return {Promise<BalanceData>}
  */
 export function getBalance(address) {
-    return explorer.get(`addresses/${address}?withSum=true`)
+    return explorer.get(`addresses/${address}?with_sum=true`)
         .then((response) => {
             const data = response.data.data;
             data.balances = prepareBalance(data.balances);
@@ -324,7 +324,7 @@ export function getAddressRewardChart(address, type = REWARD_CHART_TYPES.MONTH) 
 
 /**
  * @param {string} pubKey
- * @return {Promise<Validator>}
+ * @return {Promise<ValidatorFull>}
  */
 export function getValidator(pubKey) {
     return explorer.get(`validators/${pubKey}`)
@@ -337,6 +337,15 @@ export function getValidator(pubKey) {
 export function getValidatorList() {
     return explorer.get(`validators`)
         .then((response) => response.data.data);
+}
+
+/**
+ * @param {string} pubKey
+ * @return {Promise<StakeListInfo>}
+ */
+export function getValidatorStakeList(pubKey) {
+    return explorer.get(`validators/${pubKey}/stakes`)
+        .then((response) => response.data);
 }
 
 /**
@@ -360,63 +369,73 @@ export function getValidatorTransactionList(pubKey, params) {
  * @typedef {Object} Block
  * @property {number} height
  * @property {string} timestamp
- * @property {number} txCount - tx count in the block
+ * @property {number} transactionCount - tx count in the block
  * @property {number} size
  * @property {string} hash
  * @property {number} reward
  * @property {number} blockTime
  * @property {string} timestamp
- * @property {Array<ValidatorListItem>} validators
+ * @property {number} validatorsCount
+ * @property {Array<ValidatorListItem>} [validators]
  */
 
 /**
  * @typedef {Object} BalanceData
  * @property {string} totalBalanceSum
  * @property {string} totalBalanceSumUsd
- * @property {Array<CoinItem>} balances
+ * @property {Array<BalanceItem>} balances
  */
 
 /**
- * @typedef {Object} CoinItem
+ * @typedef {Object} BalanceItem
  * @property {string|number} amount
  * @property {string} coin
  */
 
 /**
+ * @typedef {Object} StakeListInfo
+ * @property {Array<StakeItem>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
  * @typedef {Object} StakeItem
- * @property {string} [pubKey]
- * @property {ValidatorMeta} [validatorMeta]
- * @property {string} [address]
+ * @property {string} coin
  * @property {string|number} value
  * @property {string|number} bipValue
- * @property {string} coin
+ * @property {Validator} [validator] - in address stakes
+ * @property {string} [address] - in validator stakes
  */
 
 /**
  * @typedef {Object} ValidatorListItem
- * @property {string} publicKey
- * @property {ValidatorMeta} validatorMeta
+ * @property {Validator} validator
  * @property {boolean} signed
  */
 
 /**
  * @typedef {Object} Validator
- * @property {string} [publicKey]
- * @property {ValidatorMeta} meta
+ * @property {string} publicKey
  * @property {number} status
- * @property {string|number} stake
- * @property {string|number} part
- * @property {number} delegatorCount
- * @property {Array<{coin: string, value: string, address: string}>} delegatorList
+ * @property {string} name - meta name
+ * @property {string} description - meta desc
+ * @property {string} iconUrl - meta icon
+ * @property {string} siteUrl - meta url
  */
 
 /**
- * @typedef {Object} ValidatorMeta
- * @property {string} name
- * @property {string} description
- * @property {string} iconUrl
- * @property {string} siteUrl
+ * @typedef {Validator} ValidatorFull
+ * @property {string|number} stake
+ * @property {string|number} minStake
+ * @property {string|number} part
+ * @property {number} commission
+ * @property {number} delegatorCount
+
+ * @property {Array<{coin: string, value: string, address: string}>} delegatorList
  */
+
+
+
 
 /**
  * @typedef {Object} Transaction
@@ -424,7 +443,7 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {string} hash
  * @property {string} status
  * @property {number} nonce
- * @property {number} block
+ * @property {number} height
  * @property {string} from
  * @property {string} timestamp
  * @property {string} gasCoin
@@ -457,6 +476,10 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {string} [data.pubKey]
  * @property {string} [data.rewardAddress]
  * @property {string} [data.ownerAddress]
+ * @property {string} [data.controlAddress]
+ * -- type: TX_TYPE.EDIT_CANDIDATE_PUBLIC_KEY
+ * @property {string} [data.pubKey]
+ * @property {string} [data.newPubKey]
  * -- type: TX_TYPE.DELEGATE, TX_TYPE.UNBOND
  * @property {string} [data.pubKey]
  * @property {string} [data.coin]
@@ -488,7 +511,7 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {string} timestamp
  * @property {string} role
  * @property {string} address
- * @property {string} validator
+ * @property {Validator} validator
  * @property {number} amount
  */
 

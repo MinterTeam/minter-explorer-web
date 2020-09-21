@@ -137,6 +137,7 @@
         },
         methods: {
             subscribeWS(connectData) {
+                console.log('connect', EXPLORER_RTM_URL);
                 centrifuge = new Centrifuge(EXPLORER_RTM_URL, {
                     // user: connectData.user ? connectData.user : '',
                     // timestamp: connectData.timestamp.toString(),

@@ -1,6 +1,6 @@
 <script>
     import {isValidPublicKeyString} from 'minterjs-util/src/prefix';
-    import {getValidatorTransactionList, getValidator} from "~/api";
+    import {getValidatorTransactionList, getValidator, getValidatorStakeList} from "~/api";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise, prettyRound} from '~/assets/utils';
@@ -49,12 +49,15 @@
             }
 
             const validatorPromise = getValidator(params.pubKey);
+            const stakeListPromise = getValidatorStakeList(params.pubKey);
             const txListPromise = getValidatorTransactionList(params.pubKey, query);
 
-            return Promise.all([validatorPromise, txListPromise])
-                .then(([validator, txListInfo]) => {
+            return Promise.all([validatorPromise, stakeListPromise, txListPromise])
+                .then(([validator, stakeListInfo, txListInfo]) => {
                     return {
                         validator,
+                        stakeList: stakeListInfo.data,
+                        stakePaginationInfo: stakeListInfo.meta,
                         txList: txListInfo.data,
                         txPaginationInfo: txListInfo.meta,
                     };
@@ -80,9 +83,11 @@
         },
         data() {
             return {
-                /** @type Validator|null */
+                /** @type ValidatorFull|null */
                 validator: null,
                 storedTabPages: {},
+                stakeList: [],
+                stakePaginationInfo: {},
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: false,
@@ -178,13 +183,13 @@
                 <dt>Public Key</dt>
                 <dd class="u-select-all">{{ $route.params.pubKey }}</dd>
 
-                <dt v-if="validator.meta && validator.meta.name">Name</dt>
-                <dd v-if="validator.meta && validator.meta.name">{{ validator.meta.name }}</dd>
+                <dt v-if="validator.name">Name</dt>
+                <dd v-if="validator.name">{{ validator.name }}</dd>
 
-                <dt v-if="validator.meta && (validator.meta.description || validator.meta.siteUrl)">Description</dt>
-                <dd v-if="validator.meta && (validator.meta.description || validator.meta.siteUrl)">
-                    {{ validator.meta.description }} <br v-if="validator.meta.description">
-                    <a class="link--main link--hover" :href="validator.meta.siteUrl">{{ validator.meta.siteUrl }}</a>
+                <dt v-if="validator.description || validator.siteUrl">Description</dt>
+                <dd v-if="validator.description || validator.siteUrl">
+                    {{ validator.description }} <br v-if="validator.description">
+                    <a class="link--main link--hover" :href="validator.siteUrl">{{ validator.siteUrl }}</a>
                 </dd>
 
                 <!-- @TODO owner address -->
@@ -227,7 +232,7 @@
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-validator="$route.params.pubKey" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
             <!-- Delegation -->
-            <StakeListTable :stake-list="validator.delegatorList" stake-item-type="delegator" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
+            <StakeListTable :stake-list="stakeList" stake-item-type="delegator" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
 

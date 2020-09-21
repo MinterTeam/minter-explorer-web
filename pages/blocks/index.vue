@@ -96,10 +96,10 @@
                     <tr v-for="block in blockListFormatted" :key="block.height">
                         <td><nuxt-link class="link--default" :to="'/blocks/' + block.height">{{ block.height | prettyRound }}</nuxt-link></td>
                         <td>{{ block.timeLocal}}</td>
-                        <td><span v-if="block.validators.length">{{ block.validators.length }}</span></td>
+                        <td>{{ block.validatorsCount }}</td>
                         <td>
-                            <nuxt-link class="link--default" :to="'/blocks/' + block.height" v-if="block.txCount">{{ block.txCount }}</nuxt-link>
-                            <span v-else>{{ block.txCount }}</span>
+                            <nuxt-link class="link--default" :to="'/blocks/' + block.height" v-if="block.transactionCount">{{ block.transactionCount }}</nuxt-link>
+                            <span v-else>{{ block.transactionCount }}</span>
                         </td>
                         <td>{{ block.size | prettyRound }} bytes</td>
                         <td>{{ $store.state.COIN_NAME }} {{ block.reward | pretty }}</td>

@@ -4,10 +4,11 @@ services:
   app:
     build:
       context: ./
+      dockerfile: .docker/Dockerfile
       args:
         APP_ENV: ${APP_ENV}
         APP_EXPLORER_API_URL: ${APP_EXPLORER_API_URL}
         APP_EXPLORER_RTM_URL: ${APP_EXPLORER_RTM_URL}
         APP_GATE_API_URL: ${APP_GATE_API_URL}
     ports:
-      -  ${EXPLORER_WEB_PORT}:80
+      -  ${WEB_PORT_FOR_DOCKER_COMPOSE}:80

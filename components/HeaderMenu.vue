@@ -1,18 +1,18 @@
 <script>
-    import {MAINNET_WEB_URL, HISTORY_WEB_URL, PURPOSE} from "~/assets/variables";
+    import {MAINNET_WEB_URL, HISTORY_WEB_URL, PURPOSE, NETWORK, MAINNET} from "~/assets/variables";
 
     export default {
         computed: {
-            isMain() {
-                return PURPOSE !== 'history';
+            isMainnet() {
+                return NETWORK === MAINNET;
             },
             isHistory() {
                 return PURPOSE === 'history';
             },
-            mainnetUrl() {
-                return this.isMain ? false : MAINNET_WEB_URL;
+            externalMainnetUrl() {
+                return this.isMainnet && !this.isHistory ? false : MAINNET_WEB_URL;
             },
-            historyUrl() {
+            externalHistoryUrl() {
                 return this.isHistory ? false : HISTORY_WEB_URL;
             },
         },
@@ -21,9 +21,9 @@
 
 <template>
     <div class="header__menu u-hidden-large-down">
-        <a class="header__link" :href="mainnetUrl" v-if="mainnetUrl">Mainnet</a>
+        <a class="header__link" :href="externalMainnetUrl" v-if="externalMainnetUrl">Mainnet</a>
         <nuxt-link class="header__link is-active" to="/" v-else>Mainnet</nuxt-link>
-        <a class="header__link" :href="historyUrl" v-if="historyUrl">History</a>
+        <a class="header__link" :href="externalHistoryUrl" v-if="externalHistoryUrl">History</a>
         <nuxt-link class="header__link is-active" to="/" v-else>History</nuxt-link>
     </div>
 </template>

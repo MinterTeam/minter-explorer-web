@@ -32,10 +32,10 @@
         },
         methods: {
             getValidatorName(item) {
-                return item.validatorMeta && item.validatorMeta.name;
+                return item.validator.name;
             },
             getLabel(item) {
-                const name = this.getValidatorName(item) || item.validator;
+                const name = item.validator.name || item.validator.publicKey;
                 return name.toString();
             },
         },
@@ -65,11 +65,11 @@
                 <!-- Time -->
                 <td>
                     <template v-if="dataType === $options.TYPE_REWARD">
-                        {{ $options.getDate(dataItem.timestamp) }}
+                        {{ $options.getDate(dataItem.timeId) }}
                     </template>
                     <template v-else>
-                        {{ $options.getTimeMinutes(dataItem.timestamp) }}
-                        <span class="u-text-muted">{{ $options.getTimeZone(dataItem.timestamp) }}</span>
+                        {{ $options.getTimeMinutes(dataItem.timeId) }}
+                        <span class="u-text-muted">{{ $options.getTimeZone(dataItem.timeId) }}</span>
                     </template>
                 </td>
                 <!-- block -->
@@ -83,8 +83,8 @@
                 <!-- public key -->
                 <td>
                     <TableLink :link-text="getLabel(dataItem)"
-                               :link-path="'/validator/' + dataItem.validator"
-                               :should-not-shorten="!!getValidatorName(dataItem)"
+                               :link-path="'/validator/' + dataItem.validator.publicKey"
+                               :should-not-shorten="!!dataItem.validator.name"
                     />
                 </td>
                 <!-- value -->
