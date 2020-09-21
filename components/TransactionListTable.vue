@@ -274,11 +274,11 @@
                                 {{ tx.data.symbol }}
                             </div>
                             <div class="table__inner-item" v-if="tx.data.initialAmount">
-                                <strong>Initial Amount</strong> <br>
+                                <strong>Initial amount</strong> <br>
                                 {{ tx.data.initialAmount | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="tx.data.initialReserve">
-                                <strong>Initial Reserve</strong> <br>
+                                <strong>Initial reserve</strong> <br>
                                 {{ tx.data.initialReserve | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="tx.data.constantReserveRatio">
@@ -286,7 +286,7 @@
                                 {{ tx.data.constantReserveRatio }}&thinsp;%
                             </div>
                             <div class="table__inner-item" v-if="tx.data.maxSupply">
-                                <strong>Max Supply</strong> <br>
+                                <strong>Max supply</strong> <br>
                                 {{ prettyRound(tx.data.maxSupply) }}
                             </div>
 
@@ -300,7 +300,7 @@
                                 />
                             </div>
                             <div class="table__inner-item" v-if="tx.data.pubKey">
-                                <strong>Public Key</strong> <br>
+                                <strong>Public key</strong> <br>
                                 <TableLink :link-text="tx.data.pubKey"
                                            :link-path="'/validator/' + tx.data.pubKey"
                                            :is-not-link="isCurrentValidator(tx.data.pubKey)"
@@ -316,27 +316,34 @@
                                 {{ tx.data.commission }}&thinsp;%
                             </div>
                             <div class="table__inner-item" v-if="isUnbond(tx)">
-                                <strong>Unbond Block</strong> <br>
+                                <strong>Unbond block</strong> <br>
                                 {{ prettyRound(tx.height + $options.UNBOND_PERIOD) }}
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.rewardAddress">
-                                <strong>Reward Address</strong> <br>
-                                <TableLink :link-text="tx.data.rewardAddress"
-                                           :link-path="'/address/' + tx.data.rewardAddress"
-                                           :is-not-link="isCurrentAddress(tx.data.rewardAddress)"
-                                />
-                            </div>
                             <div class="table__inner-item" v-if="tx.data.ownerAddress">
-                                <strong>Owner Address</strong> <br>
+                                <strong>Owner address</strong> <br>
                                 <TableLink :link-text="tx.data.ownerAddress"
                                            :link-path="'/address/' + tx.data.ownerAddress"
                                            :is-not-link="isCurrentAddress(tx.data.ownerAddress)"
                                 />
                             </div>
+                            <div class="table__inner-item" v-if="tx.data.rewardAddress">
+                                <strong>Reward address</strong> <br>
+                                <TableLink :link-text="tx.data.rewardAddress"
+                                           :link-path="'/address/' + tx.data.rewardAddress"
+                                           :is-not-link="isCurrentAddress(tx.data.rewardAddress)"
+                                />
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.controlAddress">
+                                <strong>Control address</strong> <br>
+                                <TableLink :link-text="tx.data.controlAddress"
+                                           :link-path="'/address/' + tx.data.controlAddress"
+                                           :is-not-link="isCurrentAddress(tx.data.controlAddress)"
+                                />
+                            </div>
 
                             <!-- type REDEEM_CHECK -->
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.sender">
-                                <strong>Check Issuer</strong> <br>
+                                <strong>Check issuer</strong> <br>
                                 <TableLink :link-text="tx.data.check.sender"
                                            :link-path="'/address/' + tx.data.check.sender"
                                            :is-not-link="isCurrentAddress(tx.data.check.sender)"
@@ -344,17 +351,17 @@
                                 />
                             </div>
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.nonce">
-                                <strong>Check Nonce</strong> <br>
+                                <strong>Check nonce</strong> <br>
                                 {{ fromBase64(tx.data.check.nonce) }}
                             </div>
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.dueBlock">
-                                <strong>Due Block</strong> <br>
+                                <strong>Due block</strong> <br>
                                 {{ tx.data.check.dueBlock }}
                             </div>
 
                             <!-- type CREATE_MULTISIG -->
                             <div class="table__inner-item" v-if="tx.data.multisigAddress">
-                                <strong>Multisig Address</strong> <br>
+                                <strong>Multisig address</strong> <br>
                                 <TableLink :link-text="tx.data.multisigAddress"
                                            :link-path="'/address/' + tx.data.multisigAddress"
                                            :should-not-shorten="true"

@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: ./
-      dockerfile: .docker/Dockerfileasd
+      dockerfile: .docker/Dockerfile
       args:
         APP_ENV: ${APP_ENV}
         APP_EXPLORER_API_URL: ${APP_EXPLORER_API_URL}
