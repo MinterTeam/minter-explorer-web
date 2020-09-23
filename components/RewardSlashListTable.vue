@@ -65,16 +65,16 @@
                 <!-- Time -->
                 <td>
                     <template v-if="dataType === $options.TYPE_REWARD">
-                        {{ $options.getDate(dataItem.timeId) }}
+                        {{ $options.getDate(dataItem.timestamp) }}
                     </template>
                     <template v-else>
-                        {{ $options.getTimeMinutes(dataItem.timeId) }}
-                        <span class="u-text-muted">{{ $options.getTimeZone(dataItem.timeId) }}</span>
+                        {{ $options.getTimeMinutes(dataItem.timestamp) }}
+                        <span class="u-text-muted">{{ $options.getTimeZone(dataItem.timestamp) }}</span>
                     </template>
                 </td>
                 <!-- block -->
                 <td v-if="dataType === $options.TYPE_SLASH">
-                    <TableLink :link-text="dataItem.block" :link-path="'/blocks/' + dataItem.block"/>
+                    <TableLink :link-text="dataItem.height" :link-path="'/blocks/' + dataItem.height"/>
                 </td>
                 <!-- type -->
                 <td v-if="dataType === $options.TYPE_REWARD">
@@ -89,7 +89,7 @@
                 </td>
                 <!-- value -->
                 <td>
-                    {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin }} {{ $options.prettyPrecise(dataItem.amount) }}
+                    {{ dataType === 'reward' ? $store.state.COIN_NAME : dataItem.coin.symbol }} {{ $options.prettyPrecise(dataItem.amount) }}
                 </td>
             </tr>
             </tbody>
