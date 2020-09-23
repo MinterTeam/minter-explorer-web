@@ -17,6 +17,7 @@ Object.keys(dotEnvExample).forEach((key) => {
 import {BASE_TITLE, BASE_DESCRIPTION} from "./assets/variables";
 
 module.exports = {
+    ssr: false,
     /*
     ** Headers of the page
     */

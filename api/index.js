@@ -507,7 +507,7 @@ export function getValidatorTransactionList(pubKey, params) {
 
 /**
  * @typedef {Object} Reward
- * @property {number} [block]
+ * @property {number} [height]
  * @property {string} timestamp
  * @property {string} role
  * @property {string} address
@@ -517,7 +517,7 @@ export function getValidatorTransactionList(pubKey, params) {
 
 /**
  * @typedef {Object} Slash
- * @property {number} block
+ * @property {number} height
  * @property {string} timestamp
  * @property {string} address
  * @property {string} validator
