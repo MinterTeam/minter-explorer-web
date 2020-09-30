@@ -323,11 +323,11 @@ export function getAddressRewardChart(address, type = REWARD_CHART_TYPES.MONTH) 
 
 
 /**
- * @param {string} pubKey
+ * @param {string} publicKey
  * @return {Promise<ValidatorFull>}
  */
-export function getValidator(pubKey) {
-    return explorer.get(`validators/${pubKey}`)
+export function getValidator(publicKey) {
+    return explorer.get(`validators/${publicKey}`)
         .then((response) => response.data.data);
 }
 
@@ -340,23 +340,30 @@ export function getValidatorList() {
 }
 
 /**
- * @param {string} pubKey
+ * @param {string} publicKey
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
  * @return {Promise<StakeListInfo>}
  */
-export function getValidatorStakeList(pubKey) {
-    return explorer.get(`validators/${pubKey}/stakes`)
+export function getValidatorStakeList(publicKey, params = {}) {
+    params = {
+        ...params,
+        limit: params.limit || 100,
+    };
+    return explorer.get(`validators/${publicKey}/stakes`, {params})
         .then((response) => response.data);
 }
 
 /**
- * @param {string} pubKey
+ * @param {string} publicKey
  * @param {Object} [params]
  * @param {number} [params.page]
  * @param {number} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
-export function getValidatorTransactionList(pubKey, params) {
-    return explorer.get(`validators/${pubKey}/transactions`, {params})
+export function getValidatorTransactionList(publicKey, params) {
+    return explorer.get(`validators/${publicKey}/transactions`, {params})
         .then((response) => response.data);
 }
 
@@ -405,6 +412,7 @@ export function getValidatorTransactionList(pubKey, params) {
  * @property {string|number} bipValue
  * @property {Validator} [validator] - in address stakes
  * @property {string} [address] - in validator stakes
+ * @property {boolean} isWaitlisted
  */
 
 /**

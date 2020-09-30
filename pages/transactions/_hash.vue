@@ -79,7 +79,7 @@
                 if (!this.tx || !this.isUnbond(this.tx)) {
                     return;
                 }
-                return this.tx.block + UNBOND_PERIOD;
+                return this.tx.height + UNBOND_PERIOD;
             },
             isUnbondBlock() {
                 return this.unbondOrLastBlock && this.unbondOrLastBlock.height === this.unbondBlockHeight;
@@ -323,7 +323,7 @@
                 <dt v-if="tx.data.check && tx.data.check.dueBlock">Due Block</dt>
                 <dd v-if="tx.data.check && tx.data.check.dueBlock">{{ tx.data.check.dueBlock }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
-                <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.coin }} {{ tx.data.check.value | prettyExact }}</dd>
+                <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.coin.symbol }} {{ tx.data.check.value | prettyExact }}</dd>
 
                 <!-- MULTISEND -->
                 <dt v-if="tx.data.list">#Recipients</dt>
