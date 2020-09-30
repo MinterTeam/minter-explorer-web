@@ -131,6 +131,9 @@
                     return accumulator + Number(item.bipValue);
                 }, 0);
             },
+            isGroupHasWaitlisted(stakeGroup) {
+                return stakeGroup.stakeList.some((item) => item.isWaitlisted);
+            },
             isGroupCanExpand(stakeGroup) {
                 return stakeGroup.stakeList.length > 1;
             },
@@ -278,6 +281,7 @@
                                         </button>
                     -->
                 </th>
+                <th class="table__cell-waitlist"><!-- Waitlist--></th>
                 <th>
                     Coins
                     <!--
@@ -323,6 +327,12 @@
                                                 <div class="u-hidden-medium-up" v-else>{{ stakeGroup.stakeList[0].coin }} {{ $options.pretty(stakeGroup.stakeList[0].value) }}</div>
                         -->
                     </td>
+                    <!-- waitlist-->
+                    <td class="table__cell-waitlist">
+                        <template v-if="isGroupHasWaitlisted(stakeGroup)">
+                            <span class="u-emoji" :class="{'u-visually-hidden': expandedList[stakeGroup.hash]}">⚠️</span>
+                        </template>
+                    </td>
                     <!-- coin list -->
                     <td class="u-hidden-medium-down">
                         <span v-if="isGroupCanExpand(stakeGroup)" class="u-text-normal" :class="{'u-visually-hidden': expandedList[stakeGroup.hash]}">
@@ -354,23 +364,28 @@
                     </td>
                 </tr>
                 <tr class="u-hidden-medium-up" :class="{'is-expanded': expandedList[stakeGroup.hash]}" :key="`${stakeGroup.hash}-mobile`">
-                    <!-- hash -->
-                    <td colspan="2">
+                    <!-- mobile common values -->
+                    <td colspan="3">
                         <div v-if="isGroupCanExpand(stakeGroup)">
                             <div v-if="!expandedList[stakeGroup.hash]" class="u-text-normal">
                                 {{ getGroupCoinListLabel(stakeGroup) }}
                             </div>
-                            <div :title="$options.prettyPrecise(getGroupBipValue(stakeGroup))">
-                                {{ $options.pretty(getGroupBipValue(stakeGroup)) }}
+                            <div class="u-text-muted" :title="$options.prettyPrecise(getGroupBipValue(stakeGroup))">
+                                Total: {{ $options.pretty(getGroupBipValue(stakeGroup)) }} {{ $store.getters.COIN_NAME }}
                             </div>
                         </div>
                         <div v-else>{{ stakeGroup.stakeList[0].coin.symbol }} {{ $options.pretty(stakeGroup.stakeList[0].value) }}</div>
                     </td>
                 </tr>
+                <!-- expanded stake items -->
                 <template v-if="isGroupCanExpand(stakeGroup) && expandedList[stakeGroup.hash]">
                     <tr v-for="stakeItem in stakeGroup.stakeList" :key="stakeGroup.hash + stakeItem.coin.id" class="is-expanded">
                         <!-- hash -->
                         <td class="u-hidden-medium-down"></td>
+                        <!-- waitlist-->
+                        <td class="u-hidden-medium-down table__cell-waitlist">
+                            <span class="u-emoji" v-if="stakeItem.isWaitlisted">⚠️</span>
+                        </td>
                         <!-- coin -->
                         <td class="u-hidden-medium-down">{{ stakeItem.coin.symbol }}</td>
                         <!-- amount (colspan control cell) -->
@@ -381,6 +396,10 @@
                             <div class="u-text-muted" :title="$options.prettyPrecise(stakeItem.bipValue)" v-if="stakeItem.coin.symbol !== $store.getters.COIN_NAME">
                                 {{ $store.getters.COIN_NAME }} {{ $options.pretty(stakeItem.bipValue) }}
                             </div>
+                        </td>
+                        <!-- waitlist-->
+                        <td class="u-hidden-medium-up table__cell-waitlist">
+                            <span class="u-emoji" v-if="stakeItem.isWaitlisted">⚠️</span>
                         </td>
                     </tr>
                 </template>

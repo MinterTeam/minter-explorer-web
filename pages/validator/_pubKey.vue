@@ -48,9 +48,11 @@
                 });
             }
 
+            const activeTab = ensureTab(query.active_tab);
+
             const validatorPromise = getValidator(params.pubKey);
-            const stakeListPromise = getValidatorStakeList(params.pubKey);
-            const txListPromise = getValidatorTransactionList(params.pubKey, query);
+            const stakeListPromise = getValidatorStakeList(params.pubKey, activeTab === TAB_TYPES.STAKE ? query : undefined);
+            const txListPromise = getValidatorTransactionList(params.pubKey, activeTab === TAB_TYPES.TX ? query : undefined);
 
             return Promise.all([validatorPromise, stakeListPromise, txListPromise])
                 .then(([validator, stakeListInfo, txListInfo]) => {
@@ -88,6 +90,7 @@
                 storedTabPages: {},
                 stakeList: [],
                 stakePaginationInfo: {},
+                isStakeListLoading: false,
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: false,
@@ -107,6 +110,9 @@
                         if (this.activeTab === TAB_TYPES.TX) {
                             this.fetchTxs();
                         }
+                        if (this.activeTab === TAB_TYPES.STAKE) {
+                            this.fetchStakes();
+                        }
                     }
                 },
             },
@@ -118,6 +124,9 @@
             activePaginationInfo() {
                 if (this.activeTab === TAB_TYPES.TX) {
                     return this.txPaginationInfo;
+                }
+                if (this.activeTab === TAB_TYPES.STAKE) {
+                    return this.stakePaginationInfo;
                 }
                 return false;
             },
@@ -146,6 +155,18 @@
 
                 // wait for rewards chart to disappear
                 // this.$nextTick(this.checkPanelPosition);
+            },
+            fetchStakes() {
+                this.isStakeListLoading = true;
+                getValidatorStakeList(this.$route.params.pubKey, this.$route.query)
+                    .then((stakeListInfo) => {
+                        this.stakeList = stakeListInfo.data;
+                        this.stakePaginationInfo = stakeListInfo.meta;
+                        this.isStakeListLoading = false;
+                    })
+                    .catch(() => {
+                        this.isStakeListLoading = false;
+                    });
             },
             fetchTxs() {
                 this.isTxListLoading = true;
@@ -232,7 +253,7 @@
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-validator="$route.params.pubKey" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
             <!-- Delegation -->
-            <StakeListTable :stake-list="stakeList" stake-item-type="delegator" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
+            <StakeListTable :stake-list="stakeList" stake-item-type="delegator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
 
