@@ -3,10 +3,15 @@
     import {pretty, prettyPrecise, getExplorerValidatorUrl, getExplorerAddressUrl} from '~/assets/utils';
     import TableLink from "~/components/TableLink";
 
+    const STAKE_TYPE_VALIDATOR = 'validator'; // delegator page: list of validators for current delegator
+    const STAKE_TYPE_DELEGATOR = 'delegator'; // validator page: list of delegations to validator
+
     let resizeHandler;
 
     export default {
         name: 'StakeListTable',
+        STAKE_TYPE_VALIDATOR,
+        STAKE_TYPE_DELEGATOR,
         pretty,
         prettyPrecise,
         components: {
@@ -23,7 +28,7 @@
             },
             stakeItemType: {
                 type: String,
-                default: 'validator',
+                default: STAKE_TYPE_VALIDATOR,
             },
             isLoading: {
                 type: Boolean,
@@ -39,15 +44,15 @@
                     value: -1,
                     coin: 0,
                 },
-                expandedList: {/* {hash: boolean} */},
+                isExpandedList: {/* {hash: boolean} */},
             };
         },
         computed: {
             hashName() {
-                if (this.stakeItemType === 'validator') {
+                if (this.stakeItemType === STAKE_TYPE_VALIDATOR) {
                     return 'Validator';
                 }
-                if (this.stakeItemType === 'delegator') {
+                if (this.stakeItemType === STAKE_TYPE_DELEGATOR) {
                     return 'Address';
                 }
                 return '';
@@ -138,33 +143,33 @@
                 return stakeGroup.stakeList.length > 1;
             },
             toggleExpand(hash) {
-                this.expandedList = {[hash]: !this.expandedList[hash]};
+                this.isExpandedList = {[hash]: !this.isExpandedList[hash]};
                 // this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
             },
             getValidatorName(stakeItem) {
                 return stakeItem.validator?.name;
             },
             getLabel(stakeItem) {
-                if (this.stakeItemType === 'validator') {
+                if (this.stakeItemType === STAKE_TYPE_VALIDATOR) {
                     return stakeItem.validator.publicKey;
                 }
-                if (this.stakeItemType === 'delegator') {
+                if (this.stakeItemType === STAKE_TYPE_DELEGATOR) {
                     return stakeItem.address;
                 }
             },
             getUrl(stakeItem) {
-                if (this.stakeItemType === 'validator') {
+                if (this.stakeItemType === STAKE_TYPE_VALIDATOR) {
                     return getExplorerValidatorUrl(stakeItem.validator.publicKey);
                 }
-                if (this.stakeItemType === 'delegator') {
+                if (this.stakeItemType === STAKE_TYPE_DELEGATOR) {
                     return getExplorerAddressUrl(stakeItem.address);
                 }
             },
             getShouldShortenLabel() {
-                if (this.stakeItemType === 'validator') {
+                if (this.stakeItemType === STAKE_TYPE_VALIDATOR) {
                     return process.client && window.innerWidth < 1280;
                 }
-                if (this.stakeItemType === 'delegator') {
+                if (this.stakeItemType === STAKE_TYPE_DELEGATOR) {
                     return process.client && window.innerWidth < 600;
                 }
             },
@@ -305,7 +310,8 @@
             </thead>
             <tbody>
             <template v-for="stakeGroup in stakeListGrouped">
-                <tr class="table__row-lead--medium-down" :class="{'is-expanded': expandedList[stakeGroup.hash]}" :key="stakeGroup.hash">
+                <!-- desktop overall values -->
+                <tr class="table__row-lead--medium-down" :class="{'is-expanded': isExpandedList[stakeGroup.hash], 'is-waitlisted': isGroupHasWaitlisted(stakeGroup) && !isExpandedList[stakeGroup.hash]}" :key="stakeGroup.hash">
                     <!-- hash -->
                     <td>
                         <div class="table__cell-title" v-if="getValidatorName(stakeGroup.stakeList[0])">{{ getValidatorName(stakeGroup.stakeList[0]) }}</div>
@@ -317,7 +323,7 @@
                         />
                         <!--
                                                 <div v-if="isGroupCanExpand(stakeGroup)" class="u-hidden-medium-up">
-                                                    <div v-if="!expandedList[stakeGroup.hash]" class="u-text-normal">
+                                                    <div v-if="!isExpandedList[stakeGroup.hash]" class="u-text-normal">
                                                         {{ getGroupCoinList(stakeGroup).join(', ') }}
                                                     </div>
                                                     <div :title="$options.prettyPrecise(getGroupBipValue(stakeGroup))">
@@ -329,13 +335,14 @@
                     </td>
                     <!-- waitlist-->
                     <td class="table__cell-waitlist">
-                        <template v-if="isGroupHasWaitlisted(stakeGroup)">
-                            <span class="u-emoji" :class="{'u-visually-hidden': expandedList[stakeGroup.hash]}">⚠️</span>
-                        </template>
+                        <span class="u-emoji u-hidden-medium-down"
+                              :class="{'u-visually-hidden': isExpandedList[stakeGroup.hash]}"
+                              title="Stake is dropped to wait list, top up or unbond it"
+                              v-if="isGroupHasWaitlisted(stakeGroup)">⚠️</span>
                     </td>
                     <!-- coin list -->
                     <td class="u-hidden-medium-down">
-                        <span v-if="isGroupCanExpand(stakeGroup)" class="u-text-normal" :class="{'u-visually-hidden': expandedList[stakeGroup.hash]}">
+                        <span v-if="isGroupCanExpand(stakeGroup)" class="u-text-normal" :class="{'u-visually-hidden': isExpandedList[stakeGroup.hash]}">
                             {{ getGroupCoinListLabel(stakeGroup) }}
                         </span>
                         <span v-else>{{ stakeGroup.stakeList[0].coin.symbol }}</span>
@@ -355,7 +362,7 @@
                     <!-- controls -->
                     <td class="table__controls-cell">
                         <button class="table__controls-button table__controls-button--expand u-semantic-button link--opacity"
-                                :class="{'is-expanded': expandedList[stakeGroup.hash]}"
+                                :class="{'is-expanded': isExpandedList[stakeGroup.hash]}"
                                 v-if="isGroupCanExpand(stakeGroup)"
                                 @click="toggleExpand(stakeGroup.hash)"
                         >
@@ -363,11 +370,11 @@
                         </button>
                     </td>
                 </tr>
-                <tr class="u-hidden-medium-up" :class="{'is-expanded': expandedList[stakeGroup.hash]}" :key="`${stakeGroup.hash}-mobile`">
-                    <!-- mobile common values -->
-                    <td colspan="3">
+                <!-- mobile overall values -->
+                <tr class="u-hidden-medium-up" :class="{'is-expanded': isExpandedList[stakeGroup.hash], 'is-waitlisted': isGroupHasWaitlisted(stakeGroup) && !isExpandedList[stakeGroup.hash]}" :key="`${stakeGroup.hash}-mobile`">
+                    <td colspan="2">
                         <div v-if="isGroupCanExpand(stakeGroup)">
-                            <div v-if="!expandedList[stakeGroup.hash]" class="u-text-normal">
+                            <div v-if="!isExpandedList[stakeGroup.hash]" class="u-text-normal">
                                 {{ getGroupCoinListLabel(stakeGroup) }}
                             </div>
                             <div class="u-text-muted" :title="$options.prettyPrecise(getGroupBipValue(stakeGroup))">
@@ -376,15 +383,21 @@
                         </div>
                         <div v-else>{{ stakeGroup.stakeList[0].coin.symbol }} {{ $options.pretty(stakeGroup.stakeList[0].value) }}</div>
                     </td>
+                    <td class="table__cell-waitlist">
+                        <span class="u-emoji"
+                              :class="{'u-visually-hidden': isExpandedList[stakeGroup.hash]}"
+                              title="Stake is dropped to wait list, top up or unbond it"
+                              v-if="isGroupHasWaitlisted(stakeGroup)">⚠️</span>
+                    </td>
                 </tr>
                 <!-- expanded stake items -->
-                <template v-if="isGroupCanExpand(stakeGroup) && expandedList[stakeGroup.hash]">
-                    <tr v-for="stakeItem in stakeGroup.stakeList" :key="stakeGroup.hash + stakeItem.coin.id" class="is-expanded">
+                <template v-if="isGroupCanExpand(stakeGroup) && isExpandedList[stakeGroup.hash]">
+                    <tr v-for="stakeItem in stakeGroup.stakeList" :key="stakeGroup.hash + stakeItem.coin.id" class="is-expanded" :class="{'is-waitlisted': stakeItem.isWaitlisted}">
                         <!-- hash -->
                         <td class="u-hidden-medium-down"></td>
                         <!-- waitlist-->
                         <td class="u-hidden-medium-down table__cell-waitlist">
-                            <span class="u-emoji" v-if="stakeItem.isWaitlisted">⚠️</span>
+                            <span class="u-emoji" v-if="stakeItem.isWaitlisted" title="Stake is dropped to wait list, top up or unbond it">⚠️</span>
                         </td>
                         <!-- coin -->
                         <td class="u-hidden-medium-down">{{ stakeItem.coin.symbol }}</td>
@@ -405,10 +418,14 @@
                 </template>
             </template>
             </tbody>
-            <tfoot v-if="stakeListGrouped.length > 1">
+            <tfoot v-if="stakeListGrouped.length > 1 && stakeItemType === $options.STAKE_TYPE_VALIDATOR">
             <tr>
-                <td colspan="2">Total</td>
-                <td colspan="2">{{ $options.pretty(totalStake) }} {{ $store.getters.COIN_NAME }}</td>
+                <!-- hash -->
+                <td>Total</td>
+                <!-- placeholder for waitlist and coin-->
+                <td colspan="2" class="u-hidden-medium-down"></td>
+                <!-- amount (colspan controls)-->
+                <td colspan="2" class="table__cell-total-amount">{{ $options.pretty(totalStake) }} {{ $store.getters.COIN_NAME }}</td>
             </tr>
             </tfoot>
         </table>
