@@ -24,10 +24,10 @@
                 this.query = '';
             },
             inputFocus() {
-                this.$emit('inputFocus');
+                this.$emit('input-focus');
             },
             inputBlur() {
-                this.$emit('inputBlur');
+                this.$emit('input-blur');
             },
         },
     };
