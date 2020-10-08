@@ -367,6 +367,42 @@ export function getValidatorTransactionList(publicKey, params) {
         .then((response) => response.data);
 }
 
+/**
+ * @return {Promise<Array<CoinItem>>}
+ */
+export function getCoinList() {
+    return explorer.get('coins')
+        .then((response) => response.data.data);
+    // don't sort, coins already sorted by reserve
+    // .then((response) => response.data.data.sort((a, b) => {
+    //     if (a.symbol === COIN_NAME) {
+    //         return -1;
+    //     } else if (b.symbol === COIN_NAME) {
+    //         return 1;
+    //     } else {
+    //         return a.symbol.localeCompare(b.symbol);
+    //     }
+    // }));
+}
+
+
+/**
+ * @param {number} id
+ * @return {Promise<CoinItem>}
+ */
+export function getCoinById(id) {
+    id = Number(id);
+    return getCoinList()
+        .then((coinList) => {
+            const coin = coinList.find((item) => item.id === id);
+            if (!coin) {
+                throw new Error(`Coin with ID ${id} not found`);
+            }
+
+            return coin;
+        });
+}
+
 // export function getWebSocketConnectData() {
 //     return explorer.get('settings/get-ws-data')
 //         .then((response) => response.data.data);
@@ -468,6 +504,7 @@ export function getValidatorTransactionList(publicKey, params) {
  * @property {number} [data.valueToSell]
  * @property {number} [data.valueToBuy]
  * -- type: TX_TYPE.CREATE_COIN
+ * @property {number} [data.createdCoinId]
  * @property {string} [data.name]
  * @property {string} [data.symbol]
  * @property {number} [data.initialAmount]
@@ -531,5 +568,15 @@ export function getValidatorTransactionList(publicKey, params) {
  * @property {string} validator
  * @property {number} amount
  * @property {string} coin
+ */
+
+/**
+ * @typedef {Object} CoinItem
+ * @property {number} id
+ * @property {number} crr
+ * @property {number|string} volume
+ * @property {number|string} reserve_balance
+ * @property {string} name
+ * @property {string} symbol
  */
 

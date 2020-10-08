@@ -39,7 +39,7 @@
                     <div class="header__logo-text">Explorer</div>
                 </nuxt-link>
                 <HeaderMenu class="u-hidden-large-down"/>
-                <Search :class="{'header__search--expanded': isSearchFocused}" @inputFocus="inputFocus" @inputBlur="inputBlur"/>
+                <Search :class="{'header__search--expanded': isSearchFocused}" @input-focus="inputFocus" @input-blur="inputBlur"/>
             </div>
         </header>
         <HeaderMenu class="u-hidden-large-up"/>

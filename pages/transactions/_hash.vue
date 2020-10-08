@@ -3,7 +3,7 @@
     import Big from 'big.js';
     import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
-    import {getTransaction, getBlock, getBlockList} from "~/api";
+    import {getTransaction, getBlock, getBlockList, getCoinById} from "~/api";
     import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -72,6 +72,7 @@
                 tx: null,
                 shouldShortenAddress: this.getShouldShortenAddress(),
                 unbondOrLastBlock: null,
+                currentCoinSymbol: '',
             };
         },
         computed: {
@@ -112,6 +113,7 @@
                 this.fetchTx();
             } else {
                 this.fetchUnbondBlock();
+                this.fetchCreatedCoinCurrentSymbol();
             }
             if (process.client) {
                 resizeHandler = debounce(() => {
@@ -137,6 +139,7 @@
                         this.tx = tx;
                         fetchTxTimer = null;
                         this.fetchUnbondBlock();
+                        this.fetchCreatedCoinCurrentSymbol();
                     })
                     .catch((e) => {
                         if (fetchTxDestroy) {
@@ -165,6 +168,15 @@
                         })
                         .catch((e) => {
                             console.log('Unable to get block', e);
+                        });
+                }
+            },
+            fetchCreatedCoinCurrentSymbol() {
+                if (this.tx.data.createdCoinId) {
+                    getCoinById(this.tx.data.createdCoinId)
+                        .then((coinItem) => this.currentCoinSymbol = coinItem.symbol)
+                        .catch((e) => {
+                            console.log('Unable to get current coin', e);
                         });
                 }
             },
@@ -275,10 +287,15 @@
                 <dd v-if="isBuy(tx)">{{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | prettyExact }}</dd>
 
                 <!-- CREATE_COIN, EDIT_COIN_OWNER -->
+                <dt v-if="tx.data.createdCoinId">Coin ID</dt>
+                <dd v-if="tx.data.createdCoinId">{{ tx.data.createdCoinId }}</dd>
                 <dt v-if="tx.data.name">Name</dt>
                 <dd v-if="tx.data.name">{{ tx.data.name }}</dd>
                 <dt v-if="tx.data.symbol">Symbol</dt>
                 <dd v-if="tx.data.symbol">{{ tx.data.symbol }}</dd>
+                <dt v-if="currentCoinSymbol && currentCoinSymbol !== tx.data.symbol">Symbol current</dt>
+                <dd v-if="currentCoinSymbol">{{ currentCoinSymbol }}</dd>
+
                 <dt v-if="tx.data.initialAmount">Initial amount</dt>
                 <dd v-if="tx.data.initialAmount">{{ tx.data.initialAmount | prettyExact }}</dd>
                 <dt v-if="tx.data.initialReserve">Initial reserve</dt>

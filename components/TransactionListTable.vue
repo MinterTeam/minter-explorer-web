@@ -265,6 +265,10 @@
                             </div>
 
                             <!-- type CREATE_COIN -->
+                            <div class="table__inner-item" v-if="tx.data.createdCoinId">
+                                <strong>Coin ID</strong> <br>
+                                {{ tx.data.createdCoinId }}
+                            </div>
                             <div class="table__inner-item" v-if="tx.data.name">
                                 <strong>Name</strong> <br>
                                 {{ tx.data.name }}
