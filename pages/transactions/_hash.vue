@@ -294,7 +294,7 @@
                 <dt v-if="tx.data.symbol">Symbol</dt>
                 <dd v-if="tx.data.symbol">{{ tx.data.symbol }}</dd>
                 <dt v-if="currentCoinSymbol && currentCoinSymbol !== tx.data.symbol">Symbol current</dt>
-                <dd v-if="currentCoinSymbol">{{ currentCoinSymbol }}</dd>
+                <dd v-if="currentCoinSymbol && currentCoinSymbol !== tx.data.symbol">{{ currentCoinSymbol }}</dd>
 
                 <dt v-if="tx.data.initialAmount">Initial amount</dt>
                 <dd v-if="tx.data.initialAmount">{{ tx.data.initialAmount | prettyExact }}</dd>
