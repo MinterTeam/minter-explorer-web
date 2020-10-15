@@ -169,9 +169,9 @@ export function getBalance(address) {
 export function prepareBalance(balanceList) {
     return balanceList.sort((a, b) => {
             // set base coin first
-            if (a.coin === COIN_NAME) {
+            if (a.coin.symbol === COIN_NAME) {
                 return -1;
-            } else if (b.coin === COIN_NAME) {
+            } else if (b.coin.symbol === COIN_NAME) {
                 return 1;
             } else {
                 return 0;
