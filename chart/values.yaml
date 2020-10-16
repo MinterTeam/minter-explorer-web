@@ -19,7 +19,7 @@ service:
   port: 80
 
 ingress:
-  domain: explorer.testnet.minter.network
+  domain: explorer.minter.network
 
 resources: {}
 
