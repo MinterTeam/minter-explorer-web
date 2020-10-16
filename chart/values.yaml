@@ -19,7 +19,8 @@ service:
   port: 80
 
 ingress:
-  domain: explorer.minter.network
+  domain: ""
+  tlsname: ""
 
 resources: {}
 
