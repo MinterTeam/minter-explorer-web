@@ -53,7 +53,7 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_PROD_CONFIG_DATA }}
           TAG_NAME: ${{ github.sha }}
         with:
-          args: helm upgrade -n KUBE_NAMESPACE -i $PROJECT_NAME chart/ --atomic --timeout 100s --set image.tag=$TAG_NAME --set ingress.domain=$INGRESS_DOMAIN --set ingress.tlsname=$INGRESS_DOMAIN
+          args: helm upgrade -n $KUBE_NAMESPACE -i $PROJECT_NAME chart/ --atomic --timeout 100s --set image.tag=$TAG_NAME --set ingress.domain=$INGRESS_DOMAIN --set ingress.tlsname=$INGRESS_DOMAIN
       
       - name: notification
         if: cancelled() == false
