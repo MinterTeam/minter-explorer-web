@@ -1,6 +1,6 @@
 version: 1.0.0
 apiVersion: v2
-name: minter-explorer-web
+name: explorer-web
 icon: https://explorer.minter.network/img/minter-logo-circle.svg
 description: A Helm chart for Minter Explorer Web
 

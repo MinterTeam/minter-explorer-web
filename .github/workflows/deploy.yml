@@ -2,13 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ rc, testnet ]
+    branches: [ master, testnet ]
 env:
-  INGRESS_DOMAIN_mainnet: "explorer.minter.network"
-  INGRESS_DOMAIN_rc: "explorer.rc.minter.network"
+  INGRESS_DOMAIN_master: "explorer.minter.network"
   INGRESS_DOMAIN_testnet: "explorer.testnet.minter.network"
-  KUBE_NAMESPACE_mainnet: "mainnet"
-  KUBE_NAMESPACE_rc: "mainnet"
+  KUBE_NAMESPACE_master: "mainnet"
   KUBE_NAMESPACE_testnet: "default"
 jobs:
   ci:
