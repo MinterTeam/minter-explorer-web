@@ -6,8 +6,9 @@ on:
 env:
   INGRESS_DOMAIN_master: "explorer.minter.network"
   INGRESS_DOMAIN_testnet: "explorer.testnet.minter.network"
-  KUBE_NAMESPACE_master: "mainnet"
+  KUBE_NAMESPACE_master: "mainnet-reserved"
   KUBE_NAMESPACE_testnet: "default"
+
 jobs:
   ci:
     name: build
@@ -48,7 +49,7 @@ jobs:
       - name: deploy to production cluster
         uses: wahyd4/kubectl-helm-action@master
         env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_PROD_CONFIG_DATA }}
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_PROD_DO_CONFIG_DATA }}
           TAG_NAME: ${{ github.sha }}
         with:
           args: helm upgrade -n $KUBE_NAMESPACE -i $PROJECT_NAME chart/ --atomic --timeout 100s --set image.tag=$TAG_NAME --set ingress.domain=$INGRESS_DOMAIN --set ingress.tlsname=$INGRESS_DOMAIN
