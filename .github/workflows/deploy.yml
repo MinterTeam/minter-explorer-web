@@ -7,8 +7,8 @@ env:
   INGRESS_DOMAIN_master: "explorer.minter.network"
   INGRESS_DOMAIN_testnet: "explorer.testnet.minter.network"
   KUBE_NAMESPACE_master: "mainnet"
-  KUBE_NAMESPACE_master_reserved: "mainnet-reserved"
   KUBE_NAMESPACE_testnet: "default"
+  KUBE_NAMESPACE_RESERVED: "mainnet-reserved"
 
 jobs:
   ci:
@@ -50,7 +50,7 @@ jobs:
       - name: DigitalOcean Kubernetes
         uses: matootie/dokube@v1.3.2
         with:
-          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }} 
+          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
           clusterName: k8s-prod-do
 
       - name: Install helm
@@ -59,7 +59,7 @@ jobs:
       - name: Deploy to DO
         env:
           TAG_NAME: ${{ github.sha }}
-        run: ./linux-amd64/helm upgrade -n $KUBE_NAMESPACE_master_reserved -i $PROJECT_NAME chart/ --atomic --timeout 100s --set image.tag=$TAG_NAME --set ingress.domain=$INGRESS_DOMAIN --set ingress.tlsname=$INGRESS_DOMAIN
+        run: ./linux-amd64/helm upgrade -n $KUBE_NAMESPACE_RESERVED -i $PROJECT_NAME chart/ --atomic --timeout 100s --set image.tag=$TAG_NAME --set ingress.domain=$INGRESS_DOMAIN --set ingress.tlsname=$INGRESS_DOMAIN
 
       - name: deploy to production cluster
         uses: wahyd4/kubectl-helm-action@master
@@ -67,7 +67,7 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_PROD_CONFIG_DATA }}
           TAG_NAME: ${{ github.sha }}
         with:
-          args: helm upgrade -n $KUBE_NAMESPACE_master -i $PROJECT_NAME chart/ --atomic --timeout 100s --set image.tag=$TAG_NAME --set ingress.domain=$INGRESS_DOMAIN --set ingress.tlsname=$INGRESS_DOMAIN
+          args: helm upgrade -n $KUBE_NAMESPACE -i $PROJECT_NAME chart/ --atomic --timeout 100s --set image.tag=$TAG_NAME --set ingress.domain=$INGRESS_DOMAIN --set ingress.tlsname=$INGRESS_DOMAIN
       
       - name: notification
         if: cancelled() == false
