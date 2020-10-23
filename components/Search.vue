@@ -16,10 +16,12 @@
                     this.$router.push('/address/' + query);
                 } else if (query.slice(0, 2) === 'Mp') {
                     this.$router.push('/validator/' + query);
+                } else if (query.slice(0, 2) === 'Mt') {
+                    this.$router.push('/transactions/' + query);
                 } else if (/^\d+$/.test(query)) {
                     this.$router.push('/blocks/' + query);
                 } else {
-                    this.$router.push('/transactions/' + query);
+                    this.$router.push('/coins/' + query);
                 }
                 this.query = '';
             },

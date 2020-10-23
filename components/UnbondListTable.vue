@@ -2,13 +2,9 @@
     import {getTimeMinutes, getDate, getTimeZone, prettyPrecise} from '~/assets/utils';
     import TableLink from '~/components/TableLink';
 
-    const TYPE_REWARD = 'reward';
-    const TYPE_SLASH = 'slash';
 
     export default {
         ideFix: null,
-        TYPE_REWARD,
-        TYPE_SLASH,
         getTimeMinutes,
         getDate,
         getTimeZone,
@@ -21,9 +17,6 @@
             dataList: {
                 type: Array,
                 required: true,
-            },
-            dataType: {
-                type: String,
             },
             isLoading: {
                 type: Boolean,
@@ -53,9 +46,8 @@
             <thead>
             <tr>
                 <!--<th>Name</th>-->
-                <th>Time</th>
-                <th v-if="dataType === $options.TYPE_SLASH">Block</th>
-                <th v-if="dataType === $options.TYPE_REWARD">Reward Type</th>
+<!--                <th>Time</th>-->
+                <th>Block</th>
                 <th>Validator</th>
                 <th>Value</th>
             </tr>
@@ -63,7 +55,7 @@
             <tbody>
             <tr v-for="(dataItem, index) in dataList" :key="index">
                 <!-- Time -->
-                <td>
+                <!--<td>
                     <template v-if="dataType === $options.TYPE_REWARD">
                         {{ $options.getDate(dataItem.timestamp) }}
                     </template>
@@ -71,14 +63,10 @@
                         {{ $options.getTimeMinutes(dataItem.timestamp) }}
                         <span class="u-text-muted">{{ $options.getTimeZone(dataItem.timestamp) }}</span>
                     </template>
-                </td>
+                </td>-->
                 <!-- block -->
-                <td v-if="dataType === $options.TYPE_SLASH">
+                <td>
                     <TableLink :link-text="dataItem.height" :link-path="'/blocks/' + dataItem.height"/>
-                </td>
-                <!-- type -->
-                <td v-if="dataType === $options.TYPE_REWARD">
-                    {{ dataItem.role }}
                 </td>
                 <!-- public key -->
                 <td>
@@ -89,11 +77,11 @@
                 </td>
                 <!-- value -->
                 <td>
-                    {{ dataType === $options.TYPE_REWARD ? $store.state.COIN_NAME : dataItem.coin.symbol }} {{ $options.prettyPrecise(dataItem.amount) }}
+                    {{ dataItem.coin.symbol }} {{ $options.prettyPrecise(dataItem.amount) }}
                 </td>
             </tr>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No {{ dataType === $options.TYPE_REWARD ? 'Rewards' : 'Slashes' }}</div>
+        <div class="panel__content panel__section u-text-center" v-else>No Unbonds</div>
     </div>
 </template>

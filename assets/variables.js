@@ -32,6 +32,7 @@ export const TAB_TYPES = {
     STAKE: 'stake',
     REWARD: 'reward',
     SLASH: 'slash',
+    UNBOND: 'unbond',
 };
 /**
  * @readonly
