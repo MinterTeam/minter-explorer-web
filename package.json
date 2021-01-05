@@ -22,7 +22,7 @@
   "dependencies": {
     "@material/snackbar": "^7.0.0",
     "@minterteam/footer-links": "^3.0.0",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "big.js": "^6.0.1",
     "camelcase-keys": "^6.2.2",
     "centrifuge": "^2.6.4",
