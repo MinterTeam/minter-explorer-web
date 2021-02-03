@@ -6,7 +6,7 @@
     import TableLink from '~/components/TableLink';
 
     export default {
-        ideFix: null,
+        TX_TYPE,
         UNBOND_PERIOD,
         components: {
             TableLink,
@@ -81,6 +81,9 @@
             },
             isMultisend(tx) {
                 return tx.type === Number(TX_TYPE.MULTISEND);
+            },
+            isTxType(tx, txType) {
+                return tx.type === Number(txType);
             },
             isIncomeMultisend(tx) {
                 if (!this.isMultisend(tx)) {
@@ -245,7 +248,7 @@
                                 />
                             </div>
 
-                            <!-- SELL -->
+                            <!-- SELL, SELL_ALL, SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Sell coins</strong> <br>
                                 {{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | pretty }}
@@ -254,17 +257,45 @@
                                 <strong>Get coins</strong> <br>
                                 {{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | pretty  }}
                             </div>
-                            <!-- BUY -->
+                            <!-- BUY, BUY_SWAP_POOL -->
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Buy coins</strong> <br>
                                 {{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Spend coins</strong> <br>
-                                {{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | pretty }}
+                                {{ tx.data.coinToSell.symbol }} {{ pretty(tx.data.valueToSell) }}
                             </div>
 
-                            <!-- type CREATE_COIN -->
+                            <!-- operate SWAP_POOL -->
+                            <div class="table__inner-item" v-if="isDefined(tx.data.coin0)">
+                                <strong>First coin</strong> <br>
+                                {{ tx.data.coin0.symbol }} <span v-if="tx.data.volume0">{{ pretty(tx.data.volume0) }}</span>
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.coin1)">
+                                <strong>Second coin</strong> <br>
+                                {{ tx.data.coin1.symbol }} <span v-if="tx.data.volume1">{{ pretty(tx.data.volume1) }} </span>
+                            </div>
+                            <!-- ADD_LIQUIDITY -->
+                            <div class="table__inner-item" v-if="isTxType(tx, TX_TYPE.ADD_LIQUIDITY)">
+                                <strong>Max volume of second coin</strong> <br>
+                                {{ pretty(tx.data.maximumVolume1) }}
+                            </div>
+                            <!-- REMOVE_LIQUIDITY -->
+                            <div class="table__inner-item" v-if="isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY)">
+                                <strong>Liquidity</strong> <br>
+                                {{ pretty(tx.data.liquidity) }}
+                            </div>
+                            <div class="table__inner-item" v-if="isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY)">
+                                <strong>Min volume of first coin</strong> <br>
+                                {{ pretty(tx.data.minimumVolume0) }}
+                            </div>
+                            <div class="table__inner-item" v-if="isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY)">
+                                <strong>Min volume of second coin</strong> <br>
+                                {{ pretty(tx.data.minimumVolume1) }}
+                            </div>
+
+                            <!-- type CREATE_COIN, RECREATE_COIN, EDIT_TICKER_OWNER, CREATE_TOKEN, RECREATE_TOKEN -->
                             <div class="table__inner-item" v-if="tx.data.createdCoinId">
                                 <strong>Coin ID</strong> <br>
                                 {{ tx.data.createdCoinId }}
@@ -293,8 +324,24 @@
                                 <strong>Max supply</strong> <br>
                                 {{ prettyRound(tx.data.maxSupply) }}
                             </div>
+                            <div class="table__inner-item" v-if="tx.data.newOwner">
+                                <strong>Owner address</strong> <br>
+                                <TableLink :link-text="tx.data.newOwner"
+                                           :link-path="'/address/' + tx.data.newOwner"
+                                           :is-not-link="isCurrentAddress(tx.data.newOwner)"
+                                           :should-not-shorten="true"
+                                />
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.mintable">
+                                <strong>Mintable</strong> <br>
+                                {{ tx.data.mintable ? 'Yes' : 'No' }}
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.burnable">
+                                <strong>Burnable</strong> <br>
+                                {{ tx.data.burnable ? 'Yes' : 'No' }}
+                            </div>
 
-                            <!-- type DECLARE_CANDIDACY, EDIT_CANDIDATE, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
+                            <!-- type DECLARE_CANDIDACY, EDIT_CANDIDATE, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE, EDIT_CANDIDATE_PUBLIC_KEY, EDIT_CANDIDATE_COMMISSION, VOTE_HALT_BLOCK, VOTE_UPDATE, VOTE_COMMISSION -->
                             <div class="table__inner-item" v-if="getValidatorName(tx)">
                                 <strong>Validator</strong> <br>
                                 <TableLink :link-text="getValidatorName(tx)"
@@ -308,6 +355,14 @@
                                 <TableLink :link-text="tx.data.pubKey"
                                            :link-path="'/validator/' + tx.data.pubKey"
                                            :is-not-link="isCurrentValidator(tx.data.pubKey)"
+                                           :should-not-shorten="true"
+                                />
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.newPubKey">
+                                <strong>New public key</strong> <br>
+                                <TableLink :link-text="tx.data.newPubKey"
+                                           :link-path="'/validator/' + tx.data.newPubKey"
+                                           :is-not-link="isCurrentValidator(tx.data.newPubKey)"
                                            :should-not-shorten="true"
                                 />
                             </div>
@@ -343,6 +398,18 @@
                                            :link-path="'/address/' + tx.data.controlAddress"
                                            :is-not-link="isCurrentAddress(tx.data.controlAddress)"
                                 />
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.commission)">
+                                <strong>Commission</strong> <br>
+                                {{ tx.data.commission }}&thinsp;%
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.height)">
+                                <strong>Block height</strong> <br>
+                                {{ tx.data.height }}
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.version)">
+                                <strong>Version</strong> <br>
+                                {{ tx.data.version }}
                             </div>
 
                             <!-- type REDEEM_CHECK -->
