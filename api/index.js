@@ -397,6 +397,68 @@ export function getCoinList() {
     // }));
 }
 
+/**
+ * @typedef {Object} PoolListInfo
+ * @property {Array<Pool>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
+ * @typedef {Object} Pool
+ * @property {Coin} coin0
+ * @property {Coin} coin1
+ * @property {number|string} amount0
+ * @property {number|string} amount1
+ * @property {number|string} liquidity
+ * @property {number|string} liquidityBip
+ * @property {string} poolToken
+ */
+
+/**
+ * @typedef {Object} PoolProviderListInfo
+ * @property {Array<PoolProvider>} data
+ * @property {Object} meta - pagination
+ */
+
+
+/**
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<PoolListInfo>}
+ */
+export function getPoolList(params) {
+    return explorer.get('pools', {
+            params,
+        })
+        .then((response) => response.data);
+}
+
+/**
+ * @param {string} coin0
+ * @param {string} coin1
+ * @return {Promise<Pool>}
+ */
+export function getPool(coin0, coin1) {
+    return explorer.get(`pools/${coin0}/${coin1}`)
+        .then((response) => response.data.data);
+}
+
+/**
+ * @param {string} coin0
+ * @param {string} coin1
+ * @param {Object} params
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<PoolProviderListInfo>}
+ */
+export function getPoolProviderList(coin0, coin1, params) {
+    return explorer.get(`pools/providers/${coin0}/${coin1}`, {
+            params,
+        })
+        .then((response) => response.data);
+}
+
 
 /**
  * @param {number|string} id
