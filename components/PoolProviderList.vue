@@ -1,7 +1,14 @@
 <script>
+import debounce from 'lodash-es/debounce.js';
 import {pretty} from '~/assets/utils.js';
+import TableLink from '@/components/TableLink.vue';
+
+let resizeHandler;
 
 export default {
+    components: {
+        TableLink,
+    },
     props: {
         /** @type Array<PoolProvider> */
         providerList: {
@@ -13,6 +20,11 @@ export default {
             default: 0,
         },
     },
+    data() {
+        return {
+            shouldShorten: this.getShouldShorten(),
+        };
+    },
     computed: {
         providerListFormatted() {
             return this.providerList.map((provider) => {
@@ -23,8 +35,24 @@ export default {
             });
         },
     },
+    mounted() {
+        if (process.client) {
+            resizeHandler = debounce(() => {
+                this.shouldShorten = this.getShouldShorten();
+            });
+            window.addEventListener('resize', resizeHandler, 100);
+        }
+    },
+    destroyed() {
+        if (resizeHandler) {
+            window.removeEventListener('resize', resizeHandler);
+        }
+    },
     methods: {
         pretty,
+        getShouldShorten() {
+            return process.client && window.innerWidth < 960;
+        },
     },
 };
 </script>
@@ -41,20 +69,27 @@ export default {
             <table class="u-text-nowrap">
                 <thead>
                 <tr>
-                    <th>Amount {{ providerList[0].coin0.symbol }}</th>
-                    <th>Amount {{ providerList[0].coin1.symbol }}</th>
+                    <th>Provider</th>
+                    <th colspan="2">Amount</th>
                     <th>Liquidity</th>
-                    <th>Liquidity {{ $store.getters.BASE_COIN }}</th>
-                    <th>Liquidity USD</th>
+                    <th>Liquidity price</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="provider in providerListFormatted" :key="provider.poolToken">
-                    <td>{{ pretty(provider.amount0) }}</td>
-                    <td>{{ pretty(provider.amount1) }}</td>
+                <tr v-for="provider in providerListFormatted" :key="provider.address">
+                    <td>
+                        <TableLink :link-text="provider.address"
+                                   :link-path="'/address/' + provider.address"
+                                   :should-not-shorten="!shouldShorten"
+                        />
+                    </td>
+                    <td>{{ provider.coin0.symbol }} {{ pretty(provider.amount0) }}</td>
+                    <td>{{ provider.coin1.symbol }} {{ pretty(provider.amount1) }}</td>
                     <td>{{ pretty(provider.liquidity) }}</td>
-                    <td>{{ pretty(provider.liquidityBip) }} {{ $store.getters.BASE_COIN }}</td>
-                    <td>{{ pretty(provider.liquidityUsd) }} $</td>
+                    <td>
+                        {{ pretty(provider.liquidityBip) }} {{ $store.getters.BASE_COIN }}
+                        (${{ pretty(provider.liquidityUsd) }})
+                    </td>
                 </tr>
                 </tbody>
             </table>

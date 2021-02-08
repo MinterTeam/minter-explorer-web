@@ -62,6 +62,12 @@ export function shortFilter(value, endLength = 6, minLengthToShort) {
 export function txTypeFilter(value) {
     value = txTypeList[value].name; // get type name
     value = value.charAt(0).toUpperCase() + value.slice(1); // capitalize the first letter
+    if (value === 'Remove liquidity from pool') {
+        return 'Remove liquidity';
+    }
+    if (value === 'Add liquidity to pool') {
+        return 'Add liquidity';
+    }
     return value;
 }
 
@@ -78,6 +84,9 @@ export function getExplorerValidatorUrl(pubKey) {
  * @return {string}
  */
 export function pretty(value) {
+    if (!value && typeof value !== 'number') {
+        return '';
+    }
     const PRECISION = 2;
     if (value >= 1 || value <= -1 || Number(value) === 0) {
         return decode(prettyNum(value, {precision: PRECISION, precisionSetting: PRECISION_SETTING.FIXED, thousandsSeparator: '&#x202F;'}));
@@ -121,6 +130,9 @@ export function prettyPrecise(value) {
  * @return {string}
  */
 export function prettyExact(value) {
+    if (!value && typeof value !== 'number') {
+        return '';
+    }
     return decode(prettyNum(value, {precision: 2, precisionSetting: PRECISION_SETTING.INCREASE, thousandsSeparator: '&#x202F;'}));
 }
 

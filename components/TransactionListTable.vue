@@ -53,6 +53,7 @@
             },
         },
         methods: {
+            pretty,
             prettyRound,
             fromBase64,
             isCurrentAddress(address) {
@@ -71,10 +72,10 @@
                 this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
             },
             isSell(tx) {
-                return tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL);
+                return tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL) || tx.type === Number(TX_TYPE.SELL_SWAP_POOL) || tx.type === Number(TX_TYPE.SELL_ALL_SWAP_POOL);
             },
             isBuy(tx) {
-                return tx.type === Number(TX_TYPE.BUY);
+                return tx.type === Number(TX_TYPE.BUY) || tx.type === Number(TX_TYPE.BUY_SWAP_POOL);
             },
             isUnbond(tx) {
                 return tx.type === Number(TX_TYPE.UNBOND);
@@ -267,7 +268,7 @@
                                 {{ tx.data.coinToSell.symbol }} {{ pretty(tx.data.valueToSell) }}
                             </div>
 
-                            <!-- operate SWAP_POOL -->
+                            <!-- CREATE_SWAP_POOL, ADD_LIQUIDITY, REMOVE_LIQUIDITY -->
                             <div class="table__inner-item" v-if="isDefined(tx.data.coin0)">
                                 <strong>First coin</strong> <br>
                                 {{ tx.data.coin0.symbol }} <span v-if="tx.data.volume0">{{ pretty(tx.data.volume0) }}</span>
@@ -276,23 +277,9 @@
                                 <strong>Second coin</strong> <br>
                                 {{ tx.data.coin1.symbol }} <span v-if="tx.data.volume1">{{ pretty(tx.data.volume1) }} </span>
                             </div>
-                            <!-- ADD_LIQUIDITY -->
-                            <div class="table__inner-item" v-if="isTxType(tx, TX_TYPE.ADD_LIQUIDITY)">
-                                <strong>Max volume of second coin</strong> <br>
-                                {{ pretty(tx.data.maximumVolume1) }}
-                            </div>
-                            <!-- REMOVE_LIQUIDITY -->
-                            <div class="table__inner-item" v-if="isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY)">
+                            <div class="table__inner-item" v-if="isDefined(tx.data.liquidity)">
                                 <strong>Liquidity</strong> <br>
                                 {{ pretty(tx.data.liquidity) }}
-                            </div>
-                            <div class="table__inner-item" v-if="isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY)">
-                                <strong>Min volume of first coin</strong> <br>
-                                {{ pretty(tx.data.minimumVolume0) }}
-                            </div>
-                            <div class="table__inner-item" v-if="isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY)">
-                                <strong>Min volume of second coin</strong> <br>
-                                {{ pretty(tx.data.minimumVolume1) }}
                             </div>
 
                             <!-- type CREATE_COIN, RECREATE_COIN, EDIT_TICKER_OWNER, CREATE_TOKEN, RECREATE_TOKEN -->

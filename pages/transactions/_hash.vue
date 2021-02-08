@@ -292,11 +292,15 @@
                 <dd v-if="isSellType">{{ tx.data.coinToSell.symbol }} {{ prettyExact(tx.data.valueToSell) }}</dd>
                 <dt v-if="isSellType">Get coins</dt>
                 <dd v-if="isSellType">{{ tx.data.coinToBuy.symbol }} {{ prettyExact(tx.data.valueToBuy) }}</dd>
+                    <dt v-if="tx.data.minimumValueToBuy">Minimum value to get</dt>
+                    <dd v-if="tx.data.minimumValueToBuy">{{ prettyExact(tx.data.minimumValueToBuy) }}</dd>
                 <!-- BUY, BUY_SWAP_POOL -->
                 <dt v-if="isBuyType">Buy coins</dt>
                 <dd v-if="isBuyType">{{ tx.data.coinToBuy.symbol }} {{ prettyExact(tx.data.valueToBuy) }}</dd>
                 <dt v-if="isBuyType">Spend coins</dt>
                 <dd v-if="isBuyType">{{ tx.data.coinToSell.symbol }} {{ prettyExact(tx.data.valueToSell) }}</dd>
+                    <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
+                    <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
                     <!-- CREATE_SWAP_POOL -->
                     <dt v-if="tx.data.coin0">First coin</dt>

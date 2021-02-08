@@ -411,11 +411,29 @@ export function getCoinList() {
  * @property {number|string} amount1
  * @property {number|string} liquidity
  * @property {number|string} liquidityBip
- * @property {string} poolToken
+ * @property {string} token
+ */
+
+/**
+ * @typedef {Object} PoolProvider
+ * @property {string} address
+ * @property {Coin} coin0
+ * @property {Coin} coin1
+ * @property {number|string} amount0
+ * @property {number|string} amount1
+ * @property {number|string} liquidity
+ * @property {number|string} liquidityBip
+ * @property {string} token
  */
 
 /**
  * @typedef {Object} PoolProviderListInfo
+ * @property {Array<PoolProvider>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
+ * @typedef {Object} ProviderPoolListInfo
  * @property {Array<PoolProvider>} data
  * @property {Object} meta - pagination
  */
@@ -440,20 +458,45 @@ export function getPoolList(params) {
  * @return {Promise<Pool>}
  */
 export function getPool(coin0, coin1) {
-    return explorer.get(`pools/${coin0}/${coin1}`)
+    return explorer.get(`pools/coins/${coin0}/${coin1}`)
         .then((response) => response.data.data);
 }
 
 /**
  * @param {string} coin0
  * @param {string} coin1
- * @param {Object} params
+ * @param {Object} [params]
  * @param {number} [params.page]
  * @param {number} [params.limit]
  * @return {Promise<PoolProviderListInfo>}
  */
 export function getPoolProviderList(coin0, coin1, params) {
-    return explorer.get(`pools/providers/${coin0}/${coin1}`, {
+    return explorer.get(`pools/coins/${coin0}/${coin1}/providers`, {
+            params,
+        })
+        .then((response) => response.data);
+}
+
+/**
+ * @param {string} coin0
+ * @param {string} coin1
+ * @param {string} address
+ * @return {Promise<PoolProvider>}
+ */
+export function getPoolProvider(coin0, coin1, address) {
+    return explorer.get(`pools/coins/${coin0}/${coin1}/providers/${address}`)
+        .then((response) => response.data.data);
+}
+
+/**
+ * @param {string} address
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<ProviderPoolListInfo>}
+ */
+export function getProviderPoolList(address, params) {
+    return explorer.get(`pools/providers/${address}`, {
             params,
         })
         .then((response) => response.data);

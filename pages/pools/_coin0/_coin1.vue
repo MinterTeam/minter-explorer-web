@@ -40,6 +40,9 @@ import {getPool, getPoolProviderList, getStatus} from "@/api/index.js";
                     });
                 });
         },
+        fetch() {
+            this.fetchProviderList();
+        },
         head() {
             const title = getTitle(`Pool ${this.pool.coin0.symbol}-${this.pool.coin1.symbol}`);
 
@@ -64,6 +67,7 @@ import {getPool, getPoolProviderList, getStatus} from "@/api/index.js";
             // update data on page change
             '$route.query': {
                 handler(newVal, oldVal) {
+                    console.log('fetch trye');
                     if (newVal.page !== oldVal.page) {
                         this.fetchProviderList();
 
@@ -81,6 +85,7 @@ import {getPool, getPoolProviderList, getStatus} from "@/api/index.js";
             pretty,
             prettyExact,
             fetchProviderList() {
+                console.log('fetch');
                 this.isProviderListLoading = true;
                 getPoolProviderList(this.$route.params.coin0, this.$route.params.coin1, this.$route.query)
                     .then((providerListInfo) => {
@@ -113,21 +118,21 @@ import {getPool, getPoolProviderList, getStatus} from "@/api/index.js";
             </div>
             <dl>
                 <dt>Pool token</dt>
-                <dd><nuxt-link class="link--default" :to="'/coins/' + pool.poolToken">{{ pool.poolToken }}</nuxt-link></dd>
+                <dd><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></dd>
 
                 <dt>Pair</dt>
                 <dd>{{ pool.coin0.symbol }}-{{ pool.coin1.symbol }}</dd>
 
-                <dt>Amount {{ pool.coin0.symbol }}</dt>
-                <dd>{{ prettyExact(pool.amount0) }}</dd>
+                <dt>Amount</dt>
+                <dd>{{ prettyExact(pool.amount0) }} {{ pool.coin0.symbol }}</dd>
 
-                <dt>Amount {{ pool.coin1.symbol }}</dt>
-                <dd>{{ prettyExact(pool.amount1) }}</dd>
+                <dt>Amount </dt>
+                <dd>{{ prettyExact(pool.amount1) }} {{ pool.coin1.symbol }}</dd>
 
                 <dt>Liquidity</dt>
                 <dd>{{ prettyExact(pool.liquidity) }}</dd>
 
-                <dt>Liquidity BIP</dt>
+                <dt>Liquidity {{ $store.getters.BASE_COIN}}</dt>
                 <dd>{{ pretty(pool.liquidityBip) }}</dd>
 
                 <dt>Liquidity USD</dt>

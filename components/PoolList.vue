@@ -41,8 +41,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="pool in poolListFormatted" :key="pool.poolToken">
-                <td><nuxt-link class="link--default" :to="'/coins/' + pool.poolToken">{{ pool.poolToken }}</nuxt-link></td>
+            <tr v-for="pool in poolListFormatted" :key="pool.token.symbol">
+                <td><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></td>
                 <td>
                     <nuxt-link class="link--default" :to="`/pools/${pool.coin0.symbol}/${pool.coin1.symbol}`">
                         {{ pool.coin0.symbol }}-{{ pool.coin1.symbol }}
