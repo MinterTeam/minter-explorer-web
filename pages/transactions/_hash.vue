@@ -285,28 +285,30 @@
                 <dt v-if="tx.data.to">To</dt>
                 <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
                 <dt v-if="isDefined(tx.data.value) && !isStakeType">Amount</dt>
-                <dd v-if="isDefined(tx.data.value) && !isStakeType">{{ tx.data.coin.symbol }} {{ prettyExact(tx.data.value) }}</dd>
+                <dd v-if="isDefined(tx.data.value) && !isStakeType">{{ prettyExact(tx.data.value) }} {{ tx.data.coin.symbol }}</dd>
 
                 <!-- SELL, SELL_ALL, SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
                 <dt v-if="isSellType">Sell coins</dt>
-                <dd v-if="isSellType">{{ tx.data.coinToSell.symbol }} {{ prettyExact(tx.data.valueToSell) }}</dd>
+                <dd v-if="isSellType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
                 <dt v-if="isSellType">Get coins</dt>
-                <dd v-if="isSellType">{{ tx.data.coinToBuy.symbol }} {{ prettyExact(tx.data.valueToBuy) }}</dd>
+                <dd v-if="isSellType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
                     <dt v-if="tx.data.minimumValueToBuy">Minimum value to get</dt>
                     <dd v-if="tx.data.minimumValueToBuy">{{ prettyExact(tx.data.minimumValueToBuy) }}</dd>
                 <!-- BUY, BUY_SWAP_POOL -->
                 <dt v-if="isBuyType">Buy coins</dt>
-                <dd v-if="isBuyType">{{ tx.data.coinToBuy.symbol }} {{ prettyExact(tx.data.valueToBuy) }}</dd>
+                <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
                 <dt v-if="isBuyType">Spend coins</dt>
-                <dd v-if="isBuyType">{{ tx.data.coinToSell.symbol }} {{ prettyExact(tx.data.valueToSell) }}</dd>
+                <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
                     <!-- CREATE_SWAP_POOL -->
+                    <dt v-if="tx.data.poolToken">Pool token</dt>
+                    <dd v-if="tx.data.poolToken">{{ tx.data.poolToken.symbol }}</dd>
                     <dt v-if="tx.data.coin0">First coin</dt>
-                    <dd v-if="tx.data.coin0">{{ tx.data.coin0.symbol }} <span v-if="isDefined(tx.data.volume0)">{{ prettyExact(tx.data.volume0) }}</span></dd>
+                    <dd v-if="tx.data.coin0"><span v-if="isDefined(tx.data.volume0)">{{ prettyExact(tx.data.volume0) }}</span> {{ tx.data.coin0.symbol }} </dd>
                     <dt v-if="tx.data.coin1">Second coin</dt>
-                    <dd v-if="tx.data.coin1">{{ tx.data.coin1.symbol }} <span v-if="isDefined(tx.data.volume1)">{{ prettyExact(tx.data.volume1) }}</span></dd>
+                    <dd v-if="tx.data.coin1"><span v-if="isDefined(tx.data.volume1)">{{ prettyExact(tx.data.volume1) }}</span> {{ tx.data.coin1.symbol }}</dd>
                     <!-- ADD_LIQUIDITY -->
                     <dt v-if="tx.data.maximumVolume1">Max volume of second coin</dt>
                     <dd v-if="tx.data.maximumVolume1">{{ prettyExact(tx.data.maximumVolume1) }}</dd>
@@ -331,7 +333,7 @@
                 <dt v-if="tx.data.initialAmount">Initial amount</dt>
                 <dd v-if="tx.data.initialAmount">{{ tx.data.initialAmount | prettyExact }}</dd>
                 <dt v-if="tx.data.initialReserve">Initial reserve</dt>
-                <dd v-if="tx.data.initialReserve">{{ $store.state.COIN_NAME }} {{ tx.data.initialReserve | prettyExact }}</dd>
+                <dd v-if="tx.data.initialReserve">{{ prettyExact(tx.data.initialReserve) }} {{ $store.getters.BASE_COIN }}</dd>
                 <dt v-if="tx.data.constantReserveRatio">CRR</dt>
                 <dd v-if="tx.data.constantReserveRatio">{{ tx.data.constantReserveRatio }}&thinsp;%</dd>
                 <dt v-if="tx.data.maxSupply">Max supply</dt>
@@ -352,7 +354,7 @@
                     <dt v-if="tx.data.newPubKey">New public key</dt>
                     <dd v-if="tx.data.newPubKey"><nuxt-link class="link--default" :to="'/validator/' + tx.data.newPubKey">{{ tx.data.newPubKey }}</nuxt-link></dd>
                 <dt v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
-                <dd v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)">{{ tx.data.coin.symbol }} {{ (tx.data.stake || tx.data.value) | prettyExact }}</dd>
+                <dd v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)">{{ prettyExact(tx.data.stake || tx.data.value) }} {{ tx.data.coin.symbol }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbondType">Unbond block</dt>
@@ -382,7 +384,7 @@
                 <dt v-if="tx.data.check && tx.data.check.dueBlock">Due Block</dt>
                 <dd v-if="tx.data.check && tx.data.check.dueBlock">{{ tx.data.check.dueBlock }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
-                <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.coin.symbol }} {{ tx.data.check.value | prettyExact }}</dd>
+                <dd v-if="tx.data.check && tx.data.check.value">{{ prettyExact(tx.data.check.value) }} {{ tx.data.check.coin.symbol }}</dd>
                     <dt v-if="tx.data.rawCheck">Check</dt>
                     <dd v-if="tx.data.rawCheck">{{ checkFromBase64(tx.data.rawCheck) }}</dd>
 
@@ -411,11 +413,11 @@
 
                 <dt v-if="tx.fee">Fee</dt>
                 <dd v-if="tx.fee">
-                    <template v-if="tx.gasCoin.symbol === $store.state.COIN_NAME">
-                        {{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}
+                    <template v-if="tx.gasCoin.symbol === $store.getters.BASE_COIN">
+                        {{ prettyExact(tx.fee) }} {{ $store.getters.BASE_COIN }}
                     </template>
                     <template v-else>
-                        {{ tx.gasCoin.symbol }} <span class="u-text-muted">({{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }})</span>
+                        {{ tx.gasCoin.symbol }} <span class="u-text-muted">({{ prettyExact(tx.fee) }} {{ $store.getters.BASE_COIN }})</span>
                     </template>
                 </dd>
 

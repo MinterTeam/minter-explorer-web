@@ -1,5 +1,5 @@
 <script>
-    import {prettyRound} from '~/assets/utils.js';
+    import {pretty} from '~/assets/utils.js';
 
     export default {
         props: {
@@ -24,7 +24,7 @@
             },
         },
         methods: {
-            prettyRound,
+            pretty,
         },
     };
 </script>
@@ -48,9 +48,9 @@
                         {{ pool.coin0.symbol }}-{{ pool.coin1.symbol }}
                     </nuxt-link>
                 </td>
-                <td>{{ prettyRound(pool.amount0) }} {{ pool.coin0.symbol }}</td>
-                <td>{{ prettyRound(pool.amount1) }} {{ pool.coin1.symbol }}</td>
-                <td>{{ prettyRound(pool.liquidityUsd) }} $</td>
+                <td>{{ pool.coin0.symbol }} <span class="u-fw-500">{{ pretty(pool.amount0) }}</span></td>
+                <td>{{ pool.coin1.symbol }} <span class="u-fw-500">{{ pretty(pool.amount1) }}</span></td>
+                <td>${{ pretty(pool.liquidityUsd) }}</td>
             </tr>
             </tbody>
         </table>

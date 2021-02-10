@@ -83,11 +83,11 @@ export default {
                                    :should-not-shorten="!shouldShorten"
                         />
                     </td>
-                    <td>{{ provider.coin0.symbol }} {{ pretty(provider.amount0) }}</td>
-                    <td>{{ provider.coin1.symbol }} {{ pretty(provider.amount1) }}</td>
+                    <td>{{ provider.coin0.symbol }} <span class="u-fw-500">{{ pretty(provider.amount0) }}</span></td>
+                    <td>{{ provider.coin1.symbol }} <span class="u-fw-500">{{ pretty(provider.amount1) }}</span></td>
                     <td>{{ pretty(provider.liquidity) }}</td>
                     <td>
-                        {{ pretty(provider.liquidityBip) }} {{ $store.getters.BASE_COIN }}
+                        {{ $store.getters.BASE_COIN }} <span class="u-fw-500">{{ pretty(provider.liquidityBip) }}</span>
                         (${{ pretty(provider.liquidityUsd) }})
                     </td>
                 </tr>
