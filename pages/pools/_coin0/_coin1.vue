@@ -131,7 +131,7 @@ function calculateTradeReturn(amountIn, amountOut) {
                 <dd><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></dd>
 
                 <dt>Pair</dt>
-                <dd>{{ pool.coin0.symbol }}-{{ pool.coin1.symbol }}</dd>
+                <dd>{{ pool.coin0.symbol }} / {{ pool.coin1.symbol }}</dd>
 
                 <dt>Amount</dt>
                 <dd><span class="u-fw-500">{{ prettyExact(pool.amount0) }}</span> {{ pool.coin0.symbol }}</dd>

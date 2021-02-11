@@ -45,7 +45,7 @@
                 <td><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></td>
                 <td>
                     <nuxt-link class="link--default" :to="`/pools/${pool.coin0.symbol}/${pool.coin1.symbol}`">
-                        {{ pool.coin0.symbol }}-{{ pool.coin1.symbol }}
+                        {{ pool.coin0.symbol }} / {{ pool.coin1.symbol }}
                     </nuxt-link>
                 </td>
                 <td>{{ pool.coin0.symbol }} <span class="u-fw-500">{{ pretty(pool.amount0) }}</span></td>
