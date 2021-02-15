@@ -464,6 +464,20 @@ export function getPool(coin0, coin1) {
 }
 
 /**
+ *
+ * @param {string} coin0
+ * @param {string} coin1
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<TransactionListInfo>}
+ */
+export function getPoolTransactionList(coin0, coin1, params) {
+    return explorer.get(`pools/coins/${coin0}/${coin1}/transactions`, {params})
+        .then((response) => response.data);
+}
+
+/**
  * @param {string} coin0
  * @param {string} coin1
  * @param {Object} [params]

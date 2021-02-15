@@ -33,6 +33,7 @@ export const TAB_TYPES = {
     REWARD: 'reward',
     SLASH: 'slash',
     UNBOND: 'unbond',
+    PROVIDER: 'provider',
 };
 /**
  * @readonly

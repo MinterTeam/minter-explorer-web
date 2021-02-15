@@ -94,6 +94,6 @@
             </tr>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No {{ dataType === $options.TYPE_REWARD ? 'Rewards' : 'Slashes' }}</div>
+        <div class="panel__content panel__section u-text-center" v-else>No {{ dataType === $options.TYPE_REWARD ? 'rewards' : 'slashes' }}</div>
     </div>
 </template>

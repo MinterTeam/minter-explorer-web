@@ -429,6 +429,6 @@
             </tr>
             </tfoot>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No Stakes</div>
+        <div class="panel__content panel__section u-text-center" v-else>No stakes</div>
     </div>
 </template>

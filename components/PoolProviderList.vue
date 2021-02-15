@@ -19,6 +19,10 @@ export default {
             type: Number,
             default: 0,
         },
+        isLoading: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -58,46 +62,44 @@ export default {
 </script>
 
 <template>
-    <section class="panel u-section">
-        <div class="panel__section panel__header">
-            <h1 class="panel__title panel__header-title">
-                <img class="panel__header-title-icon" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
-                Providers
-            </h1>
+    <div class="table-wrap">
+        <div class="panel__content panel__section u-text-center" v-if="isLoading">
+            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
+                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
+            </svg>
         </div>
-        <div class="table-wrap">
-            <table class="u-text-nowrap">
-                <thead>
-                <tr>
-                    <th>Provider</th>
-                    <th colspan="2">Amount</th>
-                    <th>Liquidity</th>
-                    <th>Liquidity worth</th>
-                    <th>Share</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="provider in providerListFormatted" :key="provider.address">
-                    <td>
-                        <TableLink :link-text="provider.address"
-                                   :link-path="'/address/' + provider.address"
-                                   :should-not-shorten="false"
-                        />
-                    </td>
-                    <td>{{ provider.coin0.symbol }} <span class="u-fw-500">{{ pretty(provider.amount0) }}</span></td>
-                    <td>{{ provider.coin1.symbol }} <span class="u-fw-500">{{ pretty(provider.amount1) }}</span></td>
-                    <td>{{ pretty(provider.liquidity) }}</td>
-                    <td>
-                        {{ $store.getters.BASE_COIN }} <span class="u-fw-500">{{ pretty(provider.liquidityBip) }}</span>
-                        (${{ pretty(provider.liquidityUsd) }})
-                    </td>
-                    <td>
+        <table class="u-text-nowrap" v-else-if="providerList.length">
+            <thead>
+            <tr>
+                <th>Provider</th>
+                <th colspan="2">Amount</th>
+                <th>Liquidity</th>
+                <th>Liquidity worth</th>
+                <th>Share</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="provider in providerListFormatted" :key="provider.address">
+                <td>
+                    <TableLink :link-text="provider.address"
+                               :link-path="'/address/' + provider.address"
+                               :should-not-shorten="false"
+                    />
+                </td>
+                <td>{{ provider.coin0.symbol }} <span class="u-fw-500">{{ pretty(provider.amount0) }}</span></td>
+                <td>{{ provider.coin1.symbol }} <span class="u-fw-500">{{ pretty(provider.amount1) }}</span></td>
+                <td>{{ pretty(provider.liquidity) }}</td>
+                <td>
+                    {{ $store.getters.BASE_COIN }} <span class="u-fw-500">{{ pretty(provider.liquidityBip) }}</span>
+                    (${{ pretty(provider.liquidityUsd) }})
+                </td>
+                <td>
 
-                        {{ pretty(provider.liquidityShare) }}%
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+                    {{ pretty(provider.liquidityShare) }}%
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="panel__content panel__section u-text-center" v-else>No providers</div>
+    </div>
 </template>

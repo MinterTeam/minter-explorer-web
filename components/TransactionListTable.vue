@@ -467,6 +467,6 @@
             </template>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No Transactions</div>
+        <div class="panel__content panel__section u-text-center" v-else>No transactions</div>
     </div>
 </template>
