@@ -108,10 +108,16 @@
                 return validator || {};
             },
             isSellType() {
-                return this.isTxType(TX_TYPE.SELL) || this.isTxType(TX_TYPE.SELL_ALL) || this.isTxType(TX_TYPE.SELL_SWAP_POOL) || this.isTxType(TX_TYPE.SELL_ALL_SWAP_POOL);
+                return this.isTxType(TX_TYPE.SELL) || this.isTxType(TX_TYPE.SELL_ALL);
+            },
+            isSellPoolType() {
+                return this.isTxType(TX_TYPE.SELL_SWAP_POOL) || this.isTxType(TX_TYPE.SELL_ALL_SWAP_POOL);
             },
             isBuyType() {
-                return this.isTxType(TX_TYPE.BUY) || this.isTxType(TX_TYPE.BUY_SWAP_POOL);
+                return this.isTxType(TX_TYPE.BUY);
+            },
+            isBuyPoolType() {
+                return this.isTxType(TX_TYPE.BUY_SWAP_POOL);
             },
             isUnbondType() {
                 return this.isTxType(TX_TYPE.UNBOND);
@@ -287,18 +293,28 @@
                 <dt v-if="isDefined(tx.data.value) && !isStakeType">Amount</dt>
                 <dd v-if="isDefined(tx.data.value) && !isStakeType">{{ prettyExact(tx.data.value) }} {{ tx.data.coin.symbol }}</dd>
 
-                <!-- SELL, SELL_ALL, SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
+                <!-- SELL, SELL_ALL -->
                 <dt v-if="isSellType">Sell coins</dt>
                 <dd v-if="isSellType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
                 <dt v-if="isSellType">Get coins</dt>
                 <dd v-if="isSellType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
+                    <!-- SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
+                    <dt v-if="isSellPoolType">Sell coins</dt>
+                    <dd v-if="isSellPoolType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coins[0].symbol }}</dd>
+                    <dt v-if="isSellPoolType">Get coins</dt>
+                    <dd v-if="isSellPoolType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coins[tx.data.coins.length - 1].symbol }}</dd>
                     <dt v-if="tx.data.minimumValueToBuy">Minimum value to get</dt>
                     <dd v-if="tx.data.minimumValueToBuy">{{ prettyExact(tx.data.minimumValueToBuy) }}</dd>
-                <!-- BUY, BUY_SWAP_POOL -->
+                <!-- BUY -->
                 <dt v-if="isBuyType">Buy coins</dt>
-                <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
+                <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coins[0].symbol }}</dd>
                 <dt v-if="isBuyType">Spend coins</dt>
-                <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
+                <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coins[tx.data.coins.length - 1].symbol }}</dd>
+                    <!-- BUY_SWAP_POOL -->
+                    <dt v-if="isBuyPoolType">Buy coins</dt>
+                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
+                    <dt v-if="isBuyPoolType">Spend coins</dt>
+                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 

@@ -72,10 +72,16 @@
                 this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
             },
             isSell(tx) {
-                return this.isTxType(tx, TX_TYPE.SELL) || this.isTxType(tx, TX_TYPE.SELL_ALL) || this.isTxType(tx, TX_TYPE.SELL_SWAP_POOL) || this.isTxType(tx, TX_TYPE.SELL_ALL_SWAP_POOL);
+                return this.isTxType(tx, TX_TYPE.SELL) || this.isTxType(tx, TX_TYPE.SELL_ALL);
+            },
+            isSellPool(tx) {
+                return this.isTxType(tx, TX_TYPE.SELL_SWAP_POOL) || this.isTxType(tx, TX_TYPE.SELL_ALL_SWAP_POOL);
             },
             isBuy(tx) {
-                return this.isTxType(tx, TX_TYPE.BUY) || this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
+                return this.isTxType(tx, TX_TYPE.BUY);
+            },
+            isBuyPool(tx) {
+                return this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
             },
             isUnbond(tx) {
                 return this.isTxType(tx, TX_TYPE.UNBOND);
@@ -124,12 +130,15 @@
                 if (this.isBuy(tx)) {
                     return tx.data.coinToBuy.symbol;
                 }
+                if (this.isSellPool(tx) || this.isBuyPool(tx)) {
+                    return tx.data.coins[0].symbol;
+                }
             },
             getConvertValue(tx) {
-                if (this.isSell(tx)) {
+                if (this.isSell(tx) || this.isSellPool(tx)) {
                     return tx.data.valueToSell;
                 }
-                if (this.isBuy(tx)) {
+                if (this.isBuy(tx) || this.isBuyPool(tx)) {
                     return tx.data.valueToBuy;
                 }
             },
@@ -267,7 +276,7 @@
                                 />
                             </div>
 
-                            <!-- SELL, SELL_ALL, SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
+                            <!-- SELL, SELL_ALL -->
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Sell coins</strong> <br>
                                 {{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | pretty }}
@@ -276,7 +285,16 @@
                                 <strong>Get coins</strong> <br>
                                 {{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | pretty  }}
                             </div>
-                            <!-- BUY, BUY_SWAP_POOL -->
+                            <!-- SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
+                            <div class="table__inner-item" v-if="isSellPool(tx)">
+                                <strong>Sell coins</strong> <br>
+                                {{ tx.data.coins[0].symbol }} {{ tx.data.valueToSell | pretty }}
+                            </div>
+                            <div class="table__inner-item" v-if="isSellPool(tx)">
+                                <strong>Get coins</strong> <br>
+                                {{ tx.data.coins[tx.data.coins.length - 1].symbol }} {{ tx.data.valueToBuy | pretty  }}
+                            </div>
+                            <!-- BUY -->
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Buy coins</strong> <br>
                                 {{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | pretty }}
@@ -284,6 +302,15 @@
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Spend coins</strong> <br>
                                 {{ tx.data.coinToSell.symbol }} {{ pretty(tx.data.valueToSell) }}
+                            </div>
+                            <!-- BUY_SWAP_POOL -->
+                            <div class="table__inner-item" v-if="isBuyPool(tx)">
+                                <strong>Buy coins</strong> <br>
+                                {{ tx.data.coins[0].symbol }} {{ tx.data.valueToBuy | pretty }}
+                            </div>
+                            <div class="table__inner-item" v-if="isBuyPool(tx)">
+                                <strong>Spend coins</strong> <br>
+                                {{ tx.data.coins[tx.data.coins.length - 1].symbol }} {{ pretty(tx.data.valueToSell) }}
                             </div>
 
                             <!-- CREATE_SWAP_POOL, ADD_LIQUIDITY, REMOVE_LIQUIDITY -->

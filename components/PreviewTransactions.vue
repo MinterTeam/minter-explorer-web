@@ -68,20 +68,29 @@
                 if (this.isBuy(tx)) {
                     return tx.data.coinToBuy.symbol;
                 }
+                if (this.isSellPool(tx) || this.isBuyPool(tx)) {
+                    return tx.data.coins[0].symbol;
+                }
             },
             getConvertValue(tx) {
-                if (this.isSell(tx)) {
+                if (this.isSell(tx) || this.isSellPool(tx)) {
                     return tx.data.valueToSell;
                 }
-                if (this.isBuy(tx)) {
+                if (this.isBuy(tx) || this.isBuyPool(tx)) {
                     return tx.data.valueToBuy;
                 }
             },
             isSell(tx) {
-                return this.isTxType(tx, TX_TYPE.SELL) || this.isTxType(tx, TX_TYPE.SELL_ALL) || this.isTxType(tx, TX_TYPE.SELL_SWAP_POOL) || this.isTxType(tx, TX_TYPE.SELL_ALL_SWAP_POOL);
+                return this.isTxType(tx, TX_TYPE.SELL) || this.isTxType(tx, TX_TYPE.SELL_ALL);
+            },
+            isSellPool(tx) {
+                return this.isTxType(tx, TX_TYPE.SELL_SWAP_POOL) || this.isTxType(tx, TX_TYPE.SELL_ALL_SWAP_POOL);
             },
             isBuy(tx) {
-                return this.isTxType(tx, TX_TYPE.BUY) || this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
+                return this.isTxType(tx, TX_TYPE.BUY);
+            },
+            isBuyPool(tx) {
+                return this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
             },
             isMultisend(tx) {
                 return this.isTxType(tx, TX_TYPE.MULTISEND);
