@@ -130,8 +130,11 @@
                 if (this.isBuy(tx)) {
                     return tx.data.coinToBuy.symbol;
                 }
-                if (this.isSellPool(tx) || this.isBuyPool(tx)) {
+                if (this.isSellPool(tx)) {
                     return tx.data.coins[0].symbol;
+                }
+                if (this.isBuyPool(tx)) {
+                    return tx.data.coins[tx.data.coins.length - 1].symbol;
                 }
             },
             getConvertValue(tx) {
@@ -306,11 +309,11 @@
                             <!-- BUY_SWAP_POOL -->
                             <div class="table__inner-item" v-if="isBuyPool(tx)">
                                 <strong>Buy coins</strong> <br>
-                                {{ tx.data.coins[0].symbol }} {{ tx.data.valueToBuy | pretty }}
+                                {{ tx.data.coins[tx.data.coins.length - 1].symbol }} {{ tx.data.valueToBuy | pretty }}
                             </div>
                             <div class="table__inner-item" v-if="isBuyPool(tx)">
                                 <strong>Spend coins</strong> <br>
-                                {{ tx.data.coins[tx.data.coins.length - 1].symbol }} {{ pretty(tx.data.valueToSell) }}
+                                {{ tx.data.coins[0].symbol }} {{ pretty(tx.data.valueToSell) }}
                             </div>
 
                             <!-- CREATE_SWAP_POOL, ADD_LIQUIDITY, REMOVE_LIQUIDITY -->
