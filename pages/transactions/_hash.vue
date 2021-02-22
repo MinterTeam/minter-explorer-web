@@ -319,9 +319,9 @@
 
                     <!-- BUY_SWAP_POOL -->
                     <dt v-if="isBuyPoolType">Buy coins</dt>
-                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coins[0].symbol }}</dd>
+                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coins[tx.data.coins.length - 1].symbol }}</dd>
                     <dt v-if="isBuyPoolType">Spend coins</dt>
-                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coins[tx.data.coins.length - 1].symbol }}</dd>
+                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coins[0].symbol }}</dd>
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
