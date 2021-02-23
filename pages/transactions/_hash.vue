@@ -437,15 +437,19 @@
                 <dt v-if="tx.data.height">Halt height</dt>
                 <dd v-if="tx.data.height">{{ tx.data.height }}</dd>
 
-                <dt v-if="tx.fee">Fee</dt>
-                <dd v-if="tx.fee">
+                <dt v-if="tx.commissionInBaseCoin">Fee</dt>
+                <dd v-if="tx.commissionInBaseCoin">
                     <template v-if="tx.gasCoin.symbol === $store.getters.BASE_COIN">
-                        {{ prettyExact(tx.fee) }} {{ $store.getters.BASE_COIN }}
+                        {{ prettyExact(tx.commissionInBaseCoin) }} {{ $store.getters.BASE_COIN }}
                     </template>
                     <template v-else>
-                        {{ tx.gasCoin.symbol }} <span class="u-text-muted">({{ prettyExact(tx.fee) }} {{ $store.getters.BASE_COIN }})</span>
+                        {{ prettyExact(tx.commissionInGasCoin) }} {{ tx.gasCoin.symbol }} <span class="u-text-muted">({{ prettyExact(tx.commissionInBaseCoin) }} {{ $store.getters.BASE_COIN }})</span>
                     </template>
                 </dd>
+                    <dt v-if="tx.commissionPrice">Fee price</dt>
+                    <dd v-if="tx.commissionPrice">
+                        {{ prettyExact(tx.commissionPrice) }} {{ tx.commissionPriceCoin.symbol }}
+                    </dd>
 
                 <dt v-if="tx.nonce">Nonce</dt>
                 <dd v-if="tx.nonce">{{ tx.nonce }}</dd>

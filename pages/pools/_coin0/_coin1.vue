@@ -211,6 +211,9 @@ export default {
 };
 
 function calculateTradeReturn(amountIn, amountOut) {
+    if (Number(amountIn) === 0) {
+        return 0;
+    }
     return new Big(amountOut).div(amountIn);
     // return amountOut - (amountIn * amountOut / (amountIn + 1));
 }

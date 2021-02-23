@@ -108,6 +108,8 @@ export function getTransaction(hash) {
             if (response.status === 206) {
                 tx.status = TX_STATUS.FAILURE;
             }
+            //@TODO remove
+            tx.commissionInBaseCoin = tx.fee;
             return tx;
         });
 }
@@ -629,7 +631,10 @@ export function getCoinBySymbol(symbol) {
  * @property {string} from
  * @property {string} timestamp
  * @property {Coin} gasCoin
- * @property {number} fee
+ * @property {number} commissionInBaseCoin
+ * @property {number} commissionInGasCoin
+ * @property {number} commissionPrice
+ * @property {Coin} commissionPriceCoin
  * @property {number} type
  * @property {Object} data
  * -- type: TX_TYPE.SEND
