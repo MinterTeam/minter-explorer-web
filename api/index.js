@@ -108,8 +108,7 @@ export function getTransaction(hash) {
             if (response.status === 206) {
                 tx.status = TX_STATUS.FAILURE;
             }
-            //@TODO remove
-            tx.commissionInBaseCoin = tx.fee;
+
             return tx;
         });
 }
