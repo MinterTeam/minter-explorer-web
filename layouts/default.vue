@@ -2,6 +2,7 @@
     import Snackbar from '~/components/common/Snackbar';
     import HeaderMenu from '~/components/HeaderMenu';
     import Search from '~/components/Search';
+    import TestnetNotice from '~/components/TestnetNotice';
     import Footer from '~/layouts/_footer.vue';
 
     export default {
@@ -9,6 +10,7 @@
             Snackbar,
             HeaderMenu,
             Search,
+            TestnetNotice,
             Footer,
         },
         data() {
@@ -32,6 +34,7 @@
 
 <template>
     <div class="main-wrap">
+        <TestnetNotice/>
         <header class="header">
             <div class="header__container u-container">
                 <nuxt-link class="header__logo no-link" to="/" :class="{'header__logo--collapsed': isSearchFocused}">
