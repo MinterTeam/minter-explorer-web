@@ -3,6 +3,7 @@
     import Big from 'big.js';
     import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
+    import {convertFromPip} from "minterjs-util/src/converter.js";
     import {getTransaction, getBlock, getBlockList, getCoinById} from "~/api";
     import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
@@ -133,6 +134,36 @@
             },
             isMultisendType() {
                 return this.isTxType(TX_TYPE.MULTISEND);
+            },
+            commissionPriceList() {
+                if (!this.isTxType(TX_TYPE.VOTE_COMMISSION)) {
+                    return;
+                }
+
+                let commissionData = {...this.tx.data};
+                let list = [];
+                Object.keys(commissionData).forEach((fieldName) => {
+                    if (fieldName !== 'pubKey' && fieldName !== 'height' && fieldName !== 'coin') {
+                        const regex = /[a-z][A-Z0-9]/g;
+                        let result;
+                        let position = 0;
+                        let prettyName = '';
+
+                        while ((result = regex.exec(fieldName)) !== null) {
+                            prettyName += fieldName.substring(position, result.index + 1);
+                            prettyName += ' ' + fieldName[result.index + 1].toLowerCase();
+                            position = result.index + 2;
+                        }
+                        prettyName += fieldName.substring(position, fieldName.length);
+
+                        if (prettyName === 'createTicker710') {
+                            prettyName = 'createTicker7to10';
+                        }
+                        list.push(`${prettyName}: ${prettyExact(convertFromPip(commissionData[fieldName]))}`);
+                    }
+                });
+
+                return list.join('\n');
             },
         },
         mounted() {
@@ -396,10 +427,14 @@
                 <dd v-if="tx.data.ownerAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.ownerAddress">{{ tx.data.ownerAddress }}</nuxt-link></dd>
                     <dt v-if="tx.data.controlAddress">Control address</dt>
                     <dd v-if="tx.data.controlAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.controlAddress">{{ tx.data.controlAddress }}</nuxt-link></dd>
-                    <dt v-if="isDefined(tx.data.height)">Block height</dt>
+                    <dt v-if="isDefined(tx.data.height)">Vote height</dt>
                     <dd v-if="isDefined(tx.data.height)">{{ tx.data.height }}</dd>
                     <dt v-if="isDefined(tx.data.version)">Version</dt>
                     <dd v-if="isDefined(tx.data.version)">{{ tx.data.version }}</dd>
+                    <dt v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">Vote coin</dt>
+                    <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">{{ tx.data.coin.symbol }}</dd>
+                    <dt v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">Vote prices</dt>
+                    <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)" class="u-text-pre-line">{{ commissionPriceList }}</dd>
                     <!-- @TODO UPDATE_COMMISSION -->
 
                 <!-- REDEEM_CHECK -->
@@ -433,10 +468,6 @@
                 <dt v-if="tx.data.weights">Weights Sum</dt>
                 <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
 
-                <!-- SET_HALT_BLOCK -->
-                <dt v-if="tx.data.height">Halt height</dt>
-                <dd v-if="tx.data.height">{{ tx.data.height }}</dd>
-
                 <dt v-if="tx.commissionInBaseCoin">Fee</dt>
                 <dd v-if="tx.commissionInBaseCoin">
                     <template v-if="tx.gasCoin.symbol === $store.getters.BASE_COIN">
@@ -446,8 +477,8 @@
                         {{ prettyExact(tx.commissionInGasCoin) }} {{ tx.gasCoin.symbol }} <span class="u-text-muted">({{ prettyExact(tx.commissionInBaseCoin) }} {{ $store.getters.BASE_COIN }})</span>
                     </template>
                 </dd>
-                    <dt v-if="tx.commissionPrice">Fee price</dt>
-                    <dd v-if="tx.commissionPrice">
+                    <dt v-if="tx.commissionPriceCoin.id > 0">Fee price</dt>
+                    <dd v-if="tx.commissionPriceCoin.id > 0">
                         {{ prettyExact(tx.commissionPrice) }} {{ tx.commissionPriceCoin.symbol }}
                     </dd>
 
@@ -457,6 +488,13 @@
                 <dt>Message</dt>
                 <dd class="u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
 
+                </template>
+                <template v-if="tx.status === $options.TX_STATUS.FAILURE">
+                    <dt>Error code</dt>
+                    <dd>{{ tx.code }}</dd>
+
+                    <dt>Error log</dt>
+                    <dd>{{ tx.log }}</dd>
                 </template>
 
                 <!-- MULTISEND -->
