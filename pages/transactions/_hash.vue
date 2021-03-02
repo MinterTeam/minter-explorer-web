@@ -155,10 +155,8 @@
                             position = result.index + 2;
                         }
                         prettyName += fieldName.substring(position, fieldName.length);
+                        prettyName = prettyName.replace('710', '7 to 10');
 
-                        if (prettyName === 'createTicker710') {
-                            prettyName = 'createTicker7to10';
-                        }
                         list.push(`${prettyName}: ${prettyExact(convertFromPip(commissionData[fieldName]))}`);
                     }
                 });
