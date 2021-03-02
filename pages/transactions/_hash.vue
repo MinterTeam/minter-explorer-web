@@ -233,6 +233,9 @@
                     return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toFixed();
                 }
             },
+            checkFromBase64(b64) {
+                return 'Mc' + Buffer.from(b64, 'base64').toString('hex');
+            },
         },
     };
 </script>
@@ -341,6 +344,8 @@
                 <dd v-if="tx.data.check && tx.data.check.dueBlock">{{ tx.data.check.dueBlock }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
                 <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.coin.symbol }} {{ tx.data.check.value | prettyExact }}</dd>
+                    <dt v-if="tx.data.rawCheck">Check</dt>
+                    <dd v-if="tx.data.rawCheck">{{ checkFromBase64(tx.data.rawCheck) }}</dd>
 
                 <!-- MULTISEND -->
                 <dt v-if="tx.data.list">#Recipients</dt>

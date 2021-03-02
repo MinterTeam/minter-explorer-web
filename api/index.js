@@ -267,6 +267,18 @@ export function getAddressSlashList(address, params = {}) {
         .then((response) => response.data);
 }
 
+export function getAddressUnbondList(address) {
+    return explorer.get(`addresses/${address}/events/unbonds`)
+        .then((response) => {
+            response.data.data = response.data.data.map((item) => {
+                item.height = item.blockId;
+                item.amount = item.value;
+                return item;
+            });
+            return response.data.data;
+        });
+}
+
 /**
  * @param {string} address
  * @param {string} type
@@ -368,7 +380,7 @@ export function getValidatorTransactionList(publicKey, params) {
 }
 
 /**
- * @return {Promise<Array<CoinItem>>}
+ * @return {Promise<Array<CoinInfo>>}
  */
 export function getCoinList() {
     return explorer.get('coins')
@@ -387,19 +399,25 @@ export function getCoinList() {
 
 
 /**
- * @param {number} id
- * @return {Promise<CoinItem>}
+ * @param {number|string} id
+ * @return {Promise<CoinInfo>}
  */
 export function getCoinById(id) {
-    id = Number(id);
-    return getCoinList()
-        .then((coinList) => {
-            const coin = coinList.find((item) => item.id === id);
-            if (!coin) {
-                throw new Error(`Coin with ID ${id} not found`);
-            }
+    return explorer.get(`coins/id/${id}`)
+        .then((response) => {
+            return response.data.data;
+        });
+}
 
-            return coin;
+/**
+ * @param {string} symbol
+ * @return {Promise<CoinInfo>}
+ */
+export function getCoinBySymbol(symbol) {
+    symbol = symbol.toUpperCase();
+    return explorer.get(`coins/symbol/${symbol}`)
+        .then((response) => {
+            return response.data.data;
         });
 }
 
@@ -432,7 +450,7 @@ export function getCoinById(id) {
 /**
  * @typedef {Object} BalanceItem
  * @property {string|number} amount
- * @property {string} coin
+ * @property {Coin} coin
  */
 
 /**
@@ -443,7 +461,7 @@ export function getCoinById(id) {
 
 /**
  * @typedef {Object} StakeItem
- * @property {string} coin
+ * @property {Coin} coin
  * @property {string|number} value
  * @property {string|number} bipValue
  * @property {Validator} [validator] - in address stakes
@@ -475,7 +493,7 @@ export function getCoinById(id) {
  * @property {number} commission
  * @property {number} delegatorCount
 
- * @property {Array<{coin: string, value: string, address: string}>} delegatorList
+ * @property {Array<{coin: Coin, value: string, address: string}>} delegatorList
  */
 
 
@@ -490,17 +508,17 @@ export function getCoinById(id) {
  * @property {number} height
  * @property {string} from
  * @property {string} timestamp
- * @property {string} gasCoin
+ * @property {Coin} gasCoin
  * @property {number} fee
  * @property {number} type
  * @property {Object} data
  * -- type: TX_TYPE.SEND
  * @property {string} [data.to]
- * @property {string} [data.coin]
+ * @property {Coin} [data.coin]
  * @property {number} [data.amount]
  * -- type: TX_TYPE.CONVERT
- * @property {string} [data.coinToSell]
- * @property {string} [data.coinToBuy]
+ * @property {Coin} [data.coinToSell]
+ * @property {Coin} [data.coinToBuy]
  * @property {number} [data.valueToSell]
  * @property {number} [data.valueToBuy]
  * -- type: TX_TYPE.CREATE_COIN
@@ -515,7 +533,7 @@ export function getCoinById(id) {
  * @property {string} [data.address]
  * @property {string} [data.pubKey]
  * @property {number} [data.commission]
- * @property {string} [data.coin]
+ * @property {Coin} [data.coin]
  * @property {number} [data.stake]
  * -- type: TX_TYPE.EDIT_CANDIDATE
  * @property {string} [data.pubKey]
@@ -527,7 +545,7 @@ export function getCoinById(id) {
  * @property {string} [data.newPubKey]
  * -- type: TX_TYPE.DELEGATE, TX_TYPE.UNBOND
  * @property {string} [data.pubKey]
- * @property {string} [data.coin]
+ * @property {Coin} [data.coin]
  * @property {number} [data.value]
  * -- type: TX_TYPE.REDEEM_CHECK
  * @property {string} [data.rawCheck]
@@ -536,12 +554,12 @@ export function getCoinById(id) {
  * @property {string} [data.check.sender]
  * @property {number} [data.check.nonce]
  * @property {number|string} [data.check.value]
- * @property {string} [data.check.coin]
+ * @property {Coin} [data.check.coin]
  * @property {number} [data.check.dueBlock]
  * - type: TX_TYPE.SET_CANDIDATE_ON, TX_TYPE.SET_CANDIDATE_OFF
  * @property {string} [data.pubKey]
  * -- type: TX_TYPE.MULTISEND
- * @property {Array<{to: string, coin: string}>} [data.list]
+ * @property {Array<{to: string, coin: Coin}>} [data.list]
  * -- type: TX_TYPE.CREATE_MULTISIG
  * @property {string|number} [data.multisigAddress]
  * @property {Array<string>} [data.addresses]
@@ -565,18 +583,35 @@ export function getCoinById(id) {
  * @property {number} height
  * @property {string} timestamp
  * @property {string} address
- * @property {string} validator
+ * @property {Validator} validator
  * @property {number} amount
- * @property {string} coin
+ * @property {Coin} coin
  */
 
 /**
- * @typedef {Object} CoinItem
+ * @typedef {Object} Unbond
+ * @property {number} height
+ * @property {string} timestamp
+ * @property {string} validator
+ * @property {number} amount
+ * @property {Coin} coin
+ */
+
+/**
+ * @typedef {Object} Coin
+ * @property {number} id
+ * @property {string} symbol
+ */
+
+/**
+ * @typedef {Object} CoinInfo
  * @property {number} id
  * @property {number} crr
  * @property {number|string} volume
- * @property {number|string} reserve_balance
+ * @property {number|string} reserveBalance
  * @property {string} name
  * @property {string} symbol
+ * @property {number|string} maxSupply
+ * @property {string|null} ownerAddress
  */
 

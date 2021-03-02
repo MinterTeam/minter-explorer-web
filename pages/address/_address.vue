@@ -1,6 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
-    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressSlashList} from "~/api";
+    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressSlashList, getAddressUnbondList} from "~/api";
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -13,6 +13,7 @@
     import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
+    import UnbondListTable from '~/components/UnbondListTable';
     import RewardChart from '~/components/RewardChart';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -37,6 +38,7 @@
             TransactionListTable,
             StakeListTable,
             RewardSlashListTable,
+            UnbondListTable,
             RewardChart,
             BackButton,
             Pagination,
@@ -67,6 +69,8 @@
                 tabPromise = getAddressRewardAggregatedList(params.address, query);
             } else if (activeTab === TAB_TYPES.SLASH) {
                 tabPromise = getAddressSlashList(params.address, query);
+            } else if (activeTab === TAB_TYPES.UNBOND) {
+                tabPromise = getAddressUnbondList(params.address, query);
             }
 
             return Promise.all([balancePromise, txListPromise, tabPromise])
@@ -88,6 +92,11 @@
                             slashList: tabData.data,
                             slashPaginationInfo: tabData.meta,
                             isSlashListLoaded: true,
+                        };
+                    } else if (activeTab === TAB_TYPES.UNBOND) {
+                        tabResult = {
+                            unbondList: tabData,
+                            isUnbondListLoaded: true,
                         };
                     }
 
@@ -142,6 +151,10 @@
                 slashPaginationInfo: {},
                 isSlashListLoading: false,
                 isSlashListLoaded: false,
+                unbondList: [],
+                // unbondPaginationInfo: {},
+                isUnbondListLoading: false,
+                isUnbondListLoaded: false,
                 nonce: '',
                 isNonceQrModalVisible: false,
                 isAddressQrModalVisible: false,
@@ -171,6 +184,9 @@
                         if (this.activeTab === TAB_TYPES.SLASH && !this.isSlashListLoaded) {
                             this.fetchSlashes();
                         }
+                        if (this.activeTab === TAB_TYPES.UNBOND && !this.isUnbondListLoaded) {
+                            this.fetchUnbonds();
+                        }
 
                         this.checkPanelPosition();
 
@@ -184,6 +200,9 @@
                         }
                         if (this.activeTab === TAB_TYPES.SLASH) {
                             this.fetchSlashes();
+                        }
+                        if (this.activeTab === TAB_TYPES.UNBOND) {
+                            this.fetchUnbonds();
                         }
 
                         this.checkPanelPosition();
@@ -204,6 +223,10 @@
                 }
                 if (this.activeTab === TAB_TYPES.SLASH) {
                     return this.slashPaginationInfo;
+                }
+                if (this.activeTab === TAB_TYPES.UNBOND) {
+                    return null;
+                    // return this.unbondPaginationInfo;
                 }
                 return false;
             },
@@ -301,6 +324,19 @@
                     this.isSlashListLoading = false;
                 });
             },
+            fetchUnbonds() {
+                this.isUnbondListLoading = true;
+                getAddressUnbondList(this.$route.params.address, this.$route.query)
+                    .then((unbondList) => {
+                        this.slashList = unbondList;
+                        // this.unbondPaginationInfo = unbondListInfo.meta;
+                        this.isUnbondListLoading = false;
+                        this.isUnbondListLoaded = true;
+                    })
+                    .catch(() => {
+                        this.isUnbondListLoading = false;
+                    });
+            },
         },
     };
 </script>
@@ -361,7 +397,7 @@
                         :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
                         @click="switchTab($options.TAB_TYPES.TX)"
                 >
-                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
                     <span class="u-hidden-medium-down">Transactions</span>
                     <span class="u-hidden-medium-up">Txs</span>
                 </button>
@@ -369,22 +405,29 @@
                         :class="{'is-active': activeTab === $options.TAB_TYPES.STAKE}"
                         @click="switchTab($options.TAB_TYPES.STAKE)"
                 >
-                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-mining.svg" width="40" height="40" alt="" role="presentation">
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-mining.svg" width="40" height="40" alt="" role="presentation">
                     Stakes
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.REWARD}"
                         @click="switchTab($options.TAB_TYPES.REWARD)"
                 >
-                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-reward.svg" width="40" height="40" alt="" role="presentation">
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-reward.svg" width="40" height="40" alt="" role="presentation">
                     Rewards
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.SLASH}"
                         @click="switchTab($options.TAB_TYPES.SLASH)"
                 >
-                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
                     Slashes
+                </button>
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.UNBOND}"
+                        @click="switchTab($options.TAB_TYPES.UNBOND)"
+                >
+                    <!--<img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">-->
+                    Unbonds
                 </button>
             </div>
             <!-- Transactions -->
@@ -393,6 +436,7 @@
             <StakeListTable :stake-list="stakeList" stake-item-type="validator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
             <RewardSlashListTable :data-list="rewardList" data-type="reward" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
             <RewardSlashListTable :data-list="slashList" data-type="slash" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
+            <UnbondListTable :data-list="unbondList" :is-loading="isUnbondListLoading" v-if="activeTab === $options.TAB_TYPES.UNBOND"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
         <!-- Delegation Reward Chard-->
