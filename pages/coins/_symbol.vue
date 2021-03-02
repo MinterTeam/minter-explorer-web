@@ -10,7 +10,7 @@
             BackButton,
         },
         asyncData({ params, error }) {
-            if (params.symbol.length < 3) {
+            if (!params.symbol || params.symbol.length < 3) {
                 return error({
                     statusCode: 404,
                     message: 'Invalid coin symbol',

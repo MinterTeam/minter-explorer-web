@@ -147,7 +147,7 @@ export function padZero(value) {
 
 
 export function fromBase64(str) {
-    //@TODO utf8 https://github.com/dankogai/js-base64
+    //@TODO utf8 https://github.com/dankogai/js-base64/issues/130
     const asci = window.atob(str);
     try {
         return decodeURIComponent(escape(asci));

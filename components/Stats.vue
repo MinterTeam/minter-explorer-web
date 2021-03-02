@@ -38,7 +38,7 @@
 </script>
 
 <template>
-    <div class="index-stats panel">
+    <div class="index-stats panel" v-if="stats">
         <div class="index-stats__section panel__section">
             <div class="u-grid u-grid--vertical-margin">
                 <div class="u-cell">
