@@ -225,7 +225,7 @@ function calculateTradeReturn(amountIn, amountOut) {
             <div class="panel__section panel__header">
                 <h1 class="panel__header-title panel__title">
                     <BackButton/>
-                    {{ pool.coin0.symbol }}-{{ pool.coin1.symbol }} pool
+                    {{ pool.coin0.symbol }} / {{ pool.coin1.symbol }} pool
                 </h1>
             </div>
             <dl>
@@ -233,7 +233,11 @@ function calculateTradeReturn(amountIn, amountOut) {
                 <dd><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></dd>
 
                 <dt>Pair</dt>
-                <dd>{{ pool.coin0.symbol }} / {{ pool.coin1.symbol }}</dd>
+                <dd>
+                    <nuxt-link class="link--default" :to="'/coins/' + pool.coin0.symbol">{{ pool.coin0.symbol }}</nuxt-link>
+                    /
+                    <nuxt-link class="link--default" :to="'/coins/' + pool.coin1.symbol">{{ pool.coin1.symbol }}</nuxt-link>
+                </dd>
 
                 <dt>Amount</dt>
                 <dd><span class="u-fw-500">{{ prettyExact(pool.amount0) }}</span> {{ pool.coin0.symbol }}</dd>
