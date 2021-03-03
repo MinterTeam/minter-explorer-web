@@ -368,6 +368,19 @@ export function getValidatorStakeList(publicKey, params = {}) {
 }
 
 /**
+ * @param {string} address
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<SlashListInfo>}
+ */
+export function getValidatorSlashList(address, params = {}) {
+    params.limit = params.limit || 100;
+    return explorer.get(`validators/${address}/events/slashes`, {params})
+        .then((response) => response.data);
+}
+
+/**
  * @param {string} publicKey
  * @param {Object} [params]
  * @param {number} [params.page]
