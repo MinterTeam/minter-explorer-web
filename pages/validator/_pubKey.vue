@@ -288,7 +288,7 @@
             <!-- Delegation -->
             <StakeListTable :stake-list="stakeList" stake-item-type="delegator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
             <!-- Slashes -->
-            <RewardSlashListTable :data-list="slashList" data-type="slash" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
+            <RewardSlashListTable :data-list="slashList" data-type="slash" item-type="address" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
 
