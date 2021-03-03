@@ -443,6 +443,7 @@ export function getCoinList() {
 
 /**
  * @param {Object} [params]
+ * @param {string|number} [params.coin]
  * @param {number} [params.page]
  * @param {number} [params.limit]
  * @return {Promise<PoolListInfo>}
@@ -461,6 +462,15 @@ export function getPoolList(params) {
  */
 export function getPool(coin0, coin1) {
     return explorer.get(`pools/coins/${coin0}/${coin1}`)
+        .then((response) => response.data.data);
+}
+
+/**
+ * @param {string} symbol
+ * @return {Promise<Pool>}
+ */
+export function getPoolByToken(symbol) {
+    return explorer.get(`pools/token/${symbol}`)
         .then((response) => response.data.data);
 }
 
