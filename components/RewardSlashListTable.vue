@@ -25,6 +25,10 @@
             dataType: {
                 type: String,
             },
+            itemType: {
+                type: String,
+                default: 'validator',
+            },
             isLoading: {
                 type: Boolean,
                 default: false,
@@ -32,10 +36,10 @@
         },
         methods: {
             getValidatorName(item) {
-                return item.validator.name;
+                return item.validator?.name;
             },
             getLabel(item) {
-                const name = item.validator.name || item.validator.publicKey;
+                const name = item.validator?.name || item.validator?.publicKey;
                 return name.toString();
             },
         },
@@ -56,7 +60,7 @@
                 <th>Time</th>
                 <th v-if="dataType === $options.TYPE_SLASH">Block</th>
                 <th v-if="dataType === $options.TYPE_REWARD">Reward Type</th>
-                <th>Validator</th>
+                <th>{{ itemType === 'validator' ? 'Validator' : 'Address' }}</th>
                 <th>Value</th>
             </tr>
             </thead>
@@ -82,9 +86,16 @@
                 </td>
                 <!-- public key -->
                 <td>
-                    <TableLink :link-text="getLabel(dataItem)"
-                               :link-path="'/validator/' + dataItem.validator.publicKey"
-                               :should-not-shorten="!!dataItem.validator.name"
+                    <TableLink
+                        v-if="itemType === 'validator'"
+                        :link-text="getLabel(dataItem)"
+                        :link-path="'/validator/' + dataItem.validator.publicKey"
+                        :should-not-shorten="!!dataItem.validator.name"
+                    />
+                    <TableLink
+                        v-else
+                        :link-text="dataItem.address"
+                        :link-path="'/address/' + dataItem.address"
                     />
                 </td>
                 <!-- value -->

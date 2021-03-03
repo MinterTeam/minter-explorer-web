@@ -1,12 +1,13 @@
 <script>
     import {isValidPublicKeyString} from 'minterjs-util/src/prefix';
-    import {getValidatorTransactionList, getValidator, getValidatorStakeList} from "~/api";
+    import {getValidatorTransactionList, getValidator, getValidatorStakeList, getValidatorSlashList} from "~/api/index.js";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise, prettyRound} from '~/assets/utils';
     import {TAB_TYPES} from '~/assets/variables';
     import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
+    import RewardSlashListTable from '~/components/RewardSlashListTable.vue';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
@@ -29,6 +30,7 @@
         VALIDATOR_STATUS,
         components: {
             StakeListTable,
+            RewardSlashListTable,
             TransactionListTable,
             BackButton,
             Pagination,
@@ -52,14 +54,17 @@
 
             const validatorPromise = getValidator(params.pubKey);
             const stakeListPromise = getValidatorStakeList(params.pubKey, activeTab === TAB_TYPES.STAKE ? query : undefined);
+            const slashListPromise = getValidatorSlashList(params.pubKey, activeTab === TAB_TYPES.SLASH ? query : undefined);
             const txListPromise = getValidatorTransactionList(params.pubKey, activeTab === TAB_TYPES.TX ? query : undefined);
 
-            return Promise.all([validatorPromise, stakeListPromise, txListPromise])
-                .then(([validator, stakeListInfo, txListInfo]) => {
+            return Promise.all([validatorPromise, stakeListPromise, slashListPromise, txListPromise])
+                .then(([validator, stakeListInfo, slashListInfo, txListInfo]) => {
                     return {
                         validator,
                         stakeList: stakeListInfo.data,
                         stakePaginationInfo: stakeListInfo.meta,
+                        slashList: slashListInfo.data,
+                        slashPaginationInfo: slashListInfo.meta,
                         txList: txListInfo.data,
                         txPaginationInfo: txListInfo.meta,
                     };
@@ -91,6 +96,9 @@
                 stakeList: [],
                 stakePaginationInfo: {},
                 isStakeListLoading: false,
+                slashList: [],
+                slashPaginationInfo: {},
+                isSlashListLoading: false,
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: false,
@@ -113,6 +121,9 @@
                         if (this.activeTab === TAB_TYPES.STAKE) {
                             this.fetchStakes();
                         }
+                        if (this.activeTab === TAB_TYPES.SLASH) {
+                            this.fetchSlashes();
+                        }
                     }
                 },
             },
@@ -127,6 +138,9 @@
                 }
                 if (this.activeTab === TAB_TYPES.STAKE) {
                     return this.stakePaginationInfo;
+                }
+                if (this.activeTab === TAB_TYPES.SLASH) {
+                    return this.slashPaginationInfo;
                 }
                 return false;
             },
@@ -166,6 +180,18 @@
                     })
                     .catch(() => {
                         this.isStakeListLoading = false;
+                    });
+            },
+            fetchSlashes() {
+                this.isSlashListLoading = true;
+                getValidatorSlashList(this.$route.params.pubKey, this.$route.query)
+                    .then((slashListInfo) => {
+                        this.slashList = slashListInfo.data;
+                        this.slashPaginationInfo = slashListInfo.meta;
+                        this.isSlashListLoading = false;
+                    })
+                    .catch(() => {
+                        this.isSlashListLoading = false;
                     });
             },
             fetchTxs() {
@@ -249,11 +275,20 @@
                     <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-mining.svg" width="40" height="40" alt="" role="presentation">
                     <span><span class="u-hidden-medium-down">Delegated</span> Stakes</span>
                 </button>
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.SLASH}"
+                        @click="switchTab($options.TAB_TYPES.SLASH)"
+                >
+                    <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
+                    <span>Slashes</span>
+                </button>
             </div>
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-validator="$route.params.pubKey" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
             <!-- Delegation -->
             <StakeListTable :stake-list="stakeList" stake-item-type="delegator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
+            <!-- Slashes -->
+            <RewardSlashListTable :data-list="slashList" data-type="slash" item-type="address" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
 
