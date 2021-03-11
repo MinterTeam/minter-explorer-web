@@ -1,6 +1,6 @@
 <script>
     import {getBlock, getBlockTransactionList} from "~/api";
-    import {getTimeDistance, getTime, pretty, prettyRound} from "~/assets/utils";
+    import {getTimeDistance, getTime, pretty, prettyUsd, prettyRound} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import TransactionList from '~/components/TransactionList';
@@ -94,6 +94,9 @@
             },
         },
         methods: {
+            pretty,
+            prettyUsd,
+            prettyRound,
             fetchTxs() {
                 this.isTxListLoading = true;
                 getBlockTransactionList(this.block.height, this.$route.query)
@@ -127,19 +130,22 @@
             </div>
             <dl>
                 <dt>Height</dt>
-                <dd>{{ block.height | prettyRound }}</dd>
+                <dd>{{ prettyRound(block.height) }}</dd>
 
                 <dt>Timestamp</dt>
                 <dd>{{ block.timeDistance }} ago ({{ block.timeLocal }})</dd>
+
+                <dt>Block time</dt>
+                <dd>{{ prettyUsd(block.blockTime) }} seconds</dd>
 
                 <dt>Hash</dt>
                 <dd class="u-select-all">{{ block.hash }}</dd>
 
                 <dt>Size</dt>
-                <dd>{{ block.size | prettyRound }} bytes</dd>
+                <dd>{{ prettyRound(block.size) }} bytes</dd>
 
                 <dt>Reward</dt>
-                <dd>{{ $store.state.COIN_NAME }} {{ block.reward | pretty }}</dd>
+                <dd>{{ $store.state.COIN_NAME }} {{ pretty(block.reward) }}</dd>
 
                 <dt>#Transactions</dt>
                 <dd>{{ block.transactionCount || txPaginationInfo.total || 0 }}</dd>
@@ -149,8 +155,8 @@
             </dl>
         </section>
         <div class="u-section navigation">
-            <nuxt-link class="button button--ghost-main" :to="prevUrl" v-if="prevUrl">Prev Block</nuxt-link>
-            <nuxt-link class="button button--ghost-main" :to="nextUrl" v-if="nextUrl">Next Block</nuxt-link>
+            <nuxt-link class="button button--ghost-main" :to="prevUrl" v-if="prevUrl">Prev block</nuxt-link>
+            <nuxt-link class="button button--ghost-main" :to="nextUrl" v-if="nextUrl">Next block</nuxt-link>
         </div>
         <TransactionList data-tx-panel
                          :tx-list="txList"

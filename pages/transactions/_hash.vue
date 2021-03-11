@@ -12,6 +12,11 @@
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
 
+    Big.DP = 18;
+    Big.RM = 2;
+
+    const HUB_ADDRESS = 'Mxffffffffffffffffffffffffffffffffffffffff';
+
     let fetchTxTimer;
     let fetchTxDestroy;
     let resizeHandler;
@@ -162,6 +167,40 @@
                 });
 
                 return list.join('\n');
+            },
+            payloadParsed() {
+                try {
+                    return JSON.parse(fromBase64(this.tx.payload));
+                } catch (e) {
+                    return null;
+                }
+            },
+            isFromHubTx() {
+                return this.tx.from === HUB_ADDRESS;
+            },
+            isToHubTx() {
+                return this.tx.data.to === HUB_ADDRESS && this.payloadParsed?.type === 'send_to_eth';
+            },
+            hubNetworkFee() {
+                if (!this.isToHubTx) {
+                    return 0;
+                }
+
+                return convertFromPip(this.payloadParsed.fee);
+            },
+            hubBridgeFee() {
+                if (!this.isToHubTx) {
+                    return 0;
+                }
+
+                return new Big(this.tx.data.value).times(0.01).toFixed(18);
+            },
+            hubAmount() {
+                if (!this.isToHubTx) {
+                    return;
+                }
+
+                return new Big(this.tx.data.value).minus(this.hubBridgeFee).minus(this.hubNetworkFee).toFixed(18);
             },
         },
         mounted() {
@@ -359,7 +398,15 @@
 
                     <!-- CREATE_SWAP_POOL -->
                     <dt v-if="tx.data.poolToken">Pool token</dt>
-                    <dd v-if="tx.data.poolToken">{{ tx.data.poolToken.symbol }}</dd>
+                    <dd v-if="tx.data.poolToken">
+                        <nuxt-link class="link--default" :to="'/coins/' + tx.data.poolToken.symbol">{{ tx.data.poolToken.symbol }}</nuxt-link>
+                    </dd>
+                    <dt v-if="tx.data.coin0 && tx.data.coin1">Pool</dt>
+                    <dd v-if="tx.data.coin0 && tx.data.coin1">
+                        <nuxt-link class="link--default" :to="'/pools/' + tx.data.coin0.symbol + '/' + tx.data.coin1.symbol">
+                            {{ tx.data.coin0.symbol }} / {{ tx.data.coin1.symbol }}
+                        </nuxt-link>
+                    </dd>
                     <dt v-if="tx.data.coin0">First coin</dt>
                     <dd v-if="tx.data.coin0"><span v-if="isDefined(tx.data.volume0)">{{ prettyExact(tx.data.volume0) }}</span> {{ tx.data.coin0.symbol }} </dd>
                     <dt v-if="tx.data.coin1">Second coin</dt>
@@ -466,6 +513,22 @@
                 <dt v-if="tx.data.weights">Weights Sum</dt>
                 <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
 
+                    <!-- HUB -->
+                    <dt v-if="isFromHubTx || isToHubTx">Purpose</dt>
+                    <dd v-if="isFromHubTx || isToHubTx">
+                        <template v-if="isFromHubTx">Deposit from Hub</template>
+                        <template v-if="isToHubTx">Withdraw to Hub</template>
+                    </dd>
+                    <dt v-if="isToHubTx">Hub info</dt>
+                    <dd v-if="isToHubTx">
+                        Type: {{ payloadParsed.type === 'send_to_eth' ? 'Send to Ethereum' : payloadParsed.type }}<br>
+                        Recipient: {{ payloadParsed.recipient }}<br>
+                        Amount: {{ prettyExact(hubAmount) }} {{ tx.data.coin.symbol }}<br>
+                        Ethereum fee: {{ prettyExact(hubNetworkFee) }} {{ tx.data.coin.symbol }}<br>
+                        Hub bridge fee: {{ prettyExact(hubBridgeFee) }} {{ tx.data.coin.symbol }}
+                    </dd>
+
+
                 <dt v-if="tx.commissionInBaseCoin">Fee</dt>
                 <dd v-if="tx.commissionInBaseCoin">
                     <template v-if="tx.gasCoin.symbol === $store.getters.BASE_COIN">
@@ -478,6 +541,10 @@
                     <dt v-if="tx.commissionPriceCoin.id > 0">Fee price</dt>
                     <dd v-if="tx.commissionPriceCoin.id > 0">
                         {{ prettyExact(tx.commissionPrice) }} {{ tx.commissionPriceCoin.symbol }}
+                    </dd>
+                    <dt>Fee multiplier</dt>
+                    <dd>
+                        {{ tx.gasPrice }}
                     </dd>
 
                 <dt v-if="tx.nonce">Nonce</dt>
