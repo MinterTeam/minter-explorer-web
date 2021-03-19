@@ -5,7 +5,7 @@
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
     import {getTransaction, getBlock, getBlockList, getCoinById} from "~/api";
-    import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
+    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {UNBOND_PERIOD, TX_STATUS} from "~/assets/variables";
@@ -228,6 +228,7 @@
         },
         methods: {
             fromBase64,
+            pretty,
             prettyExact,
             prettyRound,
             timeDistance: getTimeDistance,
@@ -411,6 +412,14 @@
                     <dd v-if="tx.data.coin0"><span v-if="isDefined(tx.data.volume0)">{{ prettyExact(tx.data.volume0) }}</span> {{ tx.data.coin0.symbol }} </dd>
                     <dt v-if="tx.data.coin1">Second coin</dt>
                     <dd v-if="tx.data.coin1"><span v-if="isDefined(tx.data.volume1)">{{ prettyExact(tx.data.volume1) }}</span> {{ tx.data.coin1.symbol }}</dd>
+                    <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin0.symbol }} price</dt>
+                    <dd v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">
+                        {{ pretty(tx.data.volume1 / tx.data.volume0) }} {{ tx.data.coin1.symbol }}
+                    </dd>
+                    <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin1.symbol }} price</dt>
+                    <dd v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">
+                        {{ pretty(tx.data.volume0 / tx.data.volume1) }} {{ tx.data.coin0.symbol }}
+                    </dd>
                     <!-- ADD_LIQUIDITY -->
                     <dt v-if="tx.data.maximumVolume1">Max volume of second coin</dt>
                     <dd v-if="tx.data.maximumVolume1">{{ prettyExact(tx.data.maximumVolume1) }}</dd>

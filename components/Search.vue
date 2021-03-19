@@ -21,7 +21,7 @@
                 } else if (/^\d+$/.test(query)) {
                     this.$router.push('/blocks/' + query);
                 } else {
-                    this.$router.push('/coins/' + query);
+                    this.$router.push('/coins/' + query.toUpperCase());
                 }
                 this.query = '';
             },

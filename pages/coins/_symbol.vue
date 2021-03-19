@@ -13,12 +13,16 @@ export default {
         Pagination,
         PoolList,
     },
-    asyncData({ params, error }) {
+    asyncData({ params, error, redirect }) {
         if (!params.symbol || params.symbol.length < 3) {
             return error({
                 statusCode: 404,
                 message: 'Invalid coin symbol',
             });
+        }
+
+        if (params.symbol !== params.symbol.toUpperCase()) {
+            return redirect('/coins/' + params.symbol.toUpperCase());
         }
 
         return getCoinBySymbol(params.symbol)
@@ -87,7 +91,7 @@ export default {
     },
     computed: {
         isPoolToken() {
-            return this.$route.params.symbol.indexOf('P-') === 0;
+            return this.$route.params.symbol.indexOf('LP-') === 0;
         },
     },
     methods: {
@@ -143,6 +147,16 @@ export default {
                     <nuxt-link class="link--default" :to="'/pools/' + pool.coin0.symbol + '/' + pool.coin1.symbol">
                         {{ pool.coin0.symbol }} / {{ pool.coin1.symbol }}
                     </nuxt-link>
+                </dd>
+                <dt v-if="pool">First coin</dt>
+                <dd v-if="pool">
+                    {{ pretty(pool.amount0) }}
+                    <nuxt-link class="link--default" :to="'/coins/' + pool.coin0.symbol">{{ pool.coin0.symbol }}</nuxt-link>
+                </dd>
+                <dt v-if="pool">Second coin</dt>
+                <dd v-if="pool">
+                    {{ pretty(pool.amount1) }}
+                    <nuxt-link class="link--default" :to="'/coins/' + pool.coin1.symbol">{{ pool.coin1.symbol }}</nuxt-link>
                 </dd>
             </dl>
         </section>
