@@ -4,4 +4,7 @@ export default {
     COIN_NAME() {
         return COIN_NAME;
     },
+    BASE_COIN() {
+        return COIN_NAME;
+    },
 };

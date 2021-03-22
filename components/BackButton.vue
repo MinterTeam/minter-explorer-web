@@ -13,7 +13,7 @@
 </script>
 
 <template>
-    <button class="u-semantic-button panel__header-title-icon" @click="goBack">
+    <button class="u-semantic-button panel__header-title-icon link--opacity" @click="goBack">
         <img class="u-display-block" src="/img/icon-back.svg" width="40" height="40" alt="Back">
     </button>
 </template>

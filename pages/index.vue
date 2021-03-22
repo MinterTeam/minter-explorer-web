@@ -2,7 +2,7 @@
     // import Vue from 'vue';
     // import SockJS from "sockjs-client";
     import Centrifuge from 'centrifuge/src';
-    import {getBlockList, getStatus, getTransactionList} from "~/api";
+    import {getBlockList, getStatus, getTransactionList, getPoolList} from "~/api/index.js";
     import getTitle from '~/assets/get-title';
     import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
     import {toCamel} from '~/assets/to-camel.js';
@@ -10,9 +10,11 @@
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
     import PreviewTransactions from '~/components/PreviewTransactions';
+    import PreviewPools from '~/components/PreviewPools.vue';
 
     const BLOCK_LIST_LENGTH = 20;
     const TX_LIST_LENGTH = 20;
+    const POOL_LIST_LENGTH = 10;
 
     let centrifuge;
     let timeInterval = null;
@@ -22,7 +24,8 @@
         statsPromise = getStatus();
         const blocksPromise = getBlockList().then((blockListInfo) => blockListInfo.data);
         const txPromise = getTransactionList().then((txListInfo) => txListInfo.data);
-        return Promise.all([statsPromise, blocksPromise, txPromise]);
+        const poolsPromise = getPoolList().then((poolListInfo) => poolListInfo.data);
+        return Promise.all([statsPromise, blocksPromise, txPromise, poolsPromise]);
     }
 
     export default {
@@ -31,17 +34,19 @@
             HistoryChart,
             PreviewBlocks,
             PreviewTransactions,
+            PreviewPools,
         },
         asyncData() {
             if (process.server) {
                 return;
             }
             return getAllData()
-                .then(([stats, blockList, txList]) => {
+                .then(([stats, blockList, txList, poolList]) => {
                     return {
                         stats,
                         blockList: blockList.slice(0, BLOCK_LIST_LENGTH),
                         txList: txList.slice(0, TX_LIST_LENGTH),
+                        poolList: poolList.slice(0, POOL_LIST_LENGTH),
                         isDataLoading: false,
                         lastBlockTime: Date.now(),
                         lastTxTime: Date.now(),
@@ -70,8 +75,10 @@
                 stats: null,
                 /** @type Array<Block> */
                 blockList: [],
-                /*** @type Array<Transaction> */
+                /** @type Array<Transaction> */
                 txList: [],
+                /** @type Array<Pool> */
+                poolList: [],
                 lastBlockTime: 0,
                 lastTxTime: 0,
             };
@@ -189,6 +196,9 @@
         </section>
         <section class="u-cell u-cell--large--1-2">
             <PreviewTransactions :tx-list="txList"/>
+        </section>
+        <section class="u-cell">
+            <PreviewPools :pool-list="poolList" :bip-price-usd="stats.bipPriceBtc"/>
         </section>
     </div>
     <h1 class="u-text-center" style="margin-top: 50px" v-else>{{ network }} explorer is not available</h1>

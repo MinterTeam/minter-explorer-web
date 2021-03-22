@@ -6,7 +6,7 @@
     import TableLink from '~/components/TableLink';
 
     export default {
-        ideFix: null,
+        TX_TYPE,
         UNBOND_PERIOD,
         components: {
             TableLink,
@@ -53,6 +53,7 @@
             },
         },
         methods: {
+            pretty,
             prettyRound,
             fromBase64,
             isCurrentAddress(address) {
@@ -71,16 +72,25 @@
                 this.$set(this.isTxExpanded, txn, !this.isTxExpanded[txn]);
             },
             isSell(tx) {
-                return tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL);
+                return this.isTxType(tx, TX_TYPE.SELL) || this.isTxType(tx, TX_TYPE.SELL_ALL);
+            },
+            isSellPool(tx) {
+                return this.isTxType(tx, TX_TYPE.SELL_SWAP_POOL) || this.isTxType(tx, TX_TYPE.SELL_ALL_SWAP_POOL);
             },
             isBuy(tx) {
-                return tx.type === Number(TX_TYPE.BUY);
+                return this.isTxType(tx, TX_TYPE.BUY);
+            },
+            isBuyPool(tx) {
+                return this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
             },
             isUnbond(tx) {
-                return tx.type === Number(TX_TYPE.UNBOND);
+                return this.isTxType(tx, TX_TYPE.UNBOND);
             },
             isMultisend(tx) {
-                return tx.type === Number(TX_TYPE.MULTISEND);
+                return this.isTxType(tx, TX_TYPE.MULTISEND);
+            },
+            isTxType(tx, txType) {
+                return tx.type === Number(txType);
             },
             isIncomeMultisend(tx) {
                 if (!this.isMultisend(tx)) {
@@ -114,20 +124,41 @@
                 }
             },
             getConvertCoinSymbol(tx) {
-                if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
+                if (this.isSell(tx)) {
                     return tx.data.coinToSell.symbol;
                 }
-                if (tx.type === Number(TX_TYPE.BUY)) {
+                if (this.isBuy(tx)) {
                     return tx.data.coinToBuy.symbol;
+                }
+                if (this.isSellPool(tx)) {
+                    return tx.data.coins[0].symbol;
+                }
+                if (this.isBuyPool(tx)) {
+                    return tx.data.coins[tx.data.coins.length - 1].symbol;
                 }
             },
             getConvertValue(tx) {
-                if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
+                if (this.isSell(tx) || this.isSellPool(tx)) {
                     return tx.data.valueToSell;
                 }
-                if (tx.type === Number(TX_TYPE.BUY)) {
+                if (this.isBuy(tx) || this.isBuyPool(tx)) {
                     return tx.data.valueToBuy;
                 }
+            },
+            isEditPool(tx) {
+                return this.isTxType(tx, TX_TYPE.CREATE_SWAP_POOL) || this.isTxType(tx, TX_TYPE.ADD_LIQUIDITY) || this.isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY);
+            },
+            getPoolCoins(tx) {
+                let symbol0, symbol1;
+                if (tx.data.coin0.id < tx.data.coin1.id) {
+                    symbol0 = tx.data.coin0.symbol;
+                    symbol1 = tx.data.coin1.symbol;
+                } else {
+                    symbol0 = tx.data.coin1.symbol;
+                    symbol1 = tx.data.coin0.symbol;
+                }
+
+                return `${symbol0} / ${symbol1}`;
             },
             getMultisendDeliveryList(tx) {
                 if (!this.currentAddress) {
@@ -226,6 +257,9 @@
                         <template v-if="hasAmount(tx)">
                             {{ getAmountWithCoin(tx) }}
                         </template>
+                        <template v-else-if="isEditPool(tx)">
+                            {{ getPoolCoins(tx) }}
+                        </template>
                     </td>
                     <!--expand button -->
                     <td class="table__controls-cell">
@@ -245,7 +279,7 @@
                                 />
                             </div>
 
-                            <!-- SELL -->
+                            <!-- SELL, SELL_ALL -->
                             <div class="table__inner-item" v-if="isSell(tx)">
                                 <strong>Sell coins</strong> <br>
                                 {{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | pretty }}
@@ -254,6 +288,15 @@
                                 <strong>Get coins</strong> <br>
                                 {{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | pretty  }}
                             </div>
+                            <!-- SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
+                            <div class="table__inner-item" v-if="isSellPool(tx)">
+                                <strong>Sell coins</strong> <br>
+                                {{ tx.data.coins[0].symbol }} {{ tx.data.valueToSell | pretty }}
+                            </div>
+                            <div class="table__inner-item" v-if="isSellPool(tx)">
+                                <strong>Get coins</strong> <br>
+                                {{ tx.data.coins[tx.data.coins.length - 1].symbol }} {{ tx.data.valueToBuy | pretty  }}
+                            </div>
                             <!-- BUY -->
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Buy coins</strong> <br>
@@ -261,10 +304,33 @@
                             </div>
                             <div class="table__inner-item" v-if="isBuy(tx)">
                                 <strong>Spend coins</strong> <br>
-                                {{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | pretty }}
+                                {{ tx.data.coinToSell.symbol }} {{ pretty(tx.data.valueToSell) }}
+                            </div>
+                            <!-- BUY_SWAP_POOL -->
+                            <div class="table__inner-item" v-if="isBuyPool(tx)">
+                                <strong>Buy coins</strong> <br>
+                                {{ tx.data.coins[tx.data.coins.length - 1].symbol }} {{ tx.data.valueToBuy | pretty }}
+                            </div>
+                            <div class="table__inner-item" v-if="isBuyPool(tx)">
+                                <strong>Spend coins</strong> <br>
+                                {{ tx.data.coins[0].symbol }} {{ pretty(tx.data.valueToSell) }}
                             </div>
 
-                            <!-- type CREATE_COIN -->
+                            <!-- CREATE_SWAP_POOL, ADD_LIQUIDITY, REMOVE_LIQUIDITY -->
+                            <div class="table__inner-item" v-if="isDefined(tx.data.coin0)">
+                                <strong>First coin</strong> <br>
+                                {{ tx.data.coin0.symbol }} <span v-if="tx.data.volume0">{{ pretty(tx.data.volume0) }}</span>
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.coin1)">
+                                <strong>Second coin</strong> <br>
+                                {{ tx.data.coin1.symbol }} <span v-if="tx.data.volume1">{{ pretty(tx.data.volume1) }} </span>
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.liquidity)">
+                                <strong>Liquidity</strong> <br>
+                                {{ pretty(tx.data.liquidity) }}
+                            </div>
+
+                            <!-- type CREATE_COIN, RECREATE_COIN, EDIT_TICKER_OWNER, CREATE_TOKEN, RECREATE_TOKEN -->
                             <div class="table__inner-item" v-if="tx.data.createdCoinId">
                                 <strong>Coin ID</strong> <br>
                                 {{ tx.data.createdCoinId }}
@@ -293,8 +359,24 @@
                                 <strong>Max supply</strong> <br>
                                 {{ prettyRound(tx.data.maxSupply) }}
                             </div>
+                            <div class="table__inner-item" v-if="tx.data.newOwner">
+                                <strong>Owner address</strong> <br>
+                                <TableLink :link-text="tx.data.newOwner"
+                                           :link-path="'/address/' + tx.data.newOwner"
+                                           :is-not-link="isCurrentAddress(tx.data.newOwner)"
+                                           :should-not-shorten="true"
+                                />
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.mintable">
+                                <strong>Mintable</strong> <br>
+                                {{ tx.data.mintable ? 'Yes' : 'No' }}
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.burnable">
+                                <strong>Burnable</strong> <br>
+                                {{ tx.data.burnable ? 'Yes' : 'No' }}
+                            </div>
 
-                            <!-- type DECLARE_CANDIDACY, EDIT_CANDIDATE, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE -->
+                            <!-- type DECLARE_CANDIDACY, EDIT_CANDIDATE, DELEGATE, UNBOND, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE, EDIT_CANDIDATE_PUBLIC_KEY, EDIT_CANDIDATE_COMMISSION, VOTE_HALT_BLOCK, VOTE_UPDATE, VOTE_COMMISSION -->
                             <div class="table__inner-item" v-if="getValidatorName(tx)">
                                 <strong>Validator</strong> <br>
                                 <TableLink :link-text="getValidatorName(tx)"
@@ -308,6 +390,14 @@
                                 <TableLink :link-text="tx.data.pubKey"
                                            :link-path="'/validator/' + tx.data.pubKey"
                                            :is-not-link="isCurrentValidator(tx.data.pubKey)"
+                                           :should-not-shorten="true"
+                                />
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.newPubKey">
+                                <strong>New public key</strong> <br>
+                                <TableLink :link-text="tx.data.newPubKey"
+                                           :link-path="'/validator/' + tx.data.newPubKey"
+                                           :is-not-link="isCurrentValidator(tx.data.newPubKey)"
                                            :should-not-shorten="true"
                                 />
                             </div>
@@ -343,6 +433,18 @@
                                            :link-path="'/address/' + tx.data.controlAddress"
                                            :is-not-link="isCurrentAddress(tx.data.controlAddress)"
                                 />
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.commission)">
+                                <strong>Commission</strong> <br>
+                                {{ tx.data.commission }}&thinsp;%
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.height)">
+                                <strong>Block height</strong> <br>
+                                {{ tx.data.height }}
+                            </div>
+                            <div class="table__inner-item" v-if="isDefined(tx.data.version)">
+                                <strong>Version</strong> <br>
+                                {{ tx.data.version }}
                             </div>
 
                             <!-- type REDEEM_CHECK -->
@@ -395,6 +497,6 @@
             </template>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No Transactions</div>
+        <div class="panel__content panel__section u-text-center" v-else>No transactions</div>
     </div>
 </template>

@@ -108,6 +108,7 @@ export function getTransaction(hash) {
             if (response.status === 206) {
                 tx.status = TX_STATUS.FAILURE;
             }
+
             return tx;
         });
 }
@@ -368,6 +369,19 @@ export function getValidatorStakeList(publicKey, params = {}) {
 }
 
 /**
+ * @param {string} address
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<SlashListInfo>}
+ */
+export function getValidatorSlashList(address, params = {}) {
+    params.limit = params.limit || 100;
+    return explorer.get(`validators/${address}/events/slashes`, {params})
+        .then((response) => response.data);
+}
+
+/**
  * @param {string} publicKey
  * @param {Object} [params]
  * @param {number} [params.page]
@@ -395,6 +409,136 @@ export function getCoinList() {
     //         return a.symbol.localeCompare(b.symbol);
     //     }
     // }));
+}
+
+/**
+ * @typedef {Object} PoolListInfo
+ * @property {Array<Pool>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
+ * @typedef {Object} Pool
+ * @property {Coin} coin0
+ * @property {Coin} coin1
+ * @property {number|string} amount0
+ * @property {number|string} amount1
+ * @property {number|string} liquidity
+ * @property {number|string} liquidityBip
+ * @property {string} token
+ */
+
+/**
+ * @typedef {Object} PoolProvider
+ * @property {string} address
+ * @property {Coin} coin0
+ * @property {Coin} coin1
+ * @property {number|string} amount0
+ * @property {number|string} amount1
+ * @property {number|string} liquidity
+ * @property {number|string} liquidityBip
+ * @property {number|string} liquidityShare
+ * @property {string} token
+ */
+
+/**
+ * @typedef {Object} PoolProviderListInfo
+ * @property {Array<PoolProvider>} data
+ * @property {Object} meta - pagination
+ */
+
+/**
+ * @typedef {Object} ProviderPoolListInfo
+ * @property {Array<PoolProvider>} data
+ * @property {Object} meta - pagination
+ */
+
+
+/**
+ * @param {Object} [params]
+ * @param {string|number} [params.coin]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<PoolListInfo>}
+ */
+export function getPoolList(params) {
+    return explorer.get('pools', {
+            params,
+        })
+        .then((response) => response.data);
+}
+
+/**
+ * @param {string} coin0
+ * @param {string} coin1
+ * @return {Promise<Pool>}
+ */
+export function getPool(coin0, coin1) {
+    return explorer.get(`pools/coins/${coin0}/${coin1}`)
+        .then((response) => response.data.data);
+}
+
+/**
+ * @param {string} symbol
+ * @return {Promise<Pool>}
+ */
+export function getPoolByToken(symbol) {
+    return explorer.get(`pools/token/${symbol}`)
+        .then((response) => response.data.data);
+}
+
+/**
+ *
+ * @param {string} coin0
+ * @param {string} coin1
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<TransactionListInfo>}
+ */
+export function getPoolTransactionList(coin0, coin1, params) {
+    return explorer.get(`pools/coins/${coin0}/${coin1}/transactions`, {params})
+        .then((response) => response.data);
+}
+
+/**
+ * @param {string} coin0
+ * @param {string} coin1
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<PoolProviderListInfo>}
+ */
+export function getPoolProviderList(coin0, coin1, params) {
+    return explorer.get(`pools/coins/${coin0}/${coin1}/providers`, {
+            params,
+        })
+        .then((response) => response.data);
+}
+
+/**
+ * @param {string} coin0
+ * @param {string} coin1
+ * @param {string} address
+ * @return {Promise<PoolProvider>}
+ */
+export function getPoolProvider(coin0, coin1, address) {
+    return explorer.get(`pools/coins/${coin0}/${coin1}/providers/${address}`)
+        .then((response) => response.data.data);
+}
+
+/**
+ * @param {string} address
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<ProviderPoolListInfo>}
+ */
+export function getProviderPoolList(address, params) {
+    return explorer.get(`pools/providers/${address}`, {
+            params,
+        })
+        .then((response) => response.data);
 }
 
 
@@ -509,7 +653,10 @@ export function getCoinBySymbol(symbol) {
  * @property {string} from
  * @property {string} timestamp
  * @property {Coin} gasCoin
- * @property {number} fee
+ * @property {number} commissionInBaseCoin
+ * @property {number} commissionInGasCoin
+ * @property {number} commissionPrice
+ * @property {Coin} commissionPriceCoin
  * @property {number} type
  * @property {Object} data
  * -- type: TX_TYPE.SEND

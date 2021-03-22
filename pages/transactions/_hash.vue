@@ -3,19 +3,26 @@
     import Big from 'big.js';
     import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
+    import {convertFromPip} from "minterjs-util/src/converter.js";
     import {getTransaction, getBlock, getBlockList, getCoinById} from "~/api";
-    import {getTimeDistance, getTime, getTimeMinutes, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
+    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {UNBOND_PERIOD, TX_STATUS} from "~/assets/variables";
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
 
+    Big.DP = 18;
+    Big.RM = 2;
+
+    const HUB_ADDRESS = 'Mxffffffffffffffffffffffffffffffffffffffff';
+
     let fetchTxTimer;
     let fetchTxDestroy;
     let resizeHandler;
 
     export default {
+        TX_TYPE,
         UNBOND_PERIOD,
         TX_STATUS,
         components: {
@@ -27,9 +34,8 @@
             prettyRound,
             txType: txTypeFilter,
             timeDistance: getTimeDistance,
-            timeDistanceFuture: (value) => getTimeDistance(value, true),
+            // timeDistanceFuture: (value) => getTimeDistance(value, true),
             time: getTime,
-            timeMinutes: getTimeMinutes,
         },
         asyncData({ params, error }) {
             if (!isValidTransaction(params.hash)) {
@@ -77,7 +83,7 @@
         },
         computed: {
             unbondBlockHeight() {
-                if (!this.tx || !this.isUnbond(this.tx)) {
+                if (!this.tx || !this.isUnbondType) {
                     return;
                 }
                 return this.tx.height + UNBOND_PERIOD;
@@ -107,6 +113,95 @@
                 const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
                 return validator || {};
             },
+            coinPath() {
+                if (!this.tx.data.coins) {
+                    return '';
+                }
+                return this.tx.data.coins.map((item) => item.symbol).join(' > ');
+            },
+            isSellType() {
+                return this.isTxType(TX_TYPE.SELL) || this.isTxType(TX_TYPE.SELL_ALL);
+            },
+            isSellPoolType() {
+                return this.isTxType(TX_TYPE.SELL_SWAP_POOL) || this.isTxType(TX_TYPE.SELL_ALL_SWAP_POOL);
+            },
+            isBuyType() {
+                return this.isTxType(TX_TYPE.BUY);
+            },
+            isBuyPoolType() {
+                return this.isTxType(TX_TYPE.BUY_SWAP_POOL);
+            },
+            isUnbondType() {
+                return this.isTxType(TX_TYPE.UNBOND);
+            },
+            isStakeType() {
+                return this.isTxType(TX_TYPE.UNBOND) || this.isTxType(TX_TYPE.DELEGATE) || this.isTxType(TX_TYPE.DECLARE_CANDIDACY);
+            },
+            isMultisendType() {
+                return this.isTxType(TX_TYPE.MULTISEND);
+            },
+            commissionPriceList() {
+                if (!this.isTxType(TX_TYPE.VOTE_COMMISSION)) {
+                    return;
+                }
+
+                let commissionData = {...this.tx.data};
+                let list = [];
+                Object.keys(commissionData).forEach((fieldName) => {
+                    if (fieldName !== 'pubKey' && fieldName !== 'height' && fieldName !== 'coin') {
+                        const regex = /[a-z][A-Z0-9]/g;
+                        let result;
+                        let position = 0;
+                        let prettyName = '';
+
+                        while ((result = regex.exec(fieldName)) !== null) {
+                            prettyName += fieldName.substring(position, result.index + 1);
+                            prettyName += ' ' + fieldName[result.index + 1].toLowerCase();
+                            position = result.index + 2;
+                        }
+                        prettyName += fieldName.substring(position, fieldName.length);
+                        prettyName = prettyName.replace('710', '7 to 10');
+
+                        list.push(`${prettyName}: ${prettyExact(convertFromPip(commissionData[fieldName]))}`);
+                    }
+                });
+
+                return list.join('\n');
+            },
+            payloadParsed() {
+                try {
+                    return JSON.parse(fromBase64(this.tx.payload));
+                } catch (e) {
+                    return null;
+                }
+            },
+            isFromHubTx() {
+                return this.tx.from === HUB_ADDRESS;
+            },
+            isToHubTx() {
+                return this.tx.data.to === HUB_ADDRESS && this.payloadParsed?.type === 'send_to_eth';
+            },
+            hubNetworkFee() {
+                if (!this.isToHubTx) {
+                    return 0;
+                }
+
+                return convertFromPip(this.payloadParsed.fee);
+            },
+            hubBridgeFee() {
+                if (!this.isToHubTx) {
+                    return 0;
+                }
+
+                return new Big(this.tx.data.value).times(0.01).toFixed(18);
+            },
+            hubAmount() {
+                if (!this.isToHubTx) {
+                    return;
+                }
+
+                return new Big(this.tx.data.value).minus(this.hubBridgeFee).minus(this.hubNetworkFee).toFixed(18);
+            },
         },
         mounted() {
             if (!this.tx) {
@@ -119,7 +214,7 @@
                 resizeHandler = debounce(() => {
                     this.shouldShortenAddress = this.getShouldShortenAddress();
                 });
-                window.addEventListener('resize', resizeHandler, 100);
+                window.addEventListener('resize', resizeHandler);
             }
         },
         destroyed() {
@@ -133,6 +228,13 @@
         },
         methods: {
             fromBase64,
+            pretty,
+            prettyExact,
+            prettyRound,
+            timeDistance: getTimeDistance,
+            timeDistanceFuture: (value) => getTimeDistance(value, true),
+            time: getTime,
+            timeMinutes: getTimeMinutes,
             fetchTx() {
                 getTransaction(this.$route.params.hash)
                     .then((tx) => {
@@ -151,7 +253,7 @@
                     });
             },
             fetchUnbondBlock() {
-                if (this.isUnbond(this.tx)) {
+                if (this.isUnbondType) {
                     getBlock(this.unbondBlockHeight)
                         .then((block) => this.unbondOrLastBlock = block)
                         .catch((e) => {
@@ -183,20 +285,8 @@
             isDefined(value) {
                 return typeof value !== 'undefined';
             },
-            isSell(tx) {
-                return tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL);
-            },
-            isBuy(tx) {
-                return tx.type === Number(TX_TYPE.BUY);
-            },
-            isUnbond(tx) {
-                return tx.type === Number(TX_TYPE.UNBOND);
-            },
-            isStake(tx) {
-                return tx.type === Number(TX_TYPE.UNBOND) || tx.type === Number(TX_TYPE.DELEGATE) || tx.type === Number(TX_TYPE.DECLARE_CANDIDACY);
-            },
-            isMultisend(tx) {
-                return tx.type === Number(TX_TYPE.MULTISEND);
+            isTxType(txType) {
+                return this.tx.type === Number(txType);
             },
             getShouldShortenAddress() {
                 return process.client && window.innerWidth < 700;
@@ -205,7 +295,7 @@
                 return tx.data.list || [];
             },
             isMultisendMultipleCoin(tx) {
-                if (!this.isMultisend(tx)) {
+                if (!this.isMultisendType) {
                     return;
                 }
                 const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
@@ -214,7 +304,7 @@
                 });
             },
             getMultisendCoin(tx) {
-                if (!this.isMultisend(tx)) {
+                if (!this.isMultisendType) {
                     return;
                 }
                 if (!this.isMultisendMultipleCoin(tx)) {
@@ -223,7 +313,7 @@
                 }
             },
             getMultisendValue(tx) {
-                if (!this.isMultisend(tx)) {
+                if (!this.isMultisendType) {
                     return;
                 }
                 const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
@@ -272,24 +362,76 @@
 
 
 
-                <!-- SEND -->
+                <!-- SEND, MINT_TOKEN, BURN_TOKEN -->
                 <dt v-if="tx.data.to">To</dt>
                 <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
-                <dt v-if="isDefined(tx.data.value) && !isStake(tx)">Amount</dt>
-                <dd v-if="isDefined(tx.data.value) && !isStake(tx)">{{ tx.data.coin.symbol }} {{ tx.data.value | prettyExact }}</dd>
+                <dt v-if="isDefined(tx.data.value) && !isStakeType">Amount</dt>
+                <dd v-if="isDefined(tx.data.value) && !isStakeType">{{ prettyExact(tx.data.value) }} {{ tx.data.coin.symbol }}</dd>
 
-                <!-- SELL -->
-                <dt v-if="isSell(tx)">Sell coins</dt>
-                <dd v-if="isSell(tx)">{{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | prettyExact }}</dd>
-                <dt v-if="isSell(tx)">Get coins</dt>
-                <dd v-if="isSell(tx)">{{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | prettyExact }}</dd>
-                <!-- BUY -->
-                <dt v-if="isBuy(tx)">Buy coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.coinToBuy.symbol }} {{ tx.data.valueToBuy | prettyExact }}</dd>
-                <dt v-if="isBuy(tx)">Spend coins</dt>
-                <dd v-if="isBuy(tx)">{{ tx.data.coinToSell.symbol }} {{ tx.data.valueToSell | prettyExact }}</dd>
+                <!-- SELL, SELL_ALL -->
+                <dt v-if="isSellType">Sell coins</dt>
+                <dd v-if="isSellType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
+                <dt v-if="isSellType">Get coins</dt>
+                <dd v-if="isSellType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
+                    <!-- SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
+                    <dt v-if="isSellPoolType">Sell coins</dt>
+                    <dd v-if="isSellPoolType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coins[0].symbol }}</dd>
+                    <dt v-if="isSellPoolType">Get coins</dt>
+                    <dd v-if="isSellPoolType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coins[tx.data.coins.length - 1].symbol }}</dd>
+                    <dt v-if="tx.data.minimumValueToBuy">Minimum value to get</dt>
+                    <dd v-if="tx.data.minimumValueToBuy">{{ prettyExact(tx.data.minimumValueToBuy) }}</dd>
+                    <!-- BUY -->
+                    <dt v-if="isBuyType">Buy coins</dt>
+                    <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
+                    <dt v-if="isBuyType">Spend coins</dt>
+                    <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
 
-                <!-- CREATE_COIN, EDIT_COIN_OWNER -->
+                    <!-- BUY_SWAP_POOL -->
+                    <dt v-if="isBuyPoolType">Buy coins</dt>
+                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coins[tx.data.coins.length - 1].symbol }}</dd>
+                    <dt v-if="isBuyPoolType">Spend coins</dt>
+                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coins[0].symbol }}</dd>
+                    <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
+                    <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
+
+                    <dt v-if="tx.data.coins">Coins path</dt>
+                    <dd v-if="tx.data.coins">{{ coinPath }}</dd>
+
+                    <!-- CREATE_SWAP_POOL -->
+                    <dt v-if="tx.data.poolToken">Pool token</dt>
+                    <dd v-if="tx.data.poolToken">
+                        <nuxt-link class="link--default" :to="'/coins/' + tx.data.poolToken.symbol">{{ tx.data.poolToken.symbol }}</nuxt-link>
+                    </dd>
+                    <dt v-if="tx.data.coin0 && tx.data.coin1">Pool</dt>
+                    <dd v-if="tx.data.coin0 && tx.data.coin1">
+                        <nuxt-link class="link--default" :to="'/pools/' + tx.data.coin0.symbol + '/' + tx.data.coin1.symbol">
+                            {{ tx.data.coin0.symbol }} / {{ tx.data.coin1.symbol }}
+                        </nuxt-link>
+                    </dd>
+                    <dt v-if="tx.data.coin0">First coin</dt>
+                    <dd v-if="tx.data.coin0"><span v-if="isDefined(tx.data.volume0)">{{ prettyExact(tx.data.volume0) }}</span> {{ tx.data.coin0.symbol }} </dd>
+                    <dt v-if="tx.data.coin1">Second coin</dt>
+                    <dd v-if="tx.data.coin1"><span v-if="isDefined(tx.data.volume1)">{{ prettyExact(tx.data.volume1) }}</span> {{ tx.data.coin1.symbol }}</dd>
+                    <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin0.symbol }} price</dt>
+                    <dd v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">
+                        {{ pretty(tx.data.volume1 / tx.data.volume0) }} {{ tx.data.coin1.symbol }}
+                    </dd>
+                    <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin1.symbol }} price</dt>
+                    <dd v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">
+                        {{ pretty(tx.data.volume0 / tx.data.volume1) }} {{ tx.data.coin0.symbol }}
+                    </dd>
+                    <!-- ADD_LIQUIDITY -->
+                    <dt v-if="tx.data.maximumVolume1">Max volume of second coin</dt>
+                    <dd v-if="tx.data.maximumVolume1">{{ prettyExact(tx.data.maximumVolume1) }}</dd>
+                    <!-- REMOVE_LIQUIDITY -->
+                    <dt v-if="tx.data.liquidity">Liquidity</dt>
+                    <dd v-if="tx.data.liquidity">{{ prettyExact(tx.data.liquidity) }}</dd>
+                    <dt v-if="tx.data.minimumVolume0">Min volume of first coin</dt>
+                    <dd v-if="tx.data.minimumVolume0">{{ prettyExact(tx.data.minimumVolume0) }}</dd>
+                    <dt v-if="tx.data.minimumVolume1">Min volume of second coin</dt>
+                    <dd v-if="tx.data.minimumVolume1">{{ prettyExact(tx.data.minimumVolume1) }}</dd>
+
+                <!-- CREATE_COIN, RECREATE_COIN, EDIT_TICKER_OWNER, CREATE_TOKEN, RECREATE_TOKEN -->
                 <dt v-if="tx.data.createdCoinId">Coin ID</dt>
                 <dd v-if="tx.data.createdCoinId">{{ tx.data.createdCoinId }}</dd>
                 <dt v-if="tx.data.name">Name</dt>
@@ -302,31 +444,36 @@
                 <dt v-if="tx.data.initialAmount">Initial amount</dt>
                 <dd v-if="tx.data.initialAmount">{{ tx.data.initialAmount | prettyExact }}</dd>
                 <dt v-if="tx.data.initialReserve">Initial reserve</dt>
-                <dd v-if="tx.data.initialReserve">{{ $store.state.COIN_NAME }} {{ tx.data.initialReserve | prettyExact }}</dd>
+                <dd v-if="tx.data.initialReserve">{{ prettyExact(tx.data.initialReserve) }} {{ $store.getters.BASE_COIN }}</dd>
                 <dt v-if="tx.data.constantReserveRatio">CRR</dt>
                 <dd v-if="tx.data.constantReserveRatio">{{ tx.data.constantReserveRatio }}&thinsp;%</dd>
                 <dt v-if="tx.data.maxSupply">Max supply</dt>
                 <dd v-if="tx.data.maxSupply">{{ tx.data.maxSupply | prettyExact }}</dd>
                 <dt v-if="tx.data.newOwner">Owner address</dt>
                 <dd v-if="tx.data.newOwner"><nuxt-link class="link--default" :to="'/address/' + tx.data.newOwner">{{ tx.data.newOwner }}</nuxt-link></dd>
+                    <dt v-if="isDefined(tx.data.mintable)">Mintable</dt>
+                    <dd v-if="isDefined(tx.data.mintable)">{{ tx.data.mintable ? 'Yes' : 'No' }}</dd>
+                    <dt v-if="isDefined(tx.data.burnable)">Burnable</dt>
+                    <dd v-if="isDefined(tx.data.burnable)">{{ tx.data.burnable ? 'Yes' : 'No' }}</dd>
 
-                <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE, EDIT_CANDIDATE, EDIT_CANDIDATE_PUBLIC_KEY -->
+
+                <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE, EDIT_CANDIDATE, EDIT_CANDIDATE_PUBLIC_KEY, EDIT_CANDIDATE_COMMISSION, VOTE_HALT_BLOCK, VOTE_UPDATE, VOTE_COMMISSION -->
                 <dt v-if="validator.name">Validator</dt>
                 <dd v-if="validator.name"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pubKey">{{ validator.name }}</nuxt-link></dd>
                 <dt v-if="tx.data.pubKey">Public key</dt>
                 <dd v-if="tx.data.pubKey"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pubKey">{{ tx.data.pubKey }}</nuxt-link></dd>
                     <dt v-if="tx.data.newPubKey">New public key</dt>
                     <dd v-if="tx.data.newPubKey"><nuxt-link class="link--default" :to="'/validator/' + tx.data.newPubKey">{{ tx.data.newPubKey }}</nuxt-link></dd>
-                <dt v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
-                <dd v-if="isStake(tx) && isDefined(tx.data.stake || tx.data.value)">{{ tx.data.coin.symbol }} {{ (tx.data.stake || tx.data.value) | prettyExact }}</dd>
+                <dt v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
+                <dd v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)">{{ prettyExact(tx.data.stake || tx.data.value) }} {{ tx.data.coin.symbol }}</dd>
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
-                <dt v-if="isUnbond(tx)">Unbond block</dt>
-                <dd v-if="isUnbond(tx)">{{ unbondBlockHeight | prettyRound }}</dd>
-                <dt v-if="isUnbond(tx) && unbondTime">Unbond time</dt>
-                <dd v-if="isUnbond(tx) && unbondTime">
-                    <span v-if="isUnbondBlock">{{ unbondTime | timeDistance }} ago ({{ unbondTime | time }})</span>
-                    <span v-else>In {{ unbondTime | timeDistanceFuture }} ({{ unbondTime | timeMinutes }})</span>
+                <dt v-if="isUnbondType">Unbond block</dt>
+                <dd v-if="isUnbondType">{{ prettyRound(unbondBlockHeight) }}</dd>
+                <dt v-if="isUnbondType && unbondTime">Unbond time</dt>
+                <dd v-if="isUnbondType && unbondTime">
+                    <span v-if="isUnbondBlock">{{ timeDistance(unbondTime) }} ago ({{ time(unbondTime) }})</span>
+                    <span v-else>In {{ timeDistanceFuture(unbondTime) }} ({{ timeMinutes(unbondTime) }})</span>
                 </dd>
                 <dt v-if="tx.data.rewardAddress">Reward address</dt>
                 <dd v-if="tx.data.rewardAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.rewardAddress">{{ tx.data.rewardAddress }}</nuxt-link></dd>
@@ -334,6 +481,15 @@
                 <dd v-if="tx.data.ownerAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.ownerAddress">{{ tx.data.ownerAddress }}</nuxt-link></dd>
                     <dt v-if="tx.data.controlAddress">Control address</dt>
                     <dd v-if="tx.data.controlAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.controlAddress">{{ tx.data.controlAddress }}</nuxt-link></dd>
+                    <dt v-if="isDefined(tx.data.height)">Vote height</dt>
+                    <dd v-if="isDefined(tx.data.height)">{{ tx.data.height }}</dd>
+                    <dt v-if="isDefined(tx.data.version)">Version</dt>
+                    <dd v-if="isDefined(tx.data.version)">{{ tx.data.version }}</dd>
+                    <dt v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">Vote coin</dt>
+                    <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">{{ tx.data.coin.symbol }}</dd>
+                    <dt v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">Vote prices</dt>
+                    <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)" class="u-text-pre-line">{{ commissionPriceList }}</dd>
+                    <!-- @TODO UPDATE_COMMISSION -->
 
                 <!-- REDEEM_CHECK -->
                 <dt v-if="tx.data.check && tx.data.check.sender">Check issuer</dt>
@@ -343,15 +499,15 @@
                 <dt v-if="tx.data.check && tx.data.check.dueBlock">Due Block</dt>
                 <dd v-if="tx.data.check && tx.data.check.dueBlock">{{ tx.data.check.dueBlock }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
-                <dd v-if="tx.data.check && tx.data.check.value">{{ tx.data.check.coin.symbol }} {{ tx.data.check.value | prettyExact }}</dd>
+                <dd v-if="tx.data.check && tx.data.check.value">{{ prettyExact(tx.data.check.value) }} {{ tx.data.check.coin.symbol }}</dd>
                     <dt v-if="tx.data.rawCheck">Check</dt>
                     <dd v-if="tx.data.rawCheck">{{ checkFromBase64(tx.data.rawCheck) }}</dd>
 
                 <!-- MULTISEND -->
                 <dt v-if="tx.data.list">#Recipients</dt>
                 <dd v-if="tx.data.list">{{ tx.data.list.length }}</dd>
-                <dt v-if="isMultisend(tx)">Total</dt>
-                <dd v-if="isMultisend(tx)">
+                <dt v-if="isMultisendType">Total</dt>
+                <dd v-if="isMultisendType">
                     <span v-if="isMultisendMultipleCoin(tx)">Multiple coins</span>
                     <span v-else>{{ getMultisendCoin(tx) }} {{ getMultisendValue(tx) }}</span>
                 </dd>
@@ -366,19 +522,39 @@
                 <dt v-if="tx.data.weights">Weights Sum</dt>
                 <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
 
-                <!-- SET_HALT_BLOCK -->
-                <dt v-if="tx.data.height">Halt height</dt>
-                <dd v-if="tx.data.height">{{ tx.data.height }}</dd>
+                    <!-- HUB -->
+                    <dt v-if="isFromHubTx || isToHubTx">Purpose</dt>
+                    <dd v-if="isFromHubTx || isToHubTx">
+                        <template v-if="isFromHubTx">Deposit from Hub</template>
+                        <template v-if="isToHubTx">Withdraw to Hub</template>
+                    </dd>
+                    <dt v-if="isToHubTx">Hub info</dt>
+                    <dd v-if="isToHubTx">
+                        Type: {{ payloadParsed.type === 'send_to_eth' ? 'Send to Ethereum' : payloadParsed.type }}<br>
+                        Recipient: {{ payloadParsed.recipient }}<br>
+                        Amount: {{ prettyExact(hubAmount) }} {{ tx.data.coin.symbol }}<br>
+                        Ethereum fee: {{ prettyExact(hubNetworkFee) }} {{ tx.data.coin.symbol }}<br>
+                        Hub bridge fee: {{ prettyExact(hubBridgeFee) }} {{ tx.data.coin.symbol }}
+                    </dd>
 
-                <dt v-if="tx.fee">Fee</dt>
-                <dd v-if="tx.fee">
-                    <template v-if="tx.gasCoin.symbol === $store.state.COIN_NAME">
-                        {{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }}
+
+                <dt v-if="tx.commissionInBaseCoin">Fee</dt>
+                <dd v-if="tx.commissionInBaseCoin">
+                    <template v-if="tx.gasCoin.symbol === $store.getters.BASE_COIN">
+                        {{ prettyExact(tx.commissionInBaseCoin) }} {{ $store.getters.BASE_COIN }}
                     </template>
                     <template v-else>
-                        {{ tx.gasCoin.symbol }} <span class="u-text-muted">({{ $store.state.COIN_NAME }} {{ tx.fee | prettyExact }})</span>
+                        {{ prettyExact(tx.commissionInGasCoin) }} {{ tx.gasCoin.symbol }} <span class="u-text-muted">({{ prettyExact(tx.commissionInBaseCoin) }} {{ $store.getters.BASE_COIN }})</span>
                     </template>
                 </dd>
+                    <dt v-if="tx.commissionPriceCoin.id > 0">Fee price</dt>
+                    <dd v-if="tx.commissionPriceCoin.id > 0">
+                        {{ prettyExact(tx.commissionPrice) }} {{ tx.commissionPriceCoin.symbol }}
+                    </dd>
+                    <dt>Fee multiplier</dt>
+                    <dd>
+                        {{ tx.gasPrice }}
+                    </dd>
 
                 <dt v-if="tx.nonce">Nonce</dt>
                 <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
@@ -386,6 +562,13 @@
                 <dt>Message</dt>
                 <dd class="u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
 
+                </template>
+                <template v-if="tx.status === $options.TX_STATUS.FAILURE">
+                    <dt>Error code</dt>
+                    <dd>{{ tx.code }}</dd>
+
+                    <dt>Error log</dt>
+                    <dd>{{ tx.log }}</dd>
                 </template>
 
                 <!-- MULTISEND -->

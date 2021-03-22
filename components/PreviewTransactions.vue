@@ -46,24 +46,60 @@
                     return pretty(this.getAmount(tx) || 0) + ' ' + (tx.data.coin?.symbol || tx.data.symbol || this.getConvertCoinSymbol(tx) || tx.data.check?.coin?.symbol || this.getMultisendCoin(tx));
                 }
             },
+            isEditPool(tx) {
+                return this.isTxType(tx, TX_TYPE.CREATE_SWAP_POOL) || this.isTxType(tx, TX_TYPE.ADD_LIQUIDITY) || this.isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY);
+            },
+            getPoolCoins(tx) {
+                let symbol0, symbol1;
+                if (tx.data.coin0.id < tx.data.coin1.id) {
+                    symbol0 = tx.data.coin0.symbol;
+                    symbol1 = tx.data.coin1.symbol;
+                } else {
+                    symbol0 = tx.data.coin1.symbol;
+                    symbol1 = tx.data.coin0.symbol;
+                }
+
+                return `${symbol0} / ${symbol1}`;
+            },
             getConvertCoinSymbol(tx) {
-                if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
+                if (this.isSell(tx)) {
                     return tx.data.coinToSell.symbol;
                 }
-                if (tx.type === Number(TX_TYPE.BUY)) {
+                if (this.isBuy(tx)) {
                     return tx.data.coinToBuy.symbol;
+                }
+                if (this.isSellPool(tx)) {
+                    return tx.data.coins[0].symbol;
+                }
+                if (this.isBuyPool(tx)) {
+                    return tx.data.coins[tx.data.coins.length - 1].symbol;
                 }
             },
             getConvertValue(tx) {
-                if (tx.type === Number(TX_TYPE.SELL) || tx.type === Number(TX_TYPE.SELL_ALL)) {
+                if (this.isSell(tx) || this.isSellPool(tx)) {
                     return tx.data.valueToSell;
                 }
-                if (tx.type === Number(TX_TYPE.BUY)) {
+                if (this.isBuy(tx) || this.isBuyPool(tx)) {
                     return tx.data.valueToBuy;
                 }
             },
+            isSell(tx) {
+                return this.isTxType(tx, TX_TYPE.SELL) || this.isTxType(tx, TX_TYPE.SELL_ALL);
+            },
+            isSellPool(tx) {
+                return this.isTxType(tx, TX_TYPE.SELL_SWAP_POOL) || this.isTxType(tx, TX_TYPE.SELL_ALL_SWAP_POOL);
+            },
+            isBuy(tx) {
+                return this.isTxType(tx, TX_TYPE.BUY);
+            },
+            isBuyPool(tx) {
+                return this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
+            },
             isMultisend(tx) {
-                return tx.type === Number(TX_TYPE.MULTISEND);
+                return this.isTxType(tx, TX_TYPE.MULTISEND);
+            },
+            isTxType(tx, txType) {
+                return tx.type === Number(txType);
             },
             getMultisendDeliveryList(tx) {
                 return tx.data.list || [];
@@ -129,6 +165,9 @@
                             {{ tx.type | txType }}
                             <span v-if="hasAmount(tx)">
                                 {{ getAmountWithCoin(tx) }}
+                            </span>
+                            <span v-else-if="isEditPool(tx)">
+                                {{ getPoolCoins(tx) }}
                             </span>
                         </div>
                         <div>{{ tx.timeDistance }} ago</div>

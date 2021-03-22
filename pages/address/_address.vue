@@ -426,7 +426,7 @@
                         :class="{'is-active': activeTab === $options.TAB_TYPES.UNBOND}"
                         @click="switchTab($options.TAB_TYPES.UNBOND)"
                 >
-                    <!--<img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">-->
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-unbond.svg" width="40" height="40" alt="" role="presentation">
                     Unbonds
                 </button>
             </div>

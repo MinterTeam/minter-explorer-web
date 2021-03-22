@@ -82,6 +82,6 @@
             </tr>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No Unbonds</div>
+        <div class="panel__content panel__section u-text-center" v-else>No unbonds</div>
     </div>
 </template>
