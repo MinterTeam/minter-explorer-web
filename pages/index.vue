@@ -165,7 +165,7 @@
                         // this.checkLastBlockIsSynced();
                     }
                 });
-                centrifuge.subscribe("transactions", (response) => {
+                centrifuge.subscribe("transactions_100", (response) => {
                     const newTx = toCamel(response.data);
                     const isExist = this.txList.find(function(item) {
                         return item.hash === newTx.hash;
