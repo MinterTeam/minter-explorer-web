@@ -16,6 +16,7 @@
                 default: 0,
             },
         },
+
     };
 </script>
 

@@ -10,7 +10,7 @@ import BackButton from '@/components/BackButton.vue';
 import Pagination from "@/components/Pagination.vue";
 import {TAB_TYPES} from 'assets/variables.js';
 
-const DEFAULT_TAB = TAB_TYPES.PROVIDER;
+const DEFAULT_TAB = TAB_TYPES.TX;
 
 function ensureTab(val) {
     return Object.values(TAB_TYPES).indexOf(val) !== -1 ? val : DEFAULT_TAB;
@@ -265,19 +265,19 @@ function calculateTradeReturn(amountIn, amountOut) {
         <section class="panel u-section" data-tab-panel>
             <div class="panel__switcher">
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.PROVIDER}"
-                        @click="switchTab($options.TAB_TYPES.PROVIDER)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
-                    Providers
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
                         @click="switchTab($options.TAB_TYPES.TX)"
                 >
                     <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
                     <span class="u-hidden-medium-down">Transactions</span>
                     <span class="u-hidden-medium-up">Txs</span>
+                </button>
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.PROVIDER}"
+                        @click="switchTab($options.TAB_TYPES.PROVIDER)"
+                >
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
+                    Providers
                 </button>
             </div>
             <!-- Transactions -->

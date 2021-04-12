@@ -8,7 +8,6 @@ import {REWARD_CHART_TYPES, COIN_NAME, TX_STATUS} from '~/assets/variables';
  * @typedef {Object} Status
  * @property {number} marketCap - in $
  * @property {number} bipPriceUsd
- * @property {number} bipPriceBtc
  * @property {number} bipPriceChange - in %
  * @property {number} latestBlockHeight - block count
  * @property {number} avgBlockTime - in seconds
