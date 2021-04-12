@@ -18,6 +18,7 @@ import {BASE_TITLE, BASE_DESCRIPTION} from "./assets/variables";
 
 module.exports = {
     ssr: false,
+    telemetry: false,
     /*
     ** Headers of the page
     */
@@ -119,7 +120,6 @@ module.exports = {
             'minterjs-tx/src',
             'minterjs-wallet/src',
             'minter-js-sdk/src',
-            'minter-js-org/src',
         ],
     },
 };
