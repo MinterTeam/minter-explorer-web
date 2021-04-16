@@ -198,7 +198,7 @@
             <PreviewTransactions :tx-list="txList"/>
         </section>
         <section class="u-cell">
-            <PreviewPools :pool-list="poolList" :bip-price-usd="stats.bipPriceBtc"/>
+            <PreviewPools :pool-list="poolList" :bip-price-usd="stats.bipPriceUsd"/>
         </section>
     </div>
     <h1 class="u-text-center" style="margin-top: 50px" v-else>{{ network }} explorer is not available</h1>

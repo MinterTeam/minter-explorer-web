@@ -8,7 +8,6 @@ import {REWARD_CHART_TYPES, COIN_NAME, TX_STATUS} from '~/assets/variables';
  * @typedef {Object} Status
  * @property {number} marketCap - in $
  * @property {number} bipPriceUsd
- * @property {number} bipPriceBtc
  * @property {number} bipPriceChange - in %
  * @property {number} latestBlockHeight - block count
  * @property {number} avgBlockTime - in seconds
@@ -27,7 +26,7 @@ export function getStatus() {
 /**
  * @typedef {Object} BlockListInfo
  * @property {Array<Block>} data
- * @property {Object} meta - pagination
+ * @property {PaginationMeta} meta
  */
 
 /**
@@ -46,7 +45,7 @@ export function getBlockList(params) {
 /**
  * @typedef {Object} BlockInfo
  * @property {Block} data
- * @property {Object} meta
+ * @property {PaginationMeta} meta
  * @property {number} meta.latestBlockHeight
  */
 
@@ -71,13 +70,46 @@ export function getBlockTransactionList(height, params) {
         .then((response) => response.data);
 }
 
+/**
+ * @typedef {Object} BlockTimeInfo
+ * @property {boolean} isFutureBlock
+ * @property {number|string} timestamp
+ */
 
+/**
+ * @param {number|string} height
+ * @return {Promise<BlockTimeInfo>}
+ */
+export async function checkBlockTime(height) {
+    const pastOrCurrentBlock = await getPastOrCurrentBlockInfo(height);
+    const isFutureBlock = height > pastOrCurrentBlock.height;
+
+    let timestamp;
+    if (!isFutureBlock) {
+        timestamp = pastOrCurrentBlock.timestamp;
+    } else {
+        timestamp = (height - pastOrCurrentBlock.height) * 5000 + Date.now();
+    }
+
+    return {isFutureBlock, timestamp};
+}
+
+function getPastOrCurrentBlockInfo(height) {
+    return getBlock(height)
+        .catch((e) => {
+            if (e.request.status === 404) {
+                return getBlockList().then((blockList) => blockList.data[0]);
+            } else {
+                throw e;
+            }
+        });
+}
 
 
 /**
  * @typedef {Object} TransactionListInfo
  * @property {Array<Transaction>} data
- * @property {Object} meta - pagination
+ * @property {PaginationMeta} meta
  */
 
 /**
@@ -213,7 +245,7 @@ export function getAddressStakeList(address) {
 /**
  * @typedef {Object} RewardListInfo
  * @property {Array<Reward>} data
- * @property {Object} meta - pagination
+ * @property {PaginationMeta} meta
  */
 
 /**
@@ -250,9 +282,9 @@ export function getAddressRewardAggregatedList(address, params = {}) {
 }
 
 /**
- * @typedef {Object} SlashListInfo
- * @property {Array<Slash>} data
- * @property {Object} meta - pagination
+ * @typedef {Object} PenaltyListInfo
+ * @property {Array<Penalty>} data
+ * @property {PaginationMeta} meta
  */
 
 /**
@@ -260,12 +292,16 @@ export function getAddressRewardAggregatedList(address, params = {}) {
  * @param {Object} [params]
  * @param {number} [params.page]
  * @param {number} [params.limit]
- * @return {Promise<SlashListInfo>}
+ * @return {Promise<PenaltyListInfo>}
  */
-export function getAddressSlashList(address, params = {}) {
-    params.limit = 20; // set per_page
-    return explorer.get(`addresses/${address}/events/slashes`, {params})
-        .then((response) => response.data);
+export function getAddressPenaltyList(address, params = {}) {
+    params.limit = params.limit || 20;
+
+    return Promise.all([
+            explorer.get(`addresses/${address}/events/slashes`, {params}),
+            explorer.get(`addresses/${address}/events/bans`, {params}),
+        ])
+        .then(mergePenaltyList);
 }
 
 export function getAddressUnbondList(address) {
@@ -369,16 +405,35 @@ export function getValidatorStakeList(publicKey, params = {}) {
 }
 
 /**
- * @param {string} address
+ * @param {string} publicKey
  * @param {Object} [params]
  * @param {number} [params.page]
  * @param {number} [params.limit]
- * @return {Promise<SlashListInfo>}
+ * @return {Promise<PenaltyListInfo>}
  */
-export function getValidatorSlashList(address, params = {}) {
+export function getValidatorPenaltyList(publicKey, params = {}) {
     params.limit = params.limit || 100;
-    return explorer.get(`validators/${address}/events/slashes`, {params})
-        .then((response) => response.data);
+    return Promise.all([
+        explorer.get(`validators/${publicKey}/events/slashes`, {params}),
+        explorer.get(`validators/${publicKey}/events/bans`, {params}),
+    ])
+        .then(mergePenaltyList);
+}
+
+function mergePenaltyList([slashResponse, banResponse]) {
+    const slashInfo = slashResponse.data;
+    const banInfo = banResponse.data;
+
+    const meta = slashInfo.meta.total >= banInfo.meta.total ? slashInfo.meta : banInfo.meta;
+    slashInfo.data.forEach((item) => {
+        item.type = 'slash';
+    });
+    banInfo.data.forEach((item) => {
+        item.type = 'ban';
+    });
+    const data = [].concat(slashInfo.data, banInfo.data).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    return {data, meta};
 }
 
 /**
@@ -414,7 +469,7 @@ export function getCoinList() {
 /**
  * @typedef {Object} PoolListInfo
  * @property {Array<Pool>} data
- * @property {Object} meta - pagination
+ * @property {PaginationMeta} meta
  */
 
 /**
@@ -444,13 +499,13 @@ export function getCoinList() {
 /**
  * @typedef {Object} PoolProviderListInfo
  * @property {Array<PoolProvider>} data
- * @property {Object} meta - pagination
+ * @property {PaginationMeta} meta
  */
 
 /**
  * @typedef {Object} ProviderPoolListInfo
  * @property {Array<PoolProvider>} data
- * @property {Object} meta - pagination
+ * @property {PaginationMeta} meta
  */
 
 
@@ -600,7 +655,7 @@ export function getCoinBySymbol(symbol) {
 /**
  * @typedef {Object} StakeListInfo
  * @property {Array<StakeItem>} data
- * @property {Object} meta - pagination
+ * @property {PaginationMeta} meta
  */
 
 /**
@@ -729,10 +784,21 @@ export function getCoinBySymbol(symbol) {
  * @typedef {Object} Slash
  * @property {number} height
  * @property {string} timestamp
- * @property {string} address
- * @property {Validator} validator
+ * @property {string} [address]
+ * @property {Validator} [validator]
  * @property {number} amount
  * @property {Coin} coin
+ */
+
+/**
+ * @typedef {Object} Ban
+ * @property {number} height
+ * @property {string} timestamp
+ * @property {Validator} [validator]
+ */
+
+/**
+ * @typedef {Slash|Ban} Penalty
  */
 
 /**
@@ -760,5 +826,14 @@ export function getCoinBySymbol(symbol) {
  * @property {string} symbol
  * @property {number|string} maxSupply
  * @property {string|null} ownerAddress
+ */
+
+/**
+ * @typedef {Object} PaginationMeta
+ * @property {number} currentPage
+ * @property {number} lastPage
+ * @property {number} perPage
+ * @property {number} total
+ * @property {string} path
  */
 

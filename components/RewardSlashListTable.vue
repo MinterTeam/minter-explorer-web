@@ -59,7 +59,8 @@
                 <!--<th>Name</th>-->
                 <th>Time</th>
                 <th v-if="dataType === $options.TYPE_SLASH">Block</th>
-                <th v-if="dataType === $options.TYPE_REWARD">Reward Type</th>
+                <th v-if="dataType === $options.TYPE_SLASH">Type</th>
+                <th v-if="dataType === $options.TYPE_REWARD">Reward type</th>
                 <th>{{ itemType === 'validator' ? 'Validator' : 'Address' }}</th>
                 <th>Value</th>
             </tr>
@@ -80,27 +81,33 @@
                 <td v-if="dataType === $options.TYPE_SLASH">
                     <TableLink :link-text="dataItem.height" :link-path="'/blocks/' + dataItem.height"/>
                 </td>
-                <!-- type -->
+                <!-- penalty type -->
+                <td v-if="dataType === $options.TYPE_SLASH">
+                    {{ dataItem.type === 'ban' ? 'Ban' : 'Slash' }}
+                </td>
+                <!-- reward type -->
                 <td v-if="dataType === $options.TYPE_REWARD">
                     {{ dataItem.role }}
                 </td>
                 <!-- public key -->
                 <td>
                     <TableLink
-                        v-if="itemType === 'validator'"
+                        v-if="dataItem.validator"
                         :link-text="getLabel(dataItem)"
                         :link-path="'/validator/' + dataItem.validator.publicKey"
                         :should-not-shorten="!!dataItem.validator.name"
                     />
                     <TableLink
-                        v-else
+                        v-else-if="dataItem.address"
                         :link-text="dataItem.address"
                         :link-path="'/address/' + dataItem.address"
                     />
                 </td>
                 <!-- value -->
                 <td>
-                    {{ dataType === $options.TYPE_REWARD ? $store.state.COIN_NAME : dataItem.coin.symbol }} {{ $options.prettyPrecise(dataItem.amount) }}
+                    <span v-if="dataItem.amount">
+                        {{ dataType === $options.TYPE_REWARD ? $store.state.COIN_NAME : dataItem.coin.symbol }} {{ $options.prettyPrecise(dataItem.amount) }}
+                    </span>
                 </td>
             </tr>
             </tbody>
