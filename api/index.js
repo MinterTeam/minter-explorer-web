@@ -70,7 +70,40 @@ export function getBlockTransactionList(height, params) {
         .then((response) => response.data);
 }
 
+/**
+ * @typedef {Object} BlockTimeInfo
+ * @property {boolean} isFutureBlock
+ * @property {number|string} timestamp
+ */
 
+/**
+ * @param {number|string} height
+ * @return {Promise<BlockTimeInfo>}
+ */
+export async function checkBlockTime(height) {
+    const pastOrCurrentBlock = await getPastOrCurrentBlockInfo(height);
+    const isFutureBlock = height > pastOrCurrentBlock.height;
+
+    let timestamp;
+    if (!isFutureBlock) {
+        timestamp = pastOrCurrentBlock.timestamp;
+    } else {
+        timestamp = (height - pastOrCurrentBlock.height) * 5000 + Date.now();
+    }
+
+    return {isFutureBlock, timestamp};
+}
+
+function getPastOrCurrentBlockInfo(height) {
+    return getBlock(height)
+        .catch((e) => {
+            if (e.request.status === 404) {
+                return getBlockList().then((blockList) => blockList.data[0]);
+            } else {
+                throw e;
+            }
+        });
+}
 
 
 /**

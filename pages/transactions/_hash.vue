@@ -4,7 +4,7 @@
     import {TX_TYPE} from 'minterjs-tx/src/tx-types';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
-    import {getTransaction, getBlock, getBlockList, getCoinById} from "~/api";
+    import {getTransaction, getBlock, getBlockList, getCoinById, checkBlockTime} from "~/api";
     import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -77,7 +77,10 @@
                 /** @type Transaction|null */
                 tx: null,
                 shouldShortenAddress: this.getShouldShortenAddress(),
-                unbondOrLastBlock: null,
+                /** @type BlockTimeInfo|null */
+                unbondTimeInfo: null,
+                /** @type BlockTimeInfo|null */
+                voteTimeInfo: null,
                 currentCoinSymbol: '',
             };
         },
@@ -87,23 +90,6 @@
                     return;
                 }
                 return this.tx.height + UNBOND_PERIOD;
-            },
-            isUnbondBlock() {
-                return this.unbondOrLastBlock && this.unbondOrLastBlock.height === this.unbondBlockHeight;
-            },
-            unbondTime() {
-                if (!this.unbondOrLastBlock) {
-                    return;
-                }
-                // unbondOrLastBlock is unbond block
-                if (this.isUnbondBlock) {
-                    return this.unbondOrLastBlock.timestamp;
-                }
-                // unbondOrLastBlock is last block => calculate difference
-                if (this.unbondOrLastBlock.height < this.unbondBlockHeight) {
-                    return (this.unbondBlockHeight - this.unbondOrLastBlock.height) * 5000 + Date.now();
-                }
-                return undefined;
             },
             validator() {
                 const tx = this.tx;
@@ -208,6 +194,7 @@
                 this.fetchTx();
             } else {
                 this.fetchUnbondBlock();
+                this.fetchVoteBlock();
                 this.fetchCreatedCoinCurrentSymbol();
             }
             if (process.client) {
@@ -241,6 +228,7 @@
                         this.tx = tx;
                         fetchTxTimer = null;
                         this.fetchUnbondBlock();
+                        this.fetchVoteBlock();
                         this.fetchCreatedCoinCurrentSymbol();
                     })
                     .catch((e) => {
@@ -254,22 +242,19 @@
             },
             fetchUnbondBlock() {
                 if (this.isUnbondType) {
-                    getBlock(this.unbondBlockHeight)
-                        .then((block) => this.unbondOrLastBlock = block)
+                    checkBlockTime(this.unbondBlockHeight)
+                        .then((timeInfo) => this.unbondTimeInfo = timeInfo)
                         .catch((e) => {
-                            if (e.request.status === 404) {
-                                return getBlockList();
-                            } else {
-                                throw e;
-                            }
-                        })
-                        .then((blockList) => {
-                            if (blockList && blockList.data) {
-                                this.unbondOrLastBlock = blockList.data[0];
-                            }
-                        })
+                            console.log('Unable to get unbond block info', e);
+                        });
+                }
+            },
+            fetchVoteBlock() {
+                if (this.tx.data.height) {
+                    checkBlockTime(this.tx.data.height)
+                        .then((timeInfo) => this.voteTimeInfo = timeInfo)
                         .catch((e) => {
-                            console.log('Unable to get block', e);
+                            console.log('Unable to get vote block info', e);
                         });
                 }
             },
@@ -470,10 +455,10 @@
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbondType">Unbond block</dt>
                 <dd v-if="isUnbondType">{{ prettyRound(unbondBlockHeight) }}</dd>
-                <dt v-if="isUnbondType && unbondTime">Unbond time</dt>
-                <dd v-if="isUnbondType && unbondTime">
-                    <span v-if="isUnbondBlock">{{ timeDistance(unbondTime) }} ago ({{ time(unbondTime) }})</span>
-                    <span v-else>In {{ timeDistanceFuture(unbondTime) }} ({{ timeMinutes(unbondTime) }})</span>
+                <dt v-if="isUnbondType && unbondTimeInfo">Unbond time</dt>
+                <dd v-if="isUnbondType && unbondTimeInfo">
+                    <span v-if="!unbondTimeInfo.isFutureBlock">{{ timeDistance(unbondTimeInfo.timestamp) }} ago ({{ time(unbondTimeInfo.timestamp) }})</span>
+                    <span v-else>In {{ timeDistanceFuture(unbondTimeInfo.timestamp) }} ({{ timeMinutes(unbondTimeInfo.timestamp) }})</span>
                 </dd>
                 <dt v-if="tx.data.rewardAddress">Reward address</dt>
                 <dd v-if="tx.data.rewardAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.rewardAddress">{{ tx.data.rewardAddress }}</nuxt-link></dd>
@@ -483,6 +468,11 @@
                     <dd v-if="tx.data.controlAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.controlAddress">{{ tx.data.controlAddress }}</nuxt-link></dd>
                     <dt v-if="isDefined(tx.data.height)">Vote height</dt>
                     <dd v-if="isDefined(tx.data.height)">{{ tx.data.height }}</dd>
+                    <dt v-if="isDefined(tx.data.height) && voteTimeInfo">Vote time</dt>
+                    <dd v-if="isDefined(tx.data.height) && voteTimeInfo">
+                        <span v-if="!voteTimeInfo.isFutureBlock">{{ timeDistance(voteTimeInfo.timestamp) }} ago ({{ time(voteTimeInfo.timestamp) }})</span>
+                        <span v-else>In {{ timeDistanceFuture(voteTimeInfo.timestamp) }} ({{ timeMinutes(voteTimeInfo.timestamp) }})</span>
+                    </dd>
                     <dt v-if="isDefined(tx.data.version)">Version</dt>
                     <dd v-if="isDefined(tx.data.version)">{{ tx.data.version }}</dd>
                     <dt v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">Vote coin</dt>
