@@ -90,6 +90,9 @@ export default {
         },
     },
     computed: {
+        isToken() {
+            return this.coinInfo.type === 'token' || this.coinInfo.type === 'pool_token';
+        },
         isPoolToken() {
             return this.$route.params.symbol.indexOf('LP-') === 0;
         },
@@ -121,20 +124,20 @@ export default {
                 <dt>Symbol</dt>
                 <dd>{{ coinInfo.symbol }}</dd>
 
-                <dt>CRR</dt>
-                <dd>{{ coinInfo.crr }} %</dd>
+                <dt v-if="!isToken">CRR</dt>
+                <dd v-if="!isToken">{{ coinInfo.crr }} %</dd>
 
                 <dt>Volume</dt>
                 <dd :title="prettyPrecise(coinInfo.volume)">{{ pretty(coinInfo.volume) }}</dd>
 
-                <dt>Reserve</dt>
-                <dd :title="prettyPrecise(coinInfo.reserveBalance)">{{ pretty(coinInfo.reserveBalance) }} {{ $store.getters.COIN_NAME }}</dd>
+                <dt v-if="!isToken">Reserve</dt>
+                <dd v-if="!isToken" :title="prettyPrecise(coinInfo.reserveBalance)">{{ pretty(coinInfo.reserveBalance) }} {{ $store.getters.COIN_NAME }}</dd>
 
                 <dt>Max supply</dt>
                 <dd :title="prettyPrecise(coinInfo.maxSupply)">{{ pretty(coinInfo.maxSupply) }}</dd>
 
-                <dt>Owner address</dt>
-                <dd>
+                <dt v-if="!isPoolToken">Owner address</dt>
+                <dd v-if="!isPoolToken">
                     <nuxt-link class="link--default" :to="'/address/' + coinInfo.ownerAddress" v-if="coinInfo.ownerAddress">
                         {{ coinInfo.ownerAddress }}
                     </nuxt-link>

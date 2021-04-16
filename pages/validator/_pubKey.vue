@@ -1,6 +1,6 @@
 <script>
     import {isValidPublicKeyString} from 'minterjs-util/src/prefix';
-    import {getValidatorTransactionList, getValidator, getValidatorStakeList, getValidatorSlashList} from "~/api/index.js";
+    import {getValidatorTransactionList, getValidator, getValidatorStakeList, getValidatorPenaltyList} from "~/api/index.js";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise, prettyRound} from '~/assets/utils';
@@ -54,7 +54,7 @@
 
             const validatorPromise = getValidator(params.pubKey);
             const stakeListPromise = getValidatorStakeList(params.pubKey, activeTab === TAB_TYPES.STAKE ? query : undefined);
-            const slashListPromise = getValidatorSlashList(params.pubKey, activeTab === TAB_TYPES.SLASH ? query : undefined);
+            const slashListPromise = getValidatorPenaltyList(params.pubKey, activeTab === TAB_TYPES.SLASH ? query : undefined);
             const txListPromise = getValidatorTransactionList(params.pubKey, activeTab === TAB_TYPES.TX ? query : undefined);
 
             return Promise.all([validatorPromise, stakeListPromise, slashListPromise, txListPromise])
@@ -184,7 +184,7 @@
             },
             fetchSlashes() {
                 this.isSlashListLoading = true;
-                getValidatorSlashList(this.$route.params.pubKey, this.$route.query)
+                getValidatorPenaltyList(this.$route.params.pubKey, this.$route.query)
                     .then((slashListInfo) => {
                         this.slashList = slashListInfo.data;
                         this.slashPaginationInfo = slashListInfo.meta;
@@ -280,7 +280,7 @@
                         @click="switchTab($options.TAB_TYPES.SLASH)"
                 >
                     <img class="panel__header-title-icon u-hidden-medium-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
-                    <span>Slashes</span>
+                    <span>Penalties</span>
                 </button>
             </div>
             <!-- Transactions -->

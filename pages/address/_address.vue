@@ -1,6 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
-    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressSlashList, getAddressUnbondList} from "~/api";
+    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList} from "~/api";
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -68,7 +68,7 @@
             } else if (activeTab === TAB_TYPES.REWARD) {
                 tabPromise = getAddressRewardAggregatedList(params.address, query);
             } else if (activeTab === TAB_TYPES.SLASH) {
-                tabPromise = getAddressSlashList(params.address, query);
+                tabPromise = getAddressPenaltyList(params.address, query);
             } else if (activeTab === TAB_TYPES.UNBOND) {
                 tabPromise = getAddressUnbondList(params.address, query);
             }
@@ -313,7 +313,7 @@
             },
             fetchSlashes() {
                 this.isSlashListLoading = true;
-                getAddressSlashList(this.$route.params.address, this.$route.query)
+                getAddressPenaltyList(this.$route.params.address, this.$route.query)
                 .then((slashListInfo) => {
                     this.slashList = slashListInfo.data;
                     this.slashPaginationInfo = slashListInfo.meta;
@@ -420,7 +420,7 @@
                         @click="switchTab($options.TAB_TYPES.SLASH)"
                 >
                     <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
-                    Slashes
+                    Penalties
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.UNBOND}"
