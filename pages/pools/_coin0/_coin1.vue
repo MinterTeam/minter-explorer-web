@@ -229,15 +229,18 @@ function calculateTradeReturn(amountIn, amountOut) {
                 </h1>
             </div>
             <dl>
-                <dt>Pool token</dt>
-                <dd><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></dd>
-
                 <dt>Pair</dt>
                 <dd>
                     <nuxt-link class="link--default" :to="'/coins/' + pool.coin0.symbol">{{ pool.coin0.symbol }}</nuxt-link>
                     /
                     <nuxt-link class="link--default" :to="'/coins/' + pool.coin1.symbol">{{ pool.coin1.symbol }}</nuxt-link>
                 </dd>
+
+                <dt>Pool token</dt>
+                <dd><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></dd>
+
+                <dt>Amount {{ pool.token.symbol }}</dt>
+                <dd>{{ prettyExact(pool.liquidity) }} {{ pool.token.symbol }}</dd>
 
                 <dt>Amount</dt>
                 <dd><span class="u-fw-500">{{ prettyExact(pool.amount0) }}</span> {{ pool.coin0.symbol }}</dd>
@@ -251,8 +254,7 @@ function calculateTradeReturn(amountIn, amountOut) {
                 <dt>Price {{ pool.coin1.symbol }}</dt>
                 <dd><span class="u-fw-500">{{ pretty(coin1Price) }}</span> {{ pool.coin0.symbol }}</dd>
 
-                <dt>Liquidity</dt>
-                <dd>{{ prettyExact(pool.liquidity) }}</dd>
+
 
                 <dt>Liquidity {{ $store.getters.BASE_COIN}}</dt>
                 <dd>{{ pretty(pool.liquidityBip) }}</dd>

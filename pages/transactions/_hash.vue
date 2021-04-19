@@ -409,7 +409,7 @@
                     <dt v-if="tx.data.maximumVolume1">Max volume of second coin</dt>
                     <dd v-if="tx.data.maximumVolume1">{{ prettyExact(tx.data.maximumVolume1) }}</dd>
                     <!-- REMOVE_LIQUIDITY -->
-                    <dt v-if="tx.data.liquidity">Liquidity</dt>
+                    <dt v-if="tx.data.liquidity">LP amount</dt>
                     <dd v-if="tx.data.liquidity">{{ prettyExact(tx.data.liquidity) }}</dd>
                     <dt v-if="tx.data.minimumVolume0">Min volume of first coin</dt>
                     <dd v-if="tx.data.minimumVolume0">{{ prettyExact(tx.data.minimumVolume0) }}</dd>
@@ -468,7 +468,7 @@
                     <dd v-if="tx.data.controlAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.controlAddress">{{ tx.data.controlAddress }}</nuxt-link></dd>
                     <dt v-if="isDefined(tx.data.height)">Vote height</dt>
                     <dd v-if="isDefined(tx.data.height)">{{ tx.data.height }}</dd>
-                    <dt v-if="isDefined(tx.data.height) && voteTimeInfo">Vote time</dt>
+                    <dt v-if="isDefined(tx.data.height) && voteTimeInfo">Height time</dt>
                     <dd v-if="isDefined(tx.data.height) && voteTimeInfo">
                         <span v-if="!voteTimeInfo.isFutureBlock">{{ timeDistance(voteTimeInfo.timestamp) }} ago ({{ time(voteTimeInfo.timestamp) }})</span>
                         <span v-else>In {{ timeDistanceFuture(voteTimeInfo.timestamp) }} ({{ timeMinutes(voteTimeInfo.timestamp) }})</span>
