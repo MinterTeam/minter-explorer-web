@@ -19,6 +19,7 @@
                     return {
                         ...pool,
                         liquidityUsd: pool.liquidityBip * this.bipPriceUsd,
+                        volumeUsd: pool.tradeVolumeBip30D * this.bipPriceUsd,
                     };
                 });
             },
@@ -35,9 +36,10 @@
             <thead>
             <tr>
                 <th>Pair</th>
-                <th>Pool token</th>
+<!--                <th>Pool token</th>-->
                 <th colspan="2">Amount</th>
                 <th>Liquidity</th>
+                <th>Volume (30d)</th>
             </tr>
             </thead>
             <tbody>
@@ -47,10 +49,11 @@
                         {{ pool.coin0.symbol }} / {{ pool.coin1.symbol }}
                     </nuxt-link>
                 </td>
-                <td>{{ pool.token.symbol }}</td>
+<!--                <td>{{ pool.token.symbol }}</td>-->
                 <td>{{ pool.coin0.symbol }} <span class="u-fw-500">{{ pretty(pool.amount0) }}</span></td>
                 <td>{{ pool.coin1.symbol }} <span class="u-fw-500">{{ pretty(pool.amount1) }}</span></td>
                 <td>${{ pretty(pool.liquidityUsd) }}</td>
+                <td>${{ pretty(pool.volumeUsd) }}</td>
             </tr>
             </tbody>
         </table>

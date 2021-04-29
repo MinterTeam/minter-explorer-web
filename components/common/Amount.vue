@@ -1,37 +1,45 @@
 <script>
-    export default {
-        props: {
-            amount: {
-                type: [String, Number],
-                required: true,
-            },
-            coin: {
-                type: String,
-                default: '',
-            },
-            decimalClass: {
-                type: String,
-                default: 'u-amount__decimal',
-            },
+import {pretty, prettyExact} from '~/assets/utils.js';
+
+export default {
+    props: {
+        amount: {
+            type: [String, Number],
+            required: true,
         },
-        computed: {
-            amountParts() {
-                const parts = this.amount.toString().split('.');
-                return {
-                    whole:  parts[0] ? parts[0] : 0,
-                    decimal: parts[1] ? '.' + parts[1] : '',
-                };
-            },
+        coin: {
+            type: String,
+            default: '',
         },
-    };
+        tag: {
+            type: String,
+            default: 'span',
+        },
+        exact: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    computed: {
+
+        amountParts() {
+            const parts = this.amount.toString().split('.');
+            return {
+                whole:  parts[0] ? parts[0] : 0,
+                decimal: parts[1] ? '.' + parts[1] : '',
+            };
+        },
+    },
+    methods: {
+        prettyFn(value) {
+            return this.exact ? prettyExact(value) : pretty(value);
+        },
+    },
+};
 </script>
 
 <template>
-    <span class="u-amount">
-        <span class="u-amount__whole">{{ amountParts.whole }}</span><!--
-     --><span :class="decimalClass"><!--
-         --><template v-if="coin">{{ amountParts.decimal }} {{ coin }}</template><!--
-         --><template>{{ amountParts.decimal }}</template>
-        </span>
-    </span>
+    <component :is="tag">
+        <span class="u-fw-500">{{ prettyFn(amount) }}</span> {{ coin }}
+    </component>
 </template>

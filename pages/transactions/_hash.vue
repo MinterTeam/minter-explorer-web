@@ -5,17 +5,18 @@
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
     import {getTransaction, getBlock, getBlockList, getCoinById, checkBlockTime} from "~/api";
-    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, txTypeFilter, fromBase64} from "~/assets/utils";
+    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, txTypeFilter, fromBase64, getEtherscanAddressUrl} from "~/assets/utils.js";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {UNBOND_PERIOD, TX_STATUS} from "~/assets/variables";
+    import {UNBOND_PERIOD, TX_STATUS, HUB_MINTER_MULTISIG_ADDRESS} from "~/assets/variables.js";
+    import PoolLink from '~/components/common/PoolLink.vue';
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
 
     Big.DP = 18;
     Big.RM = 2;
 
-    const HUB_ADDRESS = 'Mxffffffffffffffffffffffffffffffffffffffff';
+    const HUB_ADDRESS = HUB_MINTER_MULTISIG_ADDRESS;
 
     let fetchTxTimer;
     let fetchTxDestroy;
@@ -26,6 +27,7 @@
         UNBOND_PERIOD,
         TX_STATUS,
         components: {
+            PoolLink,
             BackButton,
             TableLink,
         },
@@ -99,11 +101,18 @@
                 const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
                 return validator || {};
             },
-            coinPath() {
+            poolPath() {
                 if (!this.tx.data.coins) {
-                    return '';
+                    return [];
                 }
-                return this.tx.data.coins.map((item) => item.symbol).join(' > ');
+                let result = [];
+                for (let i = 0; i < this.tx.data.coins.length - 1; i++) {
+                    result.push({
+                        coin0: this.tx.data.coins[i],
+                        coin1: this.tx.data.coins[i + 1],
+                    });
+                }
+                return result;
             },
             isSellType() {
                 return this.isTxType(TX_TYPE.SELL) || this.isTxType(TX_TYPE.SELL_ALL);
@@ -222,6 +231,7 @@
             timeDistanceFuture: (value) => getTimeDistance(value, true),
             time: getTime,
             timeMinutes: getTimeMinutes,
+            getEtherscanAddressUrl,
             fetchTx() {
                 getTransaction(this.$route.params.hash)
                     .then((tx) => {
@@ -380,7 +390,17 @@
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
                     <dt v-if="tx.data.coins">Coins path</dt>
-                    <dd v-if="tx.data.coins">{{ coinPath }}</dd>
+                    <dd v-if="tx.data.coins">
+                        <span v-for="(coinPathItem, coinPathIndex) in tx.data.coins" :key="coinPathItem.id + '-' + coinPathIndex">
+                            <nuxt-link class="link--default" :to="'/coins/' + coinPathItem.symbol">{{ coinPathItem.symbol }}</nuxt-link><span v-if="coinPathIndex !== tx.data.coins.length - 1"> -> </span>
+                        </span>
+                    </dd>
+                    <dt v-if="tx.data.coins">Pools path</dt>
+                    <dd v-if="tx.data.coins">
+                        <span v-for="(poolPathItem, poolPathIndex) in poolPath" :key="poolPathItem.coin0.id + '-' + poolPathItem.coin1.id">
+                            <PoolLink :pool="poolPathItem"/><span v-if="poolPathIndex !== poolPath.length - 1"> -> </span>
+                        </span>
+                    </dd>
 
                     <!-- CREATE_SWAP_POOL -->
                     <dt v-if="tx.data.poolToken">Pool token</dt>
@@ -389,9 +409,7 @@
                     </dd>
                     <dt v-if="tx.data.coin0 && tx.data.coin1">Pool</dt>
                     <dd v-if="tx.data.coin0 && tx.data.coin1">
-                        <nuxt-link class="link--default" :to="'/pools/' + tx.data.coin0.symbol + '/' + tx.data.coin1.symbol">
-                            {{ tx.data.coin0.symbol }} / {{ tx.data.coin1.symbol }}
-                        </nuxt-link>
+                        <PoolLink :pool="tx.data"/>
                     </dd>
                     <dt v-if="tx.data.coin0">First coin</dt>
                     <dd v-if="tx.data.coin0"><span v-if="isDefined(tx.data.volume0)">{{ prettyExact(tx.data.volume0) }}</span> {{ tx.data.coin0.symbol }} </dd>
@@ -409,7 +427,7 @@
                     <dt v-if="tx.data.maximumVolume1">Max volume of second coin</dt>
                     <dd v-if="tx.data.maximumVolume1">{{ prettyExact(tx.data.maximumVolume1) }}</dd>
                     <!-- REMOVE_LIQUIDITY -->
-                    <dt v-if="tx.data.liquidity">Liquidity</dt>
+                    <dt v-if="tx.data.liquidity">LP amount</dt>
                     <dd v-if="tx.data.liquidity">{{ prettyExact(tx.data.liquidity) }}</dd>
                     <dt v-if="tx.data.minimumVolume0">Min volume of first coin</dt>
                     <dd v-if="tx.data.minimumVolume0">{{ prettyExact(tx.data.minimumVolume0) }}</dd>
@@ -468,7 +486,7 @@
                     <dd v-if="tx.data.controlAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.controlAddress">{{ tx.data.controlAddress }}</nuxt-link></dd>
                     <dt v-if="isDefined(tx.data.height)">Vote height</dt>
                     <dd v-if="isDefined(tx.data.height)">{{ tx.data.height }}</dd>
-                    <dt v-if="isDefined(tx.data.height) && voteTimeInfo">Vote time</dt>
+                    <dt v-if="isDefined(tx.data.height) && voteTimeInfo">Height time</dt>
                     <dd v-if="isDefined(tx.data.height) && voteTimeInfo">
                         <span v-if="!voteTimeInfo.isFutureBlock">{{ timeDistance(voteTimeInfo.timestamp) }} ago ({{ time(voteTimeInfo.timestamp) }})</span>
                         <span v-else>In {{ timeDistanceFuture(voteTimeInfo.timestamp) }} ({{ timeMinutes(voteTimeInfo.timestamp) }})</span>
@@ -521,10 +539,12 @@
                     <dt v-if="isToHubTx">Hub info</dt>
                     <dd v-if="isToHubTx">
                         Type: {{ payloadParsed.type === 'send_to_eth' ? 'Send to Ethereum' : payloadParsed.type }}<br>
-                        Recipient: {{ payloadParsed.recipient }}<br>
+                        Recipient:
+                        <a class="link--default" :href="getEtherscanAddressUrl(payloadParsed.recipient)" target="_blank">{{ payloadParsed.recipient }}</a><br>
                         Amount: {{ prettyExact(hubAmount) }} {{ tx.data.coin.symbol }}<br>
                         Ethereum fee: {{ prettyExact(hubNetworkFee) }} {{ tx.data.coin.symbol }}<br>
-                        Hub bridge fee: {{ prettyExact(hubBridgeFee) }} {{ tx.data.coin.symbol }}
+                        Hub bridge fee (1%): {{ prettyExact(hubBridgeFee) }} {{ tx.data.coin.symbol }}
+                        <!-- @TODO show ETH tx hash -->
                     </dd>
 
 

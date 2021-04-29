@@ -326,7 +326,7 @@
                                 {{ tx.data.coin1.symbol }} <span v-if="tx.data.volume1">{{ pretty(tx.data.volume1) }} </span>
                             </div>
                             <div class="table__inner-item" v-if="isDefined(tx.data.liquidity)">
-                                <strong>Liquidity</strong> <br>
+                                <strong>LP amount</strong> <br>
                                 {{ pretty(tx.data.liquidity) }}
                             </div>
 
