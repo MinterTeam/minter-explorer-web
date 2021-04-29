@@ -4,11 +4,12 @@ import {getPoolTransactionList, getPool, getPoolProviderList, getStatus} from "@
 import {pretty, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';
+import {TAB_TYPES} from '~/assets/variables.js';
+import Amount from '@/components/common/Amount.vue';
 import TransactionListTable from '~/components/TransactionListTable';
 import PoolProviderList from '@/components/PoolProviderList.vue';
 import BackButton from '@/components/BackButton.vue';
 import Pagination from "@/components/Pagination.vue";
-import {TAB_TYPES} from 'assets/variables.js';
 
 const DEFAULT_TAB = TAB_TYPES.TX;
 
@@ -22,6 +23,7 @@ function ensurePage(val) {
 export default {
     TAB_TYPES,
     components: {
+        Amount,
         TransactionListTable,
         PoolProviderList,
         BackButton,
@@ -95,6 +97,9 @@ export default {
     computed: {
         liquidityUsd() {
             return this.pool.liquidityBip * this.bipPriceUsd;
+        },
+        volumeUsd() {
+            return this.pool.tradeVolumeBip30D * this.bipPriceUsd;
         },
         coin0Price() {
             return calculateTradeReturn(this.pool.amount0, this.pool.amount1);
@@ -240,27 +245,33 @@ function calculateTradeReturn(amountIn, amountOut) {
                 <dd><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></dd>
 
                 <dt>Amount {{ pool.token.symbol }}</dt>
-                <dd>{{ prettyExact(pool.liquidity) }} {{ pool.token.symbol }}</dd>
+                <Amount :amount="pool.liquidity" :coin="pool.token.symbol" :exact="true" tag="dd"/>
 
                 <dt>Amount</dt>
-                <dd><span class="u-fw-500">{{ prettyExact(pool.amount0) }}</span> {{ pool.coin0.symbol }}</dd>
+                <Amount :amount="pool.amount0" :coin="pool.coin0.symbol" :exact="true" tag="dd"/>
 
                 <dt>Amount </dt>
-                <dd><span class="u-fw-500">{{ prettyExact(pool.amount1) }}</span> {{ pool.coin1.symbol }}</dd>
+                <Amount :amount="pool.amount1" :coin="pool.coin1.symbol" :exact="true" tag="dd"/>
 
                 <dt>Price {{ pool.coin0.symbol }}</dt>
-                <dd><span class="u-fw-500">{{ pretty(coin0Price) }}</span> {{ pool.coin1.symbol }}</dd>
+                <Amount :amount="coin0Price" :coin="pool.coin1.symbol" :exact="false" tag="dd"/>
 
                 <dt>Price {{ pool.coin1.symbol }}</dt>
-                <dd><span class="u-fw-500">{{ pretty(coin1Price) }}</span> {{ pool.coin0.symbol }}</dd>
+                <Amount :amount="coin1Price" :coin="pool.coin0.symbol" :exact="false" tag="dd"/>
 
 
 
-                <dt>Liquidity {{ $store.getters.BASE_COIN}}</dt>
-                <dd>{{ pretty(pool.liquidityBip) }}</dd>
+                <dt>Liquidity</dt>
+                <Amount :amount="pool.liquidityBip" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
                 <dt>Liquidity USD</dt>
                 <dd>${{ pretty(liquidityUsd) }}</dd>
+
+                <dt>Volume (30d)</dt>
+                <Amount :amount="pool.tradeVolumeBip30D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+
+                <dt>Volume USD</dt>
+                <dd>${{ pretty(volumeUsd) }}</dd>
             </dl>
         </section>
 
@@ -297,6 +308,6 @@ function calculateTradeReturn(amountIn, amountOut) {
                 :is-loading="isProviderListLoading"
             />
         </section>
-        <Pagination :pagination-info="providerPaginationInfo"/>
+        <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
     </div>
 </template>

@@ -14,6 +14,9 @@ export const HISTORY_WEB_URL = 'https://v1-history.explorer.minter.network';
 export const EXPLORER_API_URL = process.env.APP_EXPLORER_API_URL;
 export const EXPLORER_RTM_URL = process.env.APP_EXPLORER_RTM_URL;
 export const GATE_API_URL = process.env.APP_GATE_API_URL;
+export const HUB_MINTER_MULTISIG_ADDRESS = process.env.APP_HUB_MINTER_MULTISIG_ADDRESS;
+export const ETHERSCAN_HOST = NETWORK === MAINNET ? 'https://etherscan.io' : 'https://ropsten.etherscan.io';
+
 /**
  * @readonly
  * @enum {string}

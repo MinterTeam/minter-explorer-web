@@ -7,6 +7,7 @@ import fromExponential from 'from-exponential';
 import decode from 'entity-decode';
 import {txTypeList} from 'minterjs-tx/src/tx-types';
 import {getTimeOffset} from '~/assets/time-offset.js';
+import {ETHERSCAN_HOST} from '~/assets/variables.js';
 
 function timeFormat(timestamp, pattern) {
     if (typeof timestamp === 'string') {
@@ -77,6 +78,10 @@ export function getExplorerAddressUrl(address) {
 
 export function getExplorerValidatorUrl(pubKey) {
     return '/validator/' + pubKey;
+}
+
+export function getEtherscanAddressUrl(hash) {
+    return ETHERSCAN_HOST + '/address/' + hash;
 }
 
 /**
