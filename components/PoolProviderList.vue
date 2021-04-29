@@ -73,8 +73,8 @@ export default {
             <tr>
                 <th>Provider</th>
                 <th colspan="2">Amount</th>
+                <th>{{ providerList[0].token.symbol }} amount</th>
                 <th>Liquidity</th>
-                <th>Liquidity worth</th>
                 <th>Share</th>
             </tr>
             </thead>

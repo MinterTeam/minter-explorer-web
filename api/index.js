@@ -481,6 +481,7 @@ export function getCoinList() {
  * @property {number|string} liquidity
  * @property {number|string} liquidityBip
  * @property {string} token
+ * @property {number|string} tradeVolumeBip30D
  */
 
 /**
@@ -721,8 +722,11 @@ export function getCoinBySymbol(symbol) {
  * -- type: TX_TYPE.CONVERT
  * @property {Coin} [data.coinToSell]
  * @property {Coin} [data.coinToBuy]
+ * @property {Array<Coin>} [data.coins]
  * @property {number} [data.valueToSell]
+ * @property {number} [data.minimumValueToBuy]
  * @property {number} [data.valueToBuy]
+ * @property {number} [data.maximumValueToSell]
  * -- type: TX_TYPE.CREATE_COIN
  * @property {number} [data.createdCoinId]
  * @property {string} [data.name]
