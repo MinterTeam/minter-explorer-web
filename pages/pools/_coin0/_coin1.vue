@@ -1,6 +1,6 @@
 <script>
 import Big from 'big.js';
-import {getPoolTransactionList, getPool, getPoolProviderList, getStatus} from "@/api/index.js";
+import {getPoolTransactionList, getPool, getPoolProviderList} from "@/api/index.js";
 import {pretty, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';
@@ -38,13 +38,11 @@ export default {
         }
 
         const poolPromise = getPool(params.coin0, params.coin1);
-        const statusPromise = getStatus();
 
-        return Promise.all([poolPromise, statusPromise])
-            .then(([pool, statusData]) => {
+        return Promise.all([poolPromise])
+            .then(([pool]) => {
                 return {
                     pool: pool,
-                    bipPriceUsd: statusData.bipPriceUsd,
                 };
             })
             .catch((requestError) => {
@@ -73,7 +71,6 @@ export default {
         return {
             /** @type Pool */
             pool: {},
-            bipPriceUsd: 0,
             storedTabPages: {},
             providerList: [],
             providerPaginationInfo: {},
@@ -95,12 +92,6 @@ export default {
         },
     },
     computed: {
-        liquidityUsd() {
-            return this.pool.liquidityBip * this.bipPriceUsd;
-        },
-        volumeUsd() {
-            return this.pool.tradeVolumeBip30D * this.bipPriceUsd;
-        },
         coin0Price() {
             return calculateTradeReturn(this.pool.amount0, this.pool.amount1);
         },
@@ -219,7 +210,7 @@ function calculateTradeReturn(amountIn, amountOut) {
     if (Number(amountIn) === 0) {
         return 0;
     }
-    return new Big(amountOut).div(amountIn);
+    return new Big(amountOut).div(amountIn).toFixed(18);
     // return amountOut - (amountIn * amountOut / (amountIn + 1));
 }
 </script>
@@ -264,14 +255,8 @@ function calculateTradeReturn(amountIn, amountOut) {
                 <dt>Liquidity</dt>
                 <Amount :amount="pool.liquidityBip" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
-                <dt>Liquidity USD</dt>
-                <dd>${{ pretty(liquidityUsd) }}</dd>
-
                 <dt>Volume (30d)</dt>
                 <Amount :amount="pool.tradeVolumeBip30D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
-
-                <dt>Volume USD</dt>
-                <dd>${{ pretty(volumeUsd) }}</dd>
             </dl>
         </section>
 
@@ -304,7 +289,6 @@ function calculateTradeReturn(amountIn, amountOut) {
             <PoolProviderList
                 v-if="activeTab === $options.TAB_TYPES.PROVIDER"
                 :provider-list="providerList"
-                :bip-price-usd="bipPriceUsd"
                 :is-loading="isProviderListLoading"
             />
         </section>

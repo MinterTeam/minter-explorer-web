@@ -11,10 +11,6 @@
                 type: [Array, null],
                 required: true,
             },
-            bipPriceUsd: {
-                type: Number,
-                default: 0,
-            },
         },
 
     };
@@ -29,7 +25,7 @@
             </h2>
             <nuxt-link class="button button--ghost-main button--small" to="/pools">View All</nuxt-link>
         </div>
-        <PoolList :pool-list="poolList" :bip-price-usd="bipPriceUsd"/>
+        <PoolList :pool-list="poolList"/>
     </section>
 <!--    <div class="panel preview">-->
 <!--        <div class="preview__header panel__section panel__header">-->

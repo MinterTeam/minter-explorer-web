@@ -1,5 +1,5 @@
 <script>
-import {getCoinBySymbol, getPoolByToken, getPoolList, getStatus} from "~/api/index.js";
+import {getCoinBySymbol, getPoolByToken, getPoolList} from "~/api/index.js";
 import {pretty, prettyPrecise, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';
@@ -53,12 +53,8 @@ export default {
                 this.paginationInfo = poolListInfo.meta;
                 this.poolList = poolListInfo.data || [];
             });
-        const statusPromise = getStatus()
-            .then((statusData) => {
-                this.bipPriceUsd = statusData.bipPriceUsd;
-            });
 
-        return Promise.all([poolListPromise, statusPromise, poolTokenPromise]);
+        return Promise.all([poolListPromise, poolTokenPromise]);
     },
     head() {
         const title = getTitle('Coin ' + this.$route.params.symbol);
@@ -79,7 +75,6 @@ export default {
             paginationInfo: {},
             /** @type Array<Pool> */
             poolList: [],
-            bipPriceUsd: 0,
         };
     },
     watch: {
@@ -171,7 +166,7 @@ export default {
                     Liquidity pools with {{ $route.params.symbol }}
                 </h2>
             </div>
-            <PoolList v-if="!$fetchState.pending" :pool-list="poolList" :bip-price-usd="bipPriceUsd"/>
+            <PoolList v-if="!$fetchState.pending" :pool-list="poolList"/>
             <div class="panel__section" v-else>Loading…</div>
         </section>
         <Pagination :pagination-info="paginationInfo"/>

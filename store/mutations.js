@@ -2,6 +2,9 @@ export default {
     SET_VALIDATOR_LIST(state, validatorList) {
         state.validatorList = validatorList;
     },
+    SET_STATUS(state, statusData) {
+        state.status = statusData;
+    },
     PUSH_HISTORY: (state, historyItem) => {
         // pushstate, clear detached chain
         state.history.push(historyItem);

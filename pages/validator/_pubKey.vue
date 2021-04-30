@@ -5,6 +5,7 @@
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise, prettyRound} from '~/assets/utils';
     import {TAB_TYPES} from '~/assets/variables';
+    import Amount from '@/components/common/Amount.vue';
     import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable.vue';
@@ -29,6 +30,7 @@
         TAB_TYPES,
         VALIDATOR_STATUS,
         components: {
+            Amount,
             StakeListTable,
             RewardSlashListTable,
             TransactionListTable,
@@ -223,7 +225,7 @@
             <div class="panel__section panel__header">
                 <h1 class="panel__header-title panel__title">
                     <BackButton/>
-                    <span>Validator Overview</span>
+                    <span>Validator overview</span>
                 </h1>
             </div>
             <dl>
@@ -245,17 +247,17 @@
                 <dt>Status</dt>
                 <dd>{{ $options.VALIDATOR_STATUS[validator.status || 0] }}</dd>
 
-                <dt>Total Stake</dt>
-                <dd>{{ $store.state.COIN_NAME }} <span>{{ validator.stake | prettyPrecise }}</span></dd>
+                <dt>Total stake</dt>
+                <Amount :amount="validator.stake" :coin="$store.state.COIN_NAME" tag="dd"/>
 
-                <dt>Voting Power</dt>
+                <dt>Voting power</dt>
                 <dd>{{ (validator.part || 0) | pretty }}&thinsp;%</dd>
 
                 <dt>#Delegators</dt>
                 <dd>{{ validator.delegatorCount }}</dd>
 
-                <dt>#Transactions</dt>
-                <dd>{{ txPaginationInfo.total | prettyRound }}</dd>
+                <dt>Minimal stake</dt>
+                <Amount :amount="validator.minStake" :coin="$store.state.COIN_NAME" tag="dd"/>
             </dl>
         </section>
 

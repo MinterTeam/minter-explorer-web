@@ -50,6 +50,7 @@ module.exports = {
         middleware: [
             'hash-lowercase',
             'validator-meta',
+            'status-data',
         ],
     },
     plugins: [

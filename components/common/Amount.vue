@@ -19,19 +19,24 @@ export default {
             type: Boolean,
             default: false,
         },
+        coinFirst: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
+        amountUsd() {
+            if (this.coin !== this.$store.getters.BASE_COIN || this.amount <= 0) {
+                return 0;
+            }
 
-        amountParts() {
-            const parts = this.amount.toString().split('.');
-            return {
-                whole:  parts[0] ? parts[0] : 0,
-                decimal: parts[1] ? '.' + parts[1] : '',
-            };
+            return this.amount * this.$store.getters.bipPriceUsd;
         },
     },
     methods: {
-        prettyFn(value) {
+        pretty,
+        prettyExact,
+        prettyAmount(value) {
             return this.exact ? prettyExact(value) : pretty(value);
         },
     },
@@ -40,6 +45,7 @@ export default {
 
 <template>
     <component :is="tag">
-        <span class="u-fw-500">{{ prettyFn(amount) }}</span> {{ coin }}
+        <template v-if="coinFirst">{{ coin }}</template> <span class="u-fw-500" :title="exact ? '' : prettyExact(amount)">{{ prettyAmount(amount) }}</span> <template v-if="!coinFirst">{{ coin }}</template>
+        <span class="u-text-muted" v-if="amountUsd">(${{ pretty(amountUsd) }})</span>
     </component>
 </template>

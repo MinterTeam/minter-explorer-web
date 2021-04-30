@@ -1,12 +1,14 @@
 <script>
 import debounce from 'lodash-es/debounce.js';
 import {pretty} from '~/assets/utils.js';
+import Amount from '@/components/common/Amount.vue';
 import TableLink from '@/components/TableLink.vue';
 
 let resizeHandler;
 
 export default {
     components: {
+        Amount,
         TableLink,
     },
     props: {
@@ -14,10 +16,6 @@ export default {
         providerList: {
             type: Array,
             required: true,
-        },
-        bipPriceUsd: {
-            type: Number,
-            default: 0,
         },
         isLoading: {
             type: Boolean,
@@ -34,7 +32,7 @@ export default {
             return this.providerList.map((provider) => {
                 return {
                     ...provider,
-                    liquidityUsd: provider.liquidityBip * this.bipPriceUsd,
+                    // liquidityUsd: provider.liquidityBip * this.bipPriceUsd,
                 };
             });
         },
@@ -90,8 +88,7 @@ export default {
                 <td>{{ provider.coin1.symbol }} <span class="u-fw-500">{{ pretty(provider.amount1) }}</span></td>
                 <td>{{ pretty(provider.liquidity) }}</td>
                 <td>
-                    {{ $store.getters.BASE_COIN }} <span class="u-fw-500">{{ pretty(provider.liquidityBip) }}</span>
-                    (${{ pretty(provider.liquidityUsd) }})
+                    <Amount :amount="provider.liquidityBip" :coin="$store.getters.BASE_COIN" :coinFirst="true"/>
                 </td>
                 <td>
 
