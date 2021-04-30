@@ -9,6 +9,8 @@ export default function() {
         detachedHistory: [],
         /** @type Array<Validator> */
         validatorList: [],
+        /** @type Status|null */
+        status: null,
         isSnackbarActive: false,
     };
 }

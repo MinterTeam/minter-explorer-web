@@ -1,5 +1,5 @@
 <script>
-    import {getPoolList, getStatus} from "~/api/index.js";
+    import {getPoolList} from "~/api/index.js";
     import getTitle from '~/assets/get-title.js';
     import BackButton from '~/components/BackButton.vue';
     import Pagination from "~/components/Pagination.vue";
@@ -15,14 +15,12 @@
         key: (to) => to.fullPath,
         asyncData({ query }) {
             const poolPromise = getPoolList(query);
-            const statusPromise = getStatus();
 
-            return Promise.all([poolPromise, statusPromise])
-                .then(([poolListInfo, statusData]) => {
+            return Promise.all([poolPromise])
+                .then(([poolListInfo]) => {
                     return {
                         paginationInfo: poolListInfo.meta,
                         poolList: poolListInfo.data,
-                        bipPriceUsd: statusData.bipPriceUsd,
                     };
                 });
         },
@@ -41,7 +39,6 @@
                 paginationInfo: {},
                 /** @type Array<Pool> */
                 poolList: [],
-                bipPriceUsd: 0,
             };
         },
         computed: {
@@ -74,7 +71,7 @@
                             button-disabled-class="u-hidden"
                 />
             </div>
-            <PoolList :pool-list="poolList" :bip-price-usd="bipPriceUsd"/>
+            <PoolList :pool-list="poolList"/>
         </section>
         <Pagination :pagination-info="paginationInfo"/>
     </div>

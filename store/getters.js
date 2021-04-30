@@ -7,4 +7,7 @@ export default {
     BASE_COIN() {
         return COIN_NAME;
     },
+    bipPriceUsd(state) {
+        return state.status?.bipPriceUsd || 0;
+    },
 };

@@ -8,18 +8,14 @@
                 type: Array,
                 required: true,
             },
-            bipPriceUsd: {
-                type: Number,
-                default: 0,
-            },
         },
         computed: {
             poolListFormatted() {
                 return this.poolList.map((pool) => {
                     return {
                         ...pool,
-                        liquidityUsd: pool.liquidityBip * this.bipPriceUsd,
-                        volumeUsd: pool.tradeVolumeBip30D * this.bipPriceUsd,
+                        liquidityUsd: pool.liquidityBip * this.$store.getters.bipPriceUsd,
+                        volumeUsd: pool.tradeVolumeBip30D * this.$store.getters.bipPriceUsd,
                     };
                 });
             },
