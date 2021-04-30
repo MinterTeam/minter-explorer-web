@@ -9,6 +9,7 @@
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {UNBOND_PERIOD, TX_STATUS, HUB_MINTER_MULTISIG_ADDRESS} from "~/assets/variables.js";
+    import Amount from '@/components/common/Amount.vue';
     import PoolLink from '~/components/common/PoolLink.vue';
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
@@ -27,13 +28,12 @@
         UNBOND_PERIOD,
         TX_STATUS,
         components: {
+            Amount,
             PoolLink,
             BackButton,
             TableLink,
         },
         filters: {
-            prettyExact,
-            prettyRound,
             txType: txTypeFilter,
             timeDistance: getTimeDistance,
             // timeDistanceFuture: (value) => getTimeDistance(value, true),
@@ -115,16 +115,10 @@
                 return result;
             },
             isSellType() {
-                return this.isTxType(TX_TYPE.SELL) || this.isTxType(TX_TYPE.SELL_ALL);
-            },
-            isSellPoolType() {
-                return this.isTxType(TX_TYPE.SELL_SWAP_POOL) || this.isTxType(TX_TYPE.SELL_ALL_SWAP_POOL);
+                return this.isTxType(TX_TYPE.SELL) || this.isTxType(TX_TYPE.SELL_ALL) || this.isTxType(TX_TYPE.SELL_SWAP_POOL) || this.isTxType(TX_TYPE.SELL_ALL_SWAP_POOL);
             },
             isBuyType() {
-                return this.isTxType(TX_TYPE.BUY);
-            },
-            isBuyPoolType() {
-                return this.isTxType(TX_TYPE.BUY_SWAP_POOL);
+                return this.isTxType(TX_TYPE.BUY) || this.isTxType(TX_TYPE.BUY_SWAP_POOL);
             },
             isUnbondType() {
                 return this.isTxType(TX_TYPE.UNBOND);
@@ -345,7 +339,7 @@
                 <dd><strong :class="tx.status === $options.TX_STATUS.SUCCESS ? 'tx__success' : 'tx__fail'">{{ tx.status }}</strong></dd>
 
                 <dt>Block</dt>
-                <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.height">{{ tx.height | prettyRound }}</nuxt-link></dd>
+                <dd><nuxt-link class="link--default" :to="'/blocks/' + tx.height">{{ prettyRound(tx.height) }}</nuxt-link></dd>
 
                 <dt>Type</dt>
                 <dd>{{ tx.type | txType }}</dd>
@@ -360,42 +354,31 @@
                 <!-- SEND, MINT_TOKEN, BURN_TOKEN -->
                 <dt v-if="tx.data.to">To</dt>
                 <dd v-if="tx.data.to"><nuxt-link class="link--default" :to="'/address/' + tx.data.to">{{ tx.data.to }}</nuxt-link></dd>
-                <dt v-if="isDefined(tx.data.value) && !isStakeType">Amount</dt>
-                <dd v-if="isDefined(tx.data.value) && !isStakeType">{{ prettyExact(tx.data.value) }} {{ tx.data.coin.symbol }}</dd>
+                    <dt v-if="isDefined(tx.data.value) && !isStakeType">Amount</dt>
+                    <Amount tag="dd" v-if="isDefined(tx.data.value) && !isStakeType" :amount="tx.data.value" :coin="tx.data.coin.symbol" :exact="true"/>
 
-                <!-- SELL, SELL_ALL -->
-                <dt v-if="isSellType">Sell coins</dt>
-                <dd v-if="isSellType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
-                <dt v-if="isSellType">Get coins</dt>
-                <dd v-if="isSellType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
-                    <!-- SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
-                    <dt v-if="isSellPoolType">Sell coins</dt>
-                    <dd v-if="isSellPoolType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coins[0].symbol }}</dd>
-                    <dt v-if="isSellPoolType">Get coins</dt>
-                    <dd v-if="isSellPoolType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coins[tx.data.coins.length - 1].symbol }}</dd>
+                    <!-- SELL, SELL_ALL, SELL_SWAP_POOL, SELL_ALL_SWAP_POOL -->
+                    <dt v-if="isSellType">Sell coins</dt>
+                    <Amount tag="dd" v-if="isSellType" :amount="tx.data.valueToSell" :coin="tx.data.coinToSell.symbol" :exact="true"/>
+                    <dt v-if="isSellType">Get coins</dt>
+                    <Amount tag="dd" v-if="isSellType" :amount="tx.data.valueToBuy" :coin="tx.data.coinToBuy.symbol" :exact="true"/>
                     <dt v-if="tx.data.minimumValueToBuy">Minimum value to get</dt>
                     <dd v-if="tx.data.minimumValueToBuy">{{ prettyExact(tx.data.minimumValueToBuy) }}</dd>
-                    <!-- BUY -->
+                    <!-- BUY, BUY_SWAP_POOL -->
                     <dt v-if="isBuyType">Buy coins</dt>
-                    <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coinToBuy.symbol }}</dd>
+                    <Amount tag="dd" v-if="isBuyType" :amount="tx.data.valueToBuy" :coin="tx.data.coinToBuy.symbol" :exact="true"/>
                     <dt v-if="isBuyType">Spend coins</dt>
-                    <dd v-if="isBuyType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coinToSell.symbol }}</dd>
-
-                    <!-- BUY_SWAP_POOL -->
-                    <dt v-if="isBuyPoolType">Buy coins</dt>
-                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToBuy) }} {{ tx.data.coins[tx.data.coins.length - 1].symbol }}</dd>
-                    <dt v-if="isBuyPoolType">Spend coins</dt>
-                    <dd v-if="isBuyPoolType">{{ prettyExact(tx.data.valueToSell) }} {{ tx.data.coins[0].symbol }}</dd>
+                    <Amount tag="dd" v-if="isBuyType" :amount="tx.data.valueToSell" :coin="tx.data.coinToSell.symbol" :exact="true"/>
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
-                    <dt v-if="tx.data.coins">Coins path</dt>
+                    <dt v-if="tx.data.coins">Coins route</dt>
                     <dd v-if="tx.data.coins">
                         <span v-for="(coinPathItem, coinPathIndex) in tx.data.coins" :key="coinPathItem.id + '-' + coinPathIndex">
                             <nuxt-link class="link--default" :to="'/coins/' + coinPathItem.symbol">{{ coinPathItem.symbol }}</nuxt-link><span v-if="coinPathIndex !== tx.data.coins.length - 1"> -> </span>
                         </span>
                     </dd>
-                    <dt v-if="tx.data.coins">Pools path</dt>
+                    <dt v-if="tx.data.coins">Pools route</dt>
                     <dd v-if="tx.data.coins">
                         <span v-for="(poolPathItem, poolPathIndex) in poolPath" :key="poolPathItem.coin0.id + '-' + poolPathItem.coin1.id">
                             <PoolLink :pool="poolPathItem"/><span v-if="poolPathIndex !== poolPath.length - 1"> -> </span>
@@ -445,13 +428,13 @@
                 <dd v-if="currentCoinSymbol && currentCoinSymbol !== tx.data.symbol">{{ currentCoinSymbol }}</dd>
 
                 <dt v-if="tx.data.initialAmount">Initial amount</dt>
-                <dd v-if="tx.data.initialAmount">{{ tx.data.initialAmount | prettyExact }}</dd>
+                <dd v-if="tx.data.initialAmount">{{ prettyExact(tx.data.initialAmount) }}</dd>
                 <dt v-if="tx.data.initialReserve">Initial reserve</dt>
                 <dd v-if="tx.data.initialReserve">{{ prettyExact(tx.data.initialReserve) }} {{ $store.getters.BASE_COIN }}</dd>
                 <dt v-if="tx.data.constantReserveRatio">CRR</dt>
                 <dd v-if="tx.data.constantReserveRatio">{{ tx.data.constantReserveRatio }}&thinsp;%</dd>
                 <dt v-if="tx.data.maxSupply">Max supply</dt>
-                <dd v-if="tx.data.maxSupply">{{ tx.data.maxSupply | prettyExact }}</dd>
+                <dd v-if="tx.data.maxSupply">{{ prettyExact(tx.data.maxSupply) }}</dd>
                 <dt v-if="tx.data.newOwner">Owner address</dt>
                 <dd v-if="tx.data.newOwner"><nuxt-link class="link--default" :to="'/address/' + tx.data.newOwner">{{ tx.data.newOwner }}</nuxt-link></dd>
                     <dt v-if="isDefined(tx.data.mintable)">Mintable</dt>
@@ -467,8 +450,13 @@
                 <dd v-if="tx.data.pubKey"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pubKey">{{ tx.data.pubKey }}</nuxt-link></dd>
                     <dt v-if="tx.data.newPubKey">New public key</dt>
                     <dd v-if="tx.data.newPubKey"><nuxt-link class="link--default" :to="'/validator/' + tx.data.newPubKey">{{ tx.data.newPubKey }}</nuxt-link></dd>
-                <dt v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
-                <dd v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)">{{ prettyExact(tx.data.stake || tx.data.value) }} {{ tx.data.coin.symbol }}</dd>
+                    <dt v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)">Stake</dt>
+                    <Amount tag="dd"
+                            v-if="isStakeType && isDefined(tx.data.stake || tx.data.value)"
+                            :amount="tx.data.stake || tx.data.value"
+                            :coin="tx.data.coin.symbol"
+                            :exact="true"
+                    />
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbondType">Unbond block</dt>
@@ -506,8 +494,13 @@
                 <dd v-if="tx.data.check && tx.data.check.nonce">{{ fromBase64(tx.data.check.nonce) }}</dd>
                 <dt v-if="tx.data.check && tx.data.check.dueBlock">Due Block</dt>
                 <dd v-if="tx.data.check && tx.data.check.dueBlock">{{ tx.data.check.dueBlock }}</dd>
-                <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
-                <dd v-if="tx.data.check && tx.data.check.value">{{ prettyExact(tx.data.check.value) }} {{ tx.data.check.coin.symbol }}</dd>
+                    <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
+                    <Amount tag="dd"
+                            v-if="tx.data.check && tx.data.check.value"
+                            :amount="tx.data.check.value"
+                            :coin="tx.data.check.coin.symbol"
+                            :exact="true"
+                    />
                     <dt v-if="tx.data.rawCheck">Check</dt>
                     <dd v-if="tx.data.rawCheck">{{ checkFromBase64(tx.data.rawCheck) }}</dd>
 
@@ -598,7 +591,13 @@
                                 :should-not-shorten="!shouldShortenAddress"
                             />
                         </td>
-                        <td>{{ transfer.coin.symbol }} {{ transfer.value | prettyExact }}</td>
+                        <td>
+                            <Amount :amount="transfer.value"
+                                    :coin="transfer.coin.symbol"
+                                    :exact="true"
+                                    :coinFirst="true"
+                            />
+                        </td>
                     </tr>
                     </tbody>
                 </table>
