@@ -1,6 +1,6 @@
 <script>
     import {isValidPublicKeyString} from 'minterjs-util/src/prefix';
-    import {getValidatorTransactionList, getValidator, getValidatorStakeList, getValidatorPenaltyList} from "~/api/index.js";
+    import {getValidatorTransactionList, getValidator, getValidatorStakeList, getValidatorPenaltyList} from '~/api/explorer.js';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise, prettyRound} from '~/assets/utils';

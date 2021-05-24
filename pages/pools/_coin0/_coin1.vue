@@ -1,6 +1,6 @@
 <script>
 import Big from 'big.js';
-import {getPoolTransactionList, getPool, getPoolProviderList} from "@/api/index.js";
+import {getPoolTransactionList, getPool, getPoolProviderList} from "@/api/explorer.js";
 import {pretty, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';

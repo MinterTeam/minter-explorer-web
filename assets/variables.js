@@ -17,6 +17,14 @@ export const GATE_API_URL = process.env.APP_GATE_API_URL;
 export const HUB_MINTER_MULTISIG_ADDRESS = process.env.APP_HUB_MINTER_MULTISIG_ADDRESS;
 export const ETHERSCAN_HOST = NETWORK === MAINNET ? 'https://etherscan.io' : 'https://ropsten.etherscan.io';
 
+
+export const HISTORY_V1_BLOCK_COUNT = 5000000;
+export const HISTORY_V1_1_BLOCK_COUNT = 4150000;
+export const HISTORY_BLOCK_COUNT = HISTORY_V1_BLOCK_COUNT + HISTORY_V1_1_BLOCK_COUNT;
+// export const HISTORY_V1_1_TRANSACTION_COUNT = 5405605;
+// export const HISTORY_V1_2_TRANSACTION_COUNT = 12784024;
+export const HISTORY_TRANSACTION_COUNT = 12784024;
+
 /**
  * @readonly
  * @enum {string}

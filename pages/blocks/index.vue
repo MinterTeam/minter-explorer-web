@@ -1,5 +1,5 @@
 <script>
-    import {getBlockList} from "~/api";
+    import {getBlockList} from '~/api/explorer.js';
     import {getTime, pretty, prettyRound} from '~/assets/utils';
     import getTitle from '~/assets/get-title';
     import BackButton from '~/components/BackButton';
