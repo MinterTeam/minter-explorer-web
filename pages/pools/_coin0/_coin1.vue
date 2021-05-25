@@ -98,6 +98,12 @@ export default {
         coin1Price() {
             return calculateTradeReturn(this.pool.amount1, this.pool.amount0);
         },
+        tradeFee() {
+            return this.pool.tradeVolumeBip30D * 0.02;
+        },
+        apr() {
+            return this.tradeFee / this.pool.liquidityBip * 12 * 100;
+        },
         activeTab() {
             return ensureTab(this.$route.query.active_tab);
         },
@@ -257,6 +263,12 @@ function calculateTradeReturn(amountIn, amountOut) {
 
                 <dt>Volume (30d)</dt>
                 <Amount :amount="pool.tradeVolumeBip30D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+
+                <dt>Fees (30d)</dt>
+                <Amount :amount="tradeFee" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+
+                <dt>APR</dt>
+                <dd>{{ pretty(apr) }}%</dd>
             </dl>
         </section>
 
