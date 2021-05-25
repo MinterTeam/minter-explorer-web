@@ -55,7 +55,7 @@
                 <td>{{ pool.coin1.symbol }} <span class="u-fw-500">{{ pretty(pool.amount1) }}</span></td>
                 <td>${{ pretty(pool.liquidityUsd) }}</td>
                 <td>${{ pretty(pool.volumeUsd) }}</td>
-                <td>{{ pretty(pool.apr) }}%</td>
+                <td><span v-if="pool.liquidityUsd > 100">{{ pretty(pool.apr) }}%</span></td>
             </tr>
             </tbody>
         </table>
