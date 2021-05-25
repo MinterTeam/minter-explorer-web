@@ -99,7 +99,7 @@ export default {
             return calculateTradeReturn(this.pool.amount1, this.pool.amount0);
         },
         tradeFee() {
-            return this.pool.tradeVolumeBip30D * 0.02;
+            return this.pool.tradeVolumeBip30D * 0.002;
         },
         apr() {
             return this.tradeFee / this.pool.liquidityBip * 12 * 100;

@@ -12,7 +12,7 @@
         computed: {
             poolListFormatted() {
                 return this.poolList.map((pool) => {
-                    const tradeFee = pool.tradeVolumeBip30D * 0.02;
+                    const tradeFee = pool.tradeVolumeBip30D * 0.002;
                     const apr = tradeFee / pool.liquidityBip * 12 * 100;
 
                     return {
