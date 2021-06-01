@@ -12,13 +12,13 @@
         computed: {
             poolListFormatted() {
                 return this.poolList.map((pool) => {
-                    const tradeFee = pool.tradeVolumeBip30D * 0.002;
-                    const apr = tradeFee / pool.liquidityBip * 12 * 100;
+                    const tradeFee = pool.tradeVolumeBip1D * 0.002;
+                    const apr = tradeFee / pool.liquidityBip * 365 * 100;
 
                     return {
                         ...pool,
                         liquidityUsd: pool.liquidityBip * this.$store.getters.bipPriceUsd,
-                        volumeUsd: pool.tradeVolumeBip30D * this.$store.getters.bipPriceUsd,
+                        volumeUsd: pool.tradeVolumeBip1D * this.$store.getters.bipPriceUsd,
                         apr,
                     };
                 });
@@ -39,7 +39,7 @@
 <!--                <th>Pool token</th>-->
                 <th colspan="2">Amount</th>
                 <th>Liquidity</th>
-                <th>Volume (30d)</th>
+                <th>Volume (1d)</th>
                 <th>APR</th>
             </tr>
             </thead>

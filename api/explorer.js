@@ -496,7 +496,7 @@ export function getCoinList() {
  * @property {number|string} liquidity
  * @property {number|string} liquidityBip
  * @property {string} token
- * @property {number|string} tradeVolumeBip30D
+ * @property {number|string} tradeVolumeBip1D
  */
 
 /**
