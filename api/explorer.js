@@ -1,7 +1,8 @@
 import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import stripZeros from 'pretty-num/src/strip-zeros';
-import {EXPLORER_API_URL, REWARD_CHART_TYPES, COIN_NAME, TX_STATUS} from "~/assets/variables.js";
+import {_getOracleCoinList} from '~/api/hub.js';
+import {EXPLORER_API_URL, REWARD_CHART_TYPES, BASE_COIN, TX_STATUS} from "~/assets/variables.js";
 import addToCamelInterceptor from '~/assets/to-camel.js';
 import {addTimeInterceptor} from '~/assets/time-offset.js';
 import {padZero} from '~/assets/utils.js';
@@ -205,33 +206,76 @@ export function getTransactionChart() {
  * @param {string} address
  * @return {Promise<BalanceData>}
  */
-export function getBalance(address) {
-    return explorer.get(`addresses/${address}?with_sum=true`)
-        .then((response) => {
-            const data = response.data.data;
-            data.balances = prepareBalance(data.balances);
-            return data;
-        });
+export async function getBalance(address) {
+    const response = await explorer.get(`addresses/${address}?with_sum=true`);
+    const data = response.data.data;
+    data.balances = await prepareBalance(data.balances);
+    return data;
 }
 
-export function prepareBalance(balanceList) {
+export async function prepareBalance(balanceList) {
+    balanceList = await markVerified(Promise.resolve(balanceList), 'balance');
+
     return balanceList.sort((a, b) => {
-            // set base coin first
-            if (a.coin.symbol === COIN_NAME) {
+            // base coin goes first
+            if (a.coin.symbol === BASE_COIN) {
                 return -1;
-            } else if (b.coin.symbol === COIN_NAME) {
+            } else if (b.coin.symbol === BASE_COIN) {
                 return 1;
-            } else {
-                return 0;
-                // sort by name, instead of reserve
-                // return a.coin.localeCompare(b.coin);
             }
+
+            // verified coins go second
+            if (a.coin.verified && !b.coin.verified) {
+                return -1;
+            } else if (b.coin.verified && !a.coin.verified) {
+                return 1;
+            }
+
+            return 0;
+
+            // sort coins by name, instead of reserve
+            // return a.coin.symbol.localeCompare(b.coin.symbol);
         })
         .map((coinItem) => {
             return {
                 ...coinItem,
                 amount: stripZeros(coinItem.amount),
             };
+        });
+}
+
+/**
+ *
+ * @param {Promise} coinListPromise
+ * @param {('coin','balance')} itemType
+ * @return {Promise<Array<CoinItem>|Array<BalanceItem>>}
+ */
+function markVerified(coinListPromise, itemType = 'coin') {
+    const hubCoinListPromise = _getOracleCoinList()
+        .catch((error) => {
+            console.log(error);
+            return [];
+        });
+
+    return Promise.all([coinListPromise, hubCoinListPromise])
+        .then(([coinList, hubCoinList]) => {
+            let verifiedMap = {};
+            hubCoinList.forEach((item) => {
+                verifiedMap[Number(item.minterId)] = true;
+            });
+
+            return coinList.map((coinItem) => {
+                const coinItemData = itemType === 'coin' ? coinItem : coinItem.coin;
+                let verified = false;
+                if (verifiedMap[coinItemData.id]) {
+                    verified = true;
+                }
+                if (coinItemData.symbol === BASE_COIN || coinItemData.symbol === 'MUSD') {
+                    verified = true;
+                }
+                coinItemData.verified = verified;
+                return coinItem;
+            });
         });
 }
 
@@ -471,9 +515,9 @@ export function getCoinList() {
         .then((response) => response.data.data);
     // don't sort, coins already sorted by reserve
     // .then((response) => response.data.data.sort((a, b) => {
-    //     if (a.symbol === COIN_NAME) {
+    //     if (a.symbol === BASE_COIN) {
     //         return -1;
-    //     } else if (b.symbol === COIN_NAME) {
+    //     } else if (b.symbol === BASE_COIN) {
     //         return 1;
     //     } else {
     //         return a.symbol.localeCompare(b.symbol);

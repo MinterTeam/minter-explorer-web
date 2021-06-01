@@ -364,7 +364,10 @@
                 <dd>
                     <table class="table--balance">
                         <tr v-for="balance in balanceList" :key="balance.coin.id">
-                            <td>{{ balance.coin.symbol }}</td>
+                            <td>
+                                {{ balance.coin.symbol }}
+                                <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="balance.coin.verified">
+                            </td>
                             <td :title="prettyPrecise(balance.amount)">{{ balance.amount | pretty }}</td>
                         </tr>
                     </table>
