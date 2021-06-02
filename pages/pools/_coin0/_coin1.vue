@@ -101,8 +101,10 @@ export default {
         tradeFee() {
             return this.pool.tradeVolumeBip1D * 0.002;
         },
-        apr() {
-            return this.tradeFee / this.pool.liquidityBip * 365 * 100;
+        apy() {
+            const apr = this.tradeFee / this.pool.liquidityBip * 365;
+            const apy = (1 + apr / 365) ** 365 - 1;
+            return apy * 100;
         },
         activeTab() {
             return ensureTab(this.$route.query.active_tab);
@@ -267,8 +269,8 @@ function calculateTradeReturn(amountIn, amountOut) {
                 <dt>Fees (1d)</dt>
                 <Amount :amount="tradeFee" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
-                <dt>APR</dt>
-                <dd>{{ pretty(apr) }}%</dd>
+                <dt>APY</dt>
+                <dd><span title="Based on 24hr volume annualized">{{ pretty(apy) }}%</span></dd>
             </dl>
         </section>
 

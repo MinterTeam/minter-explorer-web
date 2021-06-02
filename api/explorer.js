@@ -571,7 +571,8 @@ export function getCoinList() {
 
 /**
  * @param {Object} [params]
- * @param {string|number} [params.coin]
+ * @param {string|number} [params.coin] - search by coin
+ * @param {string} [params.provider] - search by Mx address
  * @param {number} [params.page]
  * @param {number} [params.limit]
  * @return {Promise<PoolListInfo>}
