@@ -114,6 +114,12 @@
                 }
                 return result;
             },
+            coin0Price() {
+                return calculateTradeRate(this.tx.data.valueToSell, this.tx.data.valueToBuy);
+            },
+            coin1Price() {
+                return calculateTradeRate(this.tx.data.valueToBuy, this.tx.data.valueToSell);
+            },
             isSellType() {
                 return this.isTxType(TX_TYPE.SELL) || this.isTxType(TX_TYPE.SELL_ALL) || this.isTxType(TX_TYPE.SELL_SWAP_POOL) || this.isTxType(TX_TYPE.SELL_ALL_SWAP_POOL);
             },
@@ -317,6 +323,13 @@
             },
         },
     };
+
+    function calculateTradeRate(amountIn, amountOut) {
+        if (Number(amountIn) === 0 || Number.isNaN(Number(amountIn))) {
+            return 0;
+        }
+        return new Big(amountOut).div(amountIn).toFixed(18);
+    }
 </script>
 
 <template>
@@ -371,6 +384,11 @@
                     <Amount tag="dd" v-if="isBuyType" :amount="tx.data.valueToSell" :coin="tx.data.coinToSell.symbol" :exact="true"/>
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
+
+                    <dt v-if="isSellType || isBuyType">Rate {{ tx.data.coinToSell.symbol }}</dt>
+                    <Amount v-if="isSellType || isBuyType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :exact="false" tag="dd"/>
+                    <dt v-if="isSellType || isBuyType">Rate {{ tx.data.coinToBuy.symbol }}</dt>
+                    <Amount v-if="isSellType || isBuyType" :amount="coin1Price" :coin="tx.data.coinToSell.symbol" :exact="false" tag="dd"/>
 
                     <dt v-if="tx.data.coins">Coins route</dt>
                     <dd v-if="tx.data.coins">

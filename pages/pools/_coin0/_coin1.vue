@@ -93,10 +93,10 @@ export default {
     },
     computed: {
         coin0Price() {
-            return calculateTradeReturn(this.pool.amount0, this.pool.amount1);
+            return calculateTradeRate(this.pool.amount0, this.pool.amount1);
         },
         coin1Price() {
-            return calculateTradeReturn(this.pool.amount1, this.pool.amount0);
+            return calculateTradeRate(this.pool.amount1, this.pool.amount0);
         },
         tradeFee() {
             return this.pool.tradeVolumeBip1D * 0.002;
@@ -214,13 +214,15 @@ export default {
     },
 };
 
-function calculateTradeReturn(amountIn, amountOut) {
-    if (Number(amountIn) === 0) {
+function calculateTradeRate(amountIn, amountOut) {
+    if (Number(amountIn) === 0 || Number.isNaN(Number(amountIn))) {
         return 0;
     }
     return new Big(amountOut).div(amountIn).toFixed(18);
-    // return amountOut - (amountIn * amountOut / (amountIn + 1));
 }
+// function calculateTradeReturn(amountIn, amountOut) {
+//     return amountOut - (amountIn * amountOut / (amountIn + 1));
+// }
 </script>
 
 <template>
@@ -241,10 +243,11 @@ function calculateTradeReturn(amountIn, amountOut) {
                 </dd>
 
                 <dt>Pool token</dt>
-                <dd><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></dd>
+                <dd>
+                    <span class="u-fw-500">{{ prettyExact(pool.liquidity) }}</span>
+                    <nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link>
+                </dd>
 
-                <dt>Amount {{ pool.token.symbol }}</dt>
-                <Amount :amount="pool.liquidity" :coin="pool.token.symbol" :exact="true" tag="dd"/>
 
                 <dt>Amount</dt>
                 <Amount :amount="pool.amount0" :coin="pool.coin0.symbol" :exact="true" tag="dd"/>
