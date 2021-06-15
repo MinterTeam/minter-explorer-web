@@ -1,7 +1,7 @@
 <script>
     import Vue from 'vue';
     import Chart from 'chart.js/dist/Chart.min.js';
-    import {getAddressRewardChart} from '~/api';
+    import {getAddressRewardChart} from '~/api/explorer.js';
     import {pretty, padZero} from '~/assets/utils';
     import {REWARD_CHART_TYPES} from '~/assets/variables';
 

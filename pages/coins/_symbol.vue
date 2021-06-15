@@ -1,5 +1,5 @@
 <script>
-import {getCoinBySymbol, getPoolByToken, getPoolList} from "~/api/index.js";
+import {getCoinBySymbol, getPoolByToken, getPoolList} from '~/api/explorer.js';
 import {pretty, prettyPrecise, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';

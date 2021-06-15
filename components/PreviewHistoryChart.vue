@@ -1,6 +1,6 @@
 <script>
     import Chart from 'chart.js/dist/Chart.min.js';
-    import {getTransactionChart} from "~/api";
+    import {getTransactionChart} from '~/api/explorer.js';
     import {padZero} from '~/assets/utils';
 
     export default {

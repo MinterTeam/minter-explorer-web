@@ -1,10 +1,10 @@
 <script>
     import debounce from 'lodash-es/debounce';
     import Big from 'big.js';
-    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
+    import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
-    import {getTransaction, getBlock, getBlockList, getCoinById, checkBlockTime} from "~/api";
+    import {getTransaction, getBlock, getBlockList, getCoinById, checkBlockTime} from '~/api/explorer.js';
     import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, txTypeFilter, fromBase64, getEtherscanAddressUrl} from "~/assets/utils.js";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -113,6 +113,12 @@
                     });
                 }
                 return result;
+            },
+            coin0Price() {
+                return calculateTradeRate(this.tx.data.valueToSell, this.tx.data.valueToBuy);
+            },
+            coin1Price() {
+                return calculateTradeRate(this.tx.data.valueToBuy, this.tx.data.valueToSell);
             },
             isSellType() {
                 return this.isTxType(TX_TYPE.SELL) || this.isTxType(TX_TYPE.SELL_ALL) || this.isTxType(TX_TYPE.SELL_SWAP_POOL) || this.isTxType(TX_TYPE.SELL_ALL_SWAP_POOL);
@@ -317,6 +323,13 @@
             },
         },
     };
+
+    function calculateTradeRate(amountIn, amountOut) {
+        if (Number(amountIn) === 0 || Number.isNaN(Number(amountIn))) {
+            return 0;
+        }
+        return new Big(amountOut).div(amountIn).toFixed(18);
+    }
 </script>
 
 <template>
@@ -372,6 +385,11 @@
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
+                    <dt v-if="isSellType || isBuyType">Rate {{ tx.data.coinToSell.symbol }}</dt>
+                    <Amount v-if="isSellType || isBuyType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :exact="false" tag="dd"/>
+                    <dt v-if="isSellType || isBuyType">Rate {{ tx.data.coinToBuy.symbol }}</dt>
+                    <Amount v-if="isSellType || isBuyType" :amount="coin1Price" :coin="tx.data.coinToSell.symbol" :exact="false" tag="dd"/>
+
                     <dt v-if="tx.data.coins">Coins route</dt>
                     <dd v-if="tx.data.coins">
                         <span v-for="(coinPathItem, coinPathIndex) in tx.data.coins" :key="coinPathItem.id + '-' + coinPathIndex">
@@ -386,18 +404,29 @@
                     </dd>
 
                     <!-- CREATE_SWAP_POOL -->
-                    <dt v-if="tx.data.poolToken">Pool token</dt>
-                    <dd v-if="tx.data.poolToken">
-                        <nuxt-link class="link--default" :to="'/coins/' + tx.data.poolToken.symbol">{{ tx.data.poolToken.symbol }}</nuxt-link>
-                    </dd>
                     <dt v-if="tx.data.coin0 && tx.data.coin1">Pool</dt>
                     <dd v-if="tx.data.coin0 && tx.data.coin1">
                         <PoolLink :pool="tx.data"/>
+                    </dd>
+                    <dt v-if="tx.data.poolToken">Pool token</dt>
+                    <dd v-if="tx.data.poolToken">
+                        <!-- REMOVE_LIQUIDITY -->
+                        <span v-if="tx.data.liquidity">{{ prettyExact(tx.data.liquidity) }}</span>
+                        <nuxt-link class="link--default" :to="'/coins/' + tx.data.poolToken.symbol">{{ tx.data.poolToken.symbol }}</nuxt-link>
                     </dd>
                     <dt v-if="tx.data.coin0">First coin</dt>
                     <dd v-if="tx.data.coin0"><span v-if="isDefined(tx.data.volume0)">{{ prettyExact(tx.data.volume0) }}</span> {{ tx.data.coin0.symbol }} </dd>
                     <dt v-if="tx.data.coin1">Second coin</dt>
                     <dd v-if="tx.data.coin1"><span v-if="isDefined(tx.data.volume1)">{{ prettyExact(tx.data.volume1) }}</span> {{ tx.data.coin1.symbol }}</dd>
+                    <!-- ADD_LIQUIDITY -->
+                    <dt v-if="tx.data.maximumVolume1">Max volume of second coin</dt>
+                    <dd v-if="tx.data.maximumVolume1">{{ prettyExact(tx.data.maximumVolume1) }} {{ tx.data.coin1.symbol }}</dd>
+                    <!-- REMOVE_LIQUIDITY -->
+                    <dt v-if="tx.data.minimumVolume0">Min volume of first coin</dt>
+                    <dd v-if="tx.data.minimumVolume0">{{ prettyExact(tx.data.minimumVolume0) }} {{ tx.data.coin0.symbol }}</dd>
+                    <dt v-if="tx.data.minimumVolume1">Min volume of second coin</dt>
+                    <dd v-if="tx.data.minimumVolume1">{{ prettyExact(tx.data.minimumVolume1) }} {{ tx.data.coin1.symbol }}</dd>
+
                     <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin0.symbol }} price</dt>
                     <dd v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">
                         {{ pretty(tx.data.volume1 / tx.data.volume0) }} {{ tx.data.coin1.symbol }}
@@ -406,16 +435,6 @@
                     <dd v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">
                         {{ pretty(tx.data.volume0 / tx.data.volume1) }} {{ tx.data.coin0.symbol }}
                     </dd>
-                    <!-- ADD_LIQUIDITY -->
-                    <dt v-if="tx.data.maximumVolume1">Max volume of second coin</dt>
-                    <dd v-if="tx.data.maximumVolume1">{{ prettyExact(tx.data.maximumVolume1) }}</dd>
-                    <!-- REMOVE_LIQUIDITY -->
-                    <dt v-if="tx.data.liquidity">LP amount</dt>
-                    <dd v-if="tx.data.liquidity">{{ prettyExact(tx.data.liquidity) }}</dd>
-                    <dt v-if="tx.data.minimumVolume0">Min volume of first coin</dt>
-                    <dd v-if="tx.data.minimumVolume0">{{ prettyExact(tx.data.minimumVolume0) }}</dd>
-                    <dt v-if="tx.data.minimumVolume1">Min volume of second coin</dt>
-                    <dd v-if="tx.data.minimumVolume1">{{ prettyExact(tx.data.minimumVolume1) }}</dd>
 
                 <!-- CREATE_COIN, RECREATE_COIN, EDIT_TICKER_OWNER, CREATE_TOKEN, RECREATE_TOKEN -->
                 <dt v-if="tx.data.createdCoinId">Coin ID</dt>

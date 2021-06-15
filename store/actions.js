@@ -1,4 +1,4 @@
-import {getValidatorList, getStatus} from '~/api/index.js';
+import {getValidatorList, getStatus} from '~/api/explorer.js';
 
 export default {
     FETCH_VALIDATOR_LIST({ commit }) {

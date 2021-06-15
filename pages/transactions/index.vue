@@ -1,5 +1,5 @@
 <script>
-    import {getTransactionList} from "~/api";
+    import {getTransactionList} from '~/api/explorer.js';
     import getTitle from '~/assets/get-title';
     import TransactionList from '~/components/TransactionList';
     import Pagination from "~/components/Pagination";
