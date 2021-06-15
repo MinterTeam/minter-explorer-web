@@ -1,6 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
-    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList} from '~/api/explorer.js';
+    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList, getPoolList, getProviderPoolList} from '~/api/explorer.js';
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -11,6 +11,7 @@
     import ButtonCopyIcon from '~/components/common/ButtonCopyIcon';
     import Modal from '~/components/common/Modal';
     import TransactionListTable from '~/components/TransactionListTable';
+    import PoolProviderList from '@/components/PoolProviderList.vue';
     import StakeListTable from '~/components/StakeListTable';
     import RewardSlashListTable from '~/components/RewardSlashListTable';
     import UnbondListTable from '~/components/UnbondListTable';
@@ -36,6 +37,7 @@
             ButtonCopyIcon,
             Modal,
             TransactionListTable,
+            PoolProviderList,
             StakeListTable,
             RewardSlashListTable,
             UnbondListTable,
@@ -49,7 +51,7 @@
         },
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
-        asyncData({ params, query, error }) {
+        asyncData({ params, error }) {
             if (!isValidAddress(params.address)) {
                 return error({
                     statusCode: 404,
@@ -58,53 +60,10 @@
             }
 
             const balancePromise = getBalance(params.address);
-            // txList always needed for tx count
-            const txListPromise = getAddressTransactionList(params.address, query);
 
-            const activeTab = ensureTab(query.active_tab);
-            let tabPromise;
-            if (activeTab === TAB_TYPES.STAKE) {
-                tabPromise = getAddressStakeList(params.address);
-            } else if (activeTab === TAB_TYPES.REWARD) {
-                tabPromise = getAddressRewardAggregatedList(params.address, query);
-            } else if (activeTab === TAB_TYPES.SLASH) {
-                tabPromise = getAddressPenaltyList(params.address, query);
-            } else if (activeTab === TAB_TYPES.UNBOND) {
-                tabPromise = getAddressUnbondList(params.address, query);
-            }
-
-            return Promise.all([balancePromise, txListPromise, tabPromise])
-                .then(([balanceData, txListData, tabData]) => {
-                    let tabResult;
-                    if (activeTab === TAB_TYPES.STAKE) {
-                        tabResult = {
-                            stakeList: tabData,
-                            isStakeListLoaded: true,
-                        };
-                    } else if (activeTab === TAB_TYPES.REWARD) {
-                        tabResult = {
-                            rewardList: tabData.data,
-                            rewardPaginationInfo: tabData.meta,
-                            isRewardListLoaded: true,
-                        };
-                    } else if (activeTab === TAB_TYPES.SLASH) {
-                        tabResult = {
-                            slashList: tabData.data,
-                            slashPaginationInfo: tabData.meta,
-                            isSlashListLoaded: true,
-                        };
-                    } else if (activeTab === TAB_TYPES.UNBOND) {
-                        tabResult = {
-                            unbondList: tabData,
-                            isUnbondListLoaded: true,
-                        };
-                    }
-
+            return balancePromise
+                .then((balanceData) => {
                     return {
-                        ...tabResult,
-                        txList: txListData.data,
-                        txPaginationInfo:  txListData.meta,
-                        isTxListLoaded: true,
                         balanceList: balanceData.balances,
                         balanceTotal: balanceData.totalBalanceSum,
                         balanceTotalUsd: balanceData.totalBalanceSumUsd,
@@ -118,6 +77,13 @@
                         statusCode,
                         message: statusCode === 404 ? 'Address not found' : getErrorText(e),
                     });
+                });
+        },
+        fetch() {
+            this.fetchTab(this.$route.query);
+            getNonce(this.$route.params.address)
+                .then((nonce) => {
+                    this.nonce = nonce.toString();
                 });
         },
         head() {
@@ -136,21 +102,31 @@
                 balanceTotal: '',
                 balanceTotalUsd: '',
                 storedTabPages: {},
+                // txs
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: false,
                 isTxListLoaded: false,
+                // provider pools
+                poolList: [],
+                poolPaginationInfo: {},
+                isPoolListLoading: false,
+                isPoolListLoaded: false,
+                // stakes
                 stakeList: [],
                 isStakeListLoading: false,
                 isStakeListLoaded: false,
+                // rewards
                 rewardList: [],
                 rewardPaginationInfo: {},
                 isRewardListLoading: false,
                 isRewardListLoaded: false,
+                // slashes
                 slashList: [],
                 slashPaginationInfo: {},
                 isSlashListLoading: false,
                 isSlashListLoaded: false,
+                // unbonds
                 unbondList: [],
                 // unbondPaginationInfo: {},
                 isUnbondListLoading: false,
@@ -165,48 +141,7 @@
             // update data on page change
             '$route.query': {
                 handler(newVal, oldVal) {
-                    const oldTab = ensureTab(oldVal.active_tab);
-                    const newTab = ensureTab(newVal.active_tab);
-                    const oldPage = ensurePage(oldVal.page);
-                    const newPage = ensurePage(newVal.page);
-
-                    // new tab
-                    if (newTab !== oldTab) {
-                        if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
-                            this.fetchTxs();
-                        }
-                        if (this.activeTab === TAB_TYPES.STAKE && !this.isStakeListLoaded) {
-                            this.fetchStakes();
-                        }
-                        if (this.activeTab === TAB_TYPES.REWARD && !this.isRewardListLoaded) {
-                            this.fetchRewards();
-                        }
-                        if (this.activeTab === TAB_TYPES.SLASH && !this.isSlashListLoaded) {
-                            this.fetchSlashes();
-                        }
-                        if (this.activeTab === TAB_TYPES.UNBOND && !this.isUnbondListLoaded) {
-                            this.fetchUnbonds();
-                        }
-
-                        this.checkPanelPosition();
-
-                    // same tab, new page
-                    } else if (newTab === oldTab && newPage !== oldPage) {
-                        if (this.activeTab === TAB_TYPES.TX) {
-                            this.fetchTxs();
-                        }
-                        if (this.activeTab === TAB_TYPES.REWARD) {
-                            this.fetchRewards();
-                        }
-                        if (this.activeTab === TAB_TYPES.SLASH) {
-                            this.fetchSlashes();
-                        }
-                        if (this.activeTab === TAB_TYPES.UNBOND) {
-                            this.fetchUnbonds();
-                        }
-
-                        this.checkPanelPosition();
-                    }
+                    this.fetchTab(newVal, oldVal);
                 },
             },
         },
@@ -217,6 +152,9 @@
             activePaginationInfo() {
                 if (this.activeTab === TAB_TYPES.TX) {
                     return this.txPaginationInfo;
+                }
+                if (this.activeTab === TAB_TYPES.PROVIDER) {
+                    return this.providerPaginationInfo;
                 }
                 if (this.activeTab === TAB_TYPES.REWARD) {
                     return this.rewardPaginationInfo;
@@ -230,12 +168,6 @@
                 }
                 return false;
             },
-        },
-        beforeMount() {
-            getNonce(this.$route.params.address)
-                .then((nonce) => {
-                    this.nonce = nonce.toString();
-                });
         },
         methods: {
             prettyPrecise,
@@ -268,9 +200,59 @@
                 this.$nextTick(this.checkPanelPosition);
             },
             checkPanelPosition() {
-                const delegationPanelEl = document.querySelector('[data-tab-panel]');
-                if (window.pageYOffset > delegationPanelEl.offsetTop) {
-                    window.scrollTo(0, delegationPanelEl.offsetTop - 15);
+                const panelEl = document.querySelector('[data-tab-panel]');
+                if (panelEl && window.pageYOffset > panelEl.offsetTop) {
+                    window.scrollTo(0, panelEl.offsetTop - 15);
+                }
+            },
+            fetchTab(newQuery, oldQuery) {
+                const oldTab = oldQuery ? ensureTab(oldQuery.active_tab) : undefined;
+                const newTab = ensureTab(newQuery.active_tab);
+                const oldPage = oldQuery ? ensurePage(oldQuery.page) : undefined;
+                const newPage = ensurePage(newQuery.page);
+
+                // new tab
+                if (newTab !== oldTab) {
+                    if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
+                        this.fetchTxs();
+                    }
+                    if (this.activeTab === TAB_TYPES.PROVIDER && !this.isPoolListLoaded) {
+                        this.fetchProviderList();
+                    }
+                    if (this.activeTab === TAB_TYPES.STAKE && !this.isStakeListLoaded) {
+                        this.fetchStakes();
+                    }
+                    if (this.activeTab === TAB_TYPES.REWARD && !this.isRewardListLoaded) {
+                        this.fetchRewards();
+                    }
+                    if (this.activeTab === TAB_TYPES.SLASH && !this.isSlashListLoaded) {
+                        this.fetchSlashes();
+                    }
+                    if (this.activeTab === TAB_TYPES.UNBOND && !this.isUnbondListLoaded) {
+                        this.fetchUnbonds();
+                    }
+
+                    this.checkPanelPosition();
+
+                    // same tab, new page
+                } else if (newTab === oldTab && newPage !== oldPage) {
+                    if (this.activeTab === TAB_TYPES.TX) {
+                        this.fetchTxs();
+                    }
+                    if (this.activeTab === TAB_TYPES.PROVIDER) {
+                        this.fetchProviderList();
+                    }
+                    if (this.activeTab === TAB_TYPES.REWARD) {
+                        this.fetchRewards();
+                    }
+                    if (this.activeTab === TAB_TYPES.SLASH) {
+                        this.fetchSlashes();
+                    }
+                    if (this.activeTab === TAB_TYPES.UNBOND) {
+                        this.fetchUnbonds();
+                    }
+
+                    this.checkPanelPosition();
                 }
             },
             fetchTxs() {
@@ -284,6 +266,31 @@
                     })
                     .catch(() => {
                         this.isTxListLoading = false;
+                    });
+            },
+            fetchProviderList() {
+                this.isPoolListLoading = true;
+                return Promise.all([
+                        getProviderPoolList(this.$route.params.address, this.$route.query),
+                        getPoolList({provider: this.$route.params.address, limit: 1000}),
+                    ])
+                    .then(([providerListInfo, poolListInfo]) => {
+                        let volumeMap = {};
+                        poolListInfo.data.forEach((item) => {
+                            volumeMap[item.token.symbol] = item;
+                        });
+                        this.poolList = providerListInfo.data.map((item) => {
+                            // copy trade volume from pool info
+                            item.tradeVolumeBip1D = volumeMap[item.token.symbol].tradeVolumeBip1D;
+                            item.totalLiquidityBip = volumeMap[item.token.symbol].liquidityBip;
+                            return item;
+                        });
+                        this.poolPaginationInfo = providerListInfo.meta;
+                        this.isPoolListLoading = false;
+                        this.isPoolListLoaded = true;
+                    })
+                    .catch(() => {
+                        this.isPoolListLoading = false;
                     });
             },
             fetchStakes() {
@@ -401,8 +408,14 @@
                         @click="switchTab($options.TAB_TYPES.TX)"
                 >
                     <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
-                    <span class="u-hidden-medium-down">Transactions</span>
-                    <span class="u-hidden-medium-up">Txs</span>
+                    Txs
+                </button>
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.PROVIDER}"
+                        @click="switchTab($options.TAB_TYPES.PROVIDER)"
+                >
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
+                    Pools
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.STAKE}"
@@ -435,6 +448,13 @@
             </div>
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-address="$route.params.address" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
+            <!-- Provider pools -->
+            <PoolProviderList
+                v-if="activeTab === $options.TAB_TYPES.PROVIDER"
+                :provider-list="poolList"
+                item-type="pool"
+                :is-loading="isPoolListLoading"
+            />
             <!-- Delegation -->
             <StakeListTable :stake-list="stakeList" stake-item-type="validator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
             <RewardSlashListTable :data-list="rewardList" data-type="reward" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>

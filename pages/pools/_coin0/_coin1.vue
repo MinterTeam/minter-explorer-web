@@ -302,7 +302,7 @@ function calculateTradeRate(amountIn, amountOut) {
                 :current-address="$route.params.address"
                 :is-loading="isTxListLoading"
             />
-            <!-- Delegation -->
+            <!-- Providers -->
             <PoolProviderList
                 v-if="activeTab === $options.TAB_TYPES.PROVIDER"
                 :provider-list="providerList"

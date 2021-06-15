@@ -1,14 +1,15 @@
 <script>
-import debounce from 'lodash-es/debounce.js';
 import {pretty} from '~/assets/utils.js';
-import Amount from '@/components/common/Amount.vue';
 import TableLink from '@/components/TableLink.vue';
 
-let resizeHandler;
+const ITEM_TYPE = {
+    PROVIDER: 'provider',
+    PROVIDER_POOL: 'pool',
+};
 
 export default {
+    ITEM_TYPE,
     components: {
-        Amount,
         TableLink,
     },
     props: {
@@ -17,6 +18,10 @@ export default {
             type: Array,
             required: true,
         },
+        itemType: {
+            type: String,
+            default: ITEM_TYPE.PROVIDER,
+        },
         isLoading: {
             type: Boolean,
             default: false,
@@ -24,37 +29,28 @@ export default {
     },
     data() {
         return {
-            // shouldShorten: this.getShouldShorten(),
         };
     },
     computed: {
         providerListFormatted() {
             return this.providerList.map((provider) => {
+                let apy;
+                if (this.itemType === ITEM_TYPE.PROVIDER_POOL && provider.tradeVolumeBip1D > 0 && provider.totalLiquidityBip > 0) {
+                    const tradeFee = provider.tradeVolumeBip1D * 0.002;
+                    const apr = tradeFee / provider.totalLiquidityBip * 365;
+                    apy = ((1 + apr / 365) ** 365 - 1) * 100;
+                }
+
                 return {
                     ...provider,
-                    // liquidityUsd: provider.liquidityBip * this.bipPriceUsd,
+                    liquidityUsd: provider.liquidityBip * this.$store.getters.bipPriceUsd,
+                    apy,
                 };
             });
         },
     },
-    // mounted() {
-    //     if (process.client) {
-    //         resizeHandler = debounce(() => {
-    //             this.shouldShorten = this.getShouldShorten();
-    //         });
-    //         window.addEventListener('resize', resizeHandler, 100);
-    //     }
-    // },
-    // destroyed() {
-    //     if (resizeHandler) {
-    //         window.removeEventListener('resize', resizeHandler);
-    //     }
-    // },
     methods: {
         pretty,
-        // getShouldShorten() {
-        //     return process.client && window.innerWidth < 960;
-        // },
     },
 };
 </script>
@@ -69,11 +65,15 @@ export default {
         <table class="u-text-nowrap" v-else-if="providerList.length">
             <thead>
             <tr>
-                <th>Provider</th>
+                <th>
+                    <template v-if="itemType === $options.ITEM_TYPE.PROVIDER">Provider</template>
+                    <template v-else>Pool</template>
+                </th>
                 <th colspan="2">Amount</th>
                 <th>{{ providerList[0].token.symbol }} amount</th>
                 <th>Liquidity</th>
                 <th>Share</th>
+                <th v-if="itemType === $options.ITEM_TYPE.PROVIDER_POOL">APY</th>
             </tr>
             </thead>
             <tbody>
@@ -82,21 +82,33 @@ export default {
                     <TableLink :link-text="provider.address"
                                :link-path="'/address/' + provider.address"
                                :should-not-shorten="false"
+                               v-if="itemType === $options.ITEM_TYPE.PROVIDER"
+                    />
+                    <TableLink
+                        v-else
+                        :link-text="provider.coin0.symbol + ' / ' + provider.coin1.symbol"
+                        :link-path="`/pools/${provider.coin0.symbol}/${provider.coin1.symbol}`"
+                        :should-not-shorten="true"
                     />
                 </td>
                 <td>{{ provider.coin0.symbol }} <span class="u-fw-500">{{ pretty(provider.amount0) }}</span></td>
                 <td>{{ provider.coin1.symbol }} <span class="u-fw-500">{{ pretty(provider.amount1) }}</span></td>
                 <td>{{ pretty(provider.liquidity) }}</td>
                 <td>
-                    <Amount :amount="provider.liquidityBip" :coin="$store.getters.BASE_COIN" :coinFirst="true"/>
+                    ${{ pretty(provider.liquidityUsd) }}
                 </td>
                 <td>
-
                     {{ pretty(provider.liquidityShare) }}%
+                </td>
+                <td v-if="itemType === $options.ITEM_TYPE.PROVIDER_POOL">
+                    {{ pretty(provider.apy || 0) }}%
                 </td>
             </tr>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No providers</div>
+        <div class="panel__content panel__section u-text-center" v-else>
+            <template v-if="itemType === $options.ITEM_TYPE.PROVIDER">No providers</template>
+            <template v-else>No pools</template>
+        </div>
     </div>
 </template>
