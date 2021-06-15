@@ -12,10 +12,15 @@
         computed: {
             poolListFormatted() {
                 return this.poolList.map((pool) => {
+                    const tradeFee = pool.tradeVolumeBip1D * 0.002;
+                    const apr = tradeFee / pool.liquidityBip * 365;
+                    const apy = ((1 + apr / 365) ** 365 - 1) * 100;
+
                     return {
                         ...pool,
                         liquidityUsd: pool.liquidityBip * this.$store.getters.bipPriceUsd,
-                        volumeUsd: pool.tradeVolumeBip30D * this.$store.getters.bipPriceUsd,
+                        volumeUsd: pool.tradeVolumeBip1D * this.$store.getters.bipPriceUsd,
+                        apy,
                     };
                 });
             },
@@ -35,7 +40,8 @@
 <!--                <th>Pool token</th>-->
                 <th colspan="2">Amount</th>
                 <th>Liquidity</th>
-                <th>Volume (30d)</th>
+                <th>Volume (1d)</th>
+                <th title="Based on 24hr volume annualized">APY</th>
             </tr>
             </thead>
             <tbody>
@@ -50,6 +56,7 @@
                 <td>{{ pool.coin1.symbol }} <span class="u-fw-500">{{ pretty(pool.amount1) }}</span></td>
                 <td>${{ pretty(pool.liquidityUsd) }}</td>
                 <td>${{ pretty(pool.volumeUsd) }}</td>
+                <td><span v-if="pool.liquidityUsd > 100">{{ pretty(pool.apy) }}%</span></td>
             </tr>
             </tbody>
         </table>

@@ -1,5 +1,5 @@
 <script>
-    import {getPoolList} from "~/api/index.js";
+    import {getPoolList} from '~/api/explorer.js';
     import getTitle from '~/assets/get-title.js';
     import BackButton from '~/components/BackButton.vue';
     import Pagination from "~/components/Pagination.vue";

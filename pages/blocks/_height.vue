@@ -1,5 +1,5 @@
 <script>
-    import {getBlock, getBlockTransactionList} from "~/api";
+    import {getBlock, getBlockTransactionList} from '~/api/explorer.js';
     import {getTimeDistance, getTime, pretty, prettyUsd, prettyRound} from "~/assets/utils";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';

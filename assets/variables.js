@@ -6,7 +6,12 @@ export const BASE_TITLE_NETWORK = NETWORK === MAINNET ? '' : 'Testnet ';
 export const BASE_TITLE_END = ' — Minter';
 export const BASE_TITLE = BASE_TITLE_NETWORK + 'Explorer' + BASE_TITLE_END;
 export const BASE_DESCRIPTION = '';
-export const COIN_NAME = NETWORK === MAINNET ? 'BIP' : 'MNT';
+export const BASE_COIN = NETWORK === MAINNET ? 'BIP' : 'MNT';
+/**
+ * @deprecated
+ * @type {string}
+ */
+export const COIN_NAME = BASE_COIN;
 export const CHAIN_ID = NETWORK === MAINNET ? 1 : 2;
 export const UNBOND_PERIOD = NETWORK === MAINNET ? 518400 : 518400;
 export const MAINNET_WEB_URL = 'https://explorer.minter.network';
@@ -15,7 +20,16 @@ export const EXPLORER_API_URL = process.env.APP_EXPLORER_API_URL;
 export const EXPLORER_RTM_URL = process.env.APP_EXPLORER_RTM_URL;
 export const GATE_API_URL = process.env.APP_GATE_API_URL;
 export const HUB_MINTER_MULTISIG_ADDRESS = process.env.APP_HUB_MINTER_MULTISIG_ADDRESS;
+export const HUB_API_URL = process.env.APP_HUB_API_URL;
 export const ETHERSCAN_HOST = NETWORK === MAINNET ? 'https://etherscan.io' : 'https://ropsten.etherscan.io';
+
+
+export const HISTORY_V1_BLOCK_COUNT = 5000000;
+export const HISTORY_V1_1_BLOCK_COUNT = 4150000;
+export const HISTORY_BLOCK_COUNT = NETWORK === MAINNET ? HISTORY_V1_BLOCK_COUNT + HISTORY_V1_1_BLOCK_COUNT : 0;
+// export const HISTORY_V1_1_TRANSACTION_COUNT = 5405605;
+// export const HISTORY_V1_2_TRANSACTION_COUNT = 12784024;
+export const HISTORY_TRANSACTION_COUNT = NETWORK === MAINNET ? 12784024 : 0;
 
 /**
  * @readonly

@@ -316,6 +316,14 @@
                                 {{ tx.data.coins[0].symbol }} {{ pretty(tx.data.valueToSell) }}
                             </div>
 
+
+                            <div class="table__inner-item" v-if="isBuyPool(tx) || isSellPool(tx)">
+                                <strong>Route</strong> <br>
+                                <span v-for="(coinPathItem, coinPathIndex) in tx.data.coins" :key="coinPathItem.id + '-' + coinPathIndex">
+                                    {{ coinPathItem.symbol }}<span v-if="coinPathIndex !== tx.data.coins.length - 1"> -> </span>
+                                </span>
+                            </div>
+
                             <!-- CREATE_SWAP_POOL, ADD_LIQUIDITY, REMOVE_LIQUIDITY -->
                             <div class="table__inner-item" v-if="isDefined(tx.data.coin0)">
                                 <strong>First coin</strong> <br>

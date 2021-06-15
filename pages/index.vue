@@ -2,9 +2,9 @@
     // import Vue from 'vue';
     // import SockJS from "sockjs-client";
     import Centrifuge from 'centrifuge/src';
-    import {getBlockList, getStatus, getTransactionList, getPoolList} from "~/api/index.js";
+    import {getBlockList, getStatus, getTransactionList, getPoolList} from '~/api/explorer.js';
     import getTitle from '~/assets/get-title';
-    import {EXPLORER_RTM_URL, NETWORK} from "~/assets/variables";
+    import {EXPLORER_RTM_URL, NETWORK, HISTORY_TRANSACTION_COUNT} from '~/assets/variables.js';
     import {toCamel} from '~/assets/to-camel.js';
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
@@ -139,7 +139,7 @@
             },
             // take actual count from blocks response first
             totalTransactions() {
-                return (this.txList[0] && this.txList[0].txn) || (this.stats && this.stats.totalTransactions) || 0;
+                return this.txList[0] ? this.txList[0].txn + HISTORY_TRANSACTION_COUNT : (this.stats?.totalTransactions || 0);
             },
         },
         methods: {

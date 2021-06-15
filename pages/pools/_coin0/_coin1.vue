@@ -1,6 +1,6 @@
 <script>
 import Big from 'big.js';
-import {getPoolTransactionList, getPool, getPoolProviderList} from "@/api/index.js";
+import {getPoolTransactionList, getPool, getPoolProviderList} from "@/api/explorer.js";
 import {pretty, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';
@@ -93,10 +93,18 @@ export default {
     },
     computed: {
         coin0Price() {
-            return calculateTradeReturn(this.pool.amount0, this.pool.amount1);
+            return calculateTradeRate(this.pool.amount0, this.pool.amount1);
         },
         coin1Price() {
-            return calculateTradeReturn(this.pool.amount1, this.pool.amount0);
+            return calculateTradeRate(this.pool.amount1, this.pool.amount0);
+        },
+        tradeFee() {
+            return this.pool.tradeVolumeBip1D * 0.002;
+        },
+        apy() {
+            const apr = this.tradeFee / this.pool.liquidityBip * 365;
+            const apy = (1 + apr / 365) ** 365 - 1;
+            return apy * 100;
         },
         activeTab() {
             return ensureTab(this.$route.query.active_tab);
@@ -206,13 +214,15 @@ export default {
     },
 };
 
-function calculateTradeReturn(amountIn, amountOut) {
-    if (Number(amountIn) === 0) {
+function calculateTradeRate(amountIn, amountOut) {
+    if (Number(amountIn) === 0 || Number.isNaN(Number(amountIn))) {
         return 0;
     }
     return new Big(amountOut).div(amountIn).toFixed(18);
-    // return amountOut - (amountIn * amountOut / (amountIn + 1));
 }
+// function calculateTradeReturn(amountIn, amountOut) {
+//     return amountOut - (amountIn * amountOut / (amountIn + 1));
+// }
 </script>
 
 <template>
@@ -233,10 +243,11 @@ function calculateTradeReturn(amountIn, amountOut) {
                 </dd>
 
                 <dt>Pool token</dt>
-                <dd><nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link></dd>
+                <dd>
+                    <span class="u-fw-500">{{ prettyExact(pool.liquidity) }}</span>
+                    <nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link>
+                </dd>
 
-                <dt>Amount {{ pool.token.symbol }}</dt>
-                <Amount :amount="pool.liquidity" :coin="pool.token.symbol" :exact="true" tag="dd"/>
 
                 <dt>Amount</dt>
                 <Amount :amount="pool.amount0" :coin="pool.coin0.symbol" :exact="true" tag="dd"/>
@@ -255,8 +266,14 @@ function calculateTradeReturn(amountIn, amountOut) {
                 <dt>Liquidity</dt>
                 <Amount :amount="pool.liquidityBip" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
-                <dt>Volume (30d)</dt>
-                <Amount :amount="pool.tradeVolumeBip30D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+                <dt>Volume (1d)</dt>
+                <Amount :amount="pool.tradeVolumeBip1D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+
+                <dt>Fees (1d)</dt>
+                <Amount :amount="tradeFee" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+
+                <dt>APY</dt>
+                <dd><span title="Based on 24hr volume annualized">{{ pretty(apy) }}%</span></dd>
             </dl>
         </section>
 
@@ -285,7 +302,7 @@ function calculateTradeReturn(amountIn, amountOut) {
                 :current-address="$route.params.address"
                 :is-loading="isTxListLoading"
             />
-            <!-- Delegation -->
+            <!-- Providers -->
             <PoolProviderList
                 v-if="activeTab === $options.TAB_TYPES.PROVIDER"
                 :provider-list="providerList"
