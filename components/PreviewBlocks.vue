@@ -14,6 +14,7 @@
                 required: true,
             },
         },
+        //@TODO prevent scroll binding to html markup of block item (adding new blocks change scroll position)
         computed: {
             blockListFormatted() {
                 return this.blockList ? this.blockList.map((block) => {
