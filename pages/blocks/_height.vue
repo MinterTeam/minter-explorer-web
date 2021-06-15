@@ -139,7 +139,7 @@
                 <dd>{{ prettyUsd(block.blockTime) }} seconds</dd>
 
                 <dt>Hash</dt>
-                <dd class="u-select-all">{{ block.hash }}</dd>
+                <dd class="dd u-select-all">{{ block.hash }}</dd>
 
                 <dt>Size</dt>
                 <dd>{{ prettyRound(block.size) }} bytes</dd>

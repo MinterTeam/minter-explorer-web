@@ -81,7 +81,7 @@ export default {
 
         <div class="u-section" v-else>
             <div class="u-grid u-grid--vertical-margin">
-                <div class="u-cell u-cell--medium--1-3" v-for="pool in farmListFormatted" :key="pool.poolId">
+                <div class="u-cell u-cell--small--1-2 u-cell--medium--1-3" v-for="pool in farmListFormatted" :key="pool.poolId">
                     <div class="panel">
                         <div class="panel__section panel__header">
                             <nuxt-link class="link--default" :to="`/pools/${pool.coin0.symbol}/${pool.coin1.symbol}`">

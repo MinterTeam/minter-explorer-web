@@ -343,7 +343,7 @@
             </div>
             <dl>
                 <dt>Hash</dt>
-                <dd class="u-select-all">{{ tx.hash }}</dd>
+                <dd class="dd u-select-all">{{ tx.hash }}</dd>
 
                 <dt>Timestamp</dt>
                 <dd>{{ tx.timestamp | timeDistance }} ago ({{ tx.timestamp | time }})</dd>
@@ -582,7 +582,7 @@
                 <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
 
                 <dt>Message</dt>
-                <dd class="u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
+                <dd class="dd u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
 
                 </template>
                 <template v-if="tx.status === $options.TX_STATUS.FAILURE">
