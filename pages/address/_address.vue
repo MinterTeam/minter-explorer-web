@@ -171,6 +171,9 @@
         },
         methods: {
             prettyPrecise,
+            getCoinIconUrl(coin) {
+                return this.$store.getters['explorer/getCoinIcon'](coin);
+            },
             switchTab(newTab) {
                 // save previous page
                 if (this.$route.query.active_tab) {
@@ -372,8 +375,12 @@
                     <table class="table--balance">
                         <tr v-for="balance in balanceList" :key="balance.coin.id">
                             <td>
-                                {{ balance.coin.symbol }}
-                                <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="balance.coin.verified">
+                                <span class="u-icon-wrap">
+                                    <img class="u-icon--coin" :src="getCoinIconUrl(balance.coin.symbol)" width="20" height="20" alt="" role="presentation">
+                                    {{ balance.coin.symbol }}
+                                    <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="balance.coin.verified">
+                                </span>
+
                             </td>
                             <td :title="prettyPrecise(balance.amount)">{{ balance.amount | pretty }}</td>
                         </tr>

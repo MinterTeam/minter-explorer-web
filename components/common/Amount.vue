@@ -23,14 +23,18 @@ export default {
             type: Boolean,
             default: false,
         },
+        disableUsd: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         amountUsd() {
-            if (this.coin !== this.$store.getters.BASE_COIN || this.amount <= 0) {
+            if (this.disableUsd || this.coin !== this.$store.getters.BASE_COIN || this.amount <= 0) {
                 return 0;
             }
 
-            return this.amount * this.$store.getters.bipPriceUsd;
+            return this.amount * this.$store.getters['explorer/bipPriceUsd'];
         },
     },
     methods: {
