@@ -389,7 +389,7 @@
                 <dt>#Transactions</dt>
                 <dd>{{ txPaginationInfo.total || 0 }}</dd>
                 <dt>Nonce for tx</dt>
-                <dd class="u-icon-wrap">
+                <dd class="dd u-icon-wrap">
                     <template v-if="nonce">
                         {{ nonce }}
                         <ButtonCopyIcon :copy-text="nonce"/>

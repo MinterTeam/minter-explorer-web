@@ -580,6 +580,7 @@ export function getCoinList() {
 export function getPoolList(params) {
     return explorer.get('pools', {
             params,
+            cache: statusCache,
         })
         .then((response) => response.data);
 }
@@ -590,7 +591,9 @@ export function getPoolList(params) {
  * @return {Promise<Pool>}
  */
 export function getPool(coin0, coin1) {
-    return explorer.get(`pools/coins/${coin0}/${coin1}`)
+    return explorer.get(`pools/coins/${coin0}/${coin1}`, {
+            cache: statusCache,
+        })
         .then((response) => response.data.data);
 }
 
@@ -599,7 +602,9 @@ export function getPool(coin0, coin1) {
  * @return {Promise<Pool>}
  */
 export function getPoolByToken(symbol) {
-    return explorer.get(`pools/token/${symbol}`)
+    return explorer.get(`pools/token/${symbol}`, {
+            cache: statusCache,
+        })
         .then((response) => response.data.data);
 }
 
@@ -628,6 +633,7 @@ export function getPoolTransactionList(coin0, coin1, params) {
 export function getPoolProviderList(coin0, coin1, params) {
     return explorer.get(`pools/coins/${coin0}/${coin1}/providers`, {
             params,
+            cache: statusCache,
         })
         .then((response) => response.data);
 }
@@ -639,7 +645,9 @@ export function getPoolProviderList(coin0, coin1, params) {
  * @return {Promise<PoolProvider>}
  */
 export function getPoolProvider(coin0, coin1, address) {
-    return explorer.get(`pools/coins/${coin0}/${coin1}/providers/${address}`)
+    return explorer.get(`pools/coins/${coin0}/${coin1}/providers/${address}`, {
+            cache: statusCache,
+        })
         .then((response) => response.data.data);
 }
 
@@ -653,6 +661,7 @@ export function getPoolProvider(coin0, coin1, address) {
 export function getProviderPoolList(address, params) {
     return explorer.get(`pools/providers/${address}`, {
             params,
+            cache: statusCache,
         })
         .then((response) => response.data);
 }

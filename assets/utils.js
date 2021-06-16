@@ -5,7 +5,7 @@ import prettyNum, {PRECISION_SETTING} from 'pretty-num';
 import stripZeros from 'pretty-num/src/strip-zeros';
 import fromExponential from 'from-exponential';
 import decode from 'entity-decode';
-import {txTypeList} from 'minterjs-tx/src/tx-types';
+import {txTypeList} from 'minterjs-util/src/tx-types.js';
 import {getTimeOffset} from '~/assets/time-offset.js';
 import {ETHERSCAN_HOST} from '~/assets/variables.js';
 
@@ -48,6 +48,10 @@ export function getTimeMinutes(timestamp) {
 
 export function getDate(timestamp) {
     return timeFormat(timestamp, 'yyyy-MM-dd');
+}
+
+export function getDateHuman(timestamp) {
+    return timeFormat(timestamp, 'd MMMM yyyy');
 }
 
 export function shortFilter(value, endLength = 6, minLengthToShort) {

@@ -11,6 +11,7 @@
     import PreviewBlocks from '~/components/PreviewBlocks';
     import PreviewTransactions from '~/components/PreviewTransactions';
     import PreviewPools from '~/components/PreviewPools.vue';
+    import PreviewFarm from '~/components/PreviewFarm.vue';
 
     const BLOCK_LIST_LENGTH = 20;
     const TX_LIST_LENGTH = 20;
@@ -35,6 +36,7 @@
             PreviewBlocks,
             PreviewTransactions,
             PreviewPools,
+            PreviewFarm,
         },
         asyncData() {
             if (process.server) {
@@ -185,6 +187,9 @@
 
 <template>
     <div class="u-grid u-grid--vertical-margin" v-if="stats || blockList.length || txList.length">
+        <div class="u-cell">
+            <PreviewFarm/>
+        </div>
         <section class="u-cell u-cell--large--1-2">
             <Stats :stats="stats" :latest-block-height="latestBlockHeight" :total-transactions="totalTransactions"/>
         </section>

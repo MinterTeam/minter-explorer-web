@@ -230,7 +230,7 @@
             </div>
             <dl>
                 <dt>Public Key</dt>
-                <dd class="u-select-all">{{ $route.params.pubKey }}</dd>
+                <dd class="dd u-select-all">{{ $route.params.pubKey }}</dd>
 
                 <dt v-if="validator.name">Name</dt>
                 <dd v-if="validator.name">{{ validator.name }}</dd>

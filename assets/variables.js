@@ -21,6 +21,7 @@ export const EXPLORER_RTM_URL = process.env.APP_EXPLORER_RTM_URL;
 export const GATE_API_URL = process.env.APP_GATE_API_URL;
 export const HUB_MINTER_MULTISIG_ADDRESS = process.env.APP_HUB_MINTER_MULTISIG_ADDRESS;
 export const HUB_API_URL = process.env.APP_HUB_API_URL;
+export const FARM_API_URL = process.env.APP_FARM_API_URL;
 export const ETHERSCAN_HOST = NETWORK === MAINNET ? 'https://etherscan.io' : 'https://ropsten.etherscan.io';
 
 

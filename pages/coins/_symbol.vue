@@ -114,7 +114,7 @@ export default {
                 <dd>{{ coinInfo.id }}</dd>
 
                 <dt>Name</dt>
-                <dd :class="{'u-text-muted': !coinInfo.name }">{{ coinInfo.name || 'Blank' }}</dd>
+                <dd class="dd" :class="{'u-text-muted': !coinInfo.name }">{{ coinInfo.name || 'Blank' }}</dd>
 
                 <dt>Symbol</dt>
                 <dd>{{ coinInfo.symbol }}</dd>
