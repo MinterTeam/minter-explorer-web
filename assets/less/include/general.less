@@ -83,7 +83,7 @@ table {width: 100%; border-collapse: collapse;}
 th, tfoot td {background: #f6f6f6;}
 tfoot td {font-weight: 700;}
 td, th {
-    border: 1px solid @c-border; padding: @table-cell-padding; text-align: left;
+    border: solid @c-border; border-width: 1px 0; padding: @table-cell-padding; text-align: left;
     &:first-child {border-left: none;}
     &:last-child {border-right: none;}
     //tr:last-child & {border-bottom: 1px solid @c-border;}
@@ -179,17 +179,17 @@ td, th {
 }
 
 // dl
-dl {margin: 0; padding: 20px; border-top: 1px solid @c-border;}
-dt {
+dl:not([class]), .dl {margin: 0; padding: 20px; border-top: 1px solid @c-border;}
+dt:not([class]), .dt {
     font-weight: 700; margin-top: 15px;
     &:first-child {margin-top: 0;}
 }
-dd {overflow-wrap: break-word; margin: 0;}
+dd:not([class]), .dd {overflow-wrap: break-word; margin: 0;}
 @media (min-width: @breakpoint-medium-up) {
-    dl {display: flex; flex-wrap: wrap; border: none; padding: 0;}
-    dt, dd {padding: 15px 20px; margin: 0;}
-    dt {width: 150px; border-top: 1px solid @c-border; border-right: 1px solid @c-border; background: #f6f6f6;}
-    dd {width: calc(100% - 150px); border-top: 1px solid @c-border;}
+    dl:not([class]), .dl {display: flex; flex-wrap: wrap; border: none; padding: 0;}
+    dt:not([class]), .dt, dd:not([class]), .dd {padding: 15px 20px; margin: 0;}
+    dt:not([class]), .dt {width: 150px; border-top: 1px solid @c-border; border-right: 1px solid @c-border; background: #f6f6f6;}
+    dd:not([class]), .dd {width: calc(100% - 150px); border-top: 1px solid @c-border;}
 
 }
 
