@@ -32,8 +32,8 @@ export default {
 
                 return {
                     ...pool,
-                    liquidityUsd: pool.liquidityBip * this.$store.getters.bipPriceUsd,
-                    // volumeUsd: pool.tradeVolumeBip1D * this.$store.getters.bipPriceUsd,
+                    liquidityUsd: pool.liquidityBip * this.$store.getters['explorer/bipPriceUsd'],
+                    // volumeUsd: pool.tradeVolumeBip1D * this.$store.getters['explorer/bipPriceUsd'],
                     apr,
                     stakingApy,
                 };
@@ -43,6 +43,9 @@ export default {
     methods: {
         pretty,
         getDateHuman,
+        getCoinIconUrl(coin) {
+            return this.$store.getters['explorer/getCoinIcon'](coin);
+        },
     },
 };
 
@@ -109,14 +112,25 @@ function selectRandomItems(arr, count) {
                 <tbody>
                 <tr v-for="pool in farmListFormatted" :key="pool.poolId">
                     <td>
-                        <nuxt-link class="link--default" :to="`/pools/${pool.coin0.symbol}/${pool.coin1.symbol}`">
-                            {{ pool.coin0.symbol }} / {{ pool.coin1.symbol }}
-                        </nuxt-link>
+                        <div class="pool-pair">
+                            <div class="pool-pair__figure">
+                                <img class="pool-pair__icon" :src="getCoinIconUrl(pool.coin0.symbol)" width="24" height="24" alt="" role="presentation">
+                                <img class="pool-pair__icon pool-pair__icon1" :src="getCoinIconUrl(pool.coin1.symbol)" width="24" height="24" alt="" role="presentation">
+                            </div>
+                            <nuxt-link class="link--default" :to="`/pools/${pool.coin0.symbol}/${pool.coin1.symbol}`">
+                                {{ pool.coin0.symbol }} / {{ pool.coin1.symbol }}
+                            </nuxt-link>
+                        </div>
                     </td>
                     <td>{{ getDateHuman(pool.finishAt) }}</td>
                     <td>${{ pretty(pool.liquidityUsd) }}</td>
                     <td>{{ pool.rewardCoin.symbol }}</td>
-                    <td>{{ pretty(pool.apr) }}%</td>
+                    <td>
+                        <div class="farm__plus-wrap">
+                            <div>{{ pretty(pool.apr) }}%</div>
+                            <div class="farm__plus-icon">+</div>
+                        </div>
+                    </td>
                     <td>{{ pretty(pool.stakingApy) }}%</td>
                 </tr>
                 </tbody>

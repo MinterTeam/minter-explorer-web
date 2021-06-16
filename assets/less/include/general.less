@@ -120,7 +120,8 @@ td, th {
 .table--balance {
     width: auto;
     th, td {border: none; padding: 0;}
-    td:first-child {padding-right: 6px; /*text-align: right;*/}
+    td:first-child {padding-right: 12px; padding-left: 0;}
+    td:last-child {padding-right: 0;}
 }
 .table--stake-list {
     th, td {border-left: none; border-right: none;}
@@ -148,7 +149,11 @@ td, th {
     }
 }
 @media (min-width: @breakpoint-large-up) {
-    td, th {padding: @table-cell-vertical-padding-large 18px;}
+    td, th {
+        padding: @table-cell-vertical-padding-large @table-cell-padding;
+        &:first-child {padding-left: 18px;}
+        &:last-child {padding-right: 18px;}
+    }
     .table__inner {display: flex; flex-wrap: wrap; margin-left: -24px;}
     .table__inner-item {margin-left: 24px;}
     //.table__cell-overflow--middle {margin-left: -2px; margin-right: -2px;}

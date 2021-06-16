@@ -2,6 +2,7 @@ import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import stripZeros from 'pretty-num/src/strip-zeros';
 import {_getOracleCoinList} from '~/api/hub.js';
+import {getCoinIconList as getChainikIconList} from '~/api/chainik.js';
 import {EXPLORER_API_URL, REWARD_CHART_TYPES, BASE_COIN, TX_STATUS} from "~/assets/variables.js";
 import addToCamelInterceptor from '~/assets/to-camel.js';
 import {addTimeInterceptor} from '~/assets/time-offset.js';
@@ -507,22 +508,81 @@ export function getValidatorTransactionList(publicKey, params) {
         .then((response) => response.data);
 }
 
+// 1 min cache
+const coinsCache = new Cache({maxAge: 1 * 60 * 1000});
+
 /**
+ * @param {boolean} [skipMeta]
  * @return {Promise<Array<CoinInfo>>}
  */
-export function getCoinList() {
-    return explorer.get('coins')
-        .then((response) => response.data.data);
-    // don't sort, coins already sorted by reserve
-    // .then((response) => response.data.data.sort((a, b) => {
-    //     if (a.symbol === BASE_COIN) {
-    //         return -1;
-    //     } else if (b.symbol === BASE_COIN) {
-    //         return 1;
-    //     } else {
-    //         return a.symbol.localeCompare(b.symbol);
-    //     }
-    // }));
+export function getCoinList({skipMeta} = {}) {
+    let coinListPromise = explorer.get('coins', {
+            cache: coinsCache,
+        })
+        .then((response) => {
+            const coinList = response.data.data;
+            return coinList;
+        });
+
+    if (!skipMeta) {
+        const chainikIconMapPromise = getChainikIconList()
+            .catch((error) => {
+                console.log(error);
+                return {};
+            });
+
+        // fill icons
+        coinListPromise = Promise.all([coinListPromise, chainikIconMapPromise])
+            .then(([coinList, chainikIconMap]) => {
+                return coinList.map((coin) => {
+                    const icon = chainikIconMap[coin.id];
+                    coin.icon = icon;
+                    return coin;
+                });
+            });
+
+        // fill verified
+        coinListPromise = markVerified(coinListPromise);
+    }
+
+    return coinListPromise
+        // by default coins sorted by reserve
+        .then((coinList) => {
+            return coinList.sort((a, b) => {
+                // base coin goes first
+                if (a.symbol === BASE_COIN) {
+                    return -1;
+                } else if (b.symbol === BASE_COIN) {
+                    return 1;
+                }
+
+                // verified coins go second
+                if (a.verified && !b.verified) {
+                    return -1;
+                } else if (b.verified && !a.verified) {
+                    return 1;
+                }
+
+                // archived coins go last
+                const aIsArchived = isArchived(a);
+                const bIsArchived = isArchived(b);
+                if (aIsArchived && !bIsArchived) {
+                    return 1;
+                } else if (bIsArchived && !aIsArchived) {
+                    return -1;
+                }
+
+                // other coins sorted as from API (by reserve)
+                return 0;
+
+                function isArchived(coin) {
+                    if (coin.type === 'pool_token') {
+                        return false;
+                    }
+                    return /-\d+$/.test(coin.symbol);
+                }
+            });
+        });
 }
 
 /**

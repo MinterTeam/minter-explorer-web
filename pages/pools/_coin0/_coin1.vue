@@ -122,6 +122,9 @@ export default {
     methods: {
         pretty,
         prettyExact,
+        getCoinIconUrl(coin) {
+            return this.$store.getters['explorer/getCoinIcon'](coin);
+        },
         fetchProviderList() {
             this.isProviderListLoading = true;
             getPoolProviderList(this.$route.params.coin0, this.$route.params.coin1, this.$route.query)
@@ -237,9 +240,17 @@ function calculateTradeRate(amountIn, amountOut) {
             <dl>
                 <dt>Pair</dt>
                 <dd>
-                    <nuxt-link class="link--default" :to="'/coins/' + pool.coin0.symbol">{{ pool.coin0.symbol }}</nuxt-link>
-                    /
-                    <nuxt-link class="link--default" :to="'/coins/' + pool.coin1.symbol">{{ pool.coin1.symbol }}</nuxt-link>
+                    <div class="pool-pair">
+                        <div class="pool-pair__figure">
+                            <img class="pool-pair__icon" :src="getCoinIconUrl(pool.coin0.symbol)" width="24" height="24" alt="" role="presentation">
+                            <img class="pool-pair__icon pool-pair__icon1" :src="getCoinIconUrl(pool.coin1.symbol)" width="24" height="24" alt="" role="presentation">
+                        </div>
+                        <div>
+                            <nuxt-link class="link--default" :to="'/coins/' + pool.coin0.symbol">{{ pool.coin0.symbol }}</nuxt-link>
+                            /
+                            <nuxt-link class="link--default" :to="'/coins/' + pool.coin1.symbol">{{ pool.coin1.symbol }}</nuxt-link>
+                        </div>
+                    </div>
                 </dd>
 
                 <dt>Pool token</dt>

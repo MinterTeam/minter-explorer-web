@@ -96,6 +96,9 @@ export default {
         pretty,
         prettyExact,
         prettyPrecise,
+        getCoinIconUrl(coin) {
+            return this.$store.getters['explorer/getCoinIcon'](coin);
+        },
     },
 };
 </script>
@@ -117,7 +120,13 @@ export default {
                 <dd class="dd" :class="{'u-text-muted': !coinInfo.name }">{{ coinInfo.name || 'Blank' }}</dd>
 
                 <dt>Symbol</dt>
-                <dd>{{ coinInfo.symbol }}</dd>
+                <dd>
+                    <div class="u-icon-wrap">
+                        <img class="u-icon--coin" :src="getCoinIconUrl(coinInfo.symbol)" width="20" height="20" alt="" role="presentation">
+                        {{ coinInfo.symbol }}
+                        <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="coinInfo.verified">
+                    </div>
+                </dd>
 
                 <dt v-if="!isToken">CRR</dt>
                 <dd v-if="!isToken">{{ coinInfo.crr }} %</dd>
