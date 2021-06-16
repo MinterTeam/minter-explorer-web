@@ -11,6 +11,8 @@ export const state = () => ({
     coinList: [],
     /** @type {Object.<string, string>} */
     coinIconMap: {},
+    /** @type {Object.<string, boolean>} */
+    coinVerifiedMap: {},
 });
 
 export const getters = {
@@ -35,6 +37,11 @@ export const getters = {
                 return coinIcon;
             }
 
+            // archived coins
+            if (coinSymbol.indexOf('-') >= 0) {
+                return `${BASE_URL_PREFIX}/img/icon-coin-fallback.svg`;
+            }
+
             // myminter icon
             // if (!rootGetters.isOfflineMode) {
                 return getCoinIconUrl(coinSymbol);
@@ -42,6 +49,16 @@ export const getters = {
 
             // fallback
             // return `${BASE_URL_PREFIX}/img/icon-coin-fallback.svg`;
+        };
+    },
+    getCoinVerified(state) {
+        return function(coinSymbol) {
+            // BIP
+            if (coinSymbol.toUpperCase() === 'BIP') {
+                return true;
+            }
+
+            return state.coinVerifiedMap[coinSymbol];
         };
     },
 };
@@ -52,14 +69,19 @@ export const mutations = {
     },
     SET_COIN_LIST(state, data) {
         let coinIconMap = {};
+        let coinVerifiedMap = {};
         data.forEach((coin) => {
             if (coin.icon) {
                 coinIconMap[coin.symbol] = coin.icon;
+            }
+            if (coin.verified) {
+                coinVerifiedMap[coin.symbol] = true;
             }
         });
 
         state.coinList = data;
         state.coinIconMap = coinIconMap;
+        state.coinVerifiedMap = coinVerifiedMap;
     },
 };
 
