@@ -1,4 +1,4 @@
-import {getValidatorList, getStatus} from '~/api/explorer.js';
+import {getValidatorList} from '~/api/explorer.js';
 
 export default {
     FETCH_VALIDATOR_LIST({ commit }) {
@@ -6,13 +6,6 @@ export default {
             .then((validatorList) => {
                 commit('SET_VALIDATOR_LIST', validatorList);
                 return validatorList;
-            });
-    },
-    FETCH_STATUS({ commit }) {
-        return getStatus()
-            .then((statusData) => {
-                commit('SET_STATUS', statusData);
-                return statusData;
             });
     },
 };

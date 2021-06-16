@@ -1,5 +1,6 @@
 <script>
 import {pretty} from '~/assets/utils.js';
+import Amount from '~/components/common/Amount.vue';
 import TableLink from '@/components/TableLink.vue';
 
 const ITEM_TYPE = {
@@ -10,6 +11,7 @@ const ITEM_TYPE = {
 export default {
     ITEM_TYPE,
     components: {
+        Amount,
         TableLink,
     },
     props: {
@@ -43,7 +45,7 @@ export default {
 
                 return {
                     ...provider,
-                    liquidityUsd: provider.liquidityBip * this.$store.getters.bipPriceUsd,
+                    liquidityUsd: provider.liquidityBip * this.$store.getters['explorer/bipPriceUsd'],
                     apy,
                 };
             });
@@ -51,6 +53,9 @@ export default {
     },
     methods: {
         pretty,
+        getCoinIconUrl(coin) {
+            return this.$store.getters['explorer/getCoinIcon'](coin);
+        },
     },
 };
 </script>
@@ -70,7 +75,13 @@ export default {
                     <template v-else>Pool</template>
                 </th>
                 <th colspan="2">Amount</th>
-                <th>{{ providerList[0].token.symbol }} amount</th>
+                <th>
+                    <template v-if="itemType === $options.ITEM_TYPE.PROVIDER">
+                        {{ providerList[0].token.symbol }}
+                    </template>
+                    <template v-else>LP</template>
+                     amount
+                </th>
                 <th>Liquidity</th>
                 <th>Share</th>
                 <th v-if="itemType === $options.ITEM_TYPE.PROVIDER_POOL">APY</th>
@@ -84,16 +95,28 @@ export default {
                                :should-not-shorten="false"
                                v-if="itemType === $options.ITEM_TYPE.PROVIDER"
                     />
-                    <TableLink
-                        v-else
-                        :link-text="provider.coin0.symbol + ' / ' + provider.coin1.symbol"
-                        :link-path="`/pools/${provider.coin0.symbol}/${provider.coin1.symbol}`"
-                        :should-not-shorten="true"
-                    />
+                    <div class="pool-pair" v-else>
+                        <div class="pool-pair__figure">
+                            <img class="pool-pair__icon" :src="getCoinIconUrl(provider.coin0.symbol)" width="24" height="24" alt="" role="presentation">
+                            <img class="pool-pair__icon pool-pair__icon1" :src="getCoinIconUrl(provider.coin1.symbol)" width="24" height="24" alt="" role="presentation">
+                        </div>
+                        <TableLink
+                            :link-text="provider.coin0.symbol + ' / ' + provider.coin1.symbol"
+                            :link-path="`/pools/${provider.coin0.symbol}/${provider.coin1.symbol}`"
+                            :should-not-shorten="true"
+                        />
+                    </div>
                 </td>
-                <td>{{ provider.coin0.symbol }} <span class="u-fw-500">{{ pretty(provider.amount0) }}</span></td>
-                <td>{{ provider.coin1.symbol }} <span class="u-fw-500">{{ pretty(provider.amount1) }}</span></td>
-                <td>{{ pretty(provider.liquidity) }}</td>
+                <td>
+                    <Amount :amount="provider.amount0" :coin="provider.coin0.symbol" :disable-usd="true" :coin-first="itemType === $options.ITEM_TYPE.PROVIDER"/>
+                </td>
+                <td>
+                    <Amount :amount="provider.amount1" :coin="provider.coin1.symbol" :disable-usd="true" :coin-first="itemType === $options.ITEM_TYPE.PROVIDER"/>
+                </td>
+                <td>
+                    <span class="u-fw-500">{{ pretty(provider.liquidity) }}</span>
+                    <template v-if="itemType === $options.ITEM_TYPE.PROVIDER_POOL">{{ provider.token.symbol }}</template>
+                </td>
                 <td>
                     ${{ pretty(provider.liquidityUsd) }}
                 </td>
