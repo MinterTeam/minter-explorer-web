@@ -64,7 +64,7 @@ export default {
 <template>
     <div>
         <section class="panel u-section">
-            <div class="panel__section panel__header">
+            <div class="panel__section panel__header panel__header--wrap">
                 <h1 class="panel__title panel__header-title">
                     <BackButton/>
                     <img class="panel__header-title-icon" src="/img/icon-farm.svg" width="40" height="40" alt="" role="presentation">
@@ -72,7 +72,12 @@ export default {
                         Yield farm programs
                     </span>
                 </h1>
-                <a class="button button--ghost-main button--small" href="https://www.minter.network/howto/minter-farming" target="_blank">What is yield farming?</a>
+                <div class="panel__header-controls">
+                    <div class="button-group">
+                        <a class="button button--main button--small" href="https://console.minter.network/pools" target="_blank">Start farming</a>
+                        <a class="button button--ghost-main button--small" href="https://www.minter.network/howto/minter-farming" target="_blank">What is yield farming?</a>
+                    </div>
+                </div>
             </div>
         </section>
 

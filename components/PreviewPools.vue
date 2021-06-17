@@ -23,7 +23,7 @@
                 <img class="panel__header-title-icon" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
                 Liquidity pools
             </h2>
-            <nuxt-link class="button button--ghost-main button--small" to="/pools">View All</nuxt-link>
+            <nuxt-link class="button button--ghost-main button--small" to="/pools">View all</nuxt-link>
         </div>
         <PoolList :pool-list="poolList"/>
     </section>

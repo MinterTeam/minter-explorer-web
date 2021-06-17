@@ -90,7 +90,7 @@ function selectRandomItems(arr, count) {
                 <img class="panel__header-title-icon" src="/img/icon-farm.svg" width="40" height="40" alt="" role="presentation">
                 Yield farm programs
             </h2>
-            <nuxt-link class="button button--ghost-main button--small" to="/farming">View All</nuxt-link>
+            <nuxt-link class="button button--ghost-main button--small" to="/farming">View all</nuxt-link>
         </div>
         <div class="table-wrap">
             <div class="panel__content panel__section u-text-center" v-if="$fetchState.pending">
