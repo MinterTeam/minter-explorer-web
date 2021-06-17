@@ -74,7 +74,7 @@ export default {
                 </h1>
                 <div class="panel__header-controls">
                     <div class="button-group">
-                        <a class="button button--main button--small" href="https://console.minter.network/pools" target="_blank">Start farming</a>
+                        <a class="button button--main button--small" href="https://console.minter.network/pool" target="_blank">Start farming</a>
                         <a class="button button--ghost-main button--small" href="https://www.minter.network/howto/minter-farming" target="_blank">What is yield farming?</a>
                     </div>
                 </div>
