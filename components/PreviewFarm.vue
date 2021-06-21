@@ -127,7 +127,7 @@ function selectRandomItems(arr, count) {
                     <td>{{ pool.rewardCoin.symbol }}</td>
                     <td>
                         <div class="farm__plus-wrap">
-                            <div>{{ pretty(pool.apr) }}%</div>
+                            <div class="farm__plus-value">{{ pretty(pool.apr) }}%</div>
                             <div class="farm__plus-icon">+</div>
                         </div>
                     </td>
