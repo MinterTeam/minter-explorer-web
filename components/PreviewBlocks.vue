@@ -39,7 +39,7 @@
                 <img class="panel__header-title-icon" src="/img/icon-block.svg" width="40" height="40" alt="" role="presentation">
                 Blocks
             </h2>
-            <nuxt-link class="button button--ghost-main button--small" to="/blocks">View All</nuxt-link>
+            <nuxt-link class="button button--ghost-main button--small" to="/blocks">View all</nuxt-link>
         </div>
         <transition name="v-transition-fade">
             <div class="preview__content" v-if="blockListFormatted.length">
