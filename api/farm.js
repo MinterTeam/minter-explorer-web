@@ -18,7 +18,7 @@ const farmCache = new Cache({maxAge: 1 * 60 * 1000});
  * @return {Promise<Array<FarmItem>>}
  */
 export function getFarmList() {
-    return instance.get('rewarding', {
+    return instance.get('rewarding?owner=Mxcb272d7efc6c4a3122d705100fa0032703446e3e', {
             cache: farmCache,
         })
         .then((response) => {
@@ -64,7 +64,7 @@ export function fillFarmWithPoolData(farmPromise) {
             if (!absentPoolList.length) {
                 return farmList;
             } else {
-                let absentPoolMap;
+                let absentPoolMap = {};
                 absentPoolList.forEach((pool) => {
                     absentPoolMap[pool.token.symbol] = pool;
                 });

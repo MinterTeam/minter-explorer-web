@@ -503,7 +503,7 @@
                     <dt v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">Vote coin</dt>
                     <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">{{ tx.data.coin.symbol }}</dd>
                     <dt v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)">Vote prices</dt>
-                    <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)" class="u-text-pre-line">{{ commissionPriceList }}</dd>
+                    <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)" class="dd u-text-pre-line">{{ commissionPriceList }}</dd>
                     <!-- @TODO UPDATE_COMMISSION -->
 
                 <!-- REDEEM_CHECK -->

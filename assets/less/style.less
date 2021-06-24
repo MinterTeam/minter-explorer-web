@@ -51,8 +51,10 @@
 .panel__content {border-top: 1px solid @c-border;}
 .panel__title {font: inherit; font-weight: 700; line-height: 22px; text-transform: uppercase; margin: 0;}
 .panel__header {display: flex; justify-content: space-between; align-items: center; padding-top: 12px; padding-bottom: 12px;}
+.panel__header--wrap {flex-wrap: wrap;}
 .panel__header-title {display: flex; align-items: center;}
 .panel__header-title-icon {margin-right: 10px; margin-left: -8px; line-height: 40px;}
+.panel__header-controls {margin-top: 16px;}
 .panel__switcher-section {padding: 0;}
 .panel__switcher {display: flex; align-items: center; overflow-x: auto; overflow-y: hidden;}
 .panel__switcher-item {
@@ -74,6 +76,8 @@
     .panel__switcher-item--small {padding-left: 14px; padding-right: 14px;}
 }
 @media (min-width: @breakpoint-medium-up) {
+    .panel__header--wrap {flex-wrap: nowrap;}
+    .panel__header-controls {margin-left: 20px; margin-top: 0;}
     .panel__switcher {flex-grow: 2;}
     .panel__switcher-item--small {padding-left: 20px; padding-right: 20px;}
 }
@@ -253,10 +257,14 @@
 .reward__chart {height: 180px !important;}
 
 .pool-pair {display: flex; align-items: center;}
-.pool-pair__figure {margin-right: 8px; margin-top: -4px; margin-bottom: -4px; display: flex;}
-.pool-pair__figure--farming {margin-top: 0; margin-bottom: 0;}
+.pool-pair__figure {margin-right: 8px; display: flex;}
+.pool-pair__figure--farming {}
 .pool-pair__icon {border-radius: 50%;}
 .pool-pair__icon1 {margin-top: 8px; margin-left: -8px;}
+@media (min-width: @breakpoint-medium-up) {
+    .pool-pair__figure {margin-top: -4px; margin-bottom: -4px;}
+    .pool-pair__figure--farming {margin-top: 0; margin-bottom: 0;}
+}
 
 .farm__dl {margin: 0; display: flex; justify-content: space-between; flex-wrap: wrap;}
 .farm__dt, .farm__dd {
@@ -265,7 +273,8 @@
 }
 .farm__dd {text-align: right;}
 .farm__plus-wrap {display: flex; align-items: center;}
-.farm__plus-icon {font-size: 24px; line-height: 0; opacity: 0.85; width: 45%; text-align: right;}
+.farm__plus-value {min-width: 75%;}
+.farm__plus-icon {font-size: 24px; line-height: 0; opacity: 0.85;}
 
 
 

@@ -99,6 +99,9 @@ export default {
         getCoinIconUrl(coin) {
             return this.$store.getters['explorer/getCoinIcon'](coin);
         },
+        getCoinVerified(coin) {
+            return this.$store.getters['explorer/getCoinVerified'](coin);
+        },
     },
 };
 </script>
@@ -124,7 +127,7 @@ export default {
                     <div class="u-icon-wrap">
                         <img class="u-icon--coin" :src="getCoinIconUrl(coinInfo.symbol)" width="20" height="20" alt="" role="presentation">
                         {{ coinInfo.symbol }}
-                        <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="coinInfo.verified">
+                        <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="getCoinVerified(coinInfo.symbol)">
                     </div>
                 </dd>
 

@@ -143,7 +143,7 @@
                 <img class="panel__header-title-icon" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
                 Transactions
             </h2>
-            <nuxt-link class="button button--ghost-main button--small" to="/transactions">View All</nuxt-link>
+            <nuxt-link class="button button--ghost-main button--small" to="/transactions">View all</nuxt-link>
         </div>
         <transition name="v-transition-fade">
             <div class="preview__content" v-if="txListFormatted.length">
