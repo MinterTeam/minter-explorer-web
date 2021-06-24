@@ -1,5 +1,5 @@
 <script>
-    import {pretty} from '~/assets/utils.js';
+import {getApy, pretty} from '~/assets/utils.js';
 
     export default {
         props: {
@@ -12,9 +12,7 @@
         computed: {
             poolListFormatted() {
                 return this.poolList.map((pool) => {
-                    const tradeFee = pool.tradeVolumeBip1D * 0.002;
-                    const apr = tradeFee / pool.liquidityBip * 365;
-                    const apy = ((1 + apr / 365) ** 365 - 1) * 100;
+                    const apy = getApy(pool.tradeVolumeBip1D, pool.liquidityBip);
 
                     return {
                         ...pool,

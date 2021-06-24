@@ -166,6 +166,18 @@ export function padZero(value) {
     return value;
 }
 
+/**
+ * calculate APY percent
+ * @param {number} tradeVolume1d
+ * @param {number} liquidity
+ * @return {number}
+ */
+export function getApy(tradeVolume1d, liquidity) {
+    const tradeFee = tradeVolume1d * 0.002;
+    const apr = liquidity > 0 ? tradeFee / liquidity * 365 : 0;
+    return ((1 + apr / 365) ** 365 - 1) * 100;
+}
+
 
 export function fromBase64(str) {
     //@TODO utf8 https://github.com/dankogai/js-base64/issues/130
