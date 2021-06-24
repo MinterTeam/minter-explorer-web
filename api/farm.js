@@ -64,7 +64,7 @@ export function fillFarmWithPoolData(farmPromise) {
             if (!absentPoolList.length) {
                 return farmList;
             } else {
-                let absentPoolMap;
+                let absentPoolMap = {};
                 absentPoolList.forEach((pool) => {
                     absentPoolMap[pool.token.symbol] = pool;
                 });
