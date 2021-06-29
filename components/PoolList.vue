@@ -19,6 +19,7 @@ import {getApy, pretty} from '~/assets/utils.js';
                         liquidityUsd: pool.liquidityBip * this.$store.getters['explorer/bipPriceUsd'],
                         volumeUsd: pool.tradeVolumeBip1D * this.$store.getters['explorer/bipPriceUsd'],
                         apy,
+                        apy30d: getApy((pool.tradeVolumeBip30D || 0) / 30, pool.liquidityBip),
                     };
                 });
             },
@@ -64,6 +65,7 @@ import {getApy, pretty} from '~/assets/utils.js';
                 <td>${{ pretty(pool.liquidityUsd) }}</td>
                 <td>${{ pretty(pool.volumeUsd) }}</td>
                 <td><span v-if="pool.liquidityUsd > 100">{{ pretty(pool.apy) }}%</span></td>
+                <td class="u-hidden" data-apy30>{{ pretty(pool.apy30d) }}</td>
             </tr>
             </tbody>
         </table>

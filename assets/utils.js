@@ -100,7 +100,7 @@ export function pretty(value) {
     if (value >= 0.1 || value <= -0.1 || Number(value) === 0) {
         return decode(prettyNum(value, {precision: PRECISION, precisionSetting: PRECISION_SETTING.FIXED, thousandsSeparator: '&#x202F;'}));
     } else {
-        value = decode(prettyNum(value, {precision: PRECISION, precisionSetting: PRECISION_SETTING.REDUCE_SIGNIFICANT, thousandsSeparator: '&#x202F;'}));
+        value = decode(prettyNum(value, {precision: PRECISION + 1, precisionSetting: PRECISION_SETTING.REDUCE_SIGNIFICANT, thousandsSeparator: '&#x202F;'}));
         value = value.substr(0, 10);
         if (value === '0.00000000') {
             return '0.00';

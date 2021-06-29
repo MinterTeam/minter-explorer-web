@@ -120,6 +120,13 @@ export default {
                         </div>
                     </div>
                 </div>
+                <div class="u-cell u-cell--small--1-2 u-cell--medium--1-3 farm__coming-soon-cell">
+                    <div class="panel farm__coming-soon-panel">
+                        <div class="panel__section">
+                            New pools coming soon…
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
