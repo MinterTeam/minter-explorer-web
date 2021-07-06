@@ -18,11 +18,23 @@ const farmCache = new Cache({maxAge: 1 * 60 * 1000});
  * @return {Promise<Array<FarmItem>>}
  */
 export function getFarmList() {
-    return instance.get('rewarding?owner=Mxcb272d7efc6c4a3122d705100fa0032703446e3e', {
+    return Promise.all([
+            _getFarmList('Mxcb272d7efc6c4a3122d705100fa0032703446e3e'),
+            _getFarmList('Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d'),
+        ])
+        .then((lists) => [].concat(...lists));
+}
+
+/**
+ * @return {Promise<Array<FarmItem>>}
+ */
+function _getFarmList(address) {
+    return instance.get(`rewarding?owner=${address}`, {
             cache: farmCache,
         })
         .then((response) => {
-            return response.data.data.map((farmItem) => {
+            const list = response.data.data || [];
+            return list.map((farmItem) => {
                 farmItem.tokenSymbol = `LP-${farmItem.poolId}`;
 
                 return farmItem;
