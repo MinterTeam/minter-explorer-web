@@ -18,6 +18,7 @@ export const MAINNET_WEB_URL = 'https://explorer.minter.network';
 export const HISTORY_WEB_URL = 'https://v1-history.explorer.minter.network';
 export const EXPLORER_API_URL = process.env.APP_EXPLORER_API_URL;
 export const EXPLORER_RTM_URL = process.env.APP_EXPLORER_RTM_URL;
+export const EXPLORER_STATIC_HOST = process.env.APP_EXPLORER_STATIC_HOST;
 export const GATE_API_URL = process.env.APP_GATE_API_URL;
 export const ACCOUNTS_API_URL = process.env.APP_ACCOUNTS_API_URL;
 export const CHAINIK_API_URL = 'https://chainik.io/json/';
