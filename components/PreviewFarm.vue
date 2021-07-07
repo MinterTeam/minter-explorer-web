@@ -44,6 +44,9 @@ export default {
         getCoinIconUrl(coin) {
             return this.$store.getters['explorer/getCoinIcon'](coin);
         },
+        getRewardCoin(pool) {
+            return pool.rewardCoinList.map((coin) => coin.symbol).join(' + ');
+        },
     },
 };
 
@@ -122,7 +125,7 @@ function selectRandomItems(arr, count) {
                     </td>
                     <td>{{ getDateHuman(pool.finishAt) }}</td>
                     <td>${{ pretty(pool.liquidityUsd) }}</td>
-                    <td>{{ pool.rewardCoin.symbol }}</td>
+                    <td>{{ getRewardCoin(pool) }}</td>
                     <td>
                         <div class="farm__plus-wrap">
                             <div class="farm__plus-value">{{ pretty(pool.apr) }}%</div>

@@ -55,6 +55,9 @@ export default {
         getCoinIconUrl(coin) {
             return this.$store.getters['explorer/getCoinIcon'](coin);
         },
+        getRewardCoin(pool) {
+            return pool.rewardCoinList.map((coin) => coin.symbol).join(' + ');
+        },
     },
 };
 </script>
@@ -109,7 +112,7 @@ export default {
                                 <dd class="farm__dd">${{ pretty(pool.liquidityUsd) }}</dd>
 
                                 <dt class="farm__dt">Reward type</dt>
-                                <dd class="farm__dd">{{ pool.rewardCoin.symbol }}</dd>
+                                <dd class="farm__dd">{{ getRewardCoin(pool) }}</dd>
 
                                 <dt class="farm__dt u-fw-700" title="Based on 24hr rate annualized">Farming APR</dt>
                                 <dd class="farm__dd u-fw-700">{{ pretty(pool.apr) }}%</dd>

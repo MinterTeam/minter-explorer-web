@@ -22,7 +22,24 @@ export function getFarmList() {
             _getFarmList('Mxcb272d7efc6c4a3122d705100fa0032703446e3e'),
             _getFarmList('Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d'),
         ])
-        .then((lists) => [].concat(...lists));
+        .then((lists) => [].concat(...lists))
+        .then((farmList) => {
+            let farmMap = {};
+            farmList.forEach((farmItem) => {
+                // ensure farm map item
+                if (!farmMap[farmItem.tokenSymbol]) {
+                    const cleanFarmItem = {...farmItem};
+                    delete cleanFarmItem.rewardCoin;
+                    cleanFarmItem.rewardCoinList = [];
+                    cleanFarmItem.percent = 0;
+                    farmMap[farmItem.tokenSymbol] = cleanFarmItem;
+                }
+                farmMap[farmItem.tokenSymbol].percent += farmItem.percent;
+                farmMap[farmItem.tokenSymbol].rewardCoinList.push(farmItem.rewardCoin);
+            });
+
+            return Object.values(farmMap);
+        });
 }
 
 /**
@@ -42,23 +59,23 @@ function _getFarmList(address) {
         });
 }
 
+/**
+ * Fill with pool data and aggregate identical pools
+ * @param {Promise<Array<FarmItem>>} farmPromise
+ * @return {Promise<Array<FarmItem>>}
+ */
 export function fillFarmWithPoolData(farmPromise) {
     const poolListPromise = getPoolList({limit: 1000});
 
     return Promise.all([farmPromise, poolListPromise])
         .then(([farmList, poolListInfo]) => {
             // make hashmap
-            let poolMap = {};
-            poolListInfo.data.forEach((pool) => {
-                poolMap[pool.token.symbol] = pool;
-            });
+            const poolMap = poolListToMap(poolListInfo.data);
             // fill farm if pool exist, otherwise save absent token
             let absentPoolTokenList = [];
             farmList = farmList.map((farmItem) => {
-                const pool = poolMap[farmItem.tokenSymbol];
-                if (pool) {
-                    farmItem.liquidityBip = pool.liquidityBip;
-                    farmItem.tradeVolumeBip1D = pool.tradeVolumeBip1D;
+                if (poolMap[farmItem.tokenSymbol]) {
+                    farmItem = addPoolFields(farmItem, poolMap[farmItem.tokenSymbol]);
                 } else {
                     absentPoolTokenList.push(farmItem.tokenSymbol);
                 }
@@ -76,26 +93,37 @@ export function fillFarmWithPoolData(farmPromise) {
             if (!absentPoolList.length) {
                 return farmList;
             } else {
-                let absentPoolMap = {};
-                absentPoolList.forEach((pool) => {
-                    absentPoolMap[pool.token.symbol] = pool;
-                });
+                const absentPoolMap = poolListToMap(absentPoolList);
 
                 return farmList.map((farmItem) => {
-                    const pool = absentPoolMap[farmItem.tokenSymbol];
-                    if (pool) {
-                        farmItem.liquidityBip = pool.liquidityBip;
-                        farmItem.tradeVolumeBip1D = pool.tradeVolumeBip1D;
-                    }
-
-                    return farmItem;
+                    return addPoolFields(farmItem, absentPoolMap[farmItem.tokenSymbol]);
                 });
             }
         });
 }
 
+
+function poolListToMap(poolList) {
+    // make hashmap
+    let poolMap = {};
+    poolList.forEach((pool) => {
+        poolMap[pool.token.symbol] = pool;
+    });
+
+    return poolMap;
+}
+
+function addPoolFields(farmProgram, pool) {
+    if (pool) {
+        farmProgram.liquidityBip = pool.liquidityBip;
+        farmProgram.tradeVolumeBip1D = pool.tradeVolumeBip1D;
+    }
+
+    return farmProgram;
+}
+
 /**
- * @typedef {{id:number, address:string, pair:string, poolId:number, percent:number, rewardCoin:Coin, ,coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string}} FarmItem
+ * @typedef {{id:number, address:string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], ,coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string}} FarmItem
  */
 
 
