@@ -338,7 +338,7 @@
                 this.isUnbondListLoading = true;
                 getAddressUnbondList(this.$route.params.address, this.$route.query)
                     .then((unbondList) => {
-                        this.slashList = unbondList;
+                        this.unbondList = unbondList;
                         // this.unbondPaginationInfo = unbondListInfo.meta;
                         this.isUnbondListLoading = false;
                         this.isUnbondListLoaded = true;
