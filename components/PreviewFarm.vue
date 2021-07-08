@@ -1,6 +1,6 @@
 <script>
 import {getFarmList, fillFarmWithPoolData} from '@/api/farm.js';
-import {pretty, getDateHuman} from '~/assets/utils.js';
+import {pretty, getDateHuman, getApy} from '~/assets/utils.js';
 
 export default {
     fetch() {
@@ -26,9 +26,7 @@ export default {
             return this.farmList.map((pool) => {
                 const apr = pool.percent * 365;
 
-                const tradeFee = pool.tradeVolumeBip1D * 0.002;
-                const stakingApr = tradeFee / pool.liquidityBip * 365;
-                const stakingApy = ((1 + stakingApr / 365) ** 365 - 1) * 100;
+                const stakingApy = getApy(pool.tradeVolumeBip1D, pool.liquidityBip);
 
                 return {
                     ...pool,
@@ -45,6 +43,9 @@ export default {
         getDateHuman,
         getCoinIconUrl(coin) {
             return this.$store.getters['explorer/getCoinIcon'](coin);
+        },
+        getRewardCoin(pool) {
+            return pool.rewardCoinList.map((coin) => coin.symbol).join(' + ');
         },
     },
 };
@@ -124,7 +125,7 @@ function selectRandomItems(arr, count) {
                     </td>
                     <td>{{ getDateHuman(pool.finishAt) }}</td>
                     <td>${{ pretty(pool.liquidityUsd) }}</td>
-                    <td>{{ pool.rewardCoin.symbol }}</td>
+                    <td>{{ getRewardCoin(pool) }}</td>
                     <td>
                         <div class="farm__plus-wrap">
                             <div class="farm__plus-value">{{ pretty(pool.apr) }}%</div>

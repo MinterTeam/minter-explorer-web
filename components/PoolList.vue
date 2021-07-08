@@ -1,5 +1,5 @@
 <script>
-    import {pretty} from '~/assets/utils.js';
+import {getApy, pretty} from '~/assets/utils.js';
 
     export default {
         props: {
@@ -12,15 +12,14 @@
         computed: {
             poolListFormatted() {
                 return this.poolList.map((pool) => {
-                    const tradeFee = pool.tradeVolumeBip1D * 0.002;
-                    const apr = tradeFee / pool.liquidityBip * 365;
-                    const apy = ((1 + apr / 365) ** 365 - 1) * 100;
+                    const apy = getApy(pool.tradeVolumeBip1D, pool.liquidityBip);
 
                     return {
                         ...pool,
                         liquidityUsd: pool.liquidityBip * this.$store.getters['explorer/bipPriceUsd'],
                         volumeUsd: pool.tradeVolumeBip1D * this.$store.getters['explorer/bipPriceUsd'],
                         apy,
+                        apy30d: getApy((pool.tradeVolumeBip30D || 0) / 30, pool.liquidityBip),
                     };
                 });
             },
@@ -66,6 +65,7 @@
                 <td>${{ pretty(pool.liquidityUsd) }}</td>
                 <td>${{ pretty(pool.volumeUsd) }}</td>
                 <td><span v-if="pool.liquidityUsd > 100">{{ pretty(pool.apy) }}%</span></td>
+                <td class="u-hidden" data-apy30>{{ pretty(pool.apy30d) }}</td>
             </tr>
             </tbody>
         </table>

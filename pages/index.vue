@@ -19,6 +19,7 @@
 
     let centrifuge;
     let timeInterval = null;
+    let blockCacheInterval;
     let statsPromise;
 
     function getAllData() {
@@ -129,6 +130,7 @@
                 centrifuge.disconnect();
             }
             clearInterval(timeInterval);
+            clearInterval(blockCacheInterval);
         },
         computed: {
             network() {
@@ -154,19 +156,26 @@
                     // sockjs: SockJS,
                 });
 
+                // throttle rerender during sync of explorer with blockchain
+                let blocksCache = [];
                 centrifuge.subscribe("blocks", (response) => {
                     const newBlock = toCamel(response.data);
-                    const isExist = this.blockList.some(function(item) {
-                        return item.height === newBlock.height;
-                    });
-                    if (!isExist) {
-                        this.blockList.unshift(newBlock);
-                        this.blockList = this.blockList.slice(0, BLOCK_LIST_LENGTH);
-                        this.lastBlockTime = Date.now();
-
-                        // this.checkLastBlockIsSynced();
-                    }
+                    blocksCache.unshift(newBlock);
                 });
+                blockCacheInterval = setInterval(() => {
+                    blocksCache = blocksCache.filter((newBlock) => {
+                        const isExist = this.blockList.some(function(item) {
+                            return item.height === newBlock.height;
+                        });
+                        return !isExist;
+                    });
+
+                    this.blockList.unshift(...blocksCache);
+                    this.blockList = this.blockList.slice(0, BLOCK_LIST_LENGTH);
+                    this.lastBlockTime = Date.now();
+                    blocksCache = [];
+                }, 1000);
+
                 centrifuge.subscribe("transactions_100", (response) => {
                     const newTx = toCamel(response.data);
                     const isExist = this.txList.find(function(item) {

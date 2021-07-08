@@ -464,7 +464,12 @@
 
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE, EDIT_CANDIDATE, EDIT_CANDIDATE_PUBLIC_KEY, EDIT_CANDIDATE_COMMISSION, VOTE_HALT_BLOCK, VOTE_UPDATE, VOTE_COMMISSION -->
                 <dt v-if="validator.name">Validator</dt>
-                <dd v-if="validator.name"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pubKey">{{ validator.name }}</nuxt-link></dd>
+                <dd v-if="validator.name">
+                    <nuxt-link class="u-icon-wrap-inline link--default" :to="'/validator/' + tx.data.pubKey">
+                        <img v-if="validator.iconUrl" :src="validator.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
+                        {{ validator.name }}
+                    </nuxt-link>
+                </dd>
                 <dt v-if="tx.data.pubKey">Public key</dt>
                 <dd v-if="tx.data.pubKey"><nuxt-link class="link--default" :to="'/validator/' + tx.data.pubKey">{{ tx.data.pubKey }}</nuxt-link></dd>
                     <dt v-if="tx.data.newPubKey">New public key</dt>

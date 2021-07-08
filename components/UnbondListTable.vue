@@ -66,7 +66,9 @@
                 </td>-->
                 <!-- block -->
                 <td>
-                    <TableLink :link-text="dataItem.height" :link-path="'/blocks/' + dataItem.height"/>
+                    <nuxt-link class="link--default" :to="'/blocks/' + dataItem.height">
+                        {{ dataItem.height }}
+                    </nuxt-link>
                 </td>
                 <!-- public key -->
                 <td>

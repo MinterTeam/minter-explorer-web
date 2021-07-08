@@ -368,7 +368,6 @@ export function getAddressUnbondList(address) {
     return explorer.get(`addresses/${address}/events/unbonds`)
         .then((response) => {
             response.data.data = response.data.data.map((item) => {
-                item.height = item.blockId;
                 item.amount = item.value;
                 return item;
             });

@@ -233,7 +233,12 @@
                 <dd class="dd u-select-all">{{ $route.params.pubKey }}</dd>
 
                 <dt v-if="validator.name">Name</dt>
-                <dd v-if="validator.name">{{ validator.name }}</dd>
+                <dd v-if="validator.name">
+                    <div class="u-icon-wrap">
+                        <img v-if="validator.iconUrl" :src="validator.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
+                        {{ validator.name }}
+                    </div>
+                </dd>
 
                 <dt v-if="validator.description || validator.siteUrl">Description</dt>
                 <dd v-if="validator.description || validator.siteUrl">
