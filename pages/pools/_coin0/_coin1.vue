@@ -1,7 +1,7 @@
 <script>
 import Big from 'big.js';
 import {getPoolTransactionList, getPool, getPoolProviderList} from "@/api/explorer.js";
-import {pretty, prettyExact} from "~/assets/utils.js";
+import {getApy, pretty, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';
 import {TAB_TYPES} from '~/assets/variables.js';
@@ -102,9 +102,7 @@ export default {
             return this.pool.tradeVolumeBip1D * 0.002;
         },
         apy() {
-            const apr = this.tradeFee / this.pool.liquidityBip * 365;
-            const apy = (1 + apr / 365) ** 365 - 1;
-            return apy * 100;
+            return getApy(this.pool.tradeVolumeBip1D, this.pool.liquidityBip);
         },
         activeTab() {
             return ensureTab(this.$route.query.active_tab);

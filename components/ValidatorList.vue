@@ -59,20 +59,28 @@
                 <thead>
                 <tr>
                     <th v-show="!isCollapsed">Name</th>
-                    <th>{{ isCollapsed ? 'Validator' : 'Public Key' }}</th>
-                    <th>Block Sign</th>
+                    <th>{{ isCollapsed ? 'Validator' : 'Public key' }}</th>
+                    <th>Block sign</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="item in validatorList" :key="item.validator.publicKey">
                     <td v-show="!isCollapsed">
-                        <span v-if="item.validator.name">{{ item.validator.name }}</span>
+                        <div v-if="item.validator.name" class="u-icon-wrap">
+                            <img v-if="item.validator.iconUrl" :src="item.validator.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
+                            {{ item.validator.name }}
+                        </div>
                     </td>
                     <td>
+                        <nuxt-link class="link--default u-icon-wrap" v-if="isCollapsed && item.validator.name" :to="'/validator/' + item.validator.publicKey">
+                            <img v-if="item.validator.iconUrl" :src="item.validator.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
+                            {{ item.validator.name }}
+                        </nuxt-link>
                         <TableLink class="u-text-tabular-nums"
-                                   :link-text="isCollapsed && item.validator.name ? item.validator.name : item.validator.publicKey"
+                                   v-else
+                                   :link-text="item.validator.publicKey"
                                    :link-path="'/validator/' + item.validator.publicKey"
-                                   :should-not-shorten="!isCollapsed || item.validator.name"
+                                   :should-not-shorten="!isCollapsed"
                         />
                     </td>
                     <td>

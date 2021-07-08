@@ -1,6 +1,6 @@
 <script>
 import {getFarmList, fillFarmWithPoolData} from '@/api/farm.js';
-import {pretty, getDateHuman} from '~/assets/utils.js';
+import {pretty, getDateHuman, getApy} from '~/assets/utils.js';
 import getTitle from '~/assets/get-title.js';
 import BackButton from '~/components/BackButton.vue';
 
@@ -36,9 +36,7 @@ export default {
             return this.farmList.map((pool) => {
                 const apr = pool.percent * 365;
 
-                const tradeFee = pool.tradeVolumeBip1D * 0.002;
-                const stakingApr = tradeFee / pool.liquidityBip * 365;
-                const stakingApy = ((1 + stakingApr / 365) ** 365 - 1) * 100;
+                const stakingApy = getApy(pool.tradeVolumeBip1D, pool.liquidityBip);
 
                 return {
                     ...pool,
@@ -56,6 +54,9 @@ export default {
         getDateHuman,
         getCoinIconUrl(coin) {
             return this.$store.getters['explorer/getCoinIcon'](coin);
+        },
+        getRewardCoin(pool) {
+            return pool.rewardCoinList.map((coin) => coin.symbol).join(' + ');
         },
     },
 };
@@ -111,7 +112,7 @@ export default {
                                 <dd class="farm__dd">${{ pretty(pool.liquidityUsd) }}</dd>
 
                                 <dt class="farm__dt">Reward type</dt>
-                                <dd class="farm__dd">{{ pool.rewardCoin.symbol }}</dd>
+                                <dd class="farm__dd">{{ getRewardCoin(pool) }}</dd>
 
                                 <dt class="farm__dt u-fw-700" title="Based on 24hr rate annualized">Farming APR</dt>
                                 <dd class="farm__dd u-fw-700">{{ pretty(pool.apr) }}%</dd>
@@ -119,6 +120,13 @@ export default {
                                 <dt class="farm__dt u-fw-700" title="Based on 24hr volume annualized">Staking APY</dt>
                                 <dd class="farm__dd u-fw-700">{{ pretty(pool.stakingApy) }}%</dd>
                             </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-cell u-cell--small--1-2 u-cell--medium--1-3 farm__coming-soon-cell">
+                    <div class="panel farm__coming-soon-panel">
+                        <div class="panel__section">
+                            New pools coming soon…
                         </div>
                     </div>
                 </div>

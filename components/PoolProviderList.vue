@@ -1,5 +1,5 @@
 <script>
-import {pretty} from '~/assets/utils.js';
+import {getApy, pretty} from '~/assets/utils.js';
 import Amount from '~/components/common/Amount.vue';
 import TableLink from '@/components/TableLink.vue';
 
@@ -38,9 +38,7 @@ export default {
             return this.providerList.map((provider) => {
                 let apy;
                 if (this.itemType === ITEM_TYPE.PROVIDER_POOL && provider.tradeVolumeBip1D > 0 && provider.totalLiquidityBip > 0) {
-                    const tradeFee = provider.tradeVolumeBip1D * 0.002;
-                    const apr = tradeFee / provider.totalLiquidityBip * 365;
-                    apy = ((1 + apr / 365) ** 365 - 1) * 100;
+                    apy = getApy(provider.tradeVolumeBip1D, provider.totalLiquidityBip);
                 }
 
                 return {
