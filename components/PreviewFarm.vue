@@ -4,16 +4,11 @@ import {pretty, getDateHuman, getApy} from '~/assets/utils.js';
 
 export default {
     fetch() {
-        const farmListPromise = getFarmList()
+        return fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
             .then((farmList) => {
-                return selectRandomItems(farmList, 3);
+                farmList = farmList.filter((item) => item.liquidityBip > 100000);
+                this.farmList = selectRandomItems(farmList, 3);
             });
-
-        return fillFarmWithPoolData(farmListPromise)
-            .then((farmList) => {
-                this.farmList = farmList;
-            });
-
     },
     data() {
         return {

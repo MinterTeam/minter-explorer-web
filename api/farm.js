@@ -32,10 +32,29 @@ export function getFarmList() {
                     delete cleanFarmItem.rewardCoin;
                     cleanFarmItem.rewardCoinList = [];
                     cleanFarmItem.percent = 0;
+                    cleanFarmItem.finishDateList = [];
                     farmMap[farmItem.tokenSymbol] = cleanFarmItem;
                 }
+
                 farmMap[farmItem.tokenSymbol].percent += farmItem.percent;
                 farmMap[farmItem.tokenSymbol].rewardCoinList.push(farmItem.rewardCoin);
+
+                // check if finishDateList should be updated
+                const hasCurrentDate = farmMap[farmItem.tokenSymbol].finishDateList.find((item) => {
+                    // less than 1 day difference
+                    return Math.abs(new Date(item) - new Date(farmItem.finishAt)) <= 24 * 60 * 60 * 1000;
+                });
+                if (!hasCurrentDate) {
+                    farmMap[farmItem.tokenSymbol].finishDateList.push(farmItem.finishAt);
+                }
+
+                const latestDate = farmMap[farmItem.tokenSymbol].finishDateList.reduce((previous, current) => {
+                    const prevDate = new Date(previous);
+                    const currentDate = new Date(current);
+                    return currentDate > prevDate ? current : previous;
+                }, (new Date(0)).toISOString());
+                // rewrite with latest finishAt
+                farmMap[farmItem.tokenSymbol].finishAt = latestDate;
             });
 
             return Object.values(farmMap);
@@ -62,9 +81,10 @@ function _getFarmList(address) {
 /**
  * Fill with pool data and aggregate identical pools
  * @param {Promise<Array<FarmItem>>} farmPromise
+ * @param {boolean} [skipLowLiquidity]
  * @return {Promise<Array<FarmItem>>}
  */
-export function fillFarmWithPoolData(farmPromise) {
+export function fillFarmWithPoolData(farmPromise, {skipLowLiquidity} = {}) {
     const poolListPromise = getPoolList({limit: 1000});
 
     return Promise.all([farmPromise, poolListPromise])
@@ -76,7 +96,7 @@ export function fillFarmWithPoolData(farmPromise) {
             farmList = farmList.map((farmItem) => {
                 if (poolMap[farmItem.tokenSymbol]) {
                     farmItem = addPoolFields(farmItem, poolMap[farmItem.tokenSymbol]);
-                } else {
+                } else if (!skipLowLiquidity) {
                     absentPoolTokenList.push(farmItem.tokenSymbol);
                 }
 

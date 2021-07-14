@@ -106,7 +106,9 @@ export default {
                         <div class="panel__content panel__section">
                             <dl class="farm__dl">
                                 <dt class="farm__dt">End date</dt>
-                                <dd class="farm__dd">{{ getDateHuman(pool.finishAt) }}</dd>
+                                <dd class="farm__dd">
+                                    <div v-for="date in pool.finishDateList" :key="date">{{ getDateHuman(date) }}</div>
+                                </dd>
 
                                 <dt class="farm__dt" title="Total value locked">TVL</dt>
                                 <dd class="farm__dd">${{ pretty(pool.liquidityUsd) }}</dd>
