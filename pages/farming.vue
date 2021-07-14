@@ -46,7 +46,15 @@ export default {
                     stakingApy,
                 };
             })
-            .sort((a, b) => b.apr - a.apr);
+            .sort((a, b) => {
+                // first sort by apr
+                if (b.apr - a.apr !== 0) {
+                    return b.apr - a.apr;
+                }
+
+                // then sort by liquidity
+                return b.liquidityBip - a.liquidityBip;
+            });
         },
     },
     methods: {
