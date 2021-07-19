@@ -98,6 +98,45 @@ export default {
 
         <div class="u-section" v-else>
             <div class="u-grid u-grid--vertical-margin">
+                <div class="u-cell u-cell--small--1-2 u-cell--medium--1-3">
+                    <div class="panel farm__uniswap-bg">
+                        <div class="panel__section panel__header">
+                            <a class="pool-pair link--hover" href="https://v2.info.uniswap.org/pair/0xb1700c93ddc26ce1d59441c24daef1035444d7b7" target="_blank">
+                                <div class="pool-pair__figure pool-pair__figure--farming">
+                                    <img class="pool-pair__icon" :src="getCoinIconUrl('USDTE')" width="24" height="24" alt="" role="presentation">
+                                    <img class="pool-pair__icon pool-pair__icon1" src="/img/icon-coin-bipx.svg" width="24" height="24" alt="" role="presentation">
+                                </div>
+                                <div class="u-fw-700">
+                                    USDT / BIPx
+                                </div>
+                            </a>
+                            <a class="farm__uniswap-title link--hover u-fw-700" href="https://v2.info.uniswap.org/pair/0xb1700c93ddc26ce1d59441c24daef1035444d7b7" target="_blank">
+                                Uniswap
+                                <img src="/img/icon-uniswap.png" srcset="/img/icon-uniswap@2x.png 2x, /img/icon-uniswap@3x.png 3x" alt="Uniswap" width="24" height="24">
+                            </a>
+                        </div>
+                        <div class="panel__content panel__section">
+                            <dl class="farm__dl">
+                                <dt class="farm__dt">End date</dt>
+                                <dd class="farm__dd">
+                                    15 August 2021
+                                </dd>
+
+                                <dt class="farm__dt" title="Total value locked">TVL</dt>
+                                <dd class="farm__dd">$225&#x202F;771</dd>
+
+                                <dt class="farm__dt">Reward type</dt>
+                                <dd class="farm__dd">BIPx + USDT</dd>
+
+                                <dt class="farm__dt u-fw-700" title="Based on 24hr rate annualized">Farming APR</dt>
+                                <dd class="farm__dd u-fw-700">{{ pretty(73) }}%</dd>
+
+                                <dt class="farm__dt u-fw-700" title="Based on 24hr volume annualized">Staking APY</dt>
+                                <dd class="farm__dd u-fw-700">{{ pretty(9) }}%</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
                 <div class="u-cell u-cell--small--1-2 u-cell--medium--1-3" v-for="pool in farmListFormatted" :key="pool.poolId">
                     <div class="panel">
                         <div class="panel__section panel__header">

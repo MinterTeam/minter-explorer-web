@@ -7,7 +7,7 @@ export default {
         return fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
             .then((farmList) => {
                 farmList = farmList.filter((item) => item.liquidityBip > 100000);
-                this.farmList = selectRandomItems(farmList, 3);
+                this.farmList = selectRandomItems(farmList, 2);
             });
     },
     data() {
@@ -103,9 +103,38 @@ function selectRandomItems(arr, count) {
                     <th>Reward type</th>
                     <th title="Based on 24hr rate annualized">Farming APR</th>
                     <th title="Based on 24hr volume annualized">Staking APY</th>
+                    <th class="farm__uniswap-cell"><!-- placeholder --></th>
                 </tr>
                 </thead>
                 <tbody>
+                <tr class="farm__uniswap-row-bg">
+                    <td>
+                        <div class="pool-pair">
+                            <div class="pool-pair__figure">
+                                <img class="pool-pair__icon" :src="getCoinIconUrl('USDTE')" width="24" height="24" alt="" role="presentation">
+                                <img class="pool-pair__icon pool-pair__icon1" src="/img/icon-coin-bipx.svg" width="24" height="24" alt="" role="presentation">
+                            </div>
+                            <a class="link--hover u-fw-700" href="https://v2.info.uniswap.org/pair/0xb1700c93ddc26ce1d59441c24daef1035444d7b7" target="_blank">
+                                USDT / BIPx
+                            </a>
+                        </div>
+                    </td>
+                    <td>15 August 2021</td>
+                    <td>$225&#x202F;771</td>
+                    <td>BIPx + USDT</td>
+                    <td>
+                        <div class="farm__plus-wrap">
+                            <div class="farm__plus-value">73%</div>
+                            <div class="farm__plus-icon">+</div>
+                        </div>
+                    </td>
+                    <td>9%</td>
+                    <td class="farm__uniswap-cell">
+                        <a class="link--hover" href="https://v2.info.uniswap.org/pair/0xb1700c93ddc26ce1d59441c24daef1035444d7b7" target="_blank">
+                            <img src="/img/icon-uniswap.png" srcset="/img/icon-uniswap@2x.png 2x, /img/icon-uniswap@3x.png 3x" alt="Uniswap" width="40" height="40">
+                        </a>
+                    </td>
+                </tr>
                 <tr v-for="pool in farmListFormatted" :key="pool.poolId">
                     <td>
                         <div class="pool-pair">
