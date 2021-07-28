@@ -3,17 +3,24 @@ import {getFarmList, fillFarmWithPoolData} from '@/api/farm.js';
 import {pretty, getDateHuman, getApy} from '~/assets/utils.js';
 import getTitle from '~/assets/get-title.js';
 import BackButton from '~/components/BackButton.vue';
+import {getFarmingPair} from '@/api/uniswap.js';
 
 export default {
     components: {
         BackButton,
     },
     fetch() {
-        return fillFarmWithPoolData(getFarmList())
+        const uniswapFarmPromise = getFarmingPair()
+            .then((pairDayData) => {
+                this.uniswapPair = pairDayData;
+            });
+
+        const farmListPromise = fillFarmWithPoolData(getFarmList())
             .then((farmList) => {
                 this.farmList = farmList;
             });
 
+        return Promise.all([uniswapFarmPromise, farmListPromise]);
     },
     head() {
         const title = getTitle('Yield farming');
@@ -27,6 +34,8 @@ export default {
     },
     data() {
         return {
+            /** @type UniswapPairDailyData */
+            uniswapPair: {},
             /** @type Array<FarmItem> */
             farmList: [],
         };
@@ -84,7 +93,7 @@ export default {
                 <div class="panel__header-controls">
                     <div class="button-group">
                         <a class="button button--main button--small" href="https://console.minter.network/pool" target="_blank">Start farming</a>
-                        <a class="button button--ghost-main button--small" href="https://www.minter.network/howto/minter-farming" target="_blank">What is yield farming?</a>
+                        <a class="button button--ghost-main button--small" href="https://www.minter.network/earn/farm" target="_blank">What is yield farming?</a>
                     </div>
                 </div>
             </div>
@@ -123,7 +132,7 @@ export default {
                                 </dd>
 
                                 <dt class="farm__dt" title="Total value locked">TVL</dt>
-                                <dd class="farm__dd">$225&#x202F;771</dd>
+                                <dd class="farm__dd">${{ pretty(uniswapPair.reserveUSD) }}</dd>
 
                                 <dt class="farm__dt">Reward type</dt>
                                 <dd class="farm__dd">BIPx + USDT</dd>
@@ -132,7 +141,7 @@ export default {
                                 <dd class="farm__dd u-fw-700">{{ pretty(73) }}%</dd>
 
                                 <dt class="farm__dt u-fw-700" title="Based on 24hr volume annualized">Staking APY</dt>
-                                <dd class="farm__dd u-fw-700">{{ pretty(9) }}%</dd>
+                                <dd class="farm__dd u-fw-700">{{ pretty(uniswapPair.stakingApy) }}%</dd>
                             </dl>
                         </div>
                     </div>

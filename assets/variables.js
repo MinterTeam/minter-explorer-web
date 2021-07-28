@@ -25,6 +25,7 @@ export const CHAINIK_API_URL = 'https://chainik.io/json/';
 export const HUB_MINTER_MULTISIG_ADDRESS = process.env.APP_HUB_MINTER_MULTISIG_ADDRESS;
 export const HUB_API_URL = process.env.APP_HUB_API_URL;
 export const FARM_API_URL = process.env.APP_FARM_API_URL;
+// export const ETHEREUM_CHAIN_ID = NETWORK === MAINNET ? 1 : 3;
 export const ETHERSCAN_HOST = NETWORK === MAINNET ? 'https://etherscan.io' : 'https://ropsten.etherscan.io';
 
 

@@ -1,17 +1,27 @@
 <script>
 import {getFarmList, fillFarmWithPoolData} from '@/api/farm.js';
+import {getFarmingPair} from '@/api/uniswap.js';
 import {pretty, getDateHuman, getApy} from '~/assets/utils.js';
 
 export default {
     fetch() {
-        return fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
+        const uniswapFarmPromise = getFarmingPair()
+            .then((pairDayData) => {
+                this.uniswapPair = pairDayData;
+            });
+
+        const farmListPromise = fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
             .then((farmList) => {
                 farmList = farmList.filter((item) => item.liquidityBip > 100000);
                 this.farmList = selectRandomItems(farmList, 2);
             });
+
+        return Promise.all([uniswapFarmPromise, farmListPromise]);
     },
     data() {
         return {
+            /** @type UniswapPairDailyData */
+            uniswapPair: {},
             /** @type Array<FarmItem> */
             farmList: [],
         };
@@ -120,7 +130,7 @@ function selectRandomItems(arr, count) {
                         </div>
                     </td>
                     <td>15 August 2021</td>
-                    <td>$225&#x202F;771</td>
+                    <td>${{ pretty(uniswapPair.reserveUSD) }}</td>
                     <td>BIPx + USDT</td>
                     <td>
                         <div class="farm__plus-wrap">
@@ -128,7 +138,7 @@ function selectRandomItems(arr, count) {
                             <div class="farm__plus-icon">+</div>
                         </div>
                     </td>
-                    <td>9%</td>
+                    <td>{{ pretty(uniswapPair.stakingApy) }}%</td>
                     <td class="farm__uniswap-cell">
                         <a class="link--hover" href="https://v2.info.uniswap.org/pair/0xb1700c93ddc26ce1d59441c24daef1035444d7b7" target="_blank">
                             <img src="/img/icon-uniswap.png" srcset="/img/icon-uniswap@2x.png 2x, /img/icon-uniswap@3x.png 3x" alt="Uniswap" width="40" height="40">
