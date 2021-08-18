@@ -3,24 +3,24 @@ import {getFarmList, fillFarmWithPoolData} from '@/api/farm.js';
 import {pretty, getDateHuman, getApy} from '~/assets/utils.js';
 import getTitle from '~/assets/get-title.js';
 import BackButton from '~/components/BackButton.vue';
-import {getFarmingPair} from '@/api/uniswap.js';
+// import {getFarmingPair} from '@/api/uniswap.js';
 
 export default {
     components: {
         BackButton,
     },
     fetch() {
-        const uniswapFarmPromise = getFarmingPair()
-            .then((pairDayData) => {
-                this.uniswapPair = pairDayData;
-            });
+        // const uniswapFarmPromise = getFarmingPair()
+        //     .then((pairDayData) => {
+        //         this.uniswapPair = pairDayData;
+        //     });
 
         const farmListPromise = fillFarmWithPoolData(getFarmList())
             .then((farmList) => {
                 this.farmList = farmList;
             });
 
-        return Promise.all([uniswapFarmPromise, farmListPromise]);
+        return Promise.all([/*uniswapFarmPromise, */farmListPromise]);
     },
     head() {
         const title = getTitle('Yield farming');
@@ -107,6 +107,7 @@ export default {
 
         <div class="u-section" v-else>
             <div class="u-grid u-grid--vertical-margin">
+                <!--
                 <div class="u-cell u-cell--small--1-2 u-cell--medium--1-3">
                     <div class="panel farm__uniswap-bg">
                         <div class="panel__section panel__header">
@@ -146,6 +147,7 @@ export default {
                         </div>
                     </div>
                 </div>
+                -->
                 <div class="u-cell u-cell--small--1-2 u-cell--medium--1-3" v-for="pool in farmListFormatted" :key="pool.poolId">
                     <div class="panel">
                         <div class="panel__section panel__header">

@@ -1,22 +1,22 @@
 <script>
 import {getFarmList, fillFarmWithPoolData} from '@/api/farm.js';
-import {getFarmingPair} from '@/api/uniswap.js';
+// import {getFarmingPair} from '@/api/uniswap.js';
 import {pretty, getDateHuman, getApy} from '~/assets/utils.js';
 
 export default {
     fetch() {
-        const uniswapFarmPromise = getFarmingPair()
-            .then((pairDayData) => {
-                this.uniswapPair = pairDayData;
-            });
+        // const uniswapFarmPromise = getFarmingPair()
+        //     .then((pairDayData) => {
+        //         this.uniswapPair = pairDayData;
+        //     });
 
         const farmListPromise = fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
             .then((farmList) => {
                 farmList = farmList.filter((item) => item.liquidityBip > 100000);
-                this.farmList = selectRandomItems(farmList, 2);
+                this.farmList = selectRandomItems(farmList, 3);
             });
 
-        return Promise.all([uniswapFarmPromise, farmListPromise]);
+        return Promise.all([/*uniswapFarmPromise, */farmListPromise]);
     },
     data() {
         return {
@@ -113,10 +113,11 @@ function selectRandomItems(arr, count) {
                     <th>Reward type</th>
                     <th title="Based on 24hr rate annualized">Farming APR</th>
                     <th title="Based on 24hr volume annualized">Staking APY</th>
-                    <th class="farm__uniswap-cell"><!-- placeholder --></th>
+<!--                    <th class="farm__uniswap-cell">&lt;!&ndash; placeholder &ndash;&gt;</th>-->
                 </tr>
                 </thead>
                 <tbody>
+                <!--
                 <tr class="farm__uniswap-row-bg">
                     <td>
                         <div class="pool-pair">
@@ -145,6 +146,7 @@ function selectRandomItems(arr, count) {
                         </a>
                     </td>
                 </tr>
+                -->
                 <tr v-for="pool in farmListFormatted" :key="pool.poolId">
                     <td>
                         <div class="pool-pair">
