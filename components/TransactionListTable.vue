@@ -1,6 +1,6 @@
 <script>
     import Big from 'big.js';
-    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
+    import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {getTimeDistance, getTime, pretty, prettyRound, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils';
     import {UNBOND_PERIOD} from '~/assets/variables';
     import TableLink from '~/components/TableLink';
@@ -82,6 +82,9 @@
             },
             isBuyPool(tx) {
                 return this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
+            },
+            isAddOrder(tx) {
+                return this.isTxType(tx, TX_TYPE.ADD_LIMIT_ORDER);
             },
             isUnbond(tx) {
                 return this.isTxType(tx, TX_TYPE.UNBOND);
@@ -316,12 +319,27 @@
                                 {{ tx.data.coins[0].symbol }} {{ pretty(tx.data.valueToSell) }}
                             </div>
 
-
                             <div class="table__inner-item" v-if="isBuyPool(tx) || isSellPool(tx)">
                                 <strong>Route</strong> <br>
                                 <span v-for="(coinPathItem, coinPathIndex) in tx.data.coins" :key="coinPathItem.id + '-' + coinPathIndex">
                                     {{ coinPathItem.symbol }}<span v-if="coinPathIndex !== tx.data.coins.length - 1"> -> </span>
                                 </span>
+                            </div>
+
+                            <!-- ADD_LIMIT_ORDER -->
+                            <div class="table__inner-item" v-if="isAddOrder(tx)">
+                                <strong>Want to sell</strong> <br>
+                                {{ tx.data.coinToSell.symbol }} {{ pretty(tx.data.valueToSell) }}
+                            </div>
+                            <div class="table__inner-item" v-if="isAddOrder(tx)">
+                                <strong>Want to buy</strong> <br>
+                                {{ tx.data.coinToBuy.symbol }} {{ pretty(tx.data.valueToBuy) }}
+                            </div>
+
+                            <!-- REMOVE_LIMIT_ORDER -->
+                            <div class="table__inner-item" v-if="tx.data.id">
+                                <strong>Order ID</strong> <br>
+                                {{ tx.data.id }}
                             </div>
 
                             <!-- CREATE_SWAP_POOL, ADD_LIQUIDITY, REMOVE_LIQUIDITY -->
