@@ -126,6 +126,9 @@
             isBuyType() {
                 return this.isTxType(TX_TYPE.BUY) || this.isTxType(TX_TYPE.BUY_SWAP_POOL);
             },
+            isAddOrderType() {
+                return this.isTxType(TX_TYPE.ADD_LIMIT_ORDER);
+            },
             isUnbondType() {
                 return this.isTxType(TX_TYPE.UNBOND);
             },
@@ -385,10 +388,20 @@
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
-                    <dt v-if="isSellType || isBuyType">Rate {{ tx.data.coinToSell.symbol }}</dt>
-                    <Amount v-if="isSellType || isBuyType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :exact="false" tag="dd"/>
-                    <dt v-if="isSellType || isBuyType">Rate {{ tx.data.coinToBuy.symbol }}</dt>
-                    <Amount v-if="isSellType || isBuyType" :amount="coin1Price" :coin="tx.data.coinToSell.symbol" :exact="false" tag="dd"/>
+                    <!-- ADD_LIMIT_ORDER -->
+                    <dt v-if="isAddOrderType">Want to sell</dt>
+                    <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToSell" :coin="tx.data.coinToSell.symbol" :exact="true"/>
+                    <dt v-if="isAddOrderType">Want to buy</dt>
+                    <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToBuy" :coin="tx.data.coinToBuy.symbol" :exact="true"/>
+
+                    <!-- REMOVE_LIMIT_ORDER -->
+                    <dt v-if="tx.data.id">Order ID</dt>
+                    <dd v-if="tx.data.id">{{ tx.data.id }}</dd>
+
+                    <dt v-if="isSellType || isBuyType || isAddOrderType">Rate {{ tx.data.coinToSell.symbol }}</dt>
+                    <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :exact="false" tag="dd"/>
+                    <dt v-if="isSellType || isBuyType || isAddOrderType">Rate {{ tx.data.coinToBuy.symbol }}</dt>
+                    <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin1Price" :coin="tx.data.coinToSell.symbol" :exact="false" tag="dd"/>
 
                     <dt v-if="tx.data.coins">Coins route</dt>
                     <dd v-if="tx.data.coins">
