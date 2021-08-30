@@ -93,12 +93,12 @@
                 }
                 return this.tx.height + UNBOND_PERIOD;
             },
-            validator() {
+            validatorMeta() {
                 const tx = this.tx;
                 if (!tx.data.pubKey) {
                     return {};
                 }
-                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
+                const validator = this.$store.state.validatorMetaList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
                 return validator || {};
             },
             poolPath() {
@@ -388,15 +388,15 @@
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
+                    <!-- ADD_LIMIT_ORDER, REMOVE_LIMIT_ORDER -->
+                    <dt v-if="tx.data.id || tx.data.orderId">Order ID</dt>
+                    <dd v-if="tx.data.id || tx.data.orderId">{{ tx.data.id || tx.data.orderId }}</dd>
+
                     <!-- ADD_LIMIT_ORDER -->
                     <dt v-if="isAddOrderType">Want to sell</dt>
                     <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToSell" :coin="tx.data.coinToSell.symbol" :exact="true"/>
                     <dt v-if="isAddOrderType">Want to buy</dt>
                     <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToBuy" :coin="tx.data.coinToBuy.symbol" :exact="true"/>
-
-                    <!-- REMOVE_LIMIT_ORDER -->
-                    <dt v-if="tx.data.id">Order ID</dt>
-                    <dd v-if="tx.data.id">{{ tx.data.id }}</dd>
 
                     <dt v-if="isSellType || isBuyType || isAddOrderType">Rate {{ tx.data.coinToSell.symbol }}</dt>
                     <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :exact="false" tag="dd"/>
@@ -476,11 +476,11 @@
 
 
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE, EDIT_CANDIDATE, EDIT_CANDIDATE_PUBLIC_KEY, EDIT_CANDIDATE_COMMISSION, VOTE_HALT_BLOCK, VOTE_UPDATE, VOTE_COMMISSION -->
-                <dt v-if="validator.name">Validator</dt>
-                <dd v-if="validator.name">
+                <dt v-if="validatorMeta.name">Validator</dt>
+                <dd v-if="validatorMeta.name">
                     <nuxt-link class="u-icon-wrap-inline link--default" :to="'/validator/' + tx.data.pubKey">
-                        <img v-if="validator.iconUrl" :src="validator.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
-                        {{ validator.name }}
+                        <img v-if="validatorMeta.iconUrl" :src="validatorMeta.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
+                        {{ validatorMeta.name }}
                     </nuxt-link>
                 </dd>
                 <dt v-if="tx.data.pubKey">Public key</dt>

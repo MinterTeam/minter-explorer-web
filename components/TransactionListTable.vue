@@ -204,7 +204,7 @@
                 if (!tx.data.pubKey) {
                     return;
                 }
-                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
+                const validator = this.$store.state.validatorMetaList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
                 return validator && validator.name;
             },
         },
@@ -336,10 +336,10 @@
                                 {{ tx.data.coinToBuy.symbol }} {{ pretty(tx.data.valueToBuy) }}
                             </div>
 
-                            <!-- REMOVE_LIMIT_ORDER -->
-                            <div class="table__inner-item" v-if="tx.data.id">
+                            <!-- ADD_LIMIT_ORDER, REMOVE_LIMIT_ORDER -->
+                            <div class="table__inner-item" v-if="tx.data.id || tx.data.orderId">
                                 <strong>Order ID</strong> <br>
-                                {{ tx.data.id }}
+                                {{ tx.data.id || tx.data.orderId }}
                             </div>
 
                             <!-- CREATE_SWAP_POOL, ADD_LIQUIDITY, REMOVE_LIQUIDITY -->
