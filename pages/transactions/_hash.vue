@@ -388,15 +388,15 @@
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
+                    <!-- ADD_LIMIT_ORDER, REMOVE_LIMIT_ORDER -->
+                    <dt v-if="tx.data.id || tx.data.orderId">Order ID</dt>
+                    <dd v-if="tx.data.id || tx.data.orderId">{{ tx.data.id || tx.data.orderId }}</dd>
+
                     <!-- ADD_LIMIT_ORDER -->
                     <dt v-if="isAddOrderType">Want to sell</dt>
                     <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToSell" :coin="tx.data.coinToSell.symbol" :exact="true"/>
                     <dt v-if="isAddOrderType">Want to buy</dt>
                     <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToBuy" :coin="tx.data.coinToBuy.symbol" :exact="true"/>
-
-                    <!-- REMOVE_LIMIT_ORDER -->
-                    <dt v-if="tx.data.id">Order ID</dt>
-                    <dd v-if="tx.data.id">{{ tx.data.id }}</dd>
 
                     <dt v-if="isSellType || isBuyType || isAddOrderType">Rate {{ tx.data.coinToSell.symbol }}</dt>
                     <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :exact="false" tag="dd"/>
