@@ -278,6 +278,18 @@
 .farm__plus-icon {font-size: 24px; line-height: 0; opacity: 0.85;}
 .farm__coming-soon-cell {display: flex;}
 .farm__coming-soon-panel {width: 100%; display: flex; align-items: center; justify-content: center; font-weight: 700;}
-
+.farm__uniswap-cell {font-size: 0; padding-block: 0; padding-left: 0; padding-right: 8px;}
+.farm__uniswap-title {
+    display: flex; align-items: center;
+    img {margin-left: 8px;}
+}
+.farm__uniswap-row-bg, .farm__uniswap-bg {
+    background: linear-gradient(to right, #4E1D54, #FF007A); color: #fff;
+    .panel__content {border-color: rgba(255,255,255,0.15);}
+}
+// safari 10.1+ hack to fix background for table row
+@media not all and (min-resolution:.001dpcm) { @supports (-webkit-appearance:none) {
+    .farm__uniswap-row-bg { background: #a50f67; }
+} }
 
 

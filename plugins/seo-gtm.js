@@ -1,4 +1,4 @@
-const GTM_ID = 'GTM-KRDL5BW';
+const GTM_ID = 'GTM-WCM5QJN';
 
 export default ({ app }) => {
     /*

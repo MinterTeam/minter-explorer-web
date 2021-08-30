@@ -93,12 +93,12 @@
                 }
                 return this.tx.height + UNBOND_PERIOD;
             },
-            validator() {
+            validatorMeta() {
                 const tx = this.tx;
                 if (!tx.data.pubKey) {
                     return {};
                 }
-                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
+                const validator = this.$store.state.validatorMetaList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
                 return validator || {};
             },
             poolPath() {
@@ -463,11 +463,11 @@
 
 
                 <!-- DELEGATE, UNBOND, DECLARE_CANDIDACY, SET_CANDIDATE_ONLINE, SET_CANDIDATE_OFFLINE, EDIT_CANDIDATE, EDIT_CANDIDATE_PUBLIC_KEY, EDIT_CANDIDATE_COMMISSION, VOTE_HALT_BLOCK, VOTE_UPDATE, VOTE_COMMISSION -->
-                <dt v-if="validator.name">Validator</dt>
-                <dd v-if="validator.name">
+                <dt v-if="validatorMeta.name">Validator</dt>
+                <dd v-if="validatorMeta.name">
                     <nuxt-link class="u-icon-wrap-inline link--default" :to="'/validator/' + tx.data.pubKey">
-                        <img v-if="validator.iconUrl" :src="validator.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
-                        {{ validator.name }}
+                        <img v-if="validatorMeta.iconUrl" :src="validatorMeta.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
+                        {{ validatorMeta.name }}
                     </nuxt-link>
                 </dd>
                 <dt v-if="tx.data.pubKey">Public key</dt>
