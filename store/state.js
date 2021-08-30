@@ -7,8 +7,8 @@ export default function() {
         history: [],
         // history chain detached from main chain by popstate
         detachedHistory: [],
-        /** @type Array<Validator> */
-        validatorList: [],
+        /** @type Array<ValidatorMeta> */
+        validatorMetaList: [],
         isSnackbarActive: false,
     };
 }

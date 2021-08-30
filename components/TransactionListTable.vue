@@ -204,7 +204,7 @@
                 if (!tx.data.pubKey) {
                     return;
                 }
-                const validator = this.$store.state.validatorList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
+                const validator = this.$store.state.validatorMetaList.find((validatorItem) => validatorItem.publicKey === tx.data.pubKey);
                 return validator && validator.name;
             },
         },

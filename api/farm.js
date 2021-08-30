@@ -85,7 +85,8 @@ function _getFarmList(address) {
  * @return {Promise<Array<FarmItem>>}
  */
 export function fillFarmWithPoolData(farmPromise, {skipLowLiquidity} = {}) {
-    const poolListPromise = getPoolList({limit: 1000});
+    // get default pool list to share request with index pool list, anyway first 50 pools should be enough
+    const poolListPromise = getPoolList(/*{limit: 1000}*/);
 
     return Promise.all([farmPromise, poolListPromise])
         .then(([farmList, poolListInfo]) => {
