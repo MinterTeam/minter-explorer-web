@@ -30,6 +30,7 @@ const explorer = instance;
  */
 
 const statusCache = new Cache({maxAge: 5 * 1000});
+
 /**
  * @return {Promise<Status>}
  */
@@ -122,13 +123,6 @@ function getPastOrCurrentBlockInfo(height) {
         });
 }
 
-
-/**
- * @typedef {Object} TransactionListInfo
- * @property {Array<Transaction>} data
- * @property {PaginationMeta} meta
- */
-
 /**
  * @param {Object} [params]
  * @param {number} [params.page]
@@ -209,11 +203,29 @@ export function getTransactionChart() {
  */
 export async function getBalance(address) {
     const response = await explorer.get(`addresses/${address}?with_sum=true`);
-    const data = response.data.data;
-    data.balances = await prepareBalance(data.balances);
-    return data;
+    response.data.data.balances = await prepareBalance(response.data.data.balances);
+    return response.data.data;
 }
 
+/**
+ * @typedef {Object} BalanceData
+ * @property {string} totalBalanceSum
+ * @property {string} totalBalanceSumUsd
+ * @property {Array<BalanceItem>} balances
+ */
+
+/**
+ * @typedef {Object} BalanceItem
+ * @property {string|number} amount
+ * @property {string|number} bipAmount
+ * @property {Coin} coin
+ */
+
+
+/**
+ * @param {Array<BalanceItem>} balanceList
+ * @return {Promise<Array<BalanceItem>>}
+ */
 export async function prepareBalance(balanceList) {
     balanceList = await markVerified(Promise.resolve(balanceList), 'balance');
 
@@ -249,7 +261,7 @@ export async function prepareBalance(balanceList) {
  *
  * @param {Promise} coinListPromise
  * @param {('coin','balance')} itemType
- * @return {Promise<Array<CoinItem>|Array<BalanceItem>>}
+ * @return {Promise<Array<Coin>|Array<BalanceItem>>}
  */
 function markVerified(coinListPromise, itemType = 'coin') {
     const hubCoinListPromise = _getOracleCoinList()
@@ -281,7 +293,6 @@ function markVerified(coinListPromise, itemType = 'coin') {
 }
 
 /**
- *
  * @param {string} address
  * @param {Object} [params]
  * @param {number} [params.page]
@@ -599,44 +610,6 @@ export function getCoinList({skipMeta} = {}) {
  */
 
 /**
- * @typedef {Object} Pool
- * @property {Coin} coin0
- * @property {Coin} coin1
- * @property {number|string} amount0
- * @property {number|string} amount1
- * @property {number|string} liquidity
- * @property {number|string} liquidityBip
- * @property {string} token
- * @property {number|string} tradeVolumeBip1D
- */
-
-/**
- * @typedef {Object} PoolProvider
- * @property {string} address
- * @property {Coin} coin0
- * @property {Coin} coin1
- * @property {number|string} amount0
- * @property {number|string} amount1
- * @property {number|string} liquidity
- * @property {number|string} liquidityBip
- * @property {number|string} liquidityShare
- * @property {string} token
- */
-
-/**
- * @typedef {Object} PoolProviderListInfo
- * @property {Array<PoolProvider>} data
- * @property {PaginationMeta} meta
- */
-
-/**
- * @typedef {Object} ProviderPoolListInfo
- * @property {Array<PoolProvider>} data
- * @property {PaginationMeta} meta
- */
-
-
-/**
  * @param {Object} [params]
  * @param {string|number} [params.coin] - search by coin
  * @param {string} [params.provider] - search by Mx address
@@ -653,8 +626,8 @@ export function getPoolList(params) {
 }
 
 /**
- * @param {string} coin0
- * @param {string} coin1
+ * @param {string|number} coin0
+ * @param {string|number} coin1
  * @return {Promise<Pool>}
  */
 export function getPool(coin0, coin1) {
@@ -677,8 +650,8 @@ export function getPoolByToken(symbol) {
 
 /**
  *
- * @param {string} coin0
- * @param {string} coin1
+ * @param {string|number} coin0
+ * @param {string|number} coin1
  * @param {Object} [params]
  * @param {number} [params.page]
  * @param {number} [params.limit]
@@ -690,8 +663,8 @@ export function getPoolTransactionList(coin0, coin1, params) {
 }
 
 /**
- * @param {string} coin0
- * @param {string} coin1
+ * @param {string|number} coin0
+ * @param {string|number} coin1
  * @param {Object} [params]
  * @param {number} [params.page]
  * @param {number} [params.limit]
@@ -706,8 +679,14 @@ export function getPoolProviderList(coin0, coin1, params) {
 }
 
 /**
- * @param {string} coin0
- * @param {string} coin1
+ * @typedef {Object} PoolProviderListInfo
+ * @property {Array<PoolProvider>} data
+ * @property {PaginationMeta} meta
+ */
+
+/**
+ * @param {string|number} coin0
+ * @param {string|number} coin1
  * @param {string} address
  * @return {Promise<PoolProvider>}
  */
@@ -733,6 +712,12 @@ export function getProviderPoolList(address, params) {
         .then((response) => response.data);
 }
 
+/**
+ * @typedef {Object} ProviderPoolListInfo
+ * @property {Array<PoolProvider>} data
+ * @property {PaginationMeta} meta
+ */
+
 
 /**
  * @param {number|string} id
@@ -757,11 +742,6 @@ export function getCoinBySymbol(symbol) {
         });
 }
 
-// export function getWebSocketConnectData() {
-//     return explorer.get('settings/get-ws-data')
-//         .then((response) => response.data.data);
-// }
-
 /**
  * @typedef {Object} Block
  * @property {number} height
@@ -774,19 +754,6 @@ export function getCoinBySymbol(symbol) {
  * @property {string} timestamp
  * @property {number} validatorsCount
  * @property {Array<ValidatorListItem>} [validators]
- */
-
-/**
- * @typedef {Object} BalanceData
- * @property {string} totalBalanceSum
- * @property {string} totalBalanceSumUsd
- * @property {Array<BalanceItem>} balances
- */
-
-/**
- * @typedef {Object} BalanceItem
- * @property {string|number} amount
- * @property {Coin} coin
  */
 
 /**
@@ -828,12 +795,39 @@ export function getCoinBySymbol(symbol) {
  * @property {string|number} part
  * @property {number} commission
  * @property {number} delegatorCount
-
  * @property {Array<{coin: Coin, value: string, address: string}>} delegatorList
  */
 
+/**
+ * @typedef {Object} Pool
+ * @property {Coin} coin0
+ * @property {Coin} coin1
+ * @property {number|string} amount0
+ * @property {number|string} amount1
+ * @property {number|string} liquidity
+ * @property {number|string} liquidityBip
+ * @property {string} token
+ * @property {number|string} tradeVolumeBip1D
+ */
 
+/**
+ * @typedef {Object} PoolProvider
+ * @property {string} address
+ * @property {Coin} coin0
+ * @property {Coin} coin1
+ * @property {number|string} amount0
+ * @property {number|string} amount1
+ * @property {number|string} liquidity
+ * @property {number|string} liquidityBip
+ * @property {number|string} liquidityShare
+ * @property {string} token
+ */
 
+/**
+ * @typedef {Object} TransactionListInfo
+ * @property {Array<Transaction>} data
+ * @property {PaginationMeta} meta
+ */
 
 /**
  * @typedef {Object} Transaction
@@ -954,18 +948,28 @@ export function getCoinBySymbol(symbol) {
  * @typedef {Object} Coin
  * @property {number} id
  * @property {string} symbol
+ * @property {CoinType} type
  */
 
 /**
  * @typedef {Object} CoinInfo
  * @property {number} id
+ * @property {string} symbol
+ * @property {CoinType} type
  * @property {number} crr
  * @property {number|string} volume
  * @property {number|string} reserveBalance
- * @property {string} name
- * @property {string} symbol
  * @property {number|string} maxSupply
+ * @property {boolean} mintable
+ * @property {boolean} burnable
+ * @property {string} name
  * @property {string|null} ownerAddress
+ * @property {boolean} [verified] - filled from hub api
+ * @property {boolean} [icon] - filled from chainik app
+ */
+
+/**
+ * @typedef {('coin'|'token'|'pool_token')} CoinType
  */
 
 /**
@@ -976,5 +980,4 @@ export function getCoinBySymbol(symbol) {
  * @property {number} total
  * @property {string} path
  */
-
 
