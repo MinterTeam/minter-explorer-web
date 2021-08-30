@@ -1,10 +1,10 @@
-import {COIN_NAME} from '~/assets/variables';
+import {BASE_COIN} from '~/assets/variables.js';
 
 export default {
     COIN_NAME() {
-        return COIN_NAME;
+        return BASE_COIN;
     },
     BASE_COIN() {
-        return COIN_NAME;
+        return BASE_COIN;
     },
 };

@@ -432,7 +432,7 @@ export function getAddressRewardChart(address, type = REWARD_CHART_TYPES.MONTH) 
 
 /**
  * @param {string} publicKey
- * @return {Promise<ValidatorFull>}
+ * @return {Promise<Validator>}
  */
 export function getValidator(publicKey) {
     return explorer.get(`validators/${publicKey}`)
@@ -444,6 +444,14 @@ export function getValidator(publicKey) {
  */
 export function getValidatorList() {
     return explorer.get(`validators`)
+        .then((response) => response.data.data);
+}
+
+/**
+ * @return {Promise<Array<ValidatorMeta>>}
+ */
+export function getValidatorMetaList() {
+    return explorer.get(`validators/meta`)
         .then((response) => response.data.data);
 }
 
@@ -804,7 +812,7 @@ export function getCoinBySymbol(symbol) {
  */
 
 /**
- * @typedef {Object} Validator
+ * @typedef {Object} ValidatorMeta
  * @property {string} publicKey
  * @property {number} status
  * @property {string} name - meta name
@@ -814,7 +822,7 @@ export function getCoinBySymbol(symbol) {
  */
 
 /**
- * @typedef {Validator} ValidatorFull
+ * @typedef {ValidatorMeta} Validator
  * @property {string|number} stake
  * @property {string|number} minStake
  * @property {string|number} part
@@ -908,7 +916,7 @@ export function getCoinBySymbol(symbol) {
  * @property {string} timestamp
  * @property {string} role
  * @property {string} address
- * @property {Validator} validator
+ * @property {ValidatorMeta} validator
  * @property {number} amount
  */
 
@@ -917,7 +925,7 @@ export function getCoinBySymbol(symbol) {
  * @property {number} height
  * @property {string} timestamp
  * @property {string} [address]
- * @property {Validator} [validator]
+ * @property {ValidatorMeta} [validator]
  * @property {number} amount
  * @property {Coin} coin
  */
@@ -926,7 +934,7 @@ export function getCoinBySymbol(symbol) {
  * @typedef {Object} Ban
  * @property {number} height
  * @property {string} timestamp
- * @property {Validator} [validator]
+ * @property {ValidatorMeta} [validator]
  */
 
 /**
