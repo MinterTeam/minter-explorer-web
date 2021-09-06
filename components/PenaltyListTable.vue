@@ -10,7 +10,7 @@
             TableLink,
         },
         props: {
-            /** @type Array<Reward|Slash> */
+            /** @type Array<Ban|Slash> */
             dataList: {
                 type: Array,
                 required: true,
@@ -67,20 +67,23 @@
                 </td>
                 <!-- event -->
                 <td>
-                    <span style="margin-right: 4px;">
-                        {{ dataItem.type === 'ban' ? 'Ban' : 'Slash' }}
-                    </span>
+                    {{ dataItem.type === 'ban' ? 'Ban' : 'Slash' }}
+                    <template v-if="dataItem.toBlockId">
+                        until {{ dataItem.toBlockId }}
+                    </template>
 
                     <TableLink
                         v-if="dataItem.validator"
                         :link-text="getLabel(dataItem)"
                         :link-path="'/validator/' + dataItem.validator.publicKey"
                         :should-not-shorten="!!dataItem.validator.name"
+                        style="margin-left: 4px;"
                     />
                     <TableLink
                         v-else-if="dataItem.address"
                         :link-text="dataItem.address"
                         :link-path="'/address/' + dataItem.address"
+                        style="margin-left: 4px;"
                     />
 
                     <span v-if="dataItem.amount">
