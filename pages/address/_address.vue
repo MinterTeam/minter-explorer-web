@@ -13,7 +13,8 @@
     import TransactionListTable from '~/components/TransactionListTable';
     import PoolProviderList from '@/components/PoolProviderList.vue';
     import StakeListTable from '~/components/StakeListTable';
-    import RewardSlashListTable from '~/components/RewardSlashListTable';
+    import RewardListTable from '~/components/RewardListTable.vue';
+    import PenaltyListTable from '~/components/PenaltyListTable.vue';
     import UnbondListTable from '~/components/UnbondListTable';
     import RewardChart from '~/components/RewardChart';
     import BackButton from '~/components/BackButton';
@@ -39,7 +40,8 @@
             TransactionListTable,
             PoolProviderList,
             StakeListTable,
-            RewardSlashListTable,
+            RewardListTable,
+            PenaltyListTable,
             UnbondListTable,
             RewardChart,
             BackButton,
@@ -464,13 +466,15 @@
             />
             <!-- Delegation -->
             <StakeListTable :stake-list="stakeList" stake-item-type="validator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
-            <RewardSlashListTable :data-list="rewardList" data-type="reward" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
-            <RewardSlashListTable :data-list="slashList" data-type="slash" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
+            <RewardListTable :data-list="rewardList" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
+            <PenaltyListTable :data-list="slashList" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
             <UnbondListTable :data-list="unbondList" :is-loading="isUnbondListLoading" v-if="activeTab === $options.TAB_TYPES.UNBOND"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
         <!-- Delegation Reward Chard-->
-        <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
+        <keep-alive>
+            <RewardChart v-if="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
+        </keep-alive>
 
 
         <Modal class="qr-modal"

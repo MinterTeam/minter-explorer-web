@@ -53,7 +53,7 @@ export const TAB_TYPES = {
     TX: 'tx',
     STAKE: 'stake',
     REWARD: 'reward',
-    SLASH: 'slash',
+    SLASH: 'penalty',
     UNBOND: 'unbond',
     PROVIDER: 'provider',
 };
