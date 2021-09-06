@@ -13,7 +13,10 @@ export const BASE_COIN = NETWORK === MAINNET ? 'BIP' : 'MNT';
  */
 export const COIN_NAME = BASE_COIN;
 export const CHAIN_ID = NETWORK === MAINNET ? 1 : 2;
-export const UNBOND_PERIOD = NETWORK === MAINNET ? 518400 : 518400;
+// @see https://github.com/MinterTeam/minter-go-node/blob/aa9eef308ae192cd5d899d4f0c5b6be3d1b04695/coreV2/types/constants.go#L21
+export const UNBOND_PERIOD = NETWORK === MAINNET ? 518400 : 2920;
+// @see https://github.com/MinterTeam/minter-go-node/blob/aa9eef308ae192cd5d899d4f0c5b6be3d1b04695/coreV2/types/constants.go#L32
+export const JAIL_PERIOD = NETWORK === MAINNET ? 8640 * 2 : 2920 * 2;
 export const MAINNET_WEB_URL = 'https://explorer.minter.network';
 export const HISTORY_WEB_URL = 'https://v1-history.explorer.minter.network';
 export const EXPLORER_API_URL = process.env.APP_EXPLORER_API_URL;

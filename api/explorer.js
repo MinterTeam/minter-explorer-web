@@ -928,6 +928,7 @@ export function getCoinBySymbol(symbol) {
  * @typedef {Object} Ban
  * @property {number} height
  * @property {string} timestamp
+ * @property {number} toBlockId
  * @property {ValidatorMeta} [validator]
  */
 

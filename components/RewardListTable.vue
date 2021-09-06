@@ -1,9 +1,8 @@
 <script>
-    import {getTimeMinutes, getDate, getTimeZone, prettyPrecise} from '~/assets/utils';
+    import {getDate, getTimeZone, prettyPrecise} from '~/assets/utils.js';
     import TableLink from '~/components/TableLink';
 
     export default {
-        getTimeMinutes,
         getDate,
         getTimeZone,
         prettyPrecise,
@@ -11,7 +10,7 @@
             TableLink,
         },
         props: {
-            /** @type Array<Reward|Slash> */
+            /** @type Array<Reward> */
             dataList: {
                 type: Array,
                 required: true,
