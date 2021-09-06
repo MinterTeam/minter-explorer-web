@@ -8,7 +8,7 @@
     import Amount from '@/components/common/Amount.vue';
     import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
-    import RewardSlashListTable from '~/components/RewardSlashListTable.vue';
+    import PenaltyListTable from '~/components/PenaltyListTable.vue';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
@@ -32,7 +32,7 @@
         components: {
             Amount,
             StakeListTable,
-            RewardSlashListTable,
+            PenaltyListTable,
             TransactionListTable,
             BackButton,
             Pagination,
@@ -56,17 +56,17 @@
 
             const validatorPromise = getValidator(params.pubKey);
             const stakeListPromise = getValidatorStakeList(params.pubKey, activeTab === TAB_TYPES.STAKE ? query : undefined);
-            const slashListPromise = getValidatorPenaltyList(params.pubKey, activeTab === TAB_TYPES.SLASH ? query : undefined);
+            const penaltyListPromise = getValidatorPenaltyList(params.pubKey, activeTab === TAB_TYPES.SLASH ? query : undefined);
             const txListPromise = getValidatorTransactionList(params.pubKey, activeTab === TAB_TYPES.TX ? query : undefined);
 
-            return Promise.all([validatorPromise, stakeListPromise, slashListPromise, txListPromise])
-                .then(([validator, stakeListInfo, slashListInfo, txListInfo]) => {
+            return Promise.all([validatorPromise, stakeListPromise, penaltyListPromise, txListPromise])
+                .then(([validator, stakeListInfo, penaltyListInfo, txListInfo]) => {
                     return {
                         validator,
                         stakeList: stakeListInfo.data,
                         stakePaginationInfo: stakeListInfo.meta,
-                        slashList: slashListInfo.data,
-                        slashPaginationInfo: slashListInfo.meta,
+                        penaltyList: penaltyListInfo.data,
+                        penaltyPaginationInfo: penaltyListInfo.meta,
                         txList: txListInfo.data,
                         txPaginationInfo: txListInfo.meta,
                     };
@@ -92,15 +92,15 @@
         },
         data() {
             return {
-                /** @type ValidatorFull|null */
+                /** @type Validator|null */
                 validator: null,
                 storedTabPages: {},
                 stakeList: [],
                 stakePaginationInfo: {},
                 isStakeListLoading: false,
-                slashList: [],
-                slashPaginationInfo: {},
-                isSlashListLoading: false,
+                penaltyList: [],
+                penaltyPaginationInfo: {},
+                isPenaltyListLoading: false,
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: false,
@@ -124,7 +124,7 @@
                             this.fetchStakes();
                         }
                         if (this.activeTab === TAB_TYPES.SLASH) {
-                            this.fetchSlashes();
+                            this.fetchPenalties();
                         }
                     }
                 },
@@ -142,7 +142,7 @@
                     return this.stakePaginationInfo;
                 }
                 if (this.activeTab === TAB_TYPES.SLASH) {
-                    return this.slashPaginationInfo;
+                    return this.penaltyPaginationInfo;
                 }
                 return false;
             },
@@ -184,16 +184,16 @@
                         this.isStakeListLoading = false;
                     });
             },
-            fetchSlashes() {
-                this.isSlashListLoading = true;
+            fetchPenalties() {
+                this.isPenaltyListLoading = true;
                 getValidatorPenaltyList(this.$route.params.pubKey, this.$route.query)
-                    .then((slashListInfo) => {
-                        this.slashList = slashListInfo.data;
-                        this.slashPaginationInfo = slashListInfo.meta;
-                        this.isSlashListLoading = false;
+                    .then((penaltyListInfo) => {
+                        this.penaltyList = penaltyListInfo.data;
+                        this.penaltyPaginationInfo = penaltyListInfo.meta;
+                        this.isPenaltyListLoading = false;
                     })
                     .catch(() => {
-                        this.isSlashListLoading = false;
+                        this.isPenaltyListLoading = false;
                     });
             },
             fetchTxs() {
@@ -294,8 +294,8 @@
             <TransactionListTable :tx-list="txList" :current-validator="$route.params.pubKey" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
             <!-- Delegation -->
             <StakeListTable :stake-list="stakeList" stake-item-type="delegator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
-            <!-- Slashes -->
-            <RewardSlashListTable :data-list="slashList" data-type="slash" item-type="address" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
+            <!-- Penalties -->
+            <PenaltyListTable :data-list="penaltyList" item-type="address" :is-loading="isPenaltyListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
 
