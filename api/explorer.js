@@ -305,6 +305,19 @@ export function getAddressTransactionList(address, params) {
 }
 
 /**
+ * Get limit order list by owner address
+ * @param {string} address
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<LimitOrderListInfo>}
+ */
+export function getAddressOrderList(address, params) {
+    return explorer.get(`addresses/${address}/orders`, {params})
+        .then((response) => response.data);
+}
+
+/**
  * @param {string} address
  * @return {Promise<Array<StakeItem>>}
  */
@@ -663,6 +676,20 @@ export function getPoolTransactionList(coin0, coin1, params) {
 }
 
 /**
+ * Get limit order list by pool
+ * @param {string|number} coin0
+ * @param {string|number} coin1
+ * @param {Object} [params]
+ * @param {number} [params.page]
+ * @param {number} [params.limit]
+ * @return {Promise<LimitOrderListInfo>}
+ */
+export function getPoolOrderList(coin0, coin1, params) {
+    return explorer.get(`pools/coins/${coin0}/${coin1}/orders`, {params})
+        .then((response) => response.data);
+}
+
+/**
  * @param {string|number} coin0
  * @param {string|number} coin1
  * @param {Object} [params]
@@ -824,6 +851,24 @@ export function getCoinBySymbol(symbol) {
  */
 
 /**
+ * @typedef {Object} LimitOrderListInfo
+ * @property {Array<LimitOrder>} data
+ * @property {PaginationMeta} meta
+ */
+
+/**
+ * @typedef {Object} LimitOrder
+ * @property {number} id
+ * @property {number} height - created at block
+ * @property {string} address - owner
+ * @property {number} poolId
+ * @property {Coin} coinToSell
+ * @property {Coin} coinToBuy
+ * @property {string|number} coinToSellVolume
+ * @property {string|number} coinToBuyVolume
+ */
+
+/**
  * @typedef {Object} TransactionListInfo
  * @property {Array<Transaction>} data
  * @property {PaginationMeta} meta
@@ -931,6 +976,7 @@ export function getCoinBySymbol(symbol) {
  * @typedef {Object} Ban
  * @property {number} height
  * @property {string} timestamp
+ * @property {number} toBlockId
  * @property {ValidatorMeta} [validator]
  */
 

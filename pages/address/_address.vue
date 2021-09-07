@@ -1,6 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
-    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList, getPoolList, getProviderPoolList} from '~/api/explorer.js';
+    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList, getPoolList, getProviderPoolList, getAddressOrderList} from '~/api/explorer.js';
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -12,8 +12,10 @@
     import Modal from '~/components/common/Modal';
     import TransactionListTable from '~/components/TransactionListTable';
     import PoolProviderList from '@/components/PoolProviderList.vue';
+    import PoolOrderList from '@/components/PoolOrderList.vue';
     import StakeListTable from '~/components/StakeListTable';
-    import RewardSlashListTable from '~/components/RewardSlashListTable';
+    import RewardListTable from '~/components/RewardListTable.vue';
+    import PenaltyListTable from '~/components/PenaltyListTable.vue';
     import UnbondListTable from '~/components/UnbondListTable';
     import RewardChart from '~/components/RewardChart';
     import BackButton from '~/components/BackButton';
@@ -38,8 +40,10 @@
             Modal,
             TransactionListTable,
             PoolProviderList,
+            PoolOrderList,
             StakeListTable,
-            RewardSlashListTable,
+            RewardListTable,
+            PenaltyListTable,
             UnbondListTable,
             RewardChart,
             BackButton,
@@ -112,6 +116,11 @@
                 poolPaginationInfo: {},
                 isPoolListLoading: false,
                 isPoolListLoaded: false,
+                // limit orders
+                orderList: [],
+                orderPaginationInfo: {},
+                isOrderListLoading: false,
+                isOrderListLoaded: false,
                 // stakes
                 stakeList: [],
                 isStakeListLoading: false,
@@ -155,6 +164,9 @@
                 }
                 if (this.activeTab === TAB_TYPES.PROVIDER) {
                     return this.providerPaginationInfo;
+                }
+                if (this.activeTab === TAB_TYPES.ORDER) {
+                    return this.orderPaginationInfo;
                 }
                 if (this.activeTab === TAB_TYPES.REWARD) {
                     return this.rewardPaginationInfo;
@@ -222,6 +234,9 @@
                     if (this.activeTab === TAB_TYPES.PROVIDER && !this.isPoolListLoaded) {
                         this.fetchProviderList();
                     }
+                    if (this.activeTab === TAB_TYPES.ORDER && !this.isOrderListLoaded) {
+                        this.fetchLimitOrderList();
+                    }
                     if (this.activeTab === TAB_TYPES.STAKE && !this.isStakeListLoaded) {
                         this.fetchStakes();
                     }
@@ -244,6 +259,9 @@
                     }
                     if (this.activeTab === TAB_TYPES.PROVIDER) {
                         this.fetchProviderList();
+                    }
+                    if (this.activeTab === TAB_TYPES.ORDER) {
+                        this.fetchLimitOrderList();
                     }
                     if (this.activeTab === TAB_TYPES.REWARD) {
                         this.fetchRewards();
@@ -294,6 +312,19 @@
                     })
                     .catch(() => {
                         this.isPoolListLoading = false;
+                    });
+            },
+            fetchLimitOrderList() {
+                this.isOrderListLoading = true;
+                getAddressOrderList(this.$route.params.address, this.$route.query)
+                    .then((orderListInfo) => {
+                        this.orderList = orderListInfo.data;
+                        this.orderPaginationInfo = orderListInfo.meta;
+                        this.isOrderListLoading = false;
+                        this.isOrderListLoaded = true;
+                    })
+                    .catch(() => {
+                        this.isOrderListLoading = false;
                     });
             },
             fetchStakes() {
@@ -425,6 +456,13 @@
                     Pools
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.ORDER}"
+                        @click="switchTab($options.TAB_TYPES.ORDER)"
+                >
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    Orders
+                </button>
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.STAKE}"
                         @click="switchTab($options.TAB_TYPES.STAKE)"
                 >
@@ -462,15 +500,24 @@
                 item-type="pool"
                 :is-loading="isPoolListLoading"
             />
+            <!-- Limit orders -->
+            <PoolOrderList
+                v-if="activeTab === $options.TAB_TYPES.ORDER"
+                :order-list="orderList"
+                item-type="pool"
+                :is-loading="isOrderListLoading"
+            />
             <!-- Delegation -->
             <StakeListTable :stake-list="stakeList" stake-item-type="validator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
-            <RewardSlashListTable :data-list="rewardList" data-type="reward" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
-            <RewardSlashListTable :data-list="slashList" data-type="slash" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
+            <RewardListTable :data-list="rewardList" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
+            <PenaltyListTable :data-list="slashList" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
             <UnbondListTable :data-list="unbondList" :is-loading="isUnbondListLoading" v-if="activeTab === $options.TAB_TYPES.UNBOND"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
         <!-- Delegation Reward Chard-->
-        <RewardChart v-show="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
+        <keep-alive>
+            <RewardChart v-if="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
+        </keep-alive>
 
 
         <Modal class="qr-modal"
