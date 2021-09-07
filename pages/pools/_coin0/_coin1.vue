@@ -1,12 +1,13 @@
 <script>
 import Big from 'big.js';
-import {getPoolTransactionList, getPool, getPoolProviderList} from "@/api/explorer.js";
+import {getPoolTransactionList, getPool, getPoolProviderList, getPoolOrderList} from "@/api/explorer.js";
 import {getApy, pretty, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';
 import {TAB_TYPES} from '~/assets/variables.js';
 import Amount from '@/components/common/Amount.vue';
 import TransactionListTable from '~/components/TransactionListTable';
+import PoolOrderList from '@/components/PoolOrderList.vue';
 import PoolProviderList from '@/components/PoolProviderList.vue';
 import BackButton from '@/components/BackButton.vue';
 import Pagination from "@/components/Pagination.vue";
@@ -25,6 +26,7 @@ export default {
     components: {
         Amount,
         TransactionListTable,
+        PoolOrderList,
         PoolProviderList,
         BackButton,
         Pagination,
@@ -72,14 +74,21 @@ export default {
             /** @type Pool */
             pool: {},
             storedTabPages: {},
+            // pool providers
             providerList: [],
             providerPaginationInfo: {},
             isProviderListLoading: false,
             isProviderListLoaded: false,
+            // txs
             txList: [],
             txPaginationInfo: {},
             isTxListLoading: false,
             isTxListLoaded: false,
+            // limit orders
+            orderList: [],
+            orderPaginationInfo: {},
+            isOrderListLoading: false,
+            isOrderListLoaded: false,
         };
     },
     watch: {
@@ -110,6 +119,9 @@ export default {
         activePaginationInfo() {
             if (this.activeTab === TAB_TYPES.TX) {
                 return this.txPaginationInfo;
+            }
+            if (this.activeTab === TAB_TYPES.ORDER) {
+                return this.orderPaginationInfo;
             }
             if (this.activeTab === TAB_TYPES.PROVIDER) {
                 return this.providerPaginationInfo;
@@ -147,6 +159,19 @@ export default {
                 })
                 .catch(() => {
                     this.isTxListLoading = false;
+                });
+        },
+        fetchLimitOrderList() {
+            this.isOrderListLoading = true;
+            getPoolOrderList(this.$route.params.coin0, this.$route.params.coin1, this.$route.query)
+                .then((orderListInfo) => {
+                    this.orderList = orderListInfo.data;
+                    this.orderPaginationInfo = orderListInfo.meta;
+                    this.isOrderListLoading = false;
+                    this.isOrderListLoaded = true;
+                })
+                .catch(() => {
+                    this.isOrderListLoading = false;
                 });
         },
         switchTab(newTab) {
@@ -194,6 +219,9 @@ export default {
                 if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
                     this.fetchTxs();
                 }
+                if (this.activeTab === TAB_TYPES.ORDER && !this.isOrderListLoaded) {
+                    this.fetchLimitOrderList();
+                }
                 if (this.activeTab === TAB_TYPES.PROVIDER && !this.isProviderListLoaded) {
                     this.fetchProviderList();
                 }
@@ -204,6 +232,9 @@ export default {
             } else if (newTab === oldTab && newPage !== oldPage) {
                 if (this.activeTab === TAB_TYPES.TX) {
                     this.fetchTxs();
+                }
+                if (this.activeTab === TAB_TYPES.ORDER) {
+                    this.fetchLimitOrderList();
                 }
                 if (this.activeTab === TAB_TYPES.PROVIDER) {
                     this.fetchProviderList();
@@ -297,6 +328,14 @@ function calculateTradeRate(amountIn, amountOut) {
                     <span class="u-hidden-medium-up">Txs</span>
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.ORDER}"
+                        @click="switchTab($options.TAB_TYPES.ORDER)"
+                >
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    <span class="u-hidden-medium-down">Limit orders</span>
+                    <span class="u-hidden-medium-up">Orders</span>
+                </button>
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.PROVIDER}"
                         @click="switchTab($options.TAB_TYPES.PROVIDER)"
                 >
@@ -310,6 +349,13 @@ function calculateTradeRate(amountIn, amountOut) {
                 :tx-list="txList"
                 :current-address="$route.params.address"
                 :is-loading="isTxListLoading"
+            />
+            <!-- Limit orders -->
+            <PoolOrderList
+                v-if="activeTab === $options.TAB_TYPES.ORDER"
+                :order-list="orderList"
+                item-type="address"
+                :is-loading="isOrderListLoading"
             />
             <!-- Providers -->
             <PoolProviderList
