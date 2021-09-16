@@ -1,6 +1,5 @@
 <script>
-import {getApy, pretty} from '~/assets/utils.js';
-import Amount from '~/components/common/Amount.vue';
+import {pretty} from '~/assets/utils.js';
 import TableLink from '@/components/TableLink.vue';
 
 const ITEM_TYPE = {
@@ -11,7 +10,6 @@ const ITEM_TYPE = {
 export default {
     ITEM_TYPE,
     components: {
-        Amount,
         TableLink,
     },
     props: {
@@ -38,16 +36,26 @@ export default {
             return this.orderList.map((order) => {
                 return {
                     ...order,
-                    coinToSellPrice: order.coinToBuyVolume / order.coinToSellVolume,
-                    coinToBuyPrice: order.coinToSellVolume / order.coinToBuyVolume,
+                    coinToSellPrice: order.initialCoinToBuyVolume / order.initialCoinToSellVolume,
+                    coinToBuyPrice: order.initialCoinToSellVolume / order.initialCoinToBuyVolume,
                 };
             });
         },
     },
     methods: {
         pretty,
+        formatStatus(status) {
+            status = status.replaceAll('_', ' ');
+            return status[0].toUpperCase() + status.substring(1);
+        },
         getCoinIconUrl(coin) {
             return this.$store.getters['explorer/getCoinIcon'](coin);
+        },
+        shouldShowInitial(volume, initialVolume) {
+            if (volume <= 0) {
+                return false;
+            }
+            return volume !== initialVolume;
         },
     },
 };
@@ -71,6 +79,7 @@ export default {
                 <th>Want to buy</th>
                 <th>Sell price</th>
                 <th>Buy price</th>
+                <th>Status</th>
             </tr>
             </thead>
             <tbody>
@@ -83,10 +92,22 @@ export default {
                     />
                 </td>
                 <td>
-                    <Amount :amount="order.coinToSellVolume" :coin="order.coinToSell.symbol" :disable-usd="true"/>
+                    <span class="u-fw-500">
+                        {{ pretty(order.coinToSellVolume > 0 ? order.coinToSellVolume : order.initialCoinToSellVolume) }}
+                    </span>
+                    <span class="u-text-muted" v-if="shouldShowInitial(order.coinToSellVolume, order.initialCoinToSellVolume)">
+                        ({{ pretty(order.initialCoinToSellVolume) }})
+                    </span>
+                    {{ order.coinToSell.symbol }}
                 </td>
                 <td>
-                    <Amount :amount="order.coinToBuyVolume" :coin="order.coinToBuy.symbol" :disable-usd="true"/>
+                    <span class="u-fw-500">
+                        {{ pretty(order.coinToBuyVolume > 0 ? order.coinToBuyVolume : order.initialCoinToBuyVolume) }}
+                    </span>
+                    <span class="u-text-muted" v-if="shouldShowInitial(order.coinToBuyVolume, order.initialCoinToBuyVolume)">
+                        ({{ pretty(order.initialCoinToSellVolume) }})
+                    </span>
+                    {{ order.coinToBuy.symbol }}
                 </td>
                 <td>
                     {{ pretty(order.coinToSellPrice) }} {{ order.coinToBuy.symbol }}
@@ -94,6 +115,7 @@ export default {
                 <td>
                     {{ pretty(order.coinToBuyPrice) }} {{ order.coinToSell.symbol }}
                 </td>
+                <td :class="order.status === 'active' ? 'u-text-success u-fw-500' : ''">{{ formatStatus(order.status) }}</td>
             </tr>
             </tbody>
         </table>

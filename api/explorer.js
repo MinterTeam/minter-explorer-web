@@ -682,6 +682,7 @@ export function getPoolTransactionList(coin0, coin1, params) {
  * @param {Object} [params]
  * @param {number} [params.page]
  * @param {number} [params.limit]
+ * @param {string} [params.type] - sell or buy
  * @return {Promise<LimitOrderListInfo>}
  */
 export function getPoolOrderList(coin0, coin1, params) {
@@ -866,6 +867,9 @@ export function getCoinBySymbol(symbol) {
  * @property {Coin} coinToBuy
  * @property {string|number} coinToSellVolume
  * @property {string|number} coinToBuyVolume
+ * @property {string|number} initialCoinToSellVolume
+ * @property {string|number} initialCoinToBuyVolume
+ * @property {string} status
  */
 
 /**
