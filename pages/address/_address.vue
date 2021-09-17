@@ -459,7 +459,7 @@
                         :class="{'is-active': activeTab === $options.TAB_TYPES.ORDER}"
                         @click="switchTab($options.TAB_TYPES.ORDER)"
                 >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-limit-order.svg" width="40" height="40" alt="" role="presentation">
                     Orders
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"

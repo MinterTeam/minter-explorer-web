@@ -33,13 +33,7 @@ export default {
     },
     computed: {
         orderListFormatted() {
-            return this.orderList.map((order) => {
-                return {
-                    ...order,
-                    coinToSellPrice: order.initialCoinToBuyVolume / order.initialCoinToSellVolume,
-                    coinToBuyPrice: order.initialCoinToSellVolume / order.initialCoinToBuyVolume,
-                };
-            });
+            return this.orderList;
         },
     },
     methods: {
