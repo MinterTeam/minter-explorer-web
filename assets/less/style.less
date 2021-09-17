@@ -252,10 +252,20 @@
 .pool-pair__figure--farming {}
 .pool-pair__icon {border-radius: 50%;}
 .pool-pair__icon1 {margin-top: 8px; margin-left: -8px;}
+.pool-pair__button {font-size: 0; margin-left: 16px;}
 @media (min-width: @breakpoint-medium-up) {
     .pool-pair__figure {margin-top: -4px; margin-bottom: -4px;}
     .pool-pair__figure--farming {margin-top: 0; margin-bottom: 0;}
 }
+
+
+//.order-book {width: min-content; white-space: nowrap;}
+.order-book__item {display: flex; justify-content: space-between; align-items: center;}
+.order-book__item--head {font-weight: 500; /*background: #f6f6f6;*/ padding-bottom: 6px;}
+.order-book__cell {
+    &+& {padding-left: 16px; text-align: right;}
+}
+.order-book__price {font-size: 20px;}
 
 .farm__dl {margin: 0; display: flex; justify-content: space-between; flex-wrap: wrap;}
 .farm__dt, .farm__dd {

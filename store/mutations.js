@@ -1,6 +1,6 @@
 export default {
     SET_VALIDATOR_META_LIST(state, validatorList) {
-        state.validatorMetaList = validatorList;
+        state.validatorMetaList = Object.freeze(validatorList);
     },
     PUSH_HISTORY: (state, historyItem) => {
         // pushstate, clear detached chain

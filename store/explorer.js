@@ -83,10 +83,10 @@ export const mutations = {
             }
         });
 
-        state.coinList = data;
-        state.coinMap = coinMap;
-        state.coinIconMap = coinIconMap;
-        state.coinVerifiedMap = coinVerifiedMap;
+        state.coinList = Object.freeze(data);
+        state.coinMap = Object.freeze(coinMap);
+        state.coinIconMap = Object.freeze(coinIconMap);
+        state.coinVerifiedMap = Object.freeze(coinVerifiedMap);
     },
 };
 

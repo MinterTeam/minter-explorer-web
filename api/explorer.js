@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import stripZeros from 'pretty-num/src/strip-zeros';
+import Big from '~/assets/big.js';
 import {_getOracleCoinList} from '~/api/hub.js';
 import {getCoinIconList as getChainikIconList} from '~/api/chainik.js';
 import {EXPLORER_API_URL, REWARD_CHART_TYPES, BASE_COIN, TX_STATUS} from "~/assets/variables.js";
@@ -616,6 +617,9 @@ export function getCoinList({skipMeta} = {}) {
         });
 }
 
+
+const poolCache = new Cache({maxAge: 15 * 1000});
+
 /**
  * @typedef {Object} PoolListInfo
  * @property {Array<Pool>} data
@@ -633,7 +637,7 @@ export function getCoinList({skipMeta} = {}) {
 export function getPoolList(params) {
     return explorer.get('pools', {
             params,
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data);
 }
@@ -645,7 +649,7 @@ export function getPoolList(params) {
  */
 export function getPool(coin0, coin1) {
     return explorer.get(`pools/coins/${coin0}/${coin1}`, {
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data.data);
 }
@@ -656,7 +660,7 @@ export function getPool(coin0, coin1) {
  */
 export function getPoolByToken(symbol) {
     return explorer.get(`pools/token/${symbol}`, {
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data.data);
 }
@@ -671,11 +675,15 @@ export function getPoolByToken(symbol) {
  * @return {Promise<TransactionListInfo>}
  */
 export function getPoolTransactionList(coin0, coin1, params) {
-    return explorer.get(`pools/coins/${coin0}/${coin1}/transactions`, {params})
+    return explorer.get(`pools/coins/${coin0}/${coin1}/transactions`, {
+            params,
+            poolCache,
+        })
         .then((response) => response.data);
 }
 
 /**
+ * //@TODO check cache is working with query params
  * Get limit order list by pool
  * @param {string|number} coin0
  * @param {string|number} coin1
@@ -686,8 +694,21 @@ export function getPoolTransactionList(coin0, coin1, params) {
  * @return {Promise<LimitOrderListInfo>}
  */
 export function getPoolOrderList(coin0, coin1, params) {
-    return explorer.get(`pools/coins/${coin0}/${coin1}/orders`, {params})
-        .then((response) => response.data);
+    return explorer.get(`pools/coins/${coin0}/${coin1}/orders`, {
+            params,
+            poolCache,
+        })
+        .then((response) => {
+            response.data.data = response.data.data.map((order) => {
+                return {
+                    ...order,
+                    coinToSellPrice: new Big(order.initialCoinToBuyVolume).div(order.initialCoinToSellVolume).toString(),
+                    coinToBuyPrice: new Big(order.initialCoinToSellVolume).div(order.initialCoinToBuyVolume).toString(),
+                };
+            });
+
+            return response.data;
+        });
 }
 
 /**
@@ -701,7 +722,7 @@ export function getPoolOrderList(coin0, coin1, params) {
 export function getPoolProviderList(coin0, coin1, params) {
     return explorer.get(`pools/coins/${coin0}/${coin1}/providers`, {
             params,
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data);
 }
@@ -720,7 +741,7 @@ export function getPoolProviderList(coin0, coin1, params) {
  */
 export function getPoolProvider(coin0, coin1, address) {
     return explorer.get(`pools/coins/${coin0}/${coin1}/providers/${address}`, {
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data.data);
 }
@@ -735,7 +756,7 @@ export function getPoolProvider(coin0, coin1, address) {
 export function getProviderPoolList(address, params) {
     return explorer.get(`pools/providers/${address}`, {
             params,
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data);
 }
@@ -869,6 +890,8 @@ export function getCoinBySymbol(symbol) {
  * @property {string|number} coinToBuyVolume
  * @property {string|number} initialCoinToSellVolume
  * @property {string|number} initialCoinToBuyVolume
+ * @property {string|number} coinToSellPrice
+ * @property {string|number} coinToBuyPrice
  * @property {string} status
  */
 
