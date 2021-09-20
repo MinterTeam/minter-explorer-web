@@ -47,7 +47,7 @@ export default {
             if (page === 1) {
                 page = undefined;
             }
-            return getPoolOrderList(this.pool.coin0.symbol, this.pool.coin1.symbol, {type, page})
+            return getPoolOrderList(this.pool.coin0.symbol, this.pool.coin1.symbol, {type, page, status: 'active'})
                 .then((poolListInfo) => {
                     const orderList = poolListInfo.data.map((order) => sortOrder(order, this.pool.coin0.symbol));
                     if (type === TYPE_SELL) {
