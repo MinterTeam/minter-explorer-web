@@ -50,8 +50,8 @@ export function getStatus() {
 
 /**
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<BlockListInfo>}
  */
 export function getBlockList(params) {
@@ -80,8 +80,8 @@ export function getBlock(height) {
 /**
  * @param {number} height
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getBlockTransactionList(height, params) {
@@ -126,8 +126,8 @@ function getPastOrCurrentBlockInfo(height) {
 
 /**
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getTransactionList(params) {
@@ -296,8 +296,8 @@ function markVerified(coinListPromise, itemType = 'coin') {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getAddressTransactionList(address, params) {
@@ -309,13 +309,24 @@ export function getAddressTransactionList(address, params) {
  * Get limit order list by owner address
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
+ * @param {string} [params.status]
  * @return {Promise<LimitOrderListInfo>}
  */
 export function getAddressOrderList(address, params) {
     return explorer.get(`addresses/${address}/orders`, {params})
-        .then((response) => response.data);
+        .then((response) => {
+            response.data.data = response.data.data.map((order) => {
+                return {
+                    ...order,
+                    coinToSellPrice: new Big(order.initialCoinToBuyVolume).div(order.initialCoinToSellVolume).toString(),
+                    coinToBuyPrice: new Big(order.initialCoinToSellVolume).div(order.initialCoinToBuyVolume).toString(),
+                };
+            });
+
+            return response.data;
+        });
 }
 
 /**
@@ -336,8 +347,8 @@ export function getAddressStakeList(address) {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<RewardListInfo>}
  */
 export function getAddressRewardList(address, params = {}) {
@@ -350,8 +361,8 @@ export function getAddressRewardList(address, params = {}) {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<RewardListInfo>}
  */
 export function getAddressRewardAggregatedList(address, params = {}) {
@@ -375,8 +386,8 @@ export function getAddressRewardAggregatedList(address, params = {}) {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<PenaltyListInfo>}
  */
 export function getAddressPenaltyList(address, params = {}) {
@@ -483,8 +494,8 @@ export function getValidatorMetaList() {
 /**
  * @param {string} publicKey
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<StakeListInfo>}
  */
 export function getValidatorStakeList(publicKey, params = {}) {
@@ -499,8 +510,8 @@ export function getValidatorStakeList(publicKey, params = {}) {
 /**
  * @param {string} publicKey
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<PenaltyListInfo>}
  */
 export function getValidatorPenaltyList(publicKey, params = {}) {
@@ -531,8 +542,8 @@ function mergePenaltyList([slashResponse, banResponse]) {
 /**
  * @param {string} publicKey
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getValidatorTransactionList(publicKey, params) {
@@ -630,8 +641,8 @@ const poolCache = new Cache({maxAge: 15 * 1000});
  * @param {Object} [params]
  * @param {string|number} [params.coin] - search by coin
  * @param {string} [params.provider] - search by Mx address
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<PoolListInfo>}
  */
 export function getPoolList(params) {
@@ -670,8 +681,8 @@ export function getPoolByToken(symbol) {
  * @param {string|number} coin0
  * @param {string|number} coin1
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getPoolTransactionList(coin0, coin1, params) {
@@ -688,9 +699,10 @@ export function getPoolTransactionList(coin0, coin1, params) {
  * @param {string|number} coin0
  * @param {string|number} coin1
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @param {string} [params.type] - sell or buy
+ * @param {string} [params.status]
  * @return {Promise<LimitOrderListInfo>}
  */
 export function getPoolOrderList(coin0, coin1, params) {
@@ -715,8 +727,8 @@ export function getPoolOrderList(coin0, coin1, params) {
  * @param {string|number} coin0
  * @param {string|number} coin1
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<PoolProviderListInfo>}
  */
 export function getPoolProviderList(coin0, coin1, params) {
@@ -749,8 +761,8 @@ export function getPoolProvider(coin0, coin1, address) {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<ProviderPoolListInfo>}
  */
 export function getProviderPoolList(address, params) {
