@@ -1,6 +1,6 @@
 <script>
-    import Big from 'big.js';
-    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
+    import Big from '~/assets/big.js';
+    import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {getTimeDistance, pretty, shortFilter, txTypeFilter} from '~/assets/utils';
 
     export default {
@@ -129,7 +129,7 @@
                 if (this.isMultisendMultipleCoin(tx)) {
                     return '...';
                 } else {
-                    return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toFixed();
+                    return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toString();
                 }
             },
         },
