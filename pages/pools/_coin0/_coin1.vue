@@ -1,5 +1,5 @@
 <script>
-import Big from 'big.js';
+import Big from '~/assets/big.js';
 import {getPoolTransactionList, getPool, getPoolProviderList, getPoolOrderList} from "@/api/explorer.js";
 import {getApy, pretty, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
@@ -252,7 +252,7 @@ function calculateTradeRate(amountIn, amountOut) {
     if (Number(amountIn) === 0 || Number.isNaN(Number(amountIn))) {
         return 0;
     }
-    return new Big(amountOut).div(amountIn).toFixed(18);
+    return new Big(amountOut).div(amountIn).toString();
 }
 // function calculateTradeReturn(amountIn, amountOut) {
 //     return amountOut - (amountIn * amountOut / (amountIn + 1));

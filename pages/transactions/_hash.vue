@@ -1,6 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
-    import Big from 'big.js';
+    import Big from '~/assets/big.js';
     import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
@@ -13,9 +13,6 @@
     import PoolLink from '~/components/common/PoolLink.vue';
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
-
-    Big.DP = 18;
-    Big.RM = 2;
 
     const HUB_ADDRESS = HUB_MINTER_MULTISIG_ADDRESS;
 
@@ -331,7 +328,7 @@
         if (Number(amountIn) === 0 || Number.isNaN(Number(amountIn))) {
             return 0;
         }
-        return new Big(amountOut).div(amountIn).toFixed(18);
+        return new Big(amountOut).div(amountIn).toString(33);
     }
 </script>
 
@@ -399,9 +396,9 @@
                     <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToBuy" :coin="tx.data.coinToBuy.symbol" :exact="true"/>
 
                     <dt v-if="isSellType || isBuyType || isAddOrderType">Rate {{ tx.data.coinToSell.symbol }}</dt>
-                    <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :exact="false" tag="dd"/>
+                    <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :significant="true" tag="dd"/>
                     <dt v-if="isSellType || isBuyType || isAddOrderType">Rate {{ tx.data.coinToBuy.symbol }}</dt>
-                    <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin1Price" :coin="tx.data.coinToSell.symbol" :exact="false" tag="dd"/>
+                    <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin1Price" :coin="tx.data.coinToSell.symbol" :significant="true" tag="dd"/>
 
                     <dt v-if="tx.data.coins">Coins route</dt>
                     <dd v-if="tx.data.coins">
