@@ -4,14 +4,12 @@
     import BackButton from '~/components/BackButton.vue';
     import Pagination from "~/components/Pagination.vue";
     import PoolList from '@/components/PoolList.vue';
-    import PreviewFarm from '@/components/PreviewFarm.vue';
 
     export default {
         components: {
             Pagination,
             BackButton,
             PoolList,
-            PreviewFarm,
         },
         watchQuery: ['page'],
         key: (to) => to.fullPath,
@@ -56,7 +54,6 @@
 
 <template>
     <div>
-        <PreviewFarm/>
         <section class="panel u-section">
             <div class="panel__section panel__header">
                 <h1 class="panel__title panel__header-title">

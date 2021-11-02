@@ -178,7 +178,7 @@ export default {
                     Liquidity pools with {{ $route.params.symbol }}
                 </h2>
             </div>
-            <PoolList v-if="!$fetchState.pending" :pool-list="poolList"/>
+            <PoolList v-if="!$fetchState.pending" :pool-list="poolList" :coin0="$route.params.symbol"/>
             <div class="panel__section" v-else>Loading…</div>
         </section>
         <Pagination :pagination-info="paginationInfo"/>
