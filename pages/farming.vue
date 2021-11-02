@@ -15,7 +15,7 @@ export default {
         //         this.uniswapPair = pairDayData;
         //     });
 
-        const farmListPromise = fillFarmWithPoolData(getFarmList())
+        const farmListPromise = fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
             .then((farmList) => {
                 this.farmList = farmList;
             });
@@ -57,9 +57,9 @@ export default {
             })
             .sort((a, b) => {
                 // first sort by apr
-                if (b.apr - a.apr !== 0) {
-                    return b.apr - a.apr;
-                }
+                // if (b.apr - a.apr !== 0) {
+                //     return b.apr - a.apr;
+                // }
 
                 // then sort by liquidity
                 return b.liquidityBip - a.liquidityBip;

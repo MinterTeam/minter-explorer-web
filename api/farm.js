@@ -18,10 +18,13 @@ const farmCache = new Cache({maxAge: 1 * 60 * 1000});
  * @return {Promise<Array<FarmItem>>}
  */
 export function getFarmList() {
+/*
     return Promise.all([
             _getFarmList('Mxcb272d7efc6c4a3122d705100fa0032703446e3e'),
             _getFarmList('Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d'),
         ])
+*/
+    return _getFarmList()
         .then((lists) => [].concat(...lists))
         .then((farmList) => {
             let farmMap = {};
@@ -62,10 +65,11 @@ export function getFarmList() {
 }
 
 /**
+ * @param {string} [address]
  * @return {Promise<Array<FarmItem>>}
  */
 function _getFarmList(address) {
-    return instance.get(`rewarding?owner=${address}`, {
+    return instance.get('rewarding' + (address ? `?owner=${address}` : ''), {
             cache: farmCache,
         })
         .then((response) => {
@@ -111,15 +115,15 @@ export function fillFarmWithPoolData(farmPromise, {skipLowLiquidity} = {}) {
             return Promise.all([farmList, Promise.all(absentPoolListPromise)]);
         })
         .then(([farmList, absentPoolList]) => {
-            if (!absentPoolList.length) {
-                return farmList;
-            } else {
+            if (absentPoolList.length) {
                 const absentPoolMap = poolListToMap(absentPoolList);
 
-                return farmList.map((farmItem) => {
+                farmList = farmList.map((farmItem) => {
                     return addPoolFields(farmItem, absentPoolMap[farmItem.tokenSymbol]);
                 });
             }
+
+            return farmList.filter((item) => !!item.liquidityBip);
         });
 }
 
@@ -144,7 +148,7 @@ function addPoolFields(farmProgram, pool) {
 }
 
 /**
- * @typedef {{id:number, address:string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], ,coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string}} FarmItem
+ * @typedef {{id:number, address:string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string}} FarmItem
  */
 
 
