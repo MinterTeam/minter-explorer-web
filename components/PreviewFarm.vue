@@ -12,7 +12,9 @@ export default {
 
         const farmListPromise = fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
             .then((farmList) => {
-                farmList = farmList.filter((item) => item.liquidityBip > 100000);
+                farmList = farmList
+                    .filter((item) => item.liquidityBip > 100000)
+                    .filter((item) => item.ownerAddress === 'Mxcb272d7efc6c4a3122d705100fa0032703446e3e' || item.ownerAddress === 'Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d');
                 this.farmList = selectRandomItems(farmList, 3);
             });
 
@@ -40,7 +42,16 @@ export default {
                     apr,
                     stakingApy,
                 };
-            });
+            })
+                .sort((a, b) => {
+                    // first sort by apr
+                    if (b.apr - a.apr !== 0) {
+                        return b.apr - a.apr;
+                    }
+
+                    // then sort by liquidity
+                    return b.liquidityBip - a.liquidityBip;
+                });
         },
     },
     methods: {
