@@ -1,6 +1,6 @@
 <script>
     import Big from 'big.js';
-    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
+    import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {getTimeDistance, getTime, pretty, prettyRound, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils';
     import {UNBOND_PERIOD} from '~/assets/variables';
     import TableLink from '~/components/TableLink';
@@ -113,6 +113,15 @@
                     || (tx.data.check && tx.data.check.value)
                     || this.getMultisendValue(tx);
             },
+            getRecipient(tx) {
+                if (tx.data.to) {
+                    return tx.data.to;
+                }
+                // single recipient
+                if (this.isMultisend(tx) && !this.isMultisendMultipleRecipients(tx)) {
+                    return tx.data.list[0].to;
+                }
+            },
             hasAmount(tx) {
                 return typeof this.getAmount(tx) !== 'undefined';
             },
@@ -159,6 +168,13 @@
                 }
 
                 return `${symbol0} / ${symbol1}`;
+            },
+            isMultisendMultipleRecipients(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
+                }
+                const hasDifferentRecipient = tx.data.list.some((item) => item.to !== tx.data.list[0].to);
+                return hasDifferentRecipient;
             },
             getMultisendDeliveryList(tx) {
                 if (!this.currentAddress) {
@@ -269,14 +285,17 @@
                 <tr class="table__row-expanded-data" :key="tx.txn + 'exp'" v-if="isTxExpanded[tx.txn]">
                     <td colspan="7">
                         <div class="table__inner">
-                            <!-- type SEND -->
-                            <div class="table__inner-item" v-if="tx.data.to">
+                            <!-- type SEND, MULTISEND -->
+                            <div class="table__inner-item" v-if="getRecipient(tx) || (isMultisend(tx) && !isIncomeMultisend(tx))">
                                 <strong>To</strong> <br>
-                                <TableLink :link-text="tx.data.to"
-                                           :link-path="'/address/' + tx.data.to"
-                                           :is-not-link="isCurrentAddress(tx.data.to)"
+                                <TableLink :link-text="getRecipient(tx)"
+                                           :link-path="'/address/' + getRecipient(tx)"
+                                           :is-not-link="isCurrentAddress(getRecipient(tx))"
                                            :should-not-shorten="true"
+                                           v-if="getRecipient(tx)"
                                 />
+                                <!-- outcome multisend -->
+                                <span v-else>{{ tx.data.list.length }} recipients</span>
                             </div>
 
                             <!-- SELL, SELL_ALL -->
