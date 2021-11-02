@@ -8,14 +8,26 @@ import {getApy, pretty} from '~/assets/utils.js';
                 type: Array,
                 required: true,
             },
+            coin0: {
+                type: String,
+                default: '',
+            },
         },
         computed: {
             poolListFormatted() {
                 return this.poolList.map((pool) => {
                     const apy = getApy(pool.tradeVolumeBip1D, pool.liquidityBip);
 
+                    const reversed = this.coin0 && this.coin0 === pool.coin1.symbol ? {
+                        coin0: pool.coin1,
+                        coin1: pool.coin0,
+                        amount0: pool.amount1,
+                        amount1: pool.amount0,
+                    } : {};
+
                     return {
                         ...pool,
+                        ...reversed,
                         liquidityUsd: pool.liquidityBip * this.$store.getters['explorer/bipPriceUsd'],
                         volumeUsd: pool.tradeVolumeBip1D * this.$store.getters['explorer/bipPriceUsd'],
                         apy,
