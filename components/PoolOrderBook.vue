@@ -1,10 +1,11 @@
 <script>
+import Big from '~/assets/big.js';
 import {getPoolOrderList} from '@/api/explorer.js';
 import {pretty} from '~/assets/utils.js';
-import PoolOrderList from '@/components/PoolOrderList.vue';
 
 const TYPE_SELL = 'sell';
 const TYPE_BUY = 'buy';
+const BOOK_LENGTH = 15;
 
 export default {
     components: {
@@ -20,26 +21,91 @@ export default {
     },
     data() {
         return {
-            sellList: [],
-            buyList: [],
+            sellOrderList: [],
+            buyOrderList: [],
+            seenOrderMap: {},
             currentPage: 0,
-            lastPage: 0,
+            sellLastPage: 0,
+            buyLastPage: 0,
             isLoading: false,
+            loadTimestamp: 0,
+            selectedPriceGroupIndex: 3,
         };
+    },
+    computed: {
+        whatAffectBook(){
+            return {
+                sellBook: this.sellBook,
+                buyBook: this.buyBook,
+                isLoading: this.isLoading,
+                selectedPriceGroupIndex: this.selectedPriceGroupIndex,
+            };
+        },
+        lastPage() {
+            return Math.max(this.sellLastPage, this.buyLastPage);
+        },
+        midPrice() {
+            return this.pool.amount1 / this.pool.amount0;
+        },
+        midPricePower() {
+            const parts = this.midPrice.toString().split('.');
+            if (this.midPrice >= 1) {
+                // count of digits in the whole part
+                return parts[0].length;
+            } else {
+                // count of zeros in the decimal part
+                return -1 * (parts[1] || '').replace(/^(0*).*/, '$1').length;
+            }
+        },
+        priceGroupPowerList() {
+            let groupPowers = [];
+            for (let i = 0; i < 4; i++) {
+                groupPowers.push(this.midPricePower - 1 - i);
+            }
+            return groupPowers;
+        },
+        priceGroupOptions() {
+            return  this.priceGroupPowerList.map((power) => new Big(10).pow(power).toString());
+        },
+        sellBook() {
+            return groupOrdersByPrice(this.sellOrderList, this.priceGroupPowerList[this.selectedPriceGroupIndex]).reverse();
+        },
+        buyBook() {
+            return groupOrdersByPrice(this.buyOrderList, this.priceGroupPowerList[this.selectedPriceGroupIndex]);
+        },
+    },
+    watch: {
+        whatAffectBook() {
+            if (this.isLoading) {
+                return;
+            }
+            if (this.currentPage >= this.lastPage) {
+                return;
+            }
+
+            if (this.sellBook.length < BOOK_LENGTH || this.buyBook.length < BOOK_LENGTH) {
+                this.fetchOrderBook(this.currentPage + 1);
+            }
+        },
     },
     methods: {
         pretty,
-        getCoinIconUrl(coin) {
-            return this.$store.getters['explorer/getCoinIcon'](coin);
-        },
         fetchOrderBook(page) {
-            this.isLoading = false;
-            return Promise.all([this.getOrderList(TYPE_SELL), this.getOrderList(TYPE_BUY)])
+            this.isLoading = true;
+
+            const waitPromise = (Date.now() - this.loadTimestamp) < 1000 ? wait(1000) : Promise.resolve();
+            return waitPromise
                 .then(() => {
-                    this.isLoading = false;
+                    return Promise.all([
+                        this.getOrderList(TYPE_SELL, page),
+                        this.getOrderList(TYPE_BUY, page),
+                    ]);
+                })
+                .then(() => {
                     this.currentPage = page;
                 })
                 .finally(() => {
+                    this.loadTimestamp = Date.now();
                     this.isLoading = false;
                 });
         },
@@ -47,20 +113,31 @@ export default {
             if (page === 1) {
                 page = undefined;
             }
-            return getPoolOrderList(this.pool.coin0.symbol, this.pool.coin1.symbol, {type, page, status: 'active'})
+            return getPoolOrderList(this.pool.coin0.symbol, this.pool.coin1.symbol, {type, page, limit: 150, status: 'active'})
                 .then((poolListInfo) => {
-                    const orderList = poolListInfo.data.map((order) => sortOrder(order, this.pool.coin0.symbol));
+                    const orderList = poolListInfo.data
+                        // filter out seen orders (coz pagination may change order position among pages over time)
+                        .filter((order) => !this.seenOrderMap[order.id])
+                        .map((order) => sortOrderFields(order, this.pool.coin0.symbol));
+
                     if (type === TYPE_SELL) {
-                        this.sellList = Object.freeze([].concat(this.sellList, orderList));
+                        this.sellOrderList = Object.freeze([].concat(this.sellOrderList, orderList));
+                        this.sellLastPage = poolListInfo.meta.lastPage;
                     }
                     if (type === TYPE_BUY) {
-                        this.buyList = Object.freeze([].concat(this.buyList, orderList));
+                        this.buyOrderList = Object.freeze([].concat(this.buyOrderList, orderList));
+                        this.buyLastPage = poolListInfo.meta.lastPage;
                     }
+
+                    // fill seenMap
+                    const newSeenEntries = orderList.map((order) => [order.id, true]);
+                    this.seenOrderMap = Object.freeze({
+                        ...this.seenOrderMap,
+                        ...Object.fromEntries(newSeenEntries),
+                    });
                 });
         },
-        reverse(list) {
-            return list.slice().reverse();
-        },
+/*
         loadMore() {
             if (this.isLoading) {
                 return;
@@ -71,6 +148,7 @@ export default {
 
             this.fetchOrderBook(this.currentPage + 1);
         },
+*/
         switchCoins() {
             const {name, query, params} = this.$route;
             this.$router.replace({
@@ -85,12 +163,29 @@ export default {
     },
 };
 
+function round(value, power) {
+    return Math.floor(value / 10 ** power) / (10 ** (-1 * power));
+}
+
+function groupOrdersByPrice(orderList, power) {
+    let amountMap = {};
+    orderList.forEach((order) => {
+        const price = round(order.coin0Price, power);
+        amountMap[price] = (amountMap[price] || 0) + Number(order.amount0);
+    });
+    return Object.entries(amountMap)
+        .map(([price, amount]) => {
+            return {price, amount};
+        })
+        .slice(0, 15);
+}
+
 /**
  * @param {LimitOrder} order
  * @param {string} baseSymbol
  * @return {{amount1: (string|number), coin1, amount0: (string|number), coin0, coin0Price: (string|number), coin1Price: (string|number)}}
  */
-function sortOrder(order, baseSymbol) {
+function sortOrderFields(order, baseSymbol) {
     if (order.coinToSell.symbol === baseSymbol) {
         return {
             id: order.id,
@@ -113,10 +208,17 @@ function sortOrder(order, baseSymbol) {
         };
     }
 }
+
+function wait(time) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, time);
+    });
+}
 </script>
 
 <template>
-    <section class="panel u-section" v-if="!$fetchState.error && (buyList.length || sellList.length || isLoading)">
+    <section class="panel u-section">
+<!-- v-if="!$fetchState.error && (buyOrderList.length || sellOrderList.length || isLoading)" -->
         <div class="panel__section panel__header">
             <h2 class="panel__header-title panel__title">
                 <img class="panel__header-title-icon" src="/img/icon-limit-order.svg" width="40" height="40" alt="" role="presentation">
@@ -127,33 +229,42 @@ function sortOrder(order, baseSymbol) {
             </button>
 <!--            <nuxt-link class="button button&#45;&#45;ghost-main button&#45;&#45;small" to="/farming">View all</nuxt-link>-->
         </div>
-        <div class="panel__section panel__content u-text-center" v-if="isLoading">
-            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
-                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
-            </svg>
-        </div>
-        <div class="panel__section panel__content order-book" v-else>
+        <div class="panel__section panel__content order-book" v-if="sellOrderList.length || buyOrderList.length">
             <div class="order-book__item order-book__item--head">
                 <div class="order-book__cell">Price ({{ pool.coin1.symbol }})</div>
                 <div class="order-book__cell">Amount ({{ pool.coin0.symbol }})</div>
             </div>
 
-            <div class="order-book__item" v-for="item in reverse(sellList)" :key="item.id">
-                <div class="order-book__cell u-text-fail">{{ pretty(item.coin0Price) }}</div>
-                <div class="order-book__cell">{{ pretty(item.amount0) }}</div>
+            <div class="order-book__item" v-for="item in sellBook" :key="item.price">
+                <div class="order-book__cell u-text-fail">{{ item.price }}</div>
+                <div class="order-book__cell">{{ pretty(item.amount) }}</div>
             </div>
 
             <div class="order-book__item">
-                <div class="order-book__cell order-book__price">{{ pretty(pool.amount1 / pool.amount0) }}</div>
-                <div class="order-book__cell" v-if="currentPage < lastPage">
-                    <button class="u-semantic-button link--main link--hover" @click="loadMore()">Load more</button>
+                <div class="order-book__cell order-book__price">{{ pretty(midPrice) }}</div>
+
+                <div class="order-book__cell">
+                    <select v-model="selectedPriceGroupIndex">
+                        <option :value="index" v-for="(priceOption, index) in priceGroupOptions" :key="index">{{ priceOption }}</option>
+                    </select>
                 </div>
+                <!--
+                <div class="order-book__cell" v-if="currentPage < lastPage">
+                    <button class="u-semantic-button link&#45;&#45;main link&#45;&#45;hover" @click="loadMore()">Load more</button>
+                </div>
+                -->
             </div>
 
-            <div class="order-book__item" v-for="item in buyList" :key="item.id">
-                <div class="order-book__cell u-text-success">{{ pretty(item.coin0Price) }}</div>
-                <div class="order-book__cell">{{ pretty(item.amount0) }}</div>
+            <div class="order-book__item" v-for="item in buyBook" :key="item.price">
+                <div class="order-book__cell u-text-success">{{ item.price }}</div>
+                <div class="order-book__cell">{{ pretty(item.amount) }}</div>
             </div>
+        </div>
+        <div class="panel__section panel__content u-text-center" v-else>
+            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" v-if="isLoading">
+                <circle class="loader__path" cx="14" cy="14" r="12"></circle>
+            </svg>
+            <template v-else>No active orders</template>
         </div>
     </section>
 </template>
