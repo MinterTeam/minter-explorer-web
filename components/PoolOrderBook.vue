@@ -25,8 +25,8 @@ export default {
             buyOrderList: [],
             seenOrderMap: {},
             currentPage: 0,
-            sellLastPage: 0,
-            buyLastPage: 0,
+            sellLastPage: undefined,
+            buyLastPage: undefined,
             isLoading: false,
             loadTimestamp: 0,
             selectedPriceGroupIndex: 3,
@@ -93,7 +93,8 @@ export default {
         fetchOrderBook(page) {
             this.isLoading = true;
 
-            const waitPromise = (Date.now() - this.loadTimestamp) < 1000 ? wait(1000) : Promise.resolve();
+            // throttle to 4 rps (2 requests per 500ms)
+            const waitPromise = (Date.now() - this.loadTimestamp) < 500 ? wait(500) : Promise.resolve();
             return waitPromise
                 .then(() => {
                     return Promise.all([
@@ -110,6 +111,9 @@ export default {
                 });
         },
         getOrderList(type, page = 1) {
+            if ((type === TYPE_SELL && page > this.sellLastPage) || (type === TYPE_BUY && page > this.buyLastPage)) {
+                return;
+            }
             if (page === 1) {
                 page = undefined;
             }
