@@ -1,8 +1,16 @@
 import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
+import coinBlockList from 'minter-coin-block-list';
 import {FARM_API_URL} from "~/assets/variables.js";
 import addToCamelInterceptor from '~/assets/to-camel.js';
 import {getPoolList, getPoolByToken} from '@/api/explorer.js';
+
+
+const coinBlockMap = Object.fromEntries(coinBlockList.map((symbol) => [symbol, true]));
+function isBlocked(symbol) {
+    return !!coinBlockMap[symbol.replace(/-\d+$/, '')];
+}
+
 
 const instance = axios.create({
     baseURL: FARM_API_URL,
@@ -28,37 +36,39 @@ export function getFarmList() {
         .then((lists) => [].concat(...lists))
         .then((farmList) => {
             let farmMap = {};
-            farmList.forEach((farmItem) => {
-                // ensure farm map item
-                if (!farmMap[farmItem.tokenSymbol]) {
-                    const cleanFarmItem = {...farmItem};
-                    delete cleanFarmItem.rewardCoin;
-                    cleanFarmItem.rewardCoinList = [];
-                    cleanFarmItem.percent = 0;
-                    cleanFarmItem.finishDateList = [];
-                    farmMap[farmItem.tokenSymbol] = cleanFarmItem;
-                }
+            farmList
+                .filter((farmItem) => !isBlocked(farmItem.coin0.symbol) && !isBlocked(farmItem.coin1.symbol))
+                .forEach((farmItem) => {
+                    // ensure farm map item
+                    if (!farmMap[farmItem.tokenSymbol]) {
+                        const cleanFarmItem = {...farmItem};
+                        delete cleanFarmItem.rewardCoin;
+                        cleanFarmItem.rewardCoinList = [];
+                        cleanFarmItem.percent = 0;
+                        cleanFarmItem.finishDateList = [];
+                        farmMap[farmItem.tokenSymbol] = cleanFarmItem;
+                    }
 
-                farmMap[farmItem.tokenSymbol].percent += farmItem.percent;
-                farmMap[farmItem.tokenSymbol].rewardCoinList.push(farmItem.rewardCoin);
+                    farmMap[farmItem.tokenSymbol].percent += farmItem.percent;
+                    farmMap[farmItem.tokenSymbol].rewardCoinList.push(farmItem.rewardCoin);
 
-                // check if finishDateList should be updated
-                const hasCurrentDate = farmMap[farmItem.tokenSymbol].finishDateList.find((item) => {
-                    // less than 1 day difference
-                    return Math.abs(new Date(item) - new Date(farmItem.finishAt)) <= 24 * 60 * 60 * 1000;
+                    // check if finishDateList should be updated
+                    const hasCurrentDate = farmMap[farmItem.tokenSymbol].finishDateList.find((item) => {
+                        // less than 1 day difference
+                        return Math.abs(new Date(item) - new Date(farmItem.finishAt)) <= 24 * 60 * 60 * 1000;
+                    });
+                    if (!hasCurrentDate) {
+                        farmMap[farmItem.tokenSymbol].finishDateList.push(farmItem.finishAt);
+                    }
+
+                    const latestDate = farmMap[farmItem.tokenSymbol].finishDateList.reduce((previous, current) => {
+                        const prevDate = new Date(previous);
+                        const currentDate = new Date(current);
+                        return currentDate > prevDate ? current : previous;
+                    }, (new Date(0)).toISOString());
+                    // rewrite with latest finishAt
+                    farmMap[farmItem.tokenSymbol].finishAt = latestDate;
                 });
-                if (!hasCurrentDate) {
-                    farmMap[farmItem.tokenSymbol].finishDateList.push(farmItem.finishAt);
-                }
-
-                const latestDate = farmMap[farmItem.tokenSymbol].finishDateList.reduce((previous, current) => {
-                    const prevDate = new Date(previous);
-                    const currentDate = new Date(current);
-                    return currentDate > prevDate ? current : previous;
-                }, (new Date(0)).toISOString());
-                // rewrite with latest finishAt
-                farmMap[farmItem.tokenSymbol].finishAt = latestDate;
-            });
 
             return Object.values(farmMap);
         });

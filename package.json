@@ -33,6 +33,7 @@
     "entity-decode": "^2.0.2",
     "from-exponential": "^1.1.1",
     "lodash-es": "^4.17.21",
+    "minter-coin-block-list": "0.0.3",
     "minter-js-sdk": "^0.39.0-alpha.1",
     "minterjs-tx": "^11.0.0-alpha.1",
     "minterjs-util": "^0.22.0-alpha.2",
