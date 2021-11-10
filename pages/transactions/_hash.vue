@@ -390,6 +390,8 @@
                     <dd v-if="tx.data.id || tx.data.orderId">{{ tx.data.id || tx.data.orderId }}</dd>
 
                     <!-- ADD_LIMIT_ORDER -->
+                    <dt v-if="isAddOrderType">Pool</dt>
+                    <dd v-if="isAddOrderType"><PoolLink :pool="{coin0: tx.data.coinToSell, coin1: tx.data.coinToBuy}"/></dd>
                     <dt v-if="isAddOrderType">Want to sell</dt>
                     <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToSell" :coin="tx.data.coinToSell.symbol" :exact="true"/>
                     <dt v-if="isAddOrderType">Want to buy</dt>
