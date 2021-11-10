@@ -181,7 +181,8 @@ function groupOrdersByPrice(orderList, power) {
         .map(([price, amount]) => {
             return {price, amount};
         })
-        .slice(0, 15);
+        .slice(0, 15)
+        .sort((a, b) => a.price - b.price);
 }
 
 /**
