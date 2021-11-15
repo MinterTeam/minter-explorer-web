@@ -68,3 +68,9 @@ export const TX_STATUS = {
     SUCCESS: 'success',
     FAILURE: 'failure',
 };
+
+export const VALIDATOR_STATUS = {
+    0: 'Not declared',
+    1: 'Set off',
+    2: 'Set on',
+};

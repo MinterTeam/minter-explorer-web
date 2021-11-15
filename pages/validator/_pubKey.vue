@@ -4,7 +4,7 @@
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {pretty, prettyPrecise, prettyRound} from '~/assets/utils';
-    import {TAB_TYPES} from '~/assets/variables';
+    import {TAB_TYPES, VALIDATOR_STATUS} from '~/assets/variables.js';
     import Amount from '@/components/common/Amount.vue';
     import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
@@ -12,15 +12,10 @@
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
 
-    const VALIDATOR_STATUS = {
-        0: 'Not declared',
-        1: 'Set off',
-        2: 'Set on',
-    };
-
     function ensureTab(val) {
         return Object.values(TAB_TYPES).indexOf(val) !== -1 ? val : TAB_TYPES.TX;
     }
+
     function ensurePage(val) {
         return val > 0 ? val : 1;
     }
@@ -52,33 +47,23 @@
                 });
             }
 
-            const activeTab = ensureTab(query.active_tab);
-
-            const validatorPromise = getValidator(params.pubKey);
-            const stakeListPromise = getValidatorStakeList(params.pubKey, activeTab === TAB_TYPES.STAKE ? query : undefined);
-            const penaltyListPromise = getValidatorPenaltyList(params.pubKey, activeTab === TAB_TYPES.SLASH ? query : undefined);
-            const txListPromise = getValidatorTransactionList(params.pubKey, activeTab === TAB_TYPES.TX ? query : undefined);
-
-            return Promise.all([validatorPromise, stakeListPromise, penaltyListPromise, txListPromise])
-                .then(([validator, stakeListInfo, penaltyListInfo, txListInfo]) => {
+            return getValidator(params.pubKey)
+                .then((validator) => {
                     return {
                         validator,
-                        stakeList: stakeListInfo.data,
-                        stakePaginationInfo: stakeListInfo.meta,
-                        penaltyList: penaltyListInfo.data,
-                        penaltyPaginationInfo: penaltyListInfo.meta,
-                        txList: txListInfo.data,
-                        txPaginationInfo: txListInfo.meta,
                     };
                 })
-                .catch((e) => {
-                    console.log({e});
-                    let statusCode = e.request && e.request.status;
+                .catch((resError) => {
+                    console.log(resError);
+                    let statusCode = resError.request && resError.request.status;
                     error({
                         statusCode,
                         message: statusCode === 404 ? 'Validator not found' : getErrorText(e),
                     });
                 });
+        },
+        fetch() {
+            this.fetchTab(this.$route.query);
         },
         head() {
             const title = getTitle('Validator ' + this.$route.params.pubKey);
@@ -95,15 +80,21 @@
                 /** @type Validator|null */
                 validator: null,
                 storedTabPages: {},
+                // stakes
                 stakeList: [],
                 stakePaginationInfo: {},
                 isStakeListLoading: false,
+                isStakeListLoaded: false,
+                // penalties
                 penaltyList: [],
                 penaltyPaginationInfo: {},
                 isPenaltyListLoading: false,
+                isPenaltyListLoaded: false,
+                // txs
                 txList: [],
                 txPaginationInfo: {},
                 isTxListLoading: false,
+                isTxListLoaded: false,
             };
         },
         watch: {
@@ -111,22 +102,7 @@
             // update data on page change
             '$route.query': {
                 handler(newVal, oldVal) {
-                    const oldTab = ensureTab(oldVal.active_tab);
-                    const newTab = ensureTab(newVal.active_tab);
-                    const oldPage = ensurePage(oldVal.page);
-                    const newPage = ensurePage(newVal.page);
-
-                    if (newTab === oldTab && oldPage !== newPage) {
-                        if (this.activeTab === TAB_TYPES.TX) {
-                            this.fetchTxs();
-                        }
-                        if (this.activeTab === TAB_TYPES.STAKE) {
-                            this.fetchStakes();
-                        }
-                        if (this.activeTab === TAB_TYPES.SLASH) {
-                            this.fetchPenalties();
-                        }
-                    }
+                    this.fetchTab(newVal, oldVal);
                 },
             },
         },
@@ -172,6 +148,41 @@
                 // wait for rewards chart to disappear
                 // this.$nextTick(this.checkPanelPosition);
             },
+            fetchTab(newQuery, oldQuery) {
+                const oldTab = oldQuery ? ensureTab(oldQuery.active_tab) : undefined;
+                const newTab = ensureTab(newQuery.active_tab);
+                const oldPage = oldQuery ? ensurePage(oldQuery.page) : undefined;
+                const newPage = ensurePage(newQuery.page);
+
+                // new tab
+                if (newTab !== oldTab) {
+                    if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
+                        this.fetchTxs();
+                    }
+                    if (this.activeTab === TAB_TYPES.STAKE && !this.isStakeListLoaded) {
+                        this.fetchStakes();
+                    }
+                    if (this.activeTab === TAB_TYPES.SLASH && !this.isPenaltyListLoaded) {
+                        this.fetchPenalties();
+                    }
+
+                    this.checkPanelPosition();
+
+                    // same tab, new page
+                } else if (newTab === oldTab && newPage !== oldPage) {
+                    if (this.activeTab === TAB_TYPES.TX) {
+                        this.fetchTxs();
+                    }
+                    if (this.activeTab === TAB_TYPES.STAKE) {
+                        this.fetchStakes();
+                    }
+                    if (this.activeTab === TAB_TYPES.SLASH) {
+                        this.fetchPenalties();
+                    }
+
+                    this.checkPanelPosition();
+                }
+            },
             fetchStakes() {
                 this.isStakeListLoading = true;
                 getValidatorStakeList(this.$route.params.pubKey, this.$route.query)
@@ -179,6 +190,7 @@
                         this.stakeList = stakeListInfo.data;
                         this.stakePaginationInfo = stakeListInfo.meta;
                         this.isStakeListLoading = false;
+                        this.isStakeListLoaded = true;
                     })
                     .catch(() => {
                         this.isStakeListLoading = false;
@@ -191,6 +203,7 @@
                         this.penaltyList = penaltyListInfo.data;
                         this.penaltyPaginationInfo = penaltyListInfo.meta;
                         this.isPenaltyListLoading = false;
+                        this.isPenaltyListLoaded = true;
                     })
                     .catch(() => {
                         this.isPenaltyListLoading = false;
@@ -203,19 +216,19 @@
                         this.txList = txListInfo.data;
                         this.txPaginationInfo = txListInfo.meta;
                         this.isTxListLoading = false;
+                        this.isTxListLoaded = true;
                     })
                     .catch(() => {
                         this.isTxListLoading = false;
                     });
             },
-            // checkPanelPosition() {
-            //     const delegationPanelEl = document.querySelector('[data-tab-panel]');
-            //     if (window.pageYOffset > delegationPanelEl.offsetTop) {
-            //         window.scrollTo(0, delegationPanelEl.offsetTop - 15);
-            //     }
-            // },
+            checkPanelPosition() {
+                const panelEl = document.querySelector('[data-tab-panel]');
+                if (panelEl && window.pageYOffset > panelEl.offsetTop) {
+                    window.scrollTo(0, panelEl.offsetTop - 15);
+                }
+            },
         },
-
     };
 </script>
 
@@ -248,7 +261,6 @@
 
                 <!-- @TODO owner address -->
 
-                <!-- @TODO validating status-->
                 <dt>Status</dt>
                 <dd>{{ $options.VALIDATOR_STATUS[validator.status || 0] }}</dd>
 
@@ -257,6 +269,9 @@
 
                 <dt>Voting power</dt>
                 <dd>{{ (validator.part || 0) | pretty }}&thinsp;%</dd>
+
+                <dt>Commission</dt>
+                <dd>{{ validator.commission }}&thinsp;%</dd>
 
                 <dt>#Delegators</dt>
                 <dd>{{ validator.delegatorCount }}</dd>
