@@ -81,7 +81,7 @@ export function getExplorerAddressUrl(address) {
 }
 
 export function getExplorerValidatorUrl(pubKey) {
-    return '/validator/' + pubKey;
+    return '/validators/' + pubKey;
 }
 
 export function getEtherscanAddressUrl(hash) {
