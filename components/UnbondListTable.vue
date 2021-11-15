@@ -1,5 +1,5 @@
 <script>
-    import {getTimeMinutes, getDate, getTimeZone, prettyPrecise} from '~/assets/utils';
+    import {getTimeMinutes, getDate, getTimeZone, prettyPrecise, getExplorerValidatorUrl} from '~/assets/utils';
     import TableLink from '~/components/TableLink';
 
 
@@ -24,6 +24,7 @@
             },
         },
         methods: {
+            getExplorerValidatorUrl,
             getValidatorName(item) {
                 return item.validator.name;
             },
@@ -73,7 +74,7 @@
                 <!-- public key -->
                 <td>
                     <TableLink :link-text="getLabel(dataItem)"
-                               :link-path="'/validator/' + dataItem.validator.publicKey"
+                               :link-path="getExplorerValidatorUrl(dataItem.validator.publicKey)"
                                :should-not-shorten="!!dataItem.validator.name"
                     />
                 </td>

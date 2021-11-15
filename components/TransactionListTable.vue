@@ -1,7 +1,7 @@
 <script>
     import Big from '~/assets/big.js';
     import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
-    import {getTimeDistance, getTime, pretty, prettyRound, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils';
+    import {getTimeDistance, getTime, pretty, prettyRound, getExplorerValidatorUrl, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils.js';
     import {UNBOND_PERIOD} from '~/assets/variables';
     import TableLink from '~/components/TableLink';
 
@@ -55,6 +55,7 @@
         methods: {
             pretty,
             prettyRound,
+            getExplorerValidatorUrl,
             fromBase64,
             isCurrentAddress(address) {
                 return address === this.currentAddress;
@@ -425,7 +426,7 @@
                             <div class="table__inner-item" v-if="getValidatorName(tx)">
                                 <strong>Validator</strong> <br>
                                 <TableLink :link-text="getValidatorName(tx)"
-                                           :link-path="'/validator/' + tx.data.pubKey"
+                                           :link-path="getExplorerValidatorUrl(tx.data.pubKey)"
                                            :is-not-link="isCurrentValidator(tx.data.pubKey)"
                                            :should-not-shorten="true"
                                 />
@@ -433,7 +434,7 @@
                             <div class="table__inner-item" v-if="tx.data.pubKey">
                                 <strong>Public key</strong> <br>
                                 <TableLink :link-text="tx.data.pubKey"
-                                           :link-path="'/validator/' + tx.data.pubKey"
+                                           :link-path="getExplorerValidatorUrl(tx.data.pubKey)"
                                            :is-not-link="isCurrentValidator(tx.data.pubKey)"
                                            :should-not-shorten="true"
                                 />
@@ -441,7 +442,7 @@
                             <div class="table__inner-item" v-if="tx.data.newPubKey">
                                 <strong>New public key</strong> <br>
                                 <TableLink :link-text="tx.data.newPubKey"
-                                           :link-path="'/validator/' + tx.data.newPubKey"
+                                           :link-path="getExplorerValidatorUrl(tx.data.newPubKey)"
                                            :is-not-link="isCurrentValidator(tx.data.newPubKey)"
                                            :should-not-shorten="true"
                                 />

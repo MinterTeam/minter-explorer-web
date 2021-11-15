@@ -1,6 +1,7 @@
 <script>
     import debounce from 'lodash-es/debounce';
     import InlineSvg from 'vue-inline-svg';
+    import {getExplorerValidatorUrl} from '~/assets/utils.js';
     import TableLink from '~/components/TableLink';
 
     let resizeHandler;
@@ -36,6 +37,7 @@
             }
         },
         methods: {
+            getExplorerValidatorUrl,
             getIsCollapsed() {
                 return process.client && window.innerWidth < 960;
             },
@@ -72,14 +74,14 @@
                         </div>
                     </td>
                     <td>
-                        <nuxt-link class="link--default u-icon-wrap" v-if="isCollapsed && item.validator.name" :to="'/validator/' + item.validator.publicKey">
+                        <nuxt-link class="link--default u-icon-wrap" v-if="isCollapsed && item.validator.name" :to="getExplorerValidatorUrl(item.validator.publicKey)">
                             <img v-if="item.validator.iconUrl" :src="item.validator.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
                             {{ item.validator.name }}
                         </nuxt-link>
                         <TableLink class="u-text-tabular-nums"
                                    v-else
                                    :link-text="item.validator.publicKey"
-                                   :link-path="'/validator/' + item.validator.publicKey"
+                                   :link-path="getExplorerValidatorUrl(item.validator.publicKey)"
                                    :should-not-shorten="!isCollapsed"
                         />
                     </td>
