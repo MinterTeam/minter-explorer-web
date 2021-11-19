@@ -270,7 +270,9 @@
 
 
 //.order-book {width: min-content; white-space: nowrap;}
-.order-book__item {display: flex; justify-content: space-between; align-items: center;}
+.order-book__item {display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to left, var(--order-book-item-amount-color) var(--order-book-item-amount-bar), transparent 0); --order-book-item-amount-bar: 0;}
+.order-book__item--sell {--order-book-item-amount-color: fade(@c-fail, 10%);}
+.order-book__item--buy {--order-book-item-amount-color: fade(@c-success, 10%);}
 .order-book__item--head {font-weight: 500; /*background: #f6f6f6;*/ padding-bottom: 6px;}
 .order-book__cell {
     &+& {padding-left: 16px; text-align: right;}

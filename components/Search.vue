@@ -1,4 +1,6 @@
 <script>
+
+
     export default {
         data() {
             return {
@@ -15,7 +17,7 @@
                 if (query.slice(0, 2) === 'Mx') {
                     this.$router.push('/address/' + query);
                 } else if (query.slice(0, 2) === 'Mp') {
-                    this.$router.push('/validator/' + query);
+                    this.$router.push('/validators/' + query);
                 } else if (query.slice(0, 2) === 'Mt') {
                     this.$router.push('/transactions/' + query);
                 } else if (/^\d+$/.test(query)) {

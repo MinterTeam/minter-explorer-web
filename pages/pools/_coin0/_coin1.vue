@@ -33,12 +33,16 @@ export default {
         BackButton,
         Pagination,
     },
-    asyncData({ params, error }) {
+    asyncData({ params, error, redirect }) {
         if (!params.coin0 || !params.coin1 || params.coin0 === params.coin1) {
             return error({
                 statusCode: 404,
                 message: 'Pool not found',
             });
+        }
+
+        if (params.coin0 !== params.coin0.toUpperCase() || params.coin1 !== params.coin1.toUpperCase()) {
+            return redirect('/pools/' + params.coin0.toUpperCase() + '/' + params.coin1.toUpperCase());
         }
 
         const poolPromise = getPool(params.coin0, params.coin1);
