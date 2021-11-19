@@ -1,7 +1,7 @@
 <script>
 import Big from '~/assets/big.js';
 import {getPoolOrderList} from '@/api/explorer.js';
-import {pretty} from '~/assets/utils.js';
+import {pretty, decreasePrecisionSignificant} from '~/assets/utils.js';
 
 const TYPE_SELL = 'sell';
 const TYPE_BUY = 'buy';
@@ -32,7 +32,7 @@ export default {
             buyLastPage: undefined,
             isLoading: false,
             loadTimestamp: 0,
-            selectedPriceGroupIndex: 3,
+            selectedPriceGroupIndex: 4,
         };
     },
     computed: {
@@ -51,10 +51,10 @@ export default {
             return this.pool.amount1 / this.pool.amount0;
         },
         priceGroupPowerList() {
-            const midPricePower = getPower(this.midPrice);
+            const midPricePower = getExponent(this.midPrice);
             let groupPowers = [MAX_POWER];
             for (let i = 0; i < 4; i++) {
-                groupPowers.push(midPricePower - 1 - i);
+                groupPowers.push(midPricePower - i);
             }
             return groupPowers;
         },
@@ -95,17 +95,17 @@ export default {
             if (this.isLoading) {
                 return;
             }
-            if (this.currentPage >= this.lastPage) {
-                return;
-            }
+            const shouldLoadSell = this.currentPage < this.sellLastPage && this.sellBook.length < BOOK_LENGTH;
+            const shouldLoadBuy = this.currentPage < this.buyLastPage && this.buyBook.length < BOOK_LENGTH;
 
-            if (this.sellBook.length < BOOK_LENGTH || this.buyBook.length < BOOK_LENGTH) {
+            if (shouldLoadSell || shouldLoadBuy) {
                 this.fetchOrderBook(this.currentPage + 1);
             }
         },
     },
     methods: {
         pretty,
+        decreasePrecisionSignificant,
         fetchOrderBook(page) {
             this.isLoading = true;
 
@@ -188,35 +188,36 @@ export default {
  * @param {number} value
  * @return {number}
  */
-function getPower(value) {
-    const parts = value.toString().split('.');
-    if (value >= 1) {
-        // count of digits in the whole part
-        return parts[0].length;
-    } else {
-        // count of zeros in the decimal part
-        return -1 * (parts[1] || '').replace(/^(0*).*/, '$1').length;
-    }
+function getExponent(value) {
+    return Number(value.toExponential().split('e')[1]);
 }
 
+/**
+ * @param {number} groupBase
+ * @return {string} - number in exponential notation
+ */
 function roundGroupBase(groupBase) {
-    const power = getPower(groupBase) - 1;
-    // ceil to power
-    groupBase = Math.ceil(groupBase / 10 ** power);
-    // transform unwanted bases
-    if (groupBase === 4) {
-        groupBase = 5;
+    let [mantissa, exponent] = groupBase.toExponential().split('e');
+    // ceil
+    mantissa = Math.ceil(Number(mantissa));
+    // transform unwanted steps
+    if (mantissa === 4) {
+        mantissa = 5;
     }
-    if (groupBase > 5) {
-        groupBase = 10;
+    if (mantissa > 5) {
+        mantissa = 10;
     }
-    // restore power
-    groupBase = groupBase / (1 / 10 ** power);
-    return groupBase;
+    return [mantissa, exponent].join('e');
 }
 
+/**
+ * @param {number|string} value
+ * @param {string} base - number in exponential notation
+ * @return {number}
+ */
 function round(value, base) {
-    return Math.floor(value / base) / (1 / base);
+    let [mantissa, exponent] = base.split('e');
+    return Math.floor(value / base) * mantissa / `1e${-1 * exponent}`;
 }
 
 /**
@@ -226,17 +227,17 @@ function round(value, base) {
  * @return {{amount: number|string, price: number}[]}
  */
 function groupOrdersByPrice(orderList, groupBase) {
-    let amountMap = {};
+    groupBase = Number(groupBase).toExponential();
+    let amountMap = new Map();
     orderList.forEach((order) => {
         const price = round(order.coin0Price, groupBase);
-        amountMap[price] = (amountMap[price] || 0) + Number(order.amount0);
+        const storedAmount = amountMap.get(price) || 0;
+        amountMap.set(price, storedAmount + Number(order.amount0));
     });
-    return Object.entries(amountMap)
-        .map(([price, amount]) => {
+    return Array.from(amountMap, ([price, amount]) => {
             return {price, amount};
         })
-        .slice(0, BOOK_LENGTH)
-        .sort((a, b) => a.price - b.price);
+        .slice(0, BOOK_LENGTH);
 }
 
 /**
@@ -299,15 +300,15 @@ function wait(time) {
             </div>
 
             <div class="order-book__item order-book__item--sell"
-                 v-for="item in sellBook" :key="item.price"
+                 v-for="item in sellBook" :key="`sell-${item.price}`"
                  :style="`--order-book-item-amount-bar: ${item.amount / sellBookMaxAmount * 100}%`"
             >
-                <div class="order-book__cell u-text-fail">{{ item.price >= midPrice ? item.price : '' }}</div>
+                <div class="order-book__cell u-text-fail">{{ item.price >= midPrice ? item.price : pretty(midPrice) }}</div>
                 <div class="order-book__cell">{{ pretty(item.amount) }}</div>
             </div>
 
-            <div class="order-book__item">
-                <div class="order-book__cell order-book__price">{{ pretty(midPrice) }}</div>
+            <div class="order-book__item" :key="`mid-price-${midPrice}`">
+                <div class="order-book__cell order-book__price">{{ decreasePrecisionSignificant(midPrice) }}</div>
 
                 <div class="order-book__cell">
                     <select v-model="selectedPriceGroupIndex">
@@ -322,10 +323,10 @@ function wait(time) {
             </div>
 
             <div class="order-book__item order-book__item--buy"
-                 v-for="item in buyBook" :key="item.price"
+                 v-for="item in buyBook" :key="`buy-${item.price}`"
                  :style="`--order-book-item-amount-bar: ${item.amount / buyBookMaxAmount * 100}%`"
             >
-                <div class="order-book__cell u-text-success">{{ item.price }}</div>
+                <div class="order-book__cell u-text-success">{{ item.price > 0 ? item.price : pretty(buyOrderList[buyOrderList.length - 1].coin0Price) }}</div>
                 <div class="order-book__cell">{{ pretty(item.amount) }}</div>
             </div>
         </div>
