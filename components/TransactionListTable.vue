@@ -3,12 +3,14 @@
     import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {getTimeDistance, getTime, pretty, prettyRound, getExplorerValidatorUrl, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils.js';
     import {UNBOND_PERIOD} from '~/assets/variables';
+    import PoolLink from '~/components/common/PoolLink.vue';
     import TableLink from '~/components/TableLink';
 
     export default {
         TX_TYPE,
         UNBOND_PERIOD,
         components: {
+            PoolLink,
             TableLink,
         },
         filters: {
@@ -161,18 +163,6 @@
             isEditPool(tx) {
                 return this.isTxType(tx, TX_TYPE.CREATE_SWAP_POOL) || this.isTxType(tx, TX_TYPE.ADD_LIQUIDITY) || this.isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY);
             },
-            getPoolCoins(tx) {
-                let symbol0, symbol1;
-                if (tx.data.coin0.id < tx.data.coin1.id) {
-                    symbol0 = tx.data.coin0.symbol;
-                    symbol1 = tx.data.coin1.symbol;
-                } else {
-                    symbol0 = tx.data.coin1.symbol;
-                    symbol1 = tx.data.coin0.symbol;
-                }
-
-                return `${symbol0} / ${symbol1}`;
-            },
             isMultisendMultipleRecipients(tx) {
                 if (!this.isMultisend(tx)) {
                     return;
@@ -243,7 +233,7 @@
                 <th>Age</th>
                 <th>From</th>
                 <th>Type</th>
-                <th>Amount</th>
+                <th>Value</th>
                 <th class="table__controls-cell"></th>
             </tr>
             </thead>
@@ -277,9 +267,8 @@
                         <template v-if="hasAmount(tx)">
                             {{ getAmountWithCoin(tx) }}
                         </template>
-                        <template v-else-if="isEditPool(tx)">
-                            {{ getPoolCoins(tx) }}
-                        </template>
+                        <PoolLink v-else-if="isEditPool(tx)" :pool="tx.data"/>
+                        <PoolLink v-else-if="isAddOrder(tx)" :pool="{coin0: tx.data.coinToSell, coin1: tx.data.coinToBuy}"/>
                     </td>
                     <!--expand button -->
                     <td class="table__controls-cell">
