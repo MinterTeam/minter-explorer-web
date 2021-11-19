@@ -6,6 +6,7 @@ import {pretty} from '~/assets/utils.js';
 const TYPE_SELL = 'sell';
 const TYPE_BUY = 'buy';
 const BOOK_LENGTH = 15;
+const MAX_POWER = 'max';
 
 export default {
     components: {
@@ -21,7 +22,9 @@ export default {
     },
     data() {
         return {
+            /** @type {Array<LimitOrderSorted>} */
             sellOrderList: [],
+            /** @type {Array<LimitOrderSorted>} */
             buyOrderList: [],
             seenOrderMap: {},
             currentPage: 0,
@@ -47,31 +50,44 @@ export default {
         midPrice() {
             return this.pool.amount1 / this.pool.amount0;
         },
-        midPricePower() {
-            const parts = this.midPrice.toString().split('.');
-            if (this.midPrice >= 1) {
-                // count of digits in the whole part
-                return parts[0].length;
-            } else {
-                // count of zeros in the decimal part
-                return -1 * (parts[1] || '').replace(/^(0*).*/, '$1').length;
-            }
-        },
         priceGroupPowerList() {
-            let groupPowers = [];
+            const midPricePower = getPower(this.midPrice);
+            let groupPowers = [MAX_POWER];
             for (let i = 0; i < 4; i++) {
-                groupPowers.push(this.midPricePower - 1 - i);
+                groupPowers.push(midPricePower - 1 - i);
             }
             return groupPowers;
         },
         priceGroupOptions() {
-            return  this.priceGroupPowerList.map((power) => new Big(10).pow(power).toString());
+            return this.priceGroupPowerList.map((power) => power === MAX_POWER ? 'Max' : new Big(10).pow(power).toString());
         },
         sellBook() {
-            return groupOrdersByPrice(this.sellOrderList, this.priceGroupPowerList[this.selectedPriceGroupIndex]).reverse();
+            const selectedPower = this.priceGroupPowerList[this.selectedPriceGroupIndex];
+            let groupBase;
+            if (selectedPower === MAX_POWER) {
+                groupBase = (this.midPrice * 5 - this.midPrice) / BOOK_LENGTH;
+                groupBase = roundGroupBase(groupBase);
+            } else {
+                groupBase = 10 ** selectedPower;
+            }
+            return groupOrdersByPrice(this.sellOrderList, groupBase).reverse();
         },
         buyBook() {
-            return groupOrdersByPrice(this.buyOrderList, this.priceGroupPowerList[this.selectedPriceGroupIndex]);
+            const selectedPower = this.priceGroupPowerList[this.selectedPriceGroupIndex];
+            let groupBase;
+            if (selectedPower === MAX_POWER) {
+                groupBase = (this.midPrice - this.midPrice / 5) / BOOK_LENGTH;
+                groupBase = roundGroupBase(groupBase);
+            } else {
+                groupBase = 10 ** selectedPower;
+            }
+            return groupOrdersByPrice(this.buyOrderList, groupBase);
+        },
+        sellBookMaxAmount() {
+            return this.sellBook.reduce((limit, item) => Math.max(limit, item.amount), 0);
+        },
+        buyBookMaxAmount() {
+            return this.buyBook.reduce((limit, item) => Math.max(limit, item.amount), 0);
         },
     },
     watch: {
@@ -167,28 +183,70 @@ export default {
     },
 };
 
-function round(value, power) {
-    return Math.floor(value / 10 ** power) / (10 ** (-1 * power));
+/**
+ * Get power of a number
+ * @param {number} value
+ * @return {number}
+ */
+function getPower(value) {
+    const parts = value.toString().split('.');
+    if (value >= 1) {
+        // count of digits in the whole part
+        return parts[0].length;
+    } else {
+        // count of zeros in the decimal part
+        return -1 * (parts[1] || '').replace(/^(0*).*/, '$1').length;
+    }
 }
 
-function groupOrdersByPrice(orderList, power) {
+function roundGroupBase(groupBase) {
+    const power = getPower(groupBase) - 1;
+    // ceil to power
+    groupBase = Math.ceil(groupBase / 10 ** power);
+    // transform unwanted bases
+    if (groupBase === 4) {
+        groupBase = 5;
+    }
+    if (groupBase > 5) {
+        groupBase = 10;
+    }
+    // restore power
+    groupBase = groupBase / (1 / 10 ** power);
+    return groupBase;
+}
+
+function round(value, base) {
+    return Math.floor(value / base) / (1 / base);
+}
+
+/**
+ *
+ * @param {Array<LimitOrderSorted>} orderList
+ * @param {number|string} groupBase
+ * @return {{amount: number|string, price: number}[]}
+ */
+function groupOrdersByPrice(orderList, groupBase) {
     let amountMap = {};
     orderList.forEach((order) => {
-        const price = round(order.coin0Price, power);
+        const price = round(order.coin0Price, groupBase);
         amountMap[price] = (amountMap[price] || 0) + Number(order.amount0);
     });
     return Object.entries(amountMap)
         .map(([price, amount]) => {
             return {price, amount};
         })
-        .slice(0, 15)
+        .slice(0, BOOK_LENGTH)
         .sort((a, b) => a.price - b.price);
 }
 
 /**
+ * @typedef {{amount1: (string|number), coin1, amount0: (string|number), coin0, id, coin0Price: (string|number), coin1Price: (string|number)}} LimitOrderSorted
+ */
+
+/**
  * @param {LimitOrder} order
  * @param {string} baseSymbol
- * @return {{amount1: (string|number), coin1, amount0: (string|number), coin0, coin0Price: (string|number), coin1Price: (string|number)}}
+ * @return {LimitOrderSorted}
  */
 function sortOrderFields(order, baseSymbol) {
     if (order.coinToSell.symbol === baseSymbol) {
@@ -240,8 +298,11 @@ function wait(time) {
                 <div class="order-book__cell">Amount ({{ pool.coin0.symbol }})</div>
             </div>
 
-            <div class="order-book__item" v-for="item in sellBook" :key="item.price">
-                <div class="order-book__cell u-text-fail">{{ item.price }}</div>
+            <div class="order-book__item order-book__item--sell"
+                 v-for="item in sellBook" :key="item.price"
+                 :style="`--order-book-item-amount-bar: ${item.amount / sellBookMaxAmount * 100}%`"
+            >
+                <div class="order-book__cell u-text-fail">{{ item.price >= midPrice ? item.price : '' }}</div>
                 <div class="order-book__cell">{{ pretty(item.amount) }}</div>
             </div>
 
@@ -260,7 +321,10 @@ function wait(time) {
                 -->
             </div>
 
-            <div class="order-book__item" v-for="item in buyBook" :key="item.price">
+            <div class="order-book__item order-book__item--buy"
+                 v-for="item in buyBook" :key="item.price"
+                 :style="`--order-book-item-amount-bar: ${item.amount / buyBookMaxAmount * 100}%`"
+            >
                 <div class="order-book__cell u-text-success">{{ item.price }}</div>
                 <div class="order-book__cell">{{ pretty(item.amount) }}</div>
             </div>
