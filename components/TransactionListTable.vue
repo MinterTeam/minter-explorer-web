@@ -1,14 +1,16 @@
 <script>
-    import Big from 'big.js';
-    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
-    import {getTimeDistance, getTime, pretty, prettyRound, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils';
+    import Big from '~/assets/big.js';
+    import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
+    import {getTimeDistance, getTime, pretty, prettyRound, getExplorerValidatorUrl, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils.js';
     import {UNBOND_PERIOD} from '~/assets/variables';
+    import PoolLink from '~/components/common/PoolLink.vue';
     import TableLink from '~/components/TableLink';
 
     export default {
         TX_TYPE,
         UNBOND_PERIOD,
         components: {
+            PoolLink,
             TableLink,
         },
         filters: {
@@ -55,6 +57,7 @@
         methods: {
             pretty,
             prettyRound,
+            getExplorerValidatorUrl,
             fromBase64,
             isCurrentAddress(address) {
                 return address === this.currentAddress;
@@ -82,6 +85,9 @@
             },
             isBuyPool(tx) {
                 return this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
+            },
+            isAddOrder(tx) {
+                return this.isTxType(tx, TX_TYPE.ADD_LIMIT_ORDER);
             },
             isUnbond(tx) {
                 return this.isTxType(tx, TX_TYPE.UNBOND);
@@ -112,6 +118,15 @@
                     || tx.data.initialAmount
                     || (tx.data.check && tx.data.check.value)
                     || this.getMultisendValue(tx);
+            },
+            getRecipient(tx) {
+                if (tx.data.to) {
+                    return tx.data.to;
+                }
+                // single recipient
+                if (this.isMultisend(tx) && !this.isMultisendMultipleRecipients(tx)) {
+                    return tx.data.list[0].to;
+                }
             },
             hasAmount(tx) {
                 return typeof this.getAmount(tx) !== 'undefined';
@@ -148,17 +163,12 @@
             isEditPool(tx) {
                 return this.isTxType(tx, TX_TYPE.CREATE_SWAP_POOL) || this.isTxType(tx, TX_TYPE.ADD_LIQUIDITY) || this.isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY);
             },
-            getPoolCoins(tx) {
-                let symbol0, symbol1;
-                if (tx.data.coin0.id < tx.data.coin1.id) {
-                    symbol0 = tx.data.coin0.symbol;
-                    symbol1 = tx.data.coin1.symbol;
-                } else {
-                    symbol0 = tx.data.coin1.symbol;
-                    symbol1 = tx.data.coin0.symbol;
+            isMultisendMultipleRecipients(tx) {
+                if (!this.isMultisend(tx)) {
+                    return;
                 }
-
-                return `${symbol0} / ${symbol1}`;
+                const hasDifferentRecipient = tx.data.list.some((item) => item.to !== tx.data.list[0].to);
+                return hasDifferentRecipient;
             },
             getMultisendDeliveryList(tx) {
                 if (!this.currentAddress) {
@@ -194,7 +204,7 @@
                 if (this.isMultisendMultipleCoin(tx)) {
                     return '...';
                 } else {
-                    return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toFixed();
+                    return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toString();
                 }
             },
             getValidatorName(tx) {
@@ -223,7 +233,7 @@
                 <th>Age</th>
                 <th>From</th>
                 <th>Type</th>
-                <th>Amount</th>
+                <th>Value</th>
                 <th class="table__controls-cell"></th>
             </tr>
             </thead>
@@ -257,9 +267,8 @@
                         <template v-if="hasAmount(tx)">
                             {{ getAmountWithCoin(tx) }}
                         </template>
-                        <template v-else-if="isEditPool(tx)">
-                            {{ getPoolCoins(tx) }}
-                        </template>
+                        <PoolLink v-else-if="isEditPool(tx)" :pool="tx.data"/>
+                        <PoolLink v-else-if="isAddOrder(tx)" :pool="{coin0: tx.data.coinToSell, coin1: tx.data.coinToBuy}"/>
                     </td>
                     <!--expand button -->
                     <td class="table__controls-cell">
@@ -269,14 +278,17 @@
                 <tr class="table__row-expanded-data" :key="tx.txn + 'exp'" v-if="isTxExpanded[tx.txn]">
                     <td colspan="7">
                         <div class="table__inner">
-                            <!-- type SEND -->
-                            <div class="table__inner-item" v-if="tx.data.to">
+                            <!-- type SEND, MULTISEND -->
+                            <div class="table__inner-item" v-if="getRecipient(tx) || (isMultisend(tx) && !isIncomeMultisend(tx))">
                                 <strong>To</strong> <br>
-                                <TableLink :link-text="tx.data.to"
-                                           :link-path="'/address/' + tx.data.to"
-                                           :is-not-link="isCurrentAddress(tx.data.to)"
+                                <TableLink :link-text="getRecipient(tx)"
+                                           :link-path="'/address/' + getRecipient(tx)"
+                                           :is-not-link="isCurrentAddress(getRecipient(tx))"
                                            :should-not-shorten="true"
+                                           v-if="getRecipient(tx)"
                                 />
+                                <!-- outcome multisend -->
+                                <span v-else>{{ tx.data.list.length }} recipients</span>
                             </div>
 
                             <!-- SELL, SELL_ALL -->
@@ -316,12 +328,27 @@
                                 {{ tx.data.coins[0].symbol }} {{ pretty(tx.data.valueToSell) }}
                             </div>
 
-
                             <div class="table__inner-item" v-if="isBuyPool(tx) || isSellPool(tx)">
                                 <strong>Route</strong> <br>
                                 <span v-for="(coinPathItem, coinPathIndex) in tx.data.coins" :key="coinPathItem.id + '-' + coinPathIndex">
                                     {{ coinPathItem.symbol }}<span v-if="coinPathIndex !== tx.data.coins.length - 1"> -> </span>
                                 </span>
+                            </div>
+
+                            <!-- ADD_LIMIT_ORDER -->
+                            <div class="table__inner-item" v-if="isAddOrder(tx)">
+                                <strong>Want to sell</strong> <br>
+                                {{ tx.data.coinToSell.symbol }} {{ pretty(tx.data.valueToSell) }}
+                            </div>
+                            <div class="table__inner-item" v-if="isAddOrder(tx)">
+                                <strong>Want to buy</strong> <br>
+                                {{ tx.data.coinToBuy.symbol }} {{ pretty(tx.data.valueToBuy) }}
+                            </div>
+
+                            <!-- ADD_LIMIT_ORDER, REMOVE_LIMIT_ORDER -->
+                            <div class="table__inner-item" v-if="tx.data.id || tx.data.orderId">
+                                <strong>Order ID</strong> <br>
+                                {{ tx.data.id || tx.data.orderId }}
                             </div>
 
                             <!-- CREATE_SWAP_POOL, ADD_LIQUIDITY, REMOVE_LIQUIDITY -->
@@ -388,7 +415,7 @@
                             <div class="table__inner-item" v-if="getValidatorName(tx)">
                                 <strong>Validator</strong> <br>
                                 <TableLink :link-text="getValidatorName(tx)"
-                                           :link-path="'/validator/' + tx.data.pubKey"
+                                           :link-path="getExplorerValidatorUrl(tx.data.pubKey)"
                                            :is-not-link="isCurrentValidator(tx.data.pubKey)"
                                            :should-not-shorten="true"
                                 />
@@ -396,7 +423,7 @@
                             <div class="table__inner-item" v-if="tx.data.pubKey">
                                 <strong>Public key</strong> <br>
                                 <TableLink :link-text="tx.data.pubKey"
-                                           :link-path="'/validator/' + tx.data.pubKey"
+                                           :link-path="getExplorerValidatorUrl(tx.data.pubKey)"
                                            :is-not-link="isCurrentValidator(tx.data.pubKey)"
                                            :should-not-shorten="true"
                                 />
@@ -404,7 +431,7 @@
                             <div class="table__inner-item" v-if="tx.data.newPubKey">
                                 <strong>New public key</strong> <br>
                                 <TableLink :link-text="tx.data.newPubKey"
-                                           :link-path="'/validator/' + tx.data.newPubKey"
+                                           :link-path="getExplorerValidatorUrl(tx.data.newPubKey)"
                                            :is-not-link="isCurrentValidator(tx.data.newPubKey)"
                                            :should-not-shorten="true"
                                 />

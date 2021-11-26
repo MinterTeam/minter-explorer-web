@@ -81,7 +81,7 @@ export function getExplorerAddressUrl(address) {
 }
 
 export function getExplorerValidatorUrl(pubKey) {
-    return '/validator/' + pubKey;
+    return '/validators/' + pubKey;
 }
 
 export function getEtherscanAddressUrl(hash) {
@@ -143,6 +143,10 @@ export function prettyExact(value) {
         return '';
     }
     return decode(prettyNum(value, {precision: 2, precisionSetting: PRECISION_SETTING.INCREASE, thousandsSeparator: '&#x202F;'}));
+}
+
+export function decreasePrecisionSignificant(value) {
+    return prettyNum(value, {precision: 4, precisionSetting: PRECISION_SETTING.REDUCE_SIGNIFICANT});
 }
 
 
