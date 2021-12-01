@@ -20,7 +20,6 @@
     "precommit"
   ],
   "dependencies": {
-    "@babel/eslint-parser": "^7.16.3",
     "@material/snackbar": "^11.0.0",
     "@minterteam/footer-links": "^3.0.0",
     "axios": "^0.24.0",
@@ -45,9 +44,9 @@
     "vue-inline-svg": "^2.1.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.16.3",
     "@nuxt/types": "^2.15.8",
     "autoprefixer": "^9.8.8",
-    "babel-eslint": "^10.1.0",
     "beeper": "^2.1.0",
     "del": "^6.0.0",
     "dotenv": "^10.0.0",
