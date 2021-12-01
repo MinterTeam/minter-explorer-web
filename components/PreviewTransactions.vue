@@ -1,9 +1,13 @@
 <script>
-    import Big from 'big.js';
-    import {TX_TYPE} from 'minterjs-tx/src/tx-types';
+    import Big from '~/assets/big.js';
+    import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {getTimeDistance, pretty, shortFilter, txTypeFilter} from '~/assets/utils';
+    import PoolLink from '~/components/common/PoolLink.vue';
 
     export default {
+        components: {
+            PoolLink,
+        },
         filters: {
             pretty,
             addressHash: (value) => shortFilter(value, 7),
@@ -49,18 +53,6 @@
             isEditPool(tx) {
                 return this.isTxType(tx, TX_TYPE.CREATE_SWAP_POOL) || this.isTxType(tx, TX_TYPE.ADD_LIQUIDITY) || this.isTxType(tx, TX_TYPE.REMOVE_LIQUIDITY);
             },
-            getPoolCoins(tx) {
-                let symbol0, symbol1;
-                if (tx.data.coin0.id < tx.data.coin1.id) {
-                    symbol0 = tx.data.coin0.symbol;
-                    symbol1 = tx.data.coin1.symbol;
-                } else {
-                    symbol0 = tx.data.coin1.symbol;
-                    symbol1 = tx.data.coin0.symbol;
-                }
-
-                return `${symbol0} / ${symbol1}`;
-            },
             getConvertCoinSymbol(tx) {
                 if (this.isSell(tx)) {
                     return tx.data.coinToSell.symbol;
@@ -94,6 +86,9 @@
             },
             isBuyPool(tx) {
                 return this.isTxType(tx, TX_TYPE.BUY_SWAP_POOL);
+            },
+            isAddOrder(tx) {
+                return this.isTxType(tx, TX_TYPE.ADD_LIMIT_ORDER);
             },
             isMultisend(tx) {
                 return this.isTxType(tx, TX_TYPE.MULTISEND);
@@ -129,7 +124,7 @@
                 if (this.isMultisendMultipleCoin(tx)) {
                     return '...';
                 } else {
-                    return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toFixed();
+                    return currentUserDeliveryList.reduce((accumulator, delivery) => accumulator.plus(new Big(delivery.value)), new Big(0)).toString();
                 }
             },
         },
@@ -166,9 +161,8 @@
                             <span v-if="hasAmount(tx)">
                                 {{ getAmountWithCoin(tx) }}
                             </span>
-                            <span v-else-if="isEditPool(tx)">
-                                {{ getPoolCoins(tx) }}
-                            </span>
+                            <PoolLink class="u-fw-400" v-else-if="isEditPool(tx)" :pool="tx.data"/>
+                            <PoolLink class="u-fw-400" v-else-if="isAddOrder(tx)" :pool="{coin0: tx.data.coinToSell, coin1: tx.data.coinToBuy}"/>
                         </div>
                         <div>{{ tx.timeDistance }} ago</div>
                     </div>

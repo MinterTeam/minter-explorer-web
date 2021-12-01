@@ -145,6 +145,10 @@ export function prettyExact(value) {
     return decode(prettyNum(value, {precision: 2, precisionSetting: PRECISION_SETTING.INCREASE, thousandsSeparator: '&#x202F;'}));
 }
 
+export function decreasePrecisionSignificant(value) {
+    return prettyNum(value, {precision: 4, precisionSetting: PRECISION_SETTING.REDUCE_SIGNIFICANT});
+}
+
 
 /**
  * Round to power

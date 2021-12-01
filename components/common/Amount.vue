@@ -1,5 +1,5 @@
 <script>
-import {pretty, prettyExact} from '~/assets/utils.js';
+import {pretty, prettyExact, decreasePrecisionSignificant} from '~/assets/utils.js';
 
 export default {
     props: {
@@ -16,6 +16,10 @@ export default {
             default: 'span',
         },
         exact: {
+            type: Boolean,
+            default: false,
+        },
+        significant: {
             type: Boolean,
             default: false,
         },
@@ -41,7 +45,10 @@ export default {
         pretty,
         prettyExact,
         prettyAmount(value) {
-            return this.exact ? prettyExact(value) : pretty(value);
+            if (this.exact) {
+                return prettyExact(value);
+            }
+            return this.significant ? decreasePrecisionSignificant(value) : pretty(value);
         },
     },
 };
@@ -49,7 +56,9 @@ export default {
 
 <template>
     <component :is="tag">
-        <template v-if="coinFirst">{{ coin }}</template> <span class="u-fw-500" :title="exact ? '' : prettyExact(amount)">{{ prettyAmount(amount) }}</span> <template v-if="!coinFirst">{{ coin }}</template>
+        <template v-if="coinFirst">{{ coin }} </template><!--
+     --><span class="u-fw-500" :title="exact ? '' : prettyExact(amount)">{{ prettyAmount(amount) }}</span><!--
+     --><template v-if="!coinFirst"> {{ coin }}</template>
         <span class="u-text-muted" v-if="amountUsd">(${{ pretty(amountUsd) }})</span>
     </component>
 </template>

@@ -1,12 +1,14 @@
 <script>
-import Big from 'big.js';
-import {getPoolTransactionList, getPool, getPoolProviderList} from "@/api/explorer.js";
+import Big from '~/assets/big.js';
+import {getPoolTransactionList, getPool, getPoolProviderList, getPoolOrderList} from "@/api/explorer.js";
 import {getApy, pretty, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';
 import {TAB_TYPES} from '~/assets/variables.js';
 import Amount from '@/components/common/Amount.vue';
 import TransactionListTable from '~/components/TransactionListTable';
+import PoolOrderList from '@/components/PoolOrderList.vue';
+import PoolOrderBook from '@/components/PoolOrderBook.vue';
 import PoolProviderList from '@/components/PoolProviderList.vue';
 import BackButton from '@/components/BackButton.vue';
 import Pagination from "@/components/Pagination.vue";
@@ -25,6 +27,8 @@ export default {
     components: {
         Amount,
         TransactionListTable,
+        PoolOrderList,
+        PoolOrderBook,
         PoolProviderList,
         BackButton,
         Pagination,
@@ -76,14 +80,21 @@ export default {
             /** @type Pool */
             pool: {},
             storedTabPages: {},
+            // pool providers
             providerList: [],
             providerPaginationInfo: {},
             isProviderListLoading: false,
             isProviderListLoaded: false,
+            // txs
             txList: [],
             txPaginationInfo: {},
             isTxListLoading: false,
             isTxListLoaded: false,
+            // limit orders
+            orderList: [],
+            orderPaginationInfo: {},
+            isOrderListLoading: false,
+            isOrderListLoaded: false,
         };
     },
     watch: {
@@ -114,6 +125,9 @@ export default {
         activePaginationInfo() {
             if (this.activeTab === TAB_TYPES.TX) {
                 return this.txPaginationInfo;
+            }
+            if (this.activeTab === TAB_TYPES.ORDER) {
+                return this.orderPaginationInfo;
             }
             if (this.activeTab === TAB_TYPES.PROVIDER) {
                 return this.providerPaginationInfo;
@@ -151,6 +165,19 @@ export default {
                 })
                 .catch(() => {
                     this.isTxListLoading = false;
+                });
+        },
+        fetchLimitOrderList() {
+            this.isOrderListLoading = true;
+            getPoolOrderList(this.$route.params.coin0, this.$route.params.coin1, this.$route.query)
+                .then((orderListInfo) => {
+                    this.orderList = orderListInfo.data;
+                    this.orderPaginationInfo = orderListInfo.meta;
+                    this.isOrderListLoading = false;
+                    this.isOrderListLoaded = true;
+                })
+                .catch(() => {
+                    this.isOrderListLoading = false;
                 });
         },
         switchTab(newTab) {
@@ -198,6 +225,9 @@ export default {
                 if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
                     this.fetchTxs();
                 }
+                if (this.activeTab === TAB_TYPES.ORDER && !this.isOrderListLoaded) {
+                    this.fetchLimitOrderList();
+                }
                 if (this.activeTab === TAB_TYPES.PROVIDER && !this.isProviderListLoaded) {
                     this.fetchProviderList();
                 }
@@ -208,6 +238,9 @@ export default {
             } else if (newTab === oldTab && newPage !== oldPage) {
                 if (this.activeTab === TAB_TYPES.TX) {
                     this.fetchTxs();
+                }
+                if (this.activeTab === TAB_TYPES.ORDER) {
+                    this.fetchLimitOrderList();
                 }
                 if (this.activeTab === TAB_TYPES.PROVIDER) {
                     this.fetchProviderList();
@@ -223,7 +256,7 @@ function calculateTradeRate(amountIn, amountOut) {
     if (Number(amountIn) === 0 || Number.isNaN(Number(amountIn))) {
         return 0;
     }
-    return new Big(amountOut).div(amountIn).toFixed(18);
+    return new Big(amountOut).div(amountIn).toString();
 }
 // function calculateTradeReturn(amountIn, amountOut) {
 //     return amountOut - (amountIn * amountOut / (amountIn + 1));
@@ -232,96 +265,119 @@ function calculateTradeRate(amountIn, amountOut) {
 
 <template>
     <div>
-        <section class="panel u-section">
-            <div class="panel__section panel__header">
-                <h1 class="panel__header-title panel__title">
-                    <BackButton/>
-                    {{ pool.coin0.symbol }} / {{ pool.coin1.symbol }} pool
-                </h1>
-            </div>
-            <dl>
-                <dt>Pair</dt>
-                <dd>
-                    <div class="pool-pair">
-                        <div class="pool-pair__figure">
-                            <img class="pool-pair__icon" :src="getCoinIconUrl(pool.coin0.symbol)" width="24" height="24" alt="" role="presentation">
-                            <img class="pool-pair__icon pool-pair__icon1" :src="getCoinIconUrl(pool.coin1.symbol)" width="24" height="24" alt="" role="presentation">
-                        </div>
-                        <div>
-                            <nuxt-link class="link--default" :to="'/coins/' + pool.coin0.symbol">{{ pool.coin0.symbol }}</nuxt-link>
-                            /
-                            <nuxt-link class="link--default" :to="'/coins/' + pool.coin1.symbol">{{ pool.coin1.symbol }}</nuxt-link>
-                        </div>
+        <div class="u-grid u-grid--vertical-margin">
+            <div class="u-cell u-cell--medium--2-3">
+                <section class="panel u-section">
+                    <div class="panel__section panel__header">
+                        <h1 class="panel__header-title panel__title">
+                            <BackButton/>
+                            Liquidity pool
+                        </h1>
                     </div>
-                </dd>
+                    <dl>
+                        <dt>Pair</dt>
+                        <dd>
+                            <div class="pool-pair">
+                                <div class="pool-pair__figure">
+                                    <img class="pool-pair__icon" :src="getCoinIconUrl(pool.coin0.symbol)" width="24" height="24" alt="" role="presentation">
+                                    <img class="pool-pair__icon pool-pair__icon1" :src="getCoinIconUrl(pool.coin1.symbol)" width="24" height="24" alt="" role="presentation">
+                                </div>
+                                <div>
+                                    <nuxt-link class="link--default" :to="'/coins/' + pool.coin0.symbol">{{ pool.coin0.symbol }}</nuxt-link>
+                                    /
+                                    <nuxt-link class="link--default" :to="'/coins/' + pool.coin1.symbol">{{ pool.coin1.symbol }}</nuxt-link>
+                                </div>
+                            </div>
+                        </dd>
 
-                <dt>Pool token</dt>
-                <dd>
-                    <span class="u-fw-500">{{ prettyExact(pool.liquidity) }}</span>
-                    <nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link>
-                </dd>
+                        <dt>Pool token</dt>
+                        <dd>
+                            <span class="u-fw-500">{{ prettyExact(pool.liquidity) }}</span>
+                            <nuxt-link class="link--default" :to="'/coins/' + pool.token.symbol">{{ pool.token.symbol }}</nuxt-link>
+                        </dd>
 
 
-                <dt>Amount</dt>
-                <Amount :amount="pool.amount0" :coin="pool.coin0.symbol" :exact="true" tag="dd"/>
+                        <dt>Amount</dt>
+                        <Amount :amount="pool.amount0" :coin="pool.coin0.symbol" :exact="true" tag="dd"/>
 
-                <dt>Amount </dt>
-                <Amount :amount="pool.amount1" :coin="pool.coin1.symbol" :exact="true" tag="dd"/>
+                        <dt>Amount </dt>
+                        <Amount :amount="pool.amount1" :coin="pool.coin1.symbol" :exact="true" tag="dd"/>
 
-                <dt>Price {{ pool.coin0.symbol }}</dt>
-                <Amount :amount="coin0Price" :coin="pool.coin1.symbol" :exact="false" tag="dd"/>
+                        <dt>Price {{ pool.coin0.symbol }}</dt>
+                        <Amount :amount="coin0Price" :coin="pool.coin1.symbol" :exact="false" tag="dd"/>
 
-                <dt>Price {{ pool.coin1.symbol }}</dt>
-                <Amount :amount="coin1Price" :coin="pool.coin0.symbol" :exact="false" tag="dd"/>
+                        <dt>Price {{ pool.coin1.symbol }}</dt>
+                        <Amount :amount="coin1Price" :coin="pool.coin0.symbol" :exact="false" tag="dd"/>
 
 
 
-                <dt>Liquidity</dt>
-                <Amount :amount="pool.liquidityBip" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+                        <dt>Liquidity</dt>
+                        <Amount :amount="pool.liquidityBip" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
-                <dt>Volume (1d)</dt>
-                <Amount :amount="pool.tradeVolumeBip1D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+                        <dt>Volume (1d)</dt>
+                        <Amount :amount="pool.tradeVolumeBip1D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
-                <dt>Fees (1d)</dt>
-                <Amount :amount="tradeFee" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+                        <dt>Fees (1d)</dt>
+                        <Amount :amount="tradeFee" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
-                <dt>APY</dt>
-                <dd><span title="Based on 24hr volume annualized">{{ pretty(apy) }}%</span></dd>
-            </dl>
-        </section>
-
-        <section class="panel u-section" data-tab-panel>
-            <div class="panel__switcher">
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
-                        @click="switchTab($options.TAB_TYPES.TX)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
-                    <span class="u-hidden-medium-down">Transactions</span>
-                    <span class="u-hidden-medium-up">Txs</span>
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.PROVIDER}"
-                        @click="switchTab($options.TAB_TYPES.PROVIDER)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
-                    Providers
-                </button>
+                        <dt>APY</dt>
+                        <dd><span title="Based on 24hr volume annualized">{{ pretty(apy) }}%</span></dd>
+                    </dl>
+                </section>
             </div>
-            <!-- Transactions -->
-            <TransactionListTable
-                v-if="activeTab === $options.TAB_TYPES.TX"
-                :tx-list="txList"
-                :current-address="$route.params.address"
-                :is-loading="isTxListLoading"
-            />
-            <!-- Providers -->
-            <PoolProviderList
-                v-if="activeTab === $options.TAB_TYPES.PROVIDER"
-                :provider-list="providerList"
-                :is-loading="isProviderListLoading"
-            />
-        </section>
-        <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
+            <div class="u-cell u-cell--medium--1-3">
+                <PoolOrderBook :pool="pool" v-if="pool"/>
+            </div>
+            <div class="u-cell">
+                <section class="panel u-section" data-tab-panel>
+                    <div class="panel__switcher">
+                        <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                                :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
+                                @click="switchTab($options.TAB_TYPES.TX)"
+                        >
+                            <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                            <span class="u-hidden-medium-down">Transactions</span>
+                            <span class="u-hidden-medium-up">Txs</span>
+                        </button>
+                        <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                                :class="{'is-active': activeTab === $options.TAB_TYPES.ORDER}"
+                                @click="switchTab($options.TAB_TYPES.ORDER)"
+                        >
+                            <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-limit-order.svg" width="40" height="40" alt="" role="presentation">
+                            <span class="u-hidden-medium-down">Limit orders</span>
+                            <span class="u-hidden-medium-up">Orders</span>
+                        </button>
+                        <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                                :class="{'is-active': activeTab === $options.TAB_TYPES.PROVIDER}"
+                                @click="switchTab($options.TAB_TYPES.PROVIDER)"
+                        >
+                            <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
+                            Providers
+                        </button>
+                    </div>
+                    <!-- Transactions -->
+                    <TransactionListTable
+                        v-if="activeTab === $options.TAB_TYPES.TX"
+                        :tx-list="txList"
+                        :current-address="$route.params.address"
+                        :is-loading="isTxListLoading"
+                    />
+                    <!-- Limit orders -->
+                    <PoolOrderList
+                        v-if="activeTab === $options.TAB_TYPES.ORDER"
+                        :order-list="orderList"
+                        item-type="address"
+                        :is-loading="isOrderListLoading"
+                    />
+                    <!-- Providers -->
+                    <PoolProviderList
+                        v-if="activeTab === $options.TAB_TYPES.PROVIDER"
+                        :provider-list="providerList"
+                        :is-loading="isProviderListLoading"
+                    />
+                </section>
+                <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
+            </div>
+        </div>
     </div>
 </template>

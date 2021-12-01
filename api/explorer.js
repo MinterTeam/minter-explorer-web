@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import stripZeros from 'pretty-num/src/strip-zeros';
+import Big from '~/assets/big.js';
 import {_getOracleCoinList} from '~/api/hub.js';
 import {getCoinIconList as getChainikIconList} from '~/api/chainik.js';
 import {EXPLORER_API_URL, REWARD_CHART_TYPES, BASE_COIN, TX_STATUS} from "~/assets/variables.js";
@@ -49,8 +50,8 @@ export function getStatus() {
 
 /**
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<BlockListInfo>}
  */
 export function getBlockList(params) {
@@ -79,8 +80,8 @@ export function getBlock(height) {
 /**
  * @param {number} height
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getBlockTransactionList(height, params) {
@@ -125,8 +126,8 @@ function getPastOrCurrentBlockInfo(height) {
 
 /**
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getTransactionList(params) {
@@ -295,13 +296,37 @@ function markVerified(coinListPromise, itemType = 'coin') {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getAddressTransactionList(address, params) {
     return explorer.get(`addresses/${address}/transactions`, {params})
         .then((response) => response.data);
+}
+
+/**
+ * Get limit order list by owner address
+ * @param {string} address
+ * @param {Object} [params]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
+ * @param {string} [params.status]
+ * @return {Promise<LimitOrderListInfo>}
+ */
+export function getAddressOrderList(address, params) {
+    return explorer.get(`addresses/${address}/orders`, {params})
+        .then((response) => {
+            response.data.data = response.data.data.map((order) => {
+                return {
+                    ...order,
+                    coinToSellPrice: new Big(order.initialCoinToBuyVolume).div(order.initialCoinToSellVolume).toString(),
+                    coinToBuyPrice: new Big(order.initialCoinToSellVolume).div(order.initialCoinToBuyVolume).toString(),
+                };
+            });
+
+            return response.data;
+        });
 }
 
 /**
@@ -322,8 +347,8 @@ export function getAddressStakeList(address) {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<RewardListInfo>}
  */
 export function getAddressRewardList(address, params = {}) {
@@ -336,8 +361,8 @@ export function getAddressRewardList(address, params = {}) {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<RewardListInfo>}
  */
 export function getAddressRewardAggregatedList(address, params = {}) {
@@ -361,8 +386,8 @@ export function getAddressRewardAggregatedList(address, params = {}) {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<PenaltyListInfo>}
  */
 export function getAddressPenaltyList(address, params = {}) {
@@ -469,8 +494,8 @@ export function getValidatorMetaList() {
 /**
  * @param {string} publicKey
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<StakeListInfo>}
  */
 export function getValidatorStakeList(publicKey, params = {}) {
@@ -485,8 +510,8 @@ export function getValidatorStakeList(publicKey, params = {}) {
 /**
  * @param {string} publicKey
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<PenaltyListInfo>}
  */
 export function getValidatorPenaltyList(publicKey, params = {}) {
@@ -517,8 +542,8 @@ function mergePenaltyList([slashResponse, banResponse]) {
 /**
  * @param {string} publicKey
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getValidatorTransactionList(publicKey, params) {
@@ -603,6 +628,9 @@ export function getCoinList({skipMeta} = {}) {
         });
 }
 
+
+const poolCache = new Cache({maxAge: 15 * 1000});
+
 /**
  * @typedef {Object} PoolListInfo
  * @property {Array<Pool>} data
@@ -613,14 +641,14 @@ export function getCoinList({skipMeta} = {}) {
  * @param {Object} [params]
  * @param {string|number} [params.coin] - search by coin
  * @param {string} [params.provider] - search by Mx address
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<PoolListInfo>}
  */
 export function getPoolList(params) {
     return explorer.get('pools', {
             params,
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data);
 }
@@ -632,7 +660,7 @@ export function getPoolList(params) {
  */
 export function getPool(coin0, coin1) {
     return explorer.get(`pools/coins/${coin0}/${coin1}`, {
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data.data);
 }
@@ -643,7 +671,7 @@ export function getPool(coin0, coin1) {
  */
 export function getPoolByToken(symbol) {
     return explorer.get(`pools/token/${symbol}`, {
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data.data);
 }
@@ -653,27 +681,60 @@ export function getPoolByToken(symbol) {
  * @param {string|number} coin0
  * @param {string|number} coin1
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<TransactionListInfo>}
  */
 export function getPoolTransactionList(coin0, coin1, params) {
-    return explorer.get(`pools/coins/${coin0}/${coin1}/transactions`, {params})
+    return explorer.get(`pools/coins/${coin0}/${coin1}/transactions`, {
+            params,
+            poolCache,
+        })
         .then((response) => response.data);
+}
+
+/**
+ * //@TODO check cache is working with query params
+ * Get limit order list by pool
+ * @param {string|number} coin0
+ * @param {string|number} coin1
+ * @param {Object} [params]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
+ * @param {string} [params.type] - sell or buy
+ * @param {string} [params.status]
+ * @return {Promise<LimitOrderListInfo>}
+ */
+export function getPoolOrderList(coin0, coin1, params) {
+    return explorer.get(`pools/coins/${coin0}/${coin1}/orders`, {
+            params,
+            poolCache,
+        })
+        .then((response) => {
+            response.data.data = response.data.data.map((order) => {
+                return {
+                    ...order,
+                    coinToSellPrice: new Big(order.initialCoinToBuyVolume).div(order.initialCoinToSellVolume).toString(),
+                    coinToBuyPrice: new Big(order.initialCoinToSellVolume).div(order.initialCoinToBuyVolume).toString(),
+                };
+            });
+
+            return response.data;
+        });
 }
 
 /**
  * @param {string|number} coin0
  * @param {string|number} coin1
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<PoolProviderListInfo>}
  */
 export function getPoolProviderList(coin0, coin1, params) {
     return explorer.get(`pools/coins/${coin0}/${coin1}/providers`, {
             params,
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data);
 }
@@ -692,7 +753,7 @@ export function getPoolProviderList(coin0, coin1, params) {
  */
 export function getPoolProvider(coin0, coin1, address) {
     return explorer.get(`pools/coins/${coin0}/${coin1}/providers/${address}`, {
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data.data);
 }
@@ -700,14 +761,14 @@ export function getPoolProvider(coin0, coin1, address) {
 /**
  * @param {string} address
  * @param {Object} [params]
- * @param {number} [params.page]
- * @param {number} [params.limit]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
  * @return {Promise<ProviderPoolListInfo>}
  */
 export function getProviderPoolList(address, params) {
     return explorer.get(`pools/providers/${address}`, {
             params,
-            cache: statusCache,
+            cache: poolCache,
         })
         .then((response) => response.data);
 }
@@ -824,6 +885,29 @@ export function getCoinBySymbol(symbol) {
  */
 
 /**
+ * @typedef {Object} LimitOrderListInfo
+ * @property {Array<LimitOrder>} data
+ * @property {PaginationMeta} meta
+ */
+
+/**
+ * @typedef {Object} LimitOrder
+ * @property {number} id
+ * @property {number} height - created at block
+ * @property {string} address - owner
+ * @property {number} poolId
+ * @property {Coin} coinToSell
+ * @property {Coin} coinToBuy
+ * @property {string|number} coinToSellVolume
+ * @property {string|number} coinToBuyVolume
+ * @property {string|number} initialCoinToSellVolume
+ * @property {string|number} initialCoinToBuyVolume
+ * @property {string|number} coinToSellPrice
+ * @property {string|number} coinToBuyPrice
+ * @property {string} status
+ */
+
+/**
  * @typedef {Object} TransactionListInfo
  * @property {Array<Transaction>} data
  * @property {PaginationMeta} meta
@@ -849,7 +933,7 @@ export function getCoinBySymbol(symbol) {
  * @property {string} [data.to]
  * @property {Coin} [data.coin]
  * @property {number} [data.amount]
- * -- type: TX_TYPE.CONVERT
+ * -- type: TX_TYPE.SELL, TX_TYPE.BUY
  * @property {Coin} [data.coinToSell]
  * @property {Coin} [data.coinToBuy]
  * @property {Array<Coin>} [data.coins]
@@ -857,6 +941,9 @@ export function getCoinBySymbol(symbol) {
  * @property {number} [data.minimumValueToBuy]
  * @property {number} [data.valueToBuy]
  * @property {number} [data.maximumValueToSell]
+ * -- type: TX_TYPE.ADD_LIMIT_ORDER, TX_TYPE.REMOVE_LIMIT_ORDER
+ * @property {number} [data.orderId] - from tags
+ * @property {number} [data.id] - from data
  * -- type: TX_TYPE.CREATE_COIN
  * @property {number} [data.createdCoinId]
  * @property {string} [data.name]

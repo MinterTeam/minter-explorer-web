@@ -59,6 +59,7 @@ export const TAB_TYPES = {
     SLASH: 'penalty',
     UNBOND: 'unbond',
     PROVIDER: 'provider',
+    ORDER: 'order',
 };
 /**
  * @readonly

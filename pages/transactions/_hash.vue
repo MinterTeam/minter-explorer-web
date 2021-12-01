@@ -1,6 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
-    import Big from 'big.js';
+    import Big from '~/assets/big.js';
     import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
@@ -13,9 +13,6 @@
     import PoolLink from '~/components/common/PoolLink.vue';
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
-
-    Big.DP = 18;
-    Big.RM = 2;
 
     const HUB_ADDRESS = HUB_MINTER_MULTISIG_ADDRESS;
 
@@ -125,6 +122,9 @@
             },
             isBuyType() {
                 return this.isTxType(TX_TYPE.BUY) || this.isTxType(TX_TYPE.BUY_SWAP_POOL);
+            },
+            isAddOrderType() {
+                return this.isTxType(TX_TYPE.ADD_LIMIT_ORDER);
             },
             isUnbondType() {
                 return this.isTxType(TX_TYPE.UNBOND);
@@ -329,7 +329,7 @@
         if (Number(amountIn) === 0 || Number.isNaN(Number(amountIn))) {
             return 0;
         }
-        return new Big(amountOut).div(amountIn).toFixed(18);
+        return new Big(amountOut).div(amountIn).toString(33);
     }
 </script>
 
@@ -386,10 +386,22 @@
                     <dt v-if="tx.data.maximumValueToSell">Maximum value to spend</dt>
                     <dd v-if="tx.data.maximumValueToSell">{{ prettyExact(tx.data.maximumValueToSell) }}</dd>
 
-                    <dt v-if="isSellType || isBuyType">Rate {{ tx.data.coinToSell.symbol }}</dt>
-                    <Amount v-if="isSellType || isBuyType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :exact="false" tag="dd"/>
-                    <dt v-if="isSellType || isBuyType">Rate {{ tx.data.coinToBuy.symbol }}</dt>
-                    <Amount v-if="isSellType || isBuyType" :amount="coin1Price" :coin="tx.data.coinToSell.symbol" :exact="false" tag="dd"/>
+                    <!-- ADD_LIMIT_ORDER, REMOVE_LIMIT_ORDER -->
+                    <dt v-if="tx.data.id || tx.data.orderId">Order ID</dt>
+                    <dd v-if="tx.data.id || tx.data.orderId">{{ tx.data.id || tx.data.orderId }}</dd>
+
+                    <!-- ADD_LIMIT_ORDER -->
+                    <dt v-if="isAddOrderType">Pool</dt>
+                    <dd v-if="isAddOrderType"><PoolLink :pool="{coin0: tx.data.coinToSell, coin1: tx.data.coinToBuy}"/></dd>
+                    <dt v-if="isAddOrderType">Want to sell</dt>
+                    <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToSell" :coin="tx.data.coinToSell.symbol" :exact="true"/>
+                    <dt v-if="isAddOrderType">Want to buy</dt>
+                    <Amount tag="dd" v-if="isAddOrderType" :amount="tx.data.valueToBuy" :coin="tx.data.coinToBuy.symbol" :exact="true"/>
+
+                    <dt v-if="isSellType || isBuyType || isAddOrderType">Rate {{ tx.data.coinToSell.symbol }}</dt>
+                    <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin0Price" :coin="tx.data.coinToBuy.symbol" :significant="true" tag="dd"/>
+                    <dt v-if="isSellType || isBuyType || isAddOrderType">Rate {{ tx.data.coinToBuy.symbol }}</dt>
+                    <Amount v-if="isSellType || isBuyType || isAddOrderType" :amount="coin1Price" :coin="tx.data.coinToSell.symbol" :significant="true" tag="dd"/>
 
                     <dt v-if="tx.data.coins">Coins route</dt>
                     <dd v-if="tx.data.coins">
