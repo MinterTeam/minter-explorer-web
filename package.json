@@ -21,7 +21,6 @@
   ],
   "dependencies": {
     "@material/snackbar": "^13.0.0",
-    "@minterteam/footer-links": "^3.0.0",
     "axios": "^0.24.0",
     "axios-extensions": "^3.1.3",
     "big.js": "^6.1.1",
@@ -34,6 +33,7 @@
     "from-exponential": "^1.1.1",
     "lodash-es": "^4.17.21",
     "minter-coin-block-list": "0.0.7",
+    "minter-footer-links": "^3.1.0",
     "minter-js-sdk": "^0.39.0",
     "minterjs-tx": "^11.0.0",
     "minterjs-util": "^0.22.0",
