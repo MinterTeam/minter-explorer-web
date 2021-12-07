@@ -229,17 +229,24 @@
 .preview__block-time {font-size: 12px; color: @c-black-light;}
 .preview__block-reward {/*font-size: 12px;*/ line-height: 19px;}
 .preview__transaction-row {
-    &+& {margin-top: 10px;}
+    &+& {margin-top: 4px;}
 }
 .preview__transaction-meta {display: flex; justify-content: space-between; color: @c-black-light;}
 @media (min-width: @breakpoint-medium-up) {
     .preview__content {
-        height: 50vh; min-height: 460px; overflow: auto;
+        height: 50vh; min-height: 405px; /* 5 blocks */ overflow: auto;
         &::-webkit-scrollbar {width: 10px;}
         &::-webkit-scrollbar-track {background: #F6F6F6;}
         &::-webkit-scrollbar-thumb {background: #A4A4A4; border: 2px solid #F6F6F6; border-radius: 5px;}
     }
 }
+
+.preview-table {
+    background: #fff;
+    tr:first-child td {border-top: none;}
+}
+.preview-table__left {display: flex;}
+.preview-table__icon {margin-right: 10px;}
 
 .tx__success {color: @c-success; text-transform: capitalize;}
 .tx__fail {color: @c-fail; text-transform: capitalize;}

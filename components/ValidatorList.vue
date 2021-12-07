@@ -27,7 +27,7 @@
             if (process.client) {
                 resizeHandler = debounce(() => {
                     this.isCollapsed = this.getIsCollapsed();
-                });
+                }, 100);
                 window.addEventListener('resize', resizeHandler);
             }
         },
