@@ -111,6 +111,11 @@
                 txPaginationInfo: {},
                 isTxListLoading: false,
                 isTxListLoaded: false,
+                // failed txs
+                failedTxList: [],
+                failedTxPaginationInfo: {},
+                isFailedTxListLoading: false,
+                isFailedTxListLoaded: false,
                 // provider pools
                 poolList: [],
                 poolPaginationInfo: {},
@@ -231,6 +236,9 @@
                     if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
                         this.fetchTxs();
                     }
+                    if (this.activeTab === TAB_TYPES.FAILED_TX && !this.isFailedTxListLoaded) {
+                        this.fetchFailedTxs();
+                    }
                     if (this.activeTab === TAB_TYPES.PROVIDER && !this.isPoolListLoaded) {
                         this.fetchProviderList();
                     }
@@ -256,6 +264,9 @@
                 } else if (newTab === oldTab && newPage !== oldPage) {
                     if (this.activeTab === TAB_TYPES.TX) {
                         this.fetchTxs();
+                    }
+                    if (this.activeTab === TAB_TYPES.FAILED_TX) {
+                        this.fetchFailedTxs();
                     }
                     if (this.activeTab === TAB_TYPES.PROVIDER) {
                         this.fetchProviderList();
@@ -287,6 +298,19 @@
                     })
                     .catch(() => {
                         this.isTxListLoading = false;
+                    });
+            },
+            fetchFailedTxs() {
+                this.isFailedTxListLoading = true;
+                getAddressTransactionList(this.$route.params.address, {...this.$route.query, type: 'failed'})
+                    .then((txListInfo) => {
+                        this.failedTxList = txListInfo.data;
+                        this.failedtxPaginationInfo = txListInfo.meta;
+                        this.isFailedTxListLoading = false;
+                        this.isFailedTxListLoaded = true;
+                    })
+                    .catch(() => {
+                        this.isFailedTxListLoading = false;
                     });
             },
             fetchProviderList() {
@@ -485,6 +509,13 @@
                     Penalties
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.FAILED_TX}"
+                        @click="switchTab($options.TAB_TYPES.FAILED_TX)"
+                >
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    Failed txs
+                </button>
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.UNBOND}"
                         @click="switchTab($options.TAB_TYPES.UNBOND)"
                 >
@@ -494,6 +525,13 @@
             </div>
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-address="$route.params.address" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
+            <!-- Failed Transactions -->
+            <TransactionListTable
+                :tx-list="failedTxList"
+                :current-address="$route.params.address"
+                :is-loading="isFailedTxListLoading"
+                v-if="activeTab === $options.TAB_TYPES.FAILED_TX"
+            />
             <!-- Provider pools -->
             <PoolProviderList
                 v-if="activeTab === $options.TAB_TYPES.PROVIDER"

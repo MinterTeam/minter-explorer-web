@@ -297,6 +297,7 @@ function markVerified(coinListPromise, itemType = 'coin') {
  * @param {Object} [params]
  * @param {number|string} [params.page]
  * @param {number|string} [params.limit]
+ * @param {"failed"} [params.type]
  * @return {Promise<TransactionListInfo>}
  */
 export function getAddressTransactionList(address, params) {
