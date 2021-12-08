@@ -1,33 +1,52 @@
 <script>
-    import {getValidatorList} from '~/api/explorer.js';
-    import {pretty, prettyRound, getExplorerValidatorUrl} from '~/assets/utils.js';
-    import {VALIDATOR_STATUS} from '~/assets/variables.js';
-    import getTitle from '~/assets/get-title.js';
-    import BackButton from '~/components/BackButton.vue';
-    import TableLink from '~/components/TableLink.vue';
+import {pretty, prettyRound, getExplorerValidatorUrl} from '~/assets/utils.js';
+import {VALIDATOR_STATUS} from '~/assets/variables.js';
+import getTitle from '~/assets/get-title.js';
+import BackButton from '~/components/BackButton.vue';
+import TableLink from '~/components/TableLink.vue';
+import Pagination from "~/components/Pagination.vue";
 
-    export default {
-        VALIDATOR_STATUS,
-        components: {
-            BackButton,
-            TableLink,
+const PER_PAGE = 50;
+
+export default {
+    VALIDATOR_STATUS,
+    components: {
+        BackButton,
+        TableLink,
+        Pagination,
+    },
+    head() {
+        const title = getTitle('Coins');
+
+        return {
+            title: title,
+            meta: [
+                { hid: 'og-title', name: 'og:title', content: title },
+            ],
+        };
+    },
+    computed: {
+        coinList() {
+            const index = this.paginationInfo.currentPage - 1;
+            return this.$store.state.explorer.coinList.slice(index * PER_PAGE, (index + 1) * PER_PAGE);
         },
-        head() {
-            const title = getTitle('Coins');
-
+        paginationInfo() {
             return {
-                title: title,
-                meta: [
-                    { hid: 'og-title', name: 'og:title', content: title },
-                ],
+                currentPage: this.$route.query.page > 1 ? Number(this.$route.query.page) : 1,
+                lastPage: Math.ceil(this.$store.state.explorer.coinList.length / PER_PAGE),
             };
         },
-        methods: {
-            pretty,
-            prettyRound,
-            getExplorerValidatorUrl,
+    },
+    methods: {
+        pretty,
+        prettyRound,
+        getExplorerValidatorUrl,
+        formatType(value) {
+            value = value.replaceAll('_', ' ');
+            return value.charAt(0).toUpperCase() + value.slice(1); // capitalize the first letter
         },
-    };
+    },
+};
 </script>
 
 <template>
@@ -49,13 +68,12 @@
                         <th>Type</th>
                         <th>Volume</th>
                         <th>Reserve</th>
-                        <th>Crr</th>
+                        <th>CRR</th>
                         <th>Owner</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <!-- @TODO pagination -->
-                    <tr v-for="coin in $store.state.explorer.coinList.slice(0, 50)" :key="coin.id">
+                    <tr v-for="coin in coinList" :key="coin.id">
                         <td>
                             <!-- @TODO show icon as in preview -->
                             <nuxt-link class="link--default u-icon-wrap u-text-white-space-normal" :to="`/coins/${coin.symbol}`">
@@ -67,7 +85,7 @@
                                 {{ coin.symbol }}
                             </nuxt-link>
                         </td>
-                        <td>{{ coin.type }}</td>
+                        <td>{{ formatType(coin.type) }}</td>
                         <td>{{ prettyRound(coin.volume) }}</td>
                         <td>{{ prettyRound(coin.reserveBalance) }} {{ $store.state.COIN_NAME }}</td>
                         <td>
@@ -86,5 +104,6 @@
                 </table>
             </div>
         </section>
+        <Pagination :pagination-info="paginationInfo"/>
     </div>
 </template>
