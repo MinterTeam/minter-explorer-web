@@ -10,11 +10,13 @@
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
     import PreviewTransactions from '~/components/PreviewTransactions';
+    import PreviewValidators from '~/components/PreviewValidators.vue';
+    import PreviewCoins from '~/components/PreviewCoins.vue';
     import PreviewPools from '~/components/PreviewPools.vue';
     import PreviewFarm from '~/components/PreviewFarm.vue';
 
-    const BLOCK_LIST_LENGTH = 20;
-    const TX_LIST_LENGTH = 20;
+    const BLOCK_LIST_LENGTH = 10;
+    const TX_LIST_LENGTH = 10;
     const POOL_LIST_LENGTH = 10;
 
     let centrifuge;
@@ -36,6 +38,8 @@
             HistoryChart,
             PreviewBlocks,
             PreviewTransactions,
+            PreviewValidators,
+            PreviewCoins,
             PreviewPools,
             PreviewFarm,
         },
@@ -210,6 +214,12 @@
         </section>
         <section class="u-cell u-cell--large--1-2">
             <PreviewTransactions :tx-list="txList"/>
+        </section>
+        <section class="u-cell u-cell--large--1-2">
+            <PreviewValidators/>
+        </section>
+        <section class="u-cell u-cell--large--1-2">
+            <PreviewCoins/>
         </section>
         <section class="u-cell">
             <PreviewPools :pool-list="poolList"/>

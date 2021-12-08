@@ -54,7 +54,14 @@ export function getDateHuman(timestamp) {
     return timeFormat(timestamp, 'd MMMM yyyy');
 }
 
-export function shortFilter(value, endLength = 6, minLengthToShort) {
+/**
+ *
+ * @param {string} value
+ * @param {number} [endLength]
+ * @param {number} [minLengthToShort]
+ * @return {string}
+ */
+export function shortHashFilter(value, endLength = 6, minLengthToShort) {
     const startLength = endLength + 'Mx'.length - 1;
     minLengthToShort = minLengthToShort || startLength + endLength;
     value = value.toString();
@@ -62,6 +69,12 @@ export function shortFilter(value, endLength = 6, minLengthToShort) {
 
     return isLong ? value.substr(0, startLength) + '…' + value.substr(-endLength) : value;
 }
+
+/**
+ * @deprecated
+ * @type {function(string, number=, number=): string}
+ */
+export const shortFilter = shortHashFilter;
 
 
 export function txTypeFilter(value) {

@@ -2,7 +2,6 @@ import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import stripZeros from 'pretty-num/src/strip-zeros';
 import Big from '~/assets/big.js';
-import {_getOracleCoinList} from '~/api/hub.js';
 import {getCoinIconList as getChainikIconList} from '~/api/chainik.js';
 import {EXPLORER_API_URL, REWARD_CHART_TYPES, BASE_COIN, TX_STATUS} from "~/assets/variables.js";
 import addToCamelInterceptor from '~/assets/to-camel.js';
@@ -265,7 +264,7 @@ export async function prepareBalance(balanceList) {
  * @return {Promise<Array<Coin>|Array<BalanceItem>>}
  */
 function markVerified(coinListPromise, itemType = 'coin') {
-    const hubCoinListPromise = _getOracleCoinList()
+    const hubCoinListPromise = getOracleVerifiedList()
         .catch((error) => {
             console.log(error);
             return [];
@@ -275,7 +274,7 @@ function markVerified(coinListPromise, itemType = 'coin') {
         .then(([coinList, hubCoinList]) => {
             let verifiedMap = {};
             hubCoinList.forEach((item) => {
-                verifiedMap[Number(item.minterId)] = true;
+                verifiedMap[item.id] = true;
             });
 
             return coinList.map((coinItem) => {
@@ -298,6 +297,7 @@ function markVerified(coinListPromise, itemType = 'coin') {
  * @param {Object} [params]
  * @param {number|string} [params.page]
  * @param {number|string} [params.limit]
+ * @param {"failed"} [params.type]
  * @return {Promise<TransactionListInfo>}
  */
 export function getAddressTransactionList(address, params) {
@@ -625,6 +625,19 @@ export function getCoinList({skipMeta} = {}) {
                     return /-\d+$/.test(coin.symbol);
                 }
             });
+        });
+}
+
+/**
+ * @return {Promise<Array<CoinInfo>>}
+ */
+export function getOracleVerifiedList() {
+    return explorer.get('coins/oracle/verified', {
+        cache: coinsCache,
+    })
+        .then((response) => {
+            const coinList = response.data.data;
+            return coinList;
         });
 }
 

@@ -5,7 +5,8 @@ module.exports = {
         node: true,
     },
     parserOptions: {
-        parser: 'babel-eslint',
+        parser: '@babel/eslint-parser',
+        requireConfigFile: false,
     },
     extends: [
         "eslint:recommended",
@@ -29,5 +30,7 @@ module.exports = {
         'semi': ["error", "always"],
         'semi-spacing': "error",
         'space-before-function-paren': ["error", {"anonymous": "never", "named": "never", "asyncArrow": "always"}],
+
+        'vue/multi-word-component-names': 0,
     },
 };

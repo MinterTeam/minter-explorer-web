@@ -84,11 +84,14 @@ function _getFarmList(address) {
         })
         .then((response) => {
             const list = response.data.data || [];
-            return list.map((farmItem) => {
-                farmItem.tokenSymbol = `LP-${farmItem.poolId}`;
+            return list
+                // filter out unpaid for 3 days
+                .filter((farmItem) => farmItem.period * farmItem.unpaidTxCount < 24 * 3)
+                .map((farmItem) => {
+                    farmItem.tokenSymbol = `LP-${farmItem.poolId}`;
 
-                return farmItem;
-            });
+                    return farmItem;
+                });
         });
 }
 
@@ -158,7 +161,7 @@ function addPoolFields(farmProgram, pool) {
 }
 
 /**
- * @typedef {{id:number, address:string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string}} FarmItem
+ * @typedef {{id:number, address:string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string, unpaidTxCount: number, debt: number|string}} FarmItem
  */
 
 
