@@ -322,6 +322,7 @@
             checkFromBase64(b64) {
                 return 'Mc' + Buffer.from(b64, 'base64').toString('hex');
             },
+            calculateTradeRate,
         },
     };
 
@@ -440,14 +441,22 @@
                     <dt v-if="tx.data.minimumVolume1">Min volume of second coin</dt>
                     <dd v-if="tx.data.minimumVolume1">{{ prettyExact(tx.data.minimumVolume1) }} {{ tx.data.coin1.symbol }}</dd>
 
-                    <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin0.symbol }} price</dt>
-                    <dd v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">
-                        {{ pretty(tx.data.volume1 / tx.data.volume0) }} {{ tx.data.coin1.symbol }}
-                    </dd>
-                    <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin1.symbol }} price</dt>
-                    <dd v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">
-                        {{ pretty(tx.data.volume0 / tx.data.volume1) }} {{ tx.data.coin0.symbol }}
-                    </dd>
+                    <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin0.symbol }} rate</dt>
+                    <Amount
+                        tag="dd"
+                        v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)"
+                        :amount="calculateTradeRate(tx.data.volume0, tx.data.volume1)"
+                        :coin="tx.data.coin1.symbol"
+                        :significant="true"
+                    />
+                    <dt v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)">{{ tx.data.coin1.symbol }} rate</dt>
+                    <Amount
+                        tag="dd"
+                        v-if="isDefined(tx.data.volume0) && isDefined(tx.data.volume1)"
+                        :amount="calculateTradeRate(tx.data.volume1, tx.data.volume0)"
+                        :coin="tx.data.coin0.symbol"
+                        :significant="true"
+                    />
 
                 <!-- CREATE_COIN, RECREATE_COIN, EDIT_TICKER_OWNER, CREATE_TOKEN, RECREATE_TOKEN -->
                 <dt v-if="tx.data.createdCoinId">Coin ID</dt>

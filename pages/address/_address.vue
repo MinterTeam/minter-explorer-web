@@ -30,6 +30,20 @@
         return val > 0 ? val : 1;
     }
 
+    const STABLE_LIST = [
+        'USDT',
+        'USDC',
+        'BUSD',
+        'DAI',
+        'UST',
+        'PAX',
+        'TUSD',
+        'HUSD',
+    ];
+    function isStableCoin(symbol) {
+        return STABLE_LIST.some((stableName) => new RegExp(`^${stableName}`).test(symbol));
+    }
+
     export default {
         ideFix: null,
         TAB_TYPES,
@@ -55,7 +69,7 @@
         },
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
-        asyncData({ params, error }) {
+        asyncData({ params, store, error }) {
             if (!isValidAddress(params.address)) {
                 return error({
                     statusCode: 404,
@@ -160,6 +174,17 @@
             },
         },
         computed: {
+            balanceListFormatted() {
+                return this.balanceList
+                    .map((item) => {
+                        if (isStableCoin(item.coin.symbol)) {
+                            item.usdAmount = 0;
+                        } else {
+                            item.usdAmount = item.bipAmount * this.$store.getters['explorer/bipPriceUsd'];
+                        }
+                        return item;
+                    });
+            },
             activeTab() {
                 return ensureTab(this.$route.query.active_tab);
             },
@@ -187,6 +212,7 @@
             },
         },
         methods: {
+            pretty,
             prettyPrecise,
             getCoinIconUrl(coin) {
                 return this.$store.getters['explorer/getCoinIcon'](coin);
@@ -429,16 +455,20 @@
                 <dt>Balance</dt>
                 <dd>
                     <table class="table--balance">
-                        <tr v-for="balance in balanceList" :key="balance.coin.id">
+                        <tr v-for="balance in balanceListFormatted" :key="balance.coin.id">
                             <td>
                                 <span class="u-icon-wrap">
                                     <img class="u-icon--coin" :src="getCoinIconUrl(balance.coin.symbol)" width="20" height="20" alt="" role="presentation">
                                     {{ balance.coin.symbol }}
                                     <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="balance.coin.verified">
                                 </span>
-
                             </td>
-                            <td :title="prettyPrecise(balance.amount)">{{ balance.amount | pretty }}</td>
+                            <td :title="prettyPrecise(balance.amount)">
+                                {{ pretty(balance.amount) }}
+                                <span class="u-text-muted" v-if="balance.usdAmount">
+                                    (${{ pretty(balance.usdAmount) }})
+                                </span>
+                            </td>
                         </tr>
                     </table>
                 </dd>

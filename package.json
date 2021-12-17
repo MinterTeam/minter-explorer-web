@@ -32,9 +32,9 @@
     "entity-decode": "^2.0.2",
     "from-exponential": "^1.1.1",
     "lodash-es": "^4.17.21",
-    "minter-coin-block-list": "0.0.7",
+    "minter-coin-block-list": "0.0.9",
     "minter-footer-links": "^3.1.0",
-    "minter-js-sdk": "^0.39.0",
+    "minter-js-sdk": "^0.40.2",
     "minterjs-tx": "^11.0.0",
     "minterjs-util": "^0.22.0",
     "nuxt": "^2.15.8",
@@ -44,7 +44,7 @@
     "vue-inline-svg": "^2.1.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.16.3",
+    "@babel/eslint-parser": "^7.16.5",
     "@nuxt/types": "^2.15.8",
     "autoprefixer": "^9.8.8",
     "beeper": "^2.1.0",
