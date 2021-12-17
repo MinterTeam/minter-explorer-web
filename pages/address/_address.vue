@@ -30,6 +30,20 @@
         return val > 0 ? val : 1;
     }
 
+    const STABLE_LIST = [
+        'USDT',
+        'USDC',
+        'BUSD',
+        'DAI',
+        'UST',
+        'PAX',
+        'TUSD',
+        'HUSD',
+    ];
+    function isStableCoin(symbol) {
+        return STABLE_LIST.some((stableName) => new RegExp(`^${stableName}`).test(symbol));
+    }
+
     export default {
         ideFix: null,
         TAB_TYPES,
@@ -55,7 +69,7 @@
         },
         // watchQuery: ['page', 'active_tab_page'],
         // key: (to) => to.fullPath,
-        asyncData({ params, error }) {
+        asyncData({ params, store, error }) {
             if (!isValidAddress(params.address)) {
                 return error({
                     statusCode: 404,
@@ -111,6 +125,11 @@
                 txPaginationInfo: {},
                 isTxListLoading: false,
                 isTxListLoaded: false,
+                // failed txs
+                failedTxList: [],
+                failedTxPaginationInfo: {},
+                isFailedTxListLoading: false,
+                isFailedTxListLoaded: false,
                 // provider pools
                 poolList: [],
                 poolPaginationInfo: {},
@@ -155,6 +174,17 @@
             },
         },
         computed: {
+            balanceListFormatted() {
+                return this.balanceList
+                    .map((item) => {
+                        if (isStableCoin(item.coin.symbol)) {
+                            item.usdAmount = 0;
+                        } else {
+                            item.usdAmount = item.bipAmount * this.$store.getters['explorer/bipPriceUsd'];
+                        }
+                        return item;
+                    });
+            },
             activeTab() {
                 return ensureTab(this.$route.query.active_tab);
             },
@@ -182,6 +212,7 @@
             },
         },
         methods: {
+            pretty,
             prettyPrecise,
             getCoinIconUrl(coin) {
                 return this.$store.getters['explorer/getCoinIcon'](coin);
@@ -231,6 +262,9 @@
                     if (this.activeTab === TAB_TYPES.TX && !this.isTxListLoaded) {
                         this.fetchTxs();
                     }
+                    if (this.activeTab === TAB_TYPES.FAILED_TX && !this.isFailedTxListLoaded) {
+                        this.fetchFailedTxs();
+                    }
                     if (this.activeTab === TAB_TYPES.PROVIDER && !this.isPoolListLoaded) {
                         this.fetchProviderList();
                     }
@@ -256,6 +290,9 @@
                 } else if (newTab === oldTab && newPage !== oldPage) {
                     if (this.activeTab === TAB_TYPES.TX) {
                         this.fetchTxs();
+                    }
+                    if (this.activeTab === TAB_TYPES.FAILED_TX) {
+                        this.fetchFailedTxs();
                     }
                     if (this.activeTab === TAB_TYPES.PROVIDER) {
                         this.fetchProviderList();
@@ -287,6 +324,19 @@
                     })
                     .catch(() => {
                         this.isTxListLoading = false;
+                    });
+            },
+            fetchFailedTxs() {
+                this.isFailedTxListLoading = true;
+                getAddressTransactionList(this.$route.params.address, {...this.$route.query, type: 'failed'})
+                    .then((txListInfo) => {
+                        this.failedTxList = txListInfo.data;
+                        this.failedtxPaginationInfo = txListInfo.meta;
+                        this.isFailedTxListLoading = false;
+                        this.isFailedTxListLoaded = true;
+                    })
+                    .catch(() => {
+                        this.isFailedTxListLoading = false;
                     });
             },
             fetchProviderList() {
@@ -405,16 +455,20 @@
                 <dt>Balance</dt>
                 <dd>
                     <table class="table--balance">
-                        <tr v-for="balance in balanceList" :key="balance.coin.id">
+                        <tr v-for="balance in balanceListFormatted" :key="balance.coin.id">
                             <td>
                                 <span class="u-icon-wrap">
                                     <img class="u-icon--coin" :src="getCoinIconUrl(balance.coin.symbol)" width="20" height="20" alt="" role="presentation">
                                     {{ balance.coin.symbol }}
                                     <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="balance.coin.verified">
                                 </span>
-
                             </td>
-                            <td :title="prettyPrecise(balance.amount)">{{ balance.amount | pretty }}</td>
+                            <td :title="prettyPrecise(balance.amount)">
+                                {{ pretty(balance.amount) }}
+                                <span class="u-text-muted" v-if="balance.usdAmount">
+                                    (${{ pretty(balance.usdAmount) }})
+                                </span>
+                            </td>
                         </tr>
                     </table>
                 </dd>
@@ -485,6 +539,13 @@
                     Penalties
                 </button>
                 <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+                        :class="{'is-active': activeTab === $options.TAB_TYPES.FAILED_TX}"
+                        @click="switchTab($options.TAB_TYPES.FAILED_TX)"
+                >
+                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
+                    Failed txs
+                </button>
+                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                         :class="{'is-active': activeTab === $options.TAB_TYPES.UNBOND}"
                         @click="switchTab($options.TAB_TYPES.UNBOND)"
                 >
@@ -494,6 +555,13 @@
             </div>
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-address="$route.params.address" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
+            <!-- Failed Transactions -->
+            <TransactionListTable
+                :tx-list="failedTxList"
+                :current-address="$route.params.address"
+                :is-loading="isFailedTxListLoading"
+                v-if="activeTab === $options.TAB_TYPES.FAILED_TX"
+            />
             <!-- Provider pools -->
             <PoolProviderList
                 v-if="activeTab === $options.TAB_TYPES.PROVIDER"

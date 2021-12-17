@@ -55,6 +55,12 @@ a, .link {&:hover, &:focus {/*text-decoration: underline; */outline: none;}}
     &:hover, &:focus {text-decoration: underline;}
 }
 .link--default {.link--main(); .link--hover(); font-weight: 700;}
+.link--default-wrap {
+    &:hover, &:focus {
+        .link--default-inner {text-decoration: underline;}
+    }
+}
+.link--default-inner {color: @c-main; font-weight: 700;}
 button {cursor: pointer; outline: none;}
 p, ul, ol {margin: 0;}
 p + p {margin-top: 10px;}

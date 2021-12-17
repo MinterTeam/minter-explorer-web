@@ -54,6 +54,7 @@ export const REWARD_CHART_TYPES = {
  */
 export const TAB_TYPES = {
     TX: 'tx',
+    FAILED_TX: 'failed_tx',
     STAKE: 'stake',
     REWARD: 'reward',
     SLASH: 'penalty',

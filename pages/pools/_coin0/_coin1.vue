@@ -304,10 +304,10 @@ function calculateTradeRate(amountIn, amountOut) {
                         <Amount :amount="pool.amount1" :coin="pool.coin1.symbol" :exact="true" tag="dd"/>
 
                         <dt>Price {{ pool.coin0.symbol }}</dt>
-                        <Amount :amount="coin0Price" :coin="pool.coin1.symbol" :exact="false" tag="dd"/>
+                        <Amount :amount="coin0Price" :coin="pool.coin1.symbol" :significant="true" tag="dd"/>
 
                         <dt>Price {{ pool.coin1.symbol }}</dt>
-                        <Amount :amount="coin1Price" :coin="pool.coin0.symbol" :exact="false" tag="dd"/>
+                        <Amount :amount="coin1Price" :coin="pool.coin0.symbol" :significant="true" tag="dd"/>
 
 
 

@@ -1,6 +1,6 @@
 <script>
     import {getValidatorList} from '~/api/explorer.js';
-    import {pretty, getExplorerValidatorUrl} from '~/assets/utils.js';
+    import {pretty, prettyRound, getExplorerValidatorUrl} from '~/assets/utils.js';
     import {VALIDATOR_STATUS} from '~/assets/variables.js';
     import getTitle from '~/assets/get-title.js';
     import BackButton from '~/components/BackButton.vue';
@@ -42,6 +42,7 @@
         },
         methods: {
             pretty,
+            prettyRound,
             getExplorerValidatorUrl,
         },
     };
@@ -73,7 +74,8 @@
                     <tbody>
                     <tr v-for="validator in validatorList" :key="validator.publicKey">
                         <td>
-                            <nuxt-link class="link--default u-icon-wrap" v-if="validator.name" :to="getExplorerValidatorUrl(validator.publicKey)">
+<!-- @TODO show pubKey as in preview -->
+                            <nuxt-link class="link--default u-icon-wrap u-text-white-space-normal" v-if="validator.name" :to="getExplorerValidatorUrl(validator.publicKey)">
                                 <img v-if="validator.iconUrl" :src="validator.iconUrl" class="u-icon--coin" width="24" height="24" alt="" role="presentation">
                                 {{ validator.name }}
                             </nuxt-link>
@@ -86,7 +88,7 @@
                         </td>
                         <td :class="validator.status === 2 ? 'tx__success u-fw-500' : ''">{{ $options.VALIDATOR_STATUS[validator.status || 0] }}</td>
                         <td>
-                            {{ pretty(validator.stake) }} {{ $store.state.COIN_NAME }}
+                            {{ prettyRound(validator.stake) }} {{ $store.state.COIN_NAME }}
                             <span class="u-text-muted" v-if="validator.part > 0">({{ pretty(validator.part || 0) }}&thinsp;%)</span>
                         </td>
                         <td>{{ validator.commission }}&thinsp;%</td>

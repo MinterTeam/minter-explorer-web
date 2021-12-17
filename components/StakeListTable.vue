@@ -105,8 +105,8 @@
             if (process.client) {
                 resizeHandler = debounce(() => {
                     this.shouldShortenLabel = this.getShouldShortenLabel();
-                });
-                window.addEventListener('resize', resizeHandler, 100);
+                }, 100);
+                window.addEventListener('resize', resizeHandler);
             }
         },
         destroyed() {
