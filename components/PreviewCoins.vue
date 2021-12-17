@@ -53,7 +53,8 @@ export default {
                     </td>
                     <td>
                         <div class="u-text-muted">Volume</div>
-                        <div class="u-fw-500">{{ prettyRound(coin.volume) }}</div>
+                        <div class="u-fw-500" v-if="coin.volume > 0">{{ prettyRound(coin.volume) }}</div>
+                        <div v-else>—</div>
                     </td>
                     <td>
                         <div class="u-text-muted">CRR</div>
