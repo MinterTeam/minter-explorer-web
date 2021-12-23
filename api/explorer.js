@@ -237,14 +237,25 @@ export async function prepareBalance(balanceList) {
                 return 1;
             }
 
-            // verified coins go second
-            if (a.coin.verified && !b.coin.verified) {
-                return -1;
-            } else if (b.coin.verified && !a.coin.verified) {
+            // archived coins go last
+            const aIsArchived = isArchived(a.coin);
+            const bIsArchived = isArchived(b.coin);
+            if (aIsArchived && !bIsArchived) {
                 return 1;
+            } else if (bIsArchived && !aIsArchived) {
+                return -1;
             }
 
-            return 0;
+            // pool tokens go before archived
+            const aIsLP = isPoolToken(a.coin);
+            const bIsLP = isPoolToken(b.coin);
+            if (aIsLP && !bIsLP) {
+                return 1;
+            } else if (bIsLP && !aIsLP) {
+                return -1;
+            }
+
+            return b.bipAmount - a.bipAmount;
 
             // sort coins by name, instead of reserve
             // return a.coin.symbol.localeCompare(b.coin.symbol);
@@ -255,6 +266,16 @@ export async function prepareBalance(balanceList) {
                 amount: stripZeros(coinItem.amount),
             };
         });
+}
+
+function isPoolToken(coin) {
+    return coin.type === 'pool_token';
+}
+function isArchived(coin) {
+    if (coin.type === 'pool_token') {
+        return false;
+    }
+    return /-\d+$/.test(coin.symbol);
 }
 
 /**
