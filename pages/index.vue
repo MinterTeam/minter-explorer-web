@@ -28,7 +28,7 @@
         statsPromise = getStatus();
         const blocksPromise = getBlockList().then((blockListInfo) => blockListInfo.data);
         const txPromise = getTransactionList().then((txListInfo) => txListInfo.data);
-        const poolsPromise = getPoolList().then((poolListInfo) => poolListInfo.data);
+        const poolsPromise = getPoolList(undefined, {filterBlocked: true}).then((poolListInfo) => poolListInfo.data);
         return Promise.all([statsPromise, blocksPromise, txPromise, poolsPromise]);
     }
 

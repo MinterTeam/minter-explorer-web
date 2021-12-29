@@ -2,11 +2,19 @@ import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import stripZeros from 'pretty-num/src/strip-zeros';
 import Big from '~/assets/big.js';
+import coinBlockList from 'minter-coin-block-list';
 import {getCoinIconList as getChainikIconList} from '~/api/chainik.js';
 import {EXPLORER_API_URL, REWARD_CHART_TYPES, BASE_COIN, TX_STATUS} from "~/assets/variables.js";
 import addToCamelInterceptor from '~/assets/to-camel.js';
 import {addTimeInterceptor} from '~/assets/time-offset.js';
 import {padZero} from '~/assets/utils.js';
+
+
+const coinBlockMap = Object.fromEntries(coinBlockList.map((symbol) => [symbol, true]));
+function isBlocked(symbol) {
+    return !!coinBlockMap[symbol.replace(/-\d+$/, '')];
+}
+
 
 const instance = axios.create({
     baseURL: EXPLORER_API_URL,
@@ -677,14 +685,23 @@ const poolCache = new Cache({maxAge: 15 * 1000});
  * @param {string} [params.provider] - search by Mx address
  * @param {number|string} [params.page]
  * @param {number|string} [params.limit]
+ * @param {Object} [options]
+ * @param {boolean} [options.filterBlocked]
  * @return {Promise<PoolListInfo>}
  */
-export function getPoolList(params) {
+export function getPoolList(params, options) {
     return explorer.get('pools', {
             params,
             cache: poolCache,
         })
-        .then((response) => response.data);
+        .then((response) => {
+            if (options.filterBlocked) {
+                response.data.data = response.data.data.filter((pool) => {
+                    return !isBlocked(pool.coin0.symbol) && !isBlocked(pool.coin1.symbol);
+                });
+            }
+            return response.data;
+        });
 }
 
 /**
