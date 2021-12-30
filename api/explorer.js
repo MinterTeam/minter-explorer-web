@@ -689,7 +689,7 @@ const poolCache = new Cache({maxAge: 15 * 1000});
  * @param {boolean} [options.filterBlocked]
  * @return {Promise<PoolListInfo>}
  */
-export function getPoolList(params, options) {
+export function getPoolList(params, options = {}) {
     return explorer.get('pools', {
             params,
             cache: poolCache,
