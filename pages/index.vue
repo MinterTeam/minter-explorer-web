@@ -186,6 +186,8 @@
                         return item.hash === newTx.hash;
                     });
                     if (!isExist) {
+                        // ensure data
+                        newTx.data = newTx.data || {};
                         this.txList.unshift(newTx);
                         this.txList = this.txList.slice(0, TX_LIST_LENGTH);
                         this.lastTxTime = Date.now();
