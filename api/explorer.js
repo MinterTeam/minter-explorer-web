@@ -974,6 +974,8 @@ export function getCoinBySymbol(symbol) {
  * @property {string} from
  * @property {string} timestamp
  * @property {Coin} gasCoin
+ * @property {string} rawTx
+ * @property {string} payload
  * @property {number} commissionInBaseCoin
  * @property {number} commissionInGasCoin
  * @property {number} commissionPrice

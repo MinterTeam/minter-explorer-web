@@ -605,11 +605,14 @@
                         {{ tx.gasPrice }}
                     </dd>
 
-                <dt v-if="tx.nonce">Nonce</dt>
-                <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
+                    <dt v-if="tx.nonce">Nonce</dt>
+                    <dd v-if="tx.nonce">{{ tx.nonce }}</dd>
 
-                <dt>Message</dt>
-                <dd class="dd u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
+                    <dt>Payload</dt>
+                    <dd class="dd u-text-pre-line" :class="{'u-text-muted': !tx.payload }">{{ tx.payload ? fromBase64(tx.payload) : 'Blank' }}</dd>
+
+                    <dt>Raw tx</dt>
+                    <dd class="dd">0x{{ tx.rawTx }}</dd>
 
                 </template>
                 <template v-if="tx.status === $options.TX_STATUS.FAILURE">
