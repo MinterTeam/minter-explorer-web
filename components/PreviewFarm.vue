@@ -10,11 +10,10 @@ export default {
         //         this.uniswapPair = pairDayData;
         //     });
 
-        const farmListPromise = fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
+        const farmListPromise = fillFarmWithPoolData(getFarmList({onlyTrusted: true}), {skipLowLiquidity: true})
             .then((farmList) => {
-                farmList = farmList
-                    .filter((item) => item.liquidityBip > 100000)
-                    .filter((item) => item.ownerAddress === 'Mxcb272d7efc6c4a3122d705100fa0032703446e3e' || item.ownerAddress === 'Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d');
+                // farmList = farmList
+                //     .filter((item) => item.liquidityBip > 100000);
                 this.farmList = selectRandomItems(farmList, 3);
             });
 
