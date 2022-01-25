@@ -5,8 +5,8 @@ import Big from '~/assets/big.js';
 import coinBlockList from 'minter-coin-block-list';
 import {getCoinIconList as getChainikIconList} from '~/api/chainik.js';
 import {EXPLORER_API_URL, REWARD_CHART_TYPES, BASE_COIN, TX_STATUS} from "~/assets/variables.js";
-import addToCamelInterceptor from '~/assets/to-camel.js';
-import {addTimeInterceptor} from '~/assets/time-offset.js';
+import addToCamelInterceptor from '~/assets/axios-to-camel.js';
+import {addTimeInterceptor} from '~/assets/axios-time-offset.js';
 import {padZero} from '~/assets/utils.js';
 
 

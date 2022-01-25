@@ -5,7 +5,7 @@
     import {getBlockList, getStatus, getTransactionList, getPoolList} from '~/api/explorer.js';
     import getTitle from '~/assets/get-title';
     import {EXPLORER_RTM_URL, NETWORK, HISTORY_TRANSACTION_COUNT} from '~/assets/variables.js';
-    import {toCamel} from '~/assets/to-camel.js';
+    import {toCamel} from '~/assets/axios-to-camel.js';
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';

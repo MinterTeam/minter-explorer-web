@@ -6,8 +6,8 @@ import stripZeros from 'pretty-num/src/strip-zeros';
 import fromExponential from 'from-exponential';
 import decode from 'entity-decode';
 import {txTypeList} from 'minterjs-util/src/tx-types.js';
-import {getTimeOffset} from '~/assets/time-offset.js';
-import {ETHERSCAN_HOST} from '~/assets/variables.js';
+import {getTimeOffset} from 'assets/axios-time-offset.js';
+import {ETHERSCAN_HOST, HUB_CHAIN_BY_ID} from '~/assets/variables.js';
 
 function timeFormat(timestamp, pattern) {
     if (typeof timestamp === 'string') {
@@ -97,8 +97,24 @@ export function getExplorerValidatorUrl(pubKey) {
     return '/validators/' + pubKey;
 }
 
+/**
+ * @deprecated
+ * //@TODO support bsc
+ * @param hash
+ * @return {string}
+ */
 export function getEtherscanAddressUrl(hash) {
     return ETHERSCAN_HOST + '/address/' + hash;
+}
+
+/**
+ * @param {number} chainId
+ * @param {string} hash
+ * @return {string}
+ */
+export function getEvmAddressUrl(chainId, hash) {
+    const host = HUB_CHAIN_BY_ID[Number(chainId)]?.explorerHost;
+    return host + '/address/' + hash;
 }
 
 /**
