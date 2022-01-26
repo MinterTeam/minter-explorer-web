@@ -134,7 +134,7 @@ export default {
                 <dt v-if="!isToken">CRR</dt>
                 <dd v-if="!isToken">{{ coinInfo.crr }} %</dd>
 
-                <dt>Volume</dt>
+                <dt>Supply</dt>
                 <dd :title="prettyPrecise(coinInfo.volume)">{{ pretty(coinInfo.volume) }}</dd>
 
                 <dt v-if="!isToken">Reserve</dt>

@@ -87,36 +87,6 @@ function getPriceFromList(list, name) {
 <template>
     <section class="panel">
         <template v-if="!isLoading">
-            <div class="table-wrap u-mb-20" v-if="networkList.length">
-                <table>
-                    <thead>
-                        <tr class="u-text-nowrap">
-                            <th>
-                                <span class="u-hidden-small-down">{{ $td('Supported networks', 'hub.network-table-name') }}</span>
-                                <span class="u-hidden-small-up">{{ $td('Networks', 'hub.network-table-name-mobile') }}</span>
-                            </th>
-                            <th>{{ $td('Coin price', 'hub.network-table-coin-price') }}</th>
-                            <th>{{ $td('Gas price', 'hub.network-table-gas-price') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="u-text-nowrap" :key="network.network" v-for="network in networkList">
-                            <td>
-                                {{ network.name }}
-                            </td>
-                            <!-- price -->
-                            <td>
-                                1 {{ network.coinSymbol }} = ${{ pretty(network.coinPrice) }}
-                            </td>
-                            <!-- gas price -->
-                            <td>
-                                {{ network.gasPrice }} gwei
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
             <div class="table-wrap" v-if="coinList.length">
                 <table>
                     <thead>

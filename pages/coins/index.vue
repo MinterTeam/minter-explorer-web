@@ -66,7 +66,7 @@ export default {
                     <tr>
                         <th>Symbol</th>
                         <th>Type</th>
-                        <th>Volume</th>
+                        <th>Supply</th>
                         <th>Reserve</th>
                         <th>CRR</th>
                         <th>Owner</th>
@@ -86,8 +86,18 @@ export default {
                             </nuxt-link>
                         </td>
                         <td>{{ formatType(coin.type) }}</td>
-                        <td>{{ prettyRound(coin.volume) }}</td>
-                        <td>{{ prettyRound(coin.reserveBalance) }} {{ $store.state.COIN_NAME }}</td>
+                        <td>
+                            <template v-if="coin.symbol !== $store.getters.BASE_COIN">
+                                {{ prettyRound(coin.volume) }}
+                            </template>
+                            <template v-else>—</template>
+                        </td>
+                        <td>
+                            <template v-if="coin.reserveBalance > 0">
+                                {{ prettyRound(coin.reserveBalance) }} {{ $store.state.COIN_NAME }}
+                            </template>
+                            <template v-else>—</template>
+                        </td>
                         <td>
                             <template v-if="coin.crr">{{ coin.crr }}&thinsp;%</template>
                             <template v-else>—</template>
