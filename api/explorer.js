@@ -1107,6 +1107,9 @@ export function getCoinBySymbol(symbol) {
  * @property {string|null} ownerAddress
  * @property {boolean} [verified] - filled from hub api
  * @property {boolean} [icon] - filled from chainik app
+ * @property {number|string} priceUsd
+ * @property {number|string} tradingVolume24H
+ * @property {number|string} tradingVolume1Mo
  */
 
 /**

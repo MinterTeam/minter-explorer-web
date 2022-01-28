@@ -106,10 +106,10 @@ export default {
                     </div>
                 </td>
                 <td>
-                    <Amount :amount="provider.amount0" :coin="provider.coin0.symbol" :disable-usd="true" :coin-first="itemType === $options.ITEM_TYPE.PROVIDER"/>
+                    <Amount :amount="provider.amount0" :coin="provider.coin0.symbol" :price-usd="false" :coin-first="itemType === $options.ITEM_TYPE.PROVIDER"/>
                 </td>
                 <td>
-                    <Amount :amount="provider.amount1" :coin="provider.coin1.symbol" :disable-usd="true" :coin-first="itemType === $options.ITEM_TYPE.PROVIDER"/>
+                    <Amount :amount="provider.amount1" :coin="provider.coin1.symbol" :price-usd="false" :coin-first="itemType === $options.ITEM_TYPE.PROVIDER"/>
                 </td>
                 <td>
                     <span class="u-fw-500">{{ pretty(provider.liquidity) }}</span>
