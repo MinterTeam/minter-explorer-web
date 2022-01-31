@@ -1,5 +1,5 @@
 <script>
-import {pretty, getEvmAddressUrl} from '~/assets/utils.js';
+import {pretty, getEvmAddressUrl, shortHashFilter} from '~/assets/utils.js';
 import {HUB_CHAIN_ID, HUB_CHAIN_DATA, BSC_CHAIN_ID, ETHEREUM_CHAIN_ID} from '~/assets/variables.js';
 
 export default {
@@ -31,31 +31,45 @@ export default {
     },
     computed: {
         coinListMapped() {
-            return this.coinList.map((coin) => {
-                return {
-                    ...coin,
-                    price: getPriceFromList(this.priceList, coin.denom),
-                };
-            });
-        },
-        /**
-         *
-         * @type {{coinPrice: string|number, coinSymbol: string, name: string, network: *, gasPrice: string|number}[]}
-         */
-        networkList() {
-            return this.priceList
-                .filter((item) => item.name.includes('/gas') && HUB_CHAIN_DATA[item.name.replace('/gas', '')])
-                .map((item) => {
-                    const network = item.name.replace('/gas', '');
-                    const coinSymbol = HUB_CHAIN_DATA[network].coinSymbol;
+            return this.coinList
+                .map((coin) => coin.universalSymbol)
+                // keep unique symbols
+                .filter((symbol, index, self) => self.indexOf(symbol) === index)
+                // group by universalSymbol
+                .map((symbol) => {
                     return {
-                        network,
-                        name: HUB_CHAIN_DATA[network].name,
-                        coinSymbol,
-                        coinPrice: getPriceFromList(this.priceList, coinSymbol.toLowerCase()),
-                        gasPrice: getPriceFromList(this.priceList, `${network}/gas`),
+                        universalSymbol: symbol,
+                        [HUB_CHAIN_ID.ETHEREUM]: getPair(this.coinList, symbol, HUB_CHAIN_ID.ETHEREUM),
+                        [HUB_CHAIN_ID.BSC]: getPair(this.coinList, symbol, HUB_CHAIN_ID.BSC),
+                    };
+                })
+                .map((item) => {
+                    const pair = item[HUB_CHAIN_ID.ETHEREUM] || item[HUB_CHAIN_ID.BSC];
+                    return {
+                        ...item,
+                        price: getPriceFromList(this.priceList, pair.minter.denom),
+                        commission: pair.minter.commission,
+                        iconSymbol: pair.minter.symbol,
                     };
                 });
+
+            function getPair(hubCoinList, universalSymbol, networkId) {
+                const coin = hubCoinList.find((item) => item.universalSymbol === universalSymbol && item[networkId]);
+                if (coin) {
+                    return {
+                        minter: pruneMinterToken(coin),
+                        external: coin[networkId],
+                    };
+                } else {
+                    return undefined;
+                }
+            }
+            function pruneMinterToken(minterToken) {
+                const cleanCoin = {...minterToken};
+                delete cleanCoin[HUB_CHAIN_ID.BSC];
+                delete cleanCoin[HUB_CHAIN_ID.ETHEREUM];
+                return cleanCoin;
+            }
         },
     },
     methods: {
@@ -63,6 +77,7 @@ export default {
             return val;
         },
         pretty,
+        shortHash: (value) => shortHashFilter(value, 4),
         getEthereumAddressUrl(address) {
             return getEvmAddressUrl(ETHEREUM_CHAIN_ID, address);
         },
@@ -91,44 +106,69 @@ function getPriceFromList(list, name) {
                 <table>
                     <thead>
                         <tr class="u-text-nowrap">
-                            <th width="25%">
+                            <th>
                                 <span class="u-hidden-small-down">{{ $td('Available tokens', 'hub.coin-table-name') }}</span>
                                 <span class="u-hidden-small-up">{{ $td('Tokens', 'hub.coin-table-name-mobile') }}</span>
                             </th>
-                            <th width="20%">
+                            <th>
                                 {{ $options.HUB_CHAIN_DATA[$options.HUB_CHAIN_ID.ETHEREUM].shortName }}
-                                {{ $td('contract', 'hub.coin-table-contract') }}
+                                {{ $td('bridge', 'hub.coin-table-contract') }}
                             </th>
-                            <th width="20%">
+                            <th>
                                 {{ $options.HUB_CHAIN_DATA[$options.HUB_CHAIN_ID.BSC].shortName }}
-                                {{ $td('contract', 'hub.coin-table-contract') }}
+                                {{ $td('bridge', 'hub.coin-table-contract') }}
                             </th>
-                            <th width="20%">{{ $td('Price', 'hub.coin-table-price') }}</th>
-                            <th width="15%">
-                                <span class="u-hidden-small-down">{{ $td('Hub fee', 'hub.coin-table-fee') }}</span>
-                                <span class="u-hidden-small-up">{{ $td('Fee', 'hub.coin-table-fee-mobile') }}</span>
-                            </th>
+                            <th>{{ $td('Price', 'hub.coin-table-price') }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="u-text-nowrap" :key="coinItem.minterId" v-for="coinItem in coinListMapped">
+                        <tr class="u-text-nowrap" :key="group.universalSymbol" v-for="group in coinListMapped">
                             <td>
-                                <nuxt-link class="link--default" :to="'/coins/' + coinItem.symbol" target="_blank">{{ coinItem.symbol }}</nuxt-link>
+                                <img
+                                    class="u-icon--coin-table"
+                                    width="20" height="20" alt="" role="presentation"
+                                    :src="$store.getters['explorer/getCoinIcon'](group.iconSymbol)"
+                                >
+                                {{ group.universalSymbol }}
                             </td>
                             <td>
-                                <a class="link--default" :href="getEthereumAddressUrl(coinItem.ethereum.externalTokenId)" target="_blank" rel="noopener" v-if="coinItem.ethereum">{{ coinItem.denom.toUpperCase() }}</a>
+                                <template v-if="group.ethereum">
+                                    <nuxt-link class="link--default" :to="'/coins/' + group.ethereum.minter.symbol" target="_blank">
+                                        <img class="u-icon--coin-small" src="/img/minter-logo-circle.svg" alt="Minter">
+                                        {{ group.ethereum.minter.symbol }}
+                                    </nuxt-link>
+
+                                    <span class="u-icon--left-right-arrow">⟷</span>
+
+                                    <a class="link--default" :href="getEthereumAddressUrl(group.ethereum.external.externalTokenId)" target="_blank">
+                                        <img class="u-icon--coin-small" src="/img/icon-network-ethereum.svg" alt="Ethereum">
+                                        {{ shortHash(group.ethereum.external.externalTokenId) }}
+                                    </a>
+                                </template>
                             </td>
                             <td>
-                                <a class="link--default" :href="getBscAddressUrl(coinItem.bsc.externalTokenId)" target="_blank" rel="noopener" v-if="coinItem.bsc">{{ coinItem.denom.toUpperCase() }}</a>
+                                <template v-if="group.bsc">
+                                    <nuxt-link class="link--default" :to="'/coins/' + group.bsc.minter.symbol" target="_blank">
+                                        <img class="u-icon--coin-small" src="/img/minter-logo-circle.svg" alt="Minter">
+                                        {{ group.bsc.minter.symbol }}
+                                    </nuxt-link>
+
+                                    <span class="u-icon--left-right-arrow">⟷</span>
+
+                                    <a class="link--default" :href="getBscAddressUrl(group.bsc.external.externalTokenId)" target="_blank">
+                                        <img class="u-icon--coin-small" src="/img/icon-network-bsc.svg" alt="BSC">
+                                        {{ shortHash(group.bsc.external.externalTokenId) }}
+                                    </a>
+                                </template>
                             </td>
                             <!-- price -->
                             <td>
-                                ${{ pretty(coinItem.price) }}
+                                ${{ pretty(group.price) }}
                             </td>
                             <!-- fee -->
-                            <td>
-                                {{ pretty(coinItem.commission * 100) }}%
-                            </td>
+<!--                            <td>-->
+<!--                                {{ pretty(group.commission * 100) }}%-->
+<!--                            </td>-->
                         </tr>
                     </tbody>
                 </table>
