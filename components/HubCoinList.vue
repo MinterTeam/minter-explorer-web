@@ -107,7 +107,7 @@ function getPriceFromList(list, name) {
                     <thead>
                         <tr class="u-text-nowrap">
                             <th>
-                                <span class="u-hidden-small-down">{{ $td('Available tokens', 'hub.coin-table-name') }}</span>
+                                <span class="u-hidden-small-down">{{ $td('Available assets', 'hub.coin-table-name') }}</span>
                                 <span class="u-hidden-small-up">{{ $td('Tokens', 'hub.coin-table-name-mobile') }}</span>
                             </th>
                             <th>

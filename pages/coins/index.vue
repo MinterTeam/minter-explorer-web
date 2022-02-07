@@ -59,6 +59,7 @@ export default {
                         Coins
                     </span>
                 </h1>
+                <nuxt-link class="button button--ghost-main button--small" to="/coins/cross-chain">Cross-chain assets</nuxt-link>
             </div>
             <div class="table-wrap">
                 <table class="u-text-nowrap">
