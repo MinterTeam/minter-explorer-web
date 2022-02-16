@@ -832,6 +832,16 @@ export function getProviderPoolList(address, params) {
 
 
 /**
+ * @param {number|string} orderId
+ * @return {Promise<LimitOrder>}
+ */
+export function getLimitOrder(orderId) {
+    return explorer.get(`pools/orders/${orderId}`)
+        .then((response) => response.data);
+}
+
+
+/**
  * @param {number|string} id
  * @return {Promise<CoinInfo>}
  */

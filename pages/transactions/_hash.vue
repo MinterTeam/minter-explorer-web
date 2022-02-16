@@ -4,9 +4,9 @@
     import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
-    import {getTransaction, getBlock, getBlockList, getCoinById, checkBlockTime} from '~/api/explorer.js';
+    import {getTransaction, getBlock, getBlockList, getCoinById, getLimitOrder, checkBlockTime} from '~/api/explorer.js';
     import {getTransferFee, getTransferStatus} from '~/api/hub.js';
-    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, shortHashFilter, txTypeFilter, fromBase64, getEvmTxUrl, getEvmAddressUrl, getExplorerValidatorUrl} from "~/assets/utils.js";
+    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, shortHashFilter, txTypeFilter, snakeCaseToText, fromBase64, getEvmTxUrl, getEvmAddressUrl, getExplorerValidatorUrl} from "~/assets/utils.js";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
     import {UNBOND_PERIOD, TX_STATUS, HUB_MINTER_MULTISIG_ADDRESS, HUB_CHAIN_DATA, HUB_TRANSFER_STATUS as WITHDRAW_STATUS} from "~/assets/variables.js";
@@ -82,6 +82,7 @@
                 unbondTimeInfo: null,
                 /** @type BlockTimeInfo|null */
                 voteTimeInfo: null,
+                limitOrderStatus: '',
                 currentCoinSymbol: '',
                 hubFee: null,
                 hubStatus: null,
@@ -184,10 +185,10 @@
                 }
                 return false;
             },
-            /** @type {HubChainDataItem|null}*/
+            /** @type {HubChainDataItem}*/
             hubNetworkData() {
                 if (!this.isToHubTx) {
-                    return null;
+                    return undefined;
                 }
                 const networkName = this.payloadParsed.type.replace('send_to_', '');
                 return HUB_CHAIN_DATA[networkName];
@@ -243,7 +244,6 @@
             isToHubTx: {
                 handler() {
                     if (this.isToHubTx) {
-                        console.log('fetch hub fee');
                         this.fetchHubTxFee();
                         this.fetchHubTxStatus();
                     }
@@ -257,6 +257,7 @@
             } else {
                 this.fetchUnbondBlock();
                 this.fetchVoteBlock();
+                this.fetchOrderStatus();
                 this.fetchCreatedCoinCurrentSymbol();
             }
             if (process.client) {
@@ -285,6 +286,7 @@
             time: getTime,
             timeMinutes: getTimeMinutes,
             shortHashFilter,
+            snakeCaseToText,
             getWithdrawTxUrl(hash) {
                 return getEvmTxUrl(this.hubNetworkData?.chainId, hash);
             },
@@ -299,6 +301,7 @@
                         fetchTxTimer = null;
                         this.fetchUnbondBlock();
                         this.fetchVoteBlock();
+                        this.fetchOrderStatus();
                         this.fetchCreatedCoinCurrentSymbol();
                     })
                     .catch((e) => {
@@ -325,6 +328,15 @@
                         .then((timeInfo) => this.voteTimeInfo = timeInfo)
                         .catch((e) => {
                             console.log('Unable to get vote block info', e);
+                        });
+                }
+            },
+            fetchOrderStatus() {
+                if (this.isAddOrderType) {
+                    getLimitOrder(this.tx.data.orderId)
+                        .then((orderData) => this.limitOrderStatus = orderData.status)
+                        .catch((e) => {
+                            console.log('Unable to get limit order info', e);
                         });
                 }
             },
@@ -472,6 +484,8 @@
                     <dd v-if="tx.data.id || tx.data.orderId">{{ tx.data.id || tx.data.orderId }}</dd>
 
                     <!-- ADD_LIMIT_ORDER -->
+                    <dt v-if="isAddOrderType">Order status</dt>
+                    <dd v-if="isAddOrderType">{{ snakeCaseToText(limitOrderStatus) }}</dd>
                     <dt v-if="isAddOrderType">Pool</dt>
                     <dd v-if="isAddOrderType"><PoolLink :pool="{coin0: tx.data.coinToSell, coin1: tx.data.coinToBuy}"/></dd>
                     <dt v-if="isAddOrderType">Want to sell</dt>
