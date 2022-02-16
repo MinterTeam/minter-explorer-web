@@ -184,8 +184,13 @@
                 }
                 return false;
             },
-            hubNetworkName() {
-                return this.isToHubTx ? this.payloadParsed.type.replace('send_to_', '') : '';
+            /** @type {HubChainDataItem|null}*/
+            hubNetworkData() {
+                if (!this.isToHubTx) {
+                    return null;
+                }
+                const networkName = this.payloadParsed.type.replace('send_to_', '');
+                return HUB_CHAIN_DATA[networkName];
             },
             hubNetworkFee() {
                 if (!this.isToHubTx) {
@@ -281,10 +286,10 @@
             timeMinutes: getTimeMinutes,
             shortHashFilter,
             getWithdrawTxUrl(hash) {
-                return getEvmTxUrl(HUB_CHAIN_DATA[this.hubNetworkName].chainId, hash);
+                return getEvmTxUrl(this.hubNetworkData?.chainId, hash);
             },
             getWithdrawRecipientUrl(address) {
-                return getEvmAddressUrl(HUB_CHAIN_DATA[this.hubNetworkName].chainId, address);
+                return getEvmAddressUrl(this.hubNetworkData?.chainId, address);
             },
             getExplorerValidatorUrl,
             fetchTx() {
@@ -652,7 +657,7 @@
                     </dd>
                     <dt v-if="isToHubTx">Hub info</dt>
                     <dd v-if="isToHubTx">
-                        Type: {{ payloadParsed.type === 'send_to_eth' ? 'Send to Ethereum' : payloadParsed.type }}
+                        Type: {{ payloadParsed.type.includes('send_to_') ? `Send to ${hubNetworkData.shortName}` : payloadParsed.type }}
                         <div v-if="hubStatus">
                             Status:
                             <template v-if="hubStatus.status === $options.WITHDRAW_STATUS.not_found">Not found</template>
@@ -666,9 +671,9 @@
                         Recipient:
                         <a class="link--default" :href="getWithdrawRecipientUrl(payloadParsed.recipient)" target="_blank">{{ payloadParsed.recipient }}</a><br>
                         Amount: {{ prettyExact(hubAmount) }} {{ tx.data.coin.symbol }}<br>
-                        Ethereum fee sent: {{ prettyExact(hubNetworkFee) }} {{ tx.data.coin.symbol }}<br>
-                        Ethereum fee used: {{ prettyExact(hubNetworkFeeUsed) }} {{ tx.data.coin.symbol }}<br>
-                        Ethereum fee refund: {{ prettyExact(hubNetworkFeeRefunded) }} {{ tx.data.coin.symbol }}<br>
+                        {{ hubNetworkData.shortName }} fee sent: {{ prettyExact(hubNetworkFee) }} {{ tx.data.coin.symbol }}<br>
+                        {{ hubNetworkData.shortName }} fee used: {{ prettyExact(hubNetworkFeeUsed) }} {{ tx.data.coin.symbol }}<br>
+                        {{ hubNetworkData.shortName }} fee refund: {{ prettyExact(hubNetworkFeeRefunded) }} {{ tx.data.coin.symbol }}<br>
                         Hub bridge fee ({{hubBridgePercent}}%): {{ prettyExact(hubBridgeFee) }} {{ tx.data.coin.symbol }}
                     </dd>
 
