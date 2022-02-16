@@ -303,7 +303,7 @@ function wait(time) {
                  v-for="item in sellBook" :key="`sell-${item.price}`"
                  :style="`--order-book-item-amount-bar: ${item.amount / sellBookMaxAmount * 100}%`"
             >
-                <div class="order-book__cell u-text-fail">{{ item.price >= midPrice ? item.price : pretty(midPrice) }}</div>
+                <div class="order-book__cell u-text-fail">{{ item.price >= midPrice ? item.price : decreasePrecisionSignificant(midPrice) }}</div>
                 <div class="order-book__cell">{{ pretty(item.amount) }}</div>
             </div>
 
@@ -326,7 +326,7 @@ function wait(time) {
                  v-for="item in buyBook" :key="`buy-${item.price}`"
                  :style="`--order-book-item-amount-bar: ${item.amount / buyBookMaxAmount * 100}%`"
             >
-                <div class="order-book__cell u-text-success">{{ item.price > 0 ? item.price : pretty(buyOrderList[buyOrderList.length - 1].coin0Price) }}</div>
+                <div class="order-book__cell u-text-success">{{ item.price > 0 ? item.price : decreasePrecisionSignificant(buyOrderList[buyOrderList.length - 1].coin0Price) }}</div>
                 <div class="order-book__cell">{{ pretty(item.amount) }}</div>
             </div>
         </div>
