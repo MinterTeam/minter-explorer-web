@@ -27,18 +27,23 @@ export default {
             type: Boolean,
             default: false,
         },
-        disableUsd: {
-            type: Boolean,
-            default: false,
+        // false to disable usd price
+        priceUsd: {
+            type: [Number, Boolean],
+            default: 0,
         },
     },
     computed: {
         amountUsd() {
-            if (this.disableUsd || this.coin !== this.$store.getters.BASE_COIN || this.amount <= 0) {
+            if (this.priceUsd === false || this.amount <= 0) {
                 return 0;
             }
+            let priceUsd = Number(this.priceUsd) || 0;
+            if (!priceUsd && this.coin === this.$store.getters.BASE_COIN) {
+                priceUsd = this.$store.getters['explorer/bipPriceUsd'];
+            }
 
-            return this.amount * this.$store.getters['explorer/bipPriceUsd'];
+            return this.amount * priceUsd;
         },
     },
     methods: {

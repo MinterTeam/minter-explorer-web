@@ -14,7 +14,7 @@
         watchQuery: ['page'],
         key: (to) => to.fullPath,
         asyncData({ query }) {
-            const poolPromise = getPoolList(query);
+            const poolPromise = getPoolList(query, {filterBlocked: true});
 
             return Promise.all([poolPromise])
                 .then(([poolListInfo]) => {

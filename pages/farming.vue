@@ -2,12 +2,16 @@
 import {getFarmList, fillFarmWithPoolData} from '@/api/farm.js';
 import {pretty, getDateHuman, getApy} from '~/assets/utils.js';
 import getTitle from '~/assets/get-title.js';
+import tooltip from 'v-tooltip/src/directives/v-tooltip.js';
 import BackButton from '~/components/BackButton.vue';
 // import {getFarmingPair} from '@/api/uniswap.js';
 
 export default {
     components: {
         BackButton,
+    },
+    directives: {
+        tooltip,
     },
     fetch() {
         // const uniswapFarmPromise = getFarmingPair()
@@ -44,6 +48,7 @@ export default {
         farmListFormatted() {
             return this.farmList.map((pool) => {
                 const apr = pool.percent * 365;
+                const farmApy = ((1 + apr / 100 / 365) ** 365 - 1) * 100;
 
                 const stakingApy = getApy(pool.tradeVolumeBip1D, pool.liquidityBip);
 
@@ -53,6 +58,7 @@ export default {
                     // volumeUsd: pool.tradeVolumeBip1D * this.$store.getters['explorer/bipPriceUsd'],
                     apr,
                     stakingApy,
+                    totalApy: farmApy + stakingApy,
                 };
             })
             .sort((a, b) => {
@@ -174,11 +180,23 @@ export default {
                                 <dt class="farm__dt">Reward type</dt>
                                 <dd class="farm__dd">{{ getRewardCoin(pool) }}</dd>
 
-                                <dt class="farm__dt u-fw-700" title="Based on 24hr rate annualized">Farming APR</dt>
-                                <dd class="farm__dd u-fw-700">{{ pretty(pool.apr) }}%</dd>
+                                <dt class="farm__dt">
+                                    Farming APR
+                                    <img class="u-icon--tooltip" src="/img/icon-tooltip.svg" alt="" v-tooltip="'Daily farming rewards annualized'">
+                                </dt>
+                                <dd class="farm__dd">{{ pretty(pool.apr) }}%</dd>
 
-                                <dt class="farm__dt u-fw-700" title="Based on 24hr volume annualized">Staking APY</dt>
-                                <dd class="farm__dd u-fw-700">{{ pretty(pool.stakingApy) }}%</dd>
+                                <dt class="farm__dt">
+                                    Staking APY
+                                    <img class="u-icon--tooltip" src="/img/icon-tooltip.svg" alt="" v-tooltip="'24hr trading fees annualized'">
+                                </dt>
+                                <dd class="farm__dd">{{ pretty(pool.stakingApy) }}%</dd>
+
+                                <dt class="farm__dt u-fw-700">
+                                    Total APY
+                                    <img class="u-icon--tooltip" src="/img/icon-tooltip.svg" alt="" v-tooltip="'Assumed daily compounding of farm rewards'">
+                                </dt>
+                                <dd class="farm__dd u-fw-700">{{ pretty(pool.totalApy) }}%</dd>
                             </dl>
                         </div>
                     </div>

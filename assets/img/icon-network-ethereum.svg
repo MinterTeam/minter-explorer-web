@@ -1,0 +1,9 @@
+<svg viewBox="0 0 212 212" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+    <!-- edited 256 to 212 (-22px from each side) -->
+<!--    <circle cx="128" cy="128" r="128" fill="#eceff0"/>-->
+    <g transform="translate(-22, -22)">
+        <path d="M128.2 23L64 129.64l64.2 38.14 63.8-38.14zM64 142.36l64.2 37.73 63.8-37.73L128.2 233z" fill="#828384"/>
+        <path d="M128.2 167.54V23l63.62 106.34zm63.41-25.05L128.2 233v-52.74z" fill="#2f3030"/>
+        <path d="M128.2 100.93L64 129.64l64.2 38.14 63.8-38.14z" fill="#131313" opacity=".8"/>
+    </g>
+</svg>
