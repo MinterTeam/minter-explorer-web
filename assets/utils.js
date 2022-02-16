@@ -112,6 +112,16 @@ export function getEtherscanAddressUrl(hash) {
  * @param {string} hash
  * @return {string}
  */
+export function getEvmTxUrl(chainId, hash) {
+    const host = HUB_CHAIN_BY_ID[Number(chainId)]?.explorerHost;
+    return host + '/tx/' + hash;
+}
+
+/**
+ * @param {number} chainId
+ * @param {string} hash
+ * @return {string}
+ */
 export function getEvmAddressUrl(chainId, hash) {
     const host = HUB_CHAIN_BY_ID[Number(chainId)]?.explorerHost;
     return host + '/address/' + hash;
