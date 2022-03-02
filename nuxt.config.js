@@ -91,10 +91,11 @@ module.exports = {
             //         exclude: /(node_modules)/,
             //     });
             // }
-            if (!config.resolve) {
-                config.resolve = {};
-            }
+            config.resolve = config.resolve || {};
             config.resolve.mainFields =  ['module', 'browser', 'main'];
+
+            config.resolve.alias = config.resolve.alias || {};
+            config.resolve.alias['lodash'] = path.resolve(__dirname, "node_modules/lodash-es");
         },
         plugins: [
             new webpack.ContextReplacementPlugin(/moment[/]locale$/, /^\.\/(en|ru)$/),
@@ -111,6 +112,7 @@ module.exports = {
             'date-fns/esm',
             'lodash-es',
             'centrifuge/src',
+            'v-tooltip/src',
             // 'autonumeric/src',
             // 'vue-autonumeric/src',
             // 'nuxt-i18n/src',

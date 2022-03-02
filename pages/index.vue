@@ -5,7 +5,7 @@
     import {getBlockList, getStatus, getTransactionList, getPoolList} from '~/api/explorer.js';
     import getTitle from '~/assets/get-title';
     import {EXPLORER_RTM_URL, NETWORK, HISTORY_TRANSACTION_COUNT} from '~/assets/variables.js';
-    import {toCamel} from '~/assets/to-camel.js';
+    import {toCamel} from '~/assets/axios-to-camel.js';
     import Stats from '~/components/Stats';
     import HistoryChart from '~/components/PreviewHistoryChart';
     import PreviewBlocks from '~/components/PreviewBlocks';
@@ -28,7 +28,7 @@
         statsPromise = getStatus();
         const blocksPromise = getBlockList().then((blockListInfo) => blockListInfo.data);
         const txPromise = getTransactionList().then((txListInfo) => txListInfo.data);
-        const poolsPromise = getPoolList().then((poolListInfo) => poolListInfo.data);
+        const poolsPromise = getPoolList(undefined, {filterBlocked: true}).then((poolListInfo) => poolListInfo.data);
         return Promise.all([statsPromise, blocksPromise, txPromise, poolsPromise]);
     }
 
@@ -186,6 +186,8 @@
                         return item.hash === newTx.hash;
                     });
                     if (!isExist) {
+                        // ensure data
+                        newTx.data = newTx.data || {};
                         this.txList.unshift(newTx);
                         this.txList = this.txList.slice(0, TX_LIST_LENGTH);
                         this.lastTxTime = Date.now();

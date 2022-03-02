@@ -3,12 +3,14 @@ import {getCoinBySymbol, getPoolByToken, getPoolList} from '~/api/explorer.js';
 import {pretty, prettyPrecise, prettyExact} from "~/assets/utils.js";
 import getTitle from '~/assets/get-title.js';
 import {getErrorText} from '~/assets/server-error.js';
+import Amount from '~/components/common/Amount.vue';
 import BackButton from '~/components/BackButton.vue';
 import Pagination from "~/components/Pagination.vue";
 import PoolList from '~/components/PoolList.vue';
 
 export default {
     components: {
+        Amount,
         BackButton,
         Pagination,
         PoolList,
@@ -102,6 +104,10 @@ export default {
         getCoinVerified(coin) {
             return this.$store.getters['explorer/getCoinVerified'](coin);
         },
+        formatType(value) {
+            value = value.replaceAll('_', ' ');
+            return value.charAt(0).toUpperCase() + value.slice(1); // capitalize the first letter
+        },
     },
 };
 </script>
@@ -131,10 +137,22 @@ export default {
                     </div>
                 </dd>
 
+                <dt>Price</dt>
+                <dd>${{ pretty(coinInfo.priceUsd) }}</dd>
+
+                <dt>Trading volume 24h</dt>
+                <Amount tag="dd" :coin="coinInfo.symbol" :amount="coinInfo.tradingVolume24H" :price-usd="coinInfo.priceUsd"/>
+
+                <dt>Trading volume 1m</dt>
+                <Amount tag="dd" :coin="coinInfo.symbol" :amount="coinInfo.tradingVolume1Mo" :price-usd="coinInfo.priceUsd"/>
+
+                <dt>Type</dt>
+                <dd>{{ formatType(coinInfo.type) }}</dd>
+
                 <dt v-if="!isToken">CRR</dt>
                 <dd v-if="!isToken">{{ coinInfo.crr }} %</dd>
 
-                <dt>Volume</dt>
+                <dt>Supply</dt>
                 <dd :title="prettyPrecise(coinInfo.volume)">{{ pretty(coinInfo.volume) }}</dd>
 
                 <dt v-if="!isToken">Reserve</dt>

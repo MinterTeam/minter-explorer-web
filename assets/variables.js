@@ -17,6 +17,8 @@ export const CHAIN_ID = NETWORK === MAINNET ? 1 : 2;
 export const UNBOND_PERIOD = NETWORK === MAINNET ? 518400 : 2920;
 // @see https://github.com/MinterTeam/minter-go-node/blob/aa9eef308ae192cd5d899d4f0c5b6be3d1b04695/coreV2/types/constants.go#L32
 export const JAIL_PERIOD = NETWORK === MAINNET ? 8640 * 2 : 2920 * 2;
+/* 3 year mainnet, 1 hour testnet */
+export const LOCK_STAKE_PERIOD = NETWORK === MAINNET ? 18921600 : 2920 * 2;
 export const MAINNET_WEB_URL = 'https://explorer.minter.network';
 export const HISTORY_WEB_URL = 'https://v1-history.explorer.minter.network';
 export const EXPLORER_API_URL = process.env.APP_EXPLORER_API_URL;
@@ -28,8 +30,12 @@ export const CHAINIK_API_URL = 'https://chainik.io/json/';
 export const HUB_MINTER_MULTISIG_ADDRESS = process.env.APP_HUB_MINTER_MULTISIG_ADDRESS;
 export const HUB_API_URL = process.env.APP_HUB_API_URL;
 export const FARM_API_URL = process.env.APP_FARM_API_URL;
-// export const ETHEREUM_CHAIN_ID = NETWORK === MAINNET ? 1 : 3;
+export const ETHEREUM_CHAIN_ID = NETWORK === MAINNET ? 1 : 3;
+export const BSC_CHAIN_ID = NETWORK === MAINNET ? 56 : 97;
 export const ETHERSCAN_HOST = NETWORK === MAINNET ? 'https://etherscan.io' : 'https://ropsten.etherscan.io';
+export const BSCSCAN_HOST = NETWORK === MAINNET ? 'https://bscscan.com' : 'https://testnet.bscscan.com';
+export const WETH_CONTRACT_ADDRESS = NETWORK === MAINNET ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' : '0x0a180a76e4466bf68a7f86fb029bed3cccfaaac5';// '0xc778417e063141139fce010982780140aa0cd5ab';
+export const WBNB_CONTRACT_ADDRESS = NETWORK === MAINNET ? '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' : '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd';
 
 
 export const HISTORY_V1_BLOCK_COUNT = 5000000;
@@ -79,4 +85,66 @@ export const VALIDATOR_STATUS = {
     0: 'Not declared',
     1: 'Set off',
     2: 'Set on',
+};
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const HUB_CHAIN_ID = {
+    ETHEREUM: 'ethereum',
+    BSC: 'bsc',
+    MINTER: 'minter',
+};
+
+/**
+ * @typedef {{coinSymbol: string, name: string, shortName: string, chainId: number, hubChainId: HUB_CHAIN_ID, apiUrl: string, explorerHost: string, hubContractAddress: string, wrappedNativeContractAddress: string}} HubChainDataItem
+ */
+
+/**
+ * @readonly
+ * @type {{[HUB_CHAIN_ID]: HubChainDataItem}}}
+ */
+export const HUB_CHAIN_DATA = {
+    [HUB_CHAIN_ID.ETHEREUM]: {
+        name: 'Ethereum',
+        shortName: 'Ethereum',
+        coinSymbol: 'ETH',
+        chainId: ETHEREUM_CHAIN_ID,
+        hubChainId: HUB_CHAIN_ID.ETHEREUM,
+        // apiUrl: ETHEREUM_API_URL,
+        explorerHost: ETHERSCAN_HOST,
+        // hubContractAddress: HUB_ETHEREUM_CONTRACT_ADDRESS.toLowerCase(),
+        wrappedNativeContractAddress: WETH_CONTRACT_ADDRESS.toLowerCase(),
+    },
+    [HUB_CHAIN_ID.BSC]: {
+        name: 'Binance Smart Chain',
+        shortName: 'BSC',
+        coinSymbol: 'BNB',
+        chainId: BSC_CHAIN_ID,
+        hubChainId: HUB_CHAIN_ID.BSC,
+        // apiUrl: BSC_API_URL,
+        explorerHost: BSCSCAN_HOST,
+        // hubContractAddress: HUB_BSC_CONTRACT_ADDRESS.toLowerCase(),
+        wrappedNativeContractAddress: WBNB_CONTRACT_ADDRESS.toLowerCase(),
+    },
+};
+
+/**
+ * @readonly
+ * @type {{number: HubChainDataItem}}
+ */
+export const HUB_CHAIN_BY_ID = Object.fromEntries(Object.values(HUB_CHAIN_DATA).map((item) => [item.chainId, item]));
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const HUB_TRANSFER_STATUS = {
+    not_found_long: 'not_found_long', // custom status
+    not_found: 'TX_STATUS_NOT_FOUND',
+    deposit_to_hub_received: "TX_STATUS_DEPOSIT_RECEIVED",
+    batch_created: "TX_STATUS_BATCH_CREATED",
+    batch_executed: "TX_STATUS_BATCH_EXECUTED",
+    refund: "TX_STATUS_REFUNDED",
 };

@@ -2,13 +2,21 @@ import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import coinBlockList from 'minter-coin-block-list';
 import {FARM_API_URL} from "~/assets/variables.js";
-import addToCamelInterceptor from '~/assets/to-camel.js';
+import addToCamelInterceptor from '~/assets/axios-to-camel.js';
 import {getPoolList, getPoolByToken} from '@/api/explorer.js';
 
 
 const coinBlockMap = Object.fromEntries(coinBlockList.map((symbol) => [symbol, true]));
 function isBlocked(symbol) {
     return !!coinBlockMap[symbol.replace(/-\d+$/, '')];
+}
+
+const TRUSTED_FARM_OWNERS = [
+    'Mxcb272d7efc6c4a3122d705100fa0032703446e3e',
+    'Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d',
+];
+function isFarmTrusted(farmItem) {
+    return TRUSTED_FARM_OWNERS.includes(farmItem.ownerAddress);
 }
 
 
@@ -23,21 +31,26 @@ addToCamelInterceptor(instance);
 const farmCache = new Cache({maxAge: 1 * 60 * 1000});
 
 /**
+ * @param {boolean} [onlyTrusted=false]
  * @return {Promise<Array<FarmItem>>}
  */
-export function getFarmList() {
-/*
-    return Promise.all([
-            _getFarmList('Mxcb272d7efc6c4a3122d705100fa0032703446e3e'),
-            _getFarmList('Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d'),
-        ])
-*/
+export function getFarmList({onlyTrusted = false} = {}) {
     return _getFarmList()
-        .then((lists) => [].concat(...lists))
         .then((farmList) => {
             let farmMap = {};
             farmList
-                .filter((farmItem) => !isBlocked(farmItem.coin0.symbol) && !isBlocked(farmItem.coin1.symbol))
+                .filter((farmItem) => {
+                    // filter out blocked
+                    if (isBlocked(farmItem.coin0.symbol) || isBlocked(farmItem.coin1.symbol)) {
+                        return false;
+                    }
+                    // filter out untrusted
+                    if (onlyTrusted && !isFarmTrusted(farmItem)) {
+                        return false;
+                    }
+                    return true;
+                })
+                // group farms by pool
                 .forEach((farmItem) => {
                     // ensure farm map item
                     if (!farmMap[farmItem.tokenSymbol]) {
@@ -69,24 +82,28 @@ export function getFarmList() {
                     // rewrite with latest finishAt
                     farmMap[farmItem.tokenSymbol].finishAt = latestDate;
                 });
+            // console.log(farmMap);
 
             return Object.values(farmMap);
         });
 }
 
 /**
- * @param {string} [address]
+ * @param {string} [ownerAddress]
  * @return {Promise<Array<FarmItem>>}
  */
-function _getFarmList(address) {
-    return instance.get('rewarding' + (address ? `?owner=${address}` : ''), {
+function _getFarmList(ownerAddress) {
+    return instance.get('rewarding' + (ownerAddress ? `?owner=${ownerAddress}` : ''), {
             cache: farmCache,
         })
         .then((response) => {
             const list = response.data.data || [];
             return list
                 // filter out unpaid for 3 days
-                .filter((farmItem) => farmItem.period * farmItem.unpaidTxCount < 24 * 3)
+                .filter((farmItem) => {
+                    // isPaid or isTrusted
+                    return farmItem.period * farmItem.unpaidTxCount < 24 * 3 || isFarmTrusted(farmItem);
+                })
                 .map((farmItem) => {
                     farmItem.tokenSymbol = `LP-${farmItem.poolId}`;
 
@@ -114,7 +131,7 @@ export function fillFarmWithPoolData(farmPromise, {skipLowLiquidity} = {}) {
             farmList = farmList.map((farmItem) => {
                 if (poolMap[farmItem.tokenSymbol]) {
                     farmItem = addPoolFields(farmItem, poolMap[farmItem.tokenSymbol]);
-                } else if (!skipLowLiquidity) {
+                } else if (!skipLowLiquidity || isFarmTrusted(farmItem)) {
                     absentPoolTokenList.push(farmItem.tokenSymbol);
                 }
 
@@ -161,7 +178,7 @@ function addPoolFields(farmProgram, pool) {
 }
 
 /**
- * @typedef {{id:number, address:string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string, unpaidTxCount: number, debt: number|string}} FarmItem
+ * @typedef {{id:number, address:string, ownerAddress: string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string, unpaidTxCount: number, debt: number|string}} FarmItem
  */
 
 
