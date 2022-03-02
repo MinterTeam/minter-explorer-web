@@ -2,7 +2,7 @@
     import Big from '~/assets/big.js';
     import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {getTimeDistance, getTime, pretty, prettyRound, getExplorerValidatorUrl, txTypeFilter, shortFilter, fromBase64} from '~/assets/utils.js';
-    import {UNBOND_PERIOD} from '~/assets/variables';
+    import {LOCK_STAKE_PERIOD, UNBOND_PERIOD} from '~/assets/variables';
     import PoolLink from '~/components/common/PoolLink.vue';
     import TableLink from '~/components/TableLink';
 
@@ -67,6 +67,12 @@
             },
             isCurrentBlock(height) {
                 return height === this.currentBlock;
+            },
+            getDueBlockHeight(tx) {
+                if (this.isTxType(tx, TX_TYPE.LOCK_STAKE)) {
+                    return tx.height + LOCK_STAKE_PERIOD;
+                }
+                return tx?.data?.dueBlock || tx?.check?.dueBlock;
             },
             isDefined(value) {
                 return typeof value !== 'undefined';
@@ -495,9 +501,9 @@
                                 <strong>Check nonce</strong> <br>
                                 {{ fromBase64(tx.data.check.nonce) }}
                             </div>
-                            <div class="table__inner-item" v-if="tx.data.check && tx.data.check.dueBlock">
+                            <div class="table__inner-item" v-if="getDueBlockHeight(tx)">
                                 <strong>Due block</strong> <br>
-                                {{ tx.data.check.dueBlock }}
+                                {{ prettyRound(getDueBlockHeight(tx)) }}
                             </div>
 
                             <!-- type CREATE_MULTISIG -->
