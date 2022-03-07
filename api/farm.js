@@ -14,6 +14,7 @@ function isBlocked(symbol) {
 const TRUSTED_FARM_OWNERS = [
     'Mxcb272d7efc6c4a3122d705100fa0032703446e3e',
     'Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d',
+    'Mx9ff587d747d6f1875c2729c6b0f351ed7af50c01',
 ];
 function isFarmTrusted(farmItem) {
     return TRUSTED_FARM_OWNERS.includes(farmItem.ownerAddress);
