@@ -652,6 +652,12 @@
                     <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)" class="dd u-text-pre-line">{{ commissionPriceList }}</dd>
                     <!-- @TODO UPDATE_COMMISSION -->
 
+                    <!-- MOVE_STAKE -->
+                    <dt v-if="tx.data.fromPubKey">From public key</dt>
+                    <dd v-if="tx.data.fromPubKey"><nuxt-link class="link--default" :to="getExplorerValidatorUrl(tx.data.fromPubKey)">{{ tx.data.fromPubKey }}</nuxt-link></dd>
+                    <dt v-if="tx.data.toPubKey">To public key</dt>
+                    <dd v-if="tx.data.toPubKey"><nuxt-link class="link--default" :to="getExplorerValidatorUrl(tx.data.toPubKey)">{{ tx.data.toPubKey }}</nuxt-link></dd>
+
                     <!-- REDEEM_CHECK -->
                     <dt v-if="tx.data.check && tx.data.check.sender">Check issuer</dt>
                     <dd v-if="tx.data.check && tx.data.check.sender"><nuxt-link class="link--default" :to="'/address/' + tx.data.check.sender">{{ tx.data.check.sender }}</nuxt-link></dd>

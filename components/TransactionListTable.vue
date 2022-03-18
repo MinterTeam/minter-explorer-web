@@ -488,6 +488,24 @@
                                 {{ tx.data.version }}
                             </div>
 
+                            <!-- MOVE_STAKE -->
+                            <div class="table__inner-item" v-if="tx.data.fromPubKey">
+                                <strong>From public key</strong> <br>
+                                <TableLink :link-text="tx.data.fromPubKey"
+                                           :link-path="getExplorerValidatorUrl(tx.data.fromPubKey)"
+                                           :is-not-link="isCurrentValidator(tx.data.fromPubKey)"
+                                           :should-not-shorten="true"
+                                />
+                            </div>
+                            <div class="table__inner-item" v-if="tx.data.toPubKey">
+                                <strong>To public key</strong> <br>
+                                <TableLink :link-text="tx.data.toPubKey"
+                                           :link-path="getExplorerValidatorUrl(tx.data.toPubKey)"
+                                           :is-not-link="isCurrentValidator(tx.data.toPubKey)"
+                                           :should-not-shorten="true"
+                                />
+                            </div>
+
                             <!-- type REDEEM_CHECK -->
                             <div class="table__inner-item" v-if="tx.data.check && tx.data.check.sender">
                                 <strong>Check issuer</strong> <br>
