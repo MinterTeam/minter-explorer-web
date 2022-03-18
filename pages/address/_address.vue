@@ -1,6 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
-    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList, getPoolList, getProviderPoolList, getAddressOrderList} from '~/api/explorer.js';
+    import {getBalance, getBalanceLock, getAddressTransactionList, getAddressStake, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList, getPoolList, getProviderPoolList, getAddressOrderList, checkBlockTime} from '~/api/explorer.js';
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -99,6 +99,12 @@
         },
         fetch() {
             this.fetchTab(this.$route.query);
+
+            getBalanceLock(this.$route.params.address, {squashKeep: 'coin'})
+                .then((lockList) => {
+                    this.balanceLockList = lockList;
+                });
+
             getNonce(this.$route.params.address)
                 .then((nonce) => {
                     this.nonce = nonce.toString();
@@ -119,6 +125,7 @@
                 balanceList: [],
                 balanceTotal: '',
                 balanceTotalUsd: '',
+                balanceLockList: [],
                 storedTabPages: {},
                 // txs
                 txList: [],
@@ -142,6 +149,9 @@
                 isOrderListLoaded: false,
                 // stakes
                 stakeList: [],
+                stakeLock: null,
+                stakeLockEndTimestamp: '',
+                totalDelegatedBipValue: 0,
                 isStakeListLoading: false,
                 isStakeListLoaded: false,
                 // rewards
@@ -380,11 +390,23 @@
             },
             fetchStakes() {
                 this.isStakeListLoading = true;
-                getAddressStakeList(this.$route.params.address)
-                    .then((stakeList) => {
-                        this.stakeList = stakeList;
+                getAddressStake(this.$route.params.address)
+                    .then((stakeData) => {
+                        this.stakeList = stakeData.list;
+                        this.stakeLock = stakeData.lock;
+                        this.totalDelegatedBipValue = stakeData.totalDelegatedBipValue;
                         this.isStakeListLoading = false;
                         this.isStakeListLoaded = true;
+
+                        if (stakeData.lock.endBlock) {
+                            checkBlockTime(stakeData.lock.endBlock)
+                                .then((blockTimeInfo) => {
+                                    this.stakeLockEndTimestamp = blockTimeInfo.timestamp;
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                });
+                        }
                     })
                     .catch(() => {
                         this.isStakeListLoading = false;
@@ -473,10 +495,29 @@
                     </table>
                 </dd>
 
-                <dt>Total</dt>
+                <dt>Total available</dt>
                 <dd>
                     <span :title="prettyPrecise(balanceTotal)">{{ $store.getters.COIN_NAME }} {{ balanceTotal | pretty }}</span> <br>
                     <span class="u-text-muted">${{ balanceTotalUsd | prettyUsd }}</span>
+                </dd>
+
+                <dt>Locked balance</dt>
+                <dd>
+                    <table class="table--balance" v-if="balanceLockList.length">
+                        <tr v-for="balance in balanceLockList" :key="balance.coin.id">
+                            <td>
+                                <span class="u-icon-wrap">
+                                    <img class="u-icon--coin" :src="getCoinIconUrl(balance.coin.symbol)" width="20" height="20" alt="" role="presentation">
+                                    {{ balance.coin.symbol }}
+                                    <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="balance.coin.verified">
+                                </span>
+                            </td>
+                            <td :title="prettyPrecise(balance.value)">
+                                {{ pretty(balance.value) }}
+                            </td>
+                        </tr>
+                    </table>
+                    <span class="u-text-muted" v-else>—</span>
                 </dd>
 
                 <dt>#Transactions</dt>
@@ -577,7 +618,15 @@
                 :is-loading="isOrderListLoading"
             />
             <!-- Delegation -->
-            <StakeListTable :stake-list="stakeList" stake-item-type="validator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
+            <StakeListTable
+                :stake-list="stakeList"
+                stake-item-type="validator"
+                :total-delegated-bip-value="totalDelegatedBipValue"
+                :lock="stakeLock"
+                :lock-end-timestamp="stakeLockEndTimestamp"
+                :is-loading="isStakeListLoading"
+                v-if="activeTab === $options.TAB_TYPES.STAKE"
+            />
             <RewardListTable :data-list="rewardList" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
             <PenaltyListTable :data-list="slashList" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
             <UnbondListTable :data-list="unbondList" :is-loading="isUnbondListLoading" v-if="activeTab === $options.TAB_TYPES.UNBOND"/>

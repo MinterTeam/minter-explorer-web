@@ -323,6 +323,54 @@ function markVerified(coinListPromise, itemType = 'coin') {
 
 /**
  * @param {string} address
+ * @param {Object} [options]
+ * @param {'coin'|'block'} [options.squashKeep]
+ * @return {Promise<Array<BalanceLockItem>>}
+ */
+export async function getBalanceLock(address, {squashKeep} = {}) {
+    const response = await explorer.get(`addresses/${address}/locks`);
+    const lockList = response.data;
+
+    if (!squashKeep) {
+        return lockList;
+    }
+    const lockMap = lockList.reduce((accumulator, item) => {
+        let key;
+        // keep different coins
+        if (squashKeep === 'coin') {
+            key = item.coin.symbol;
+        }
+        // keep different due blocks
+        else if (squashKeep === 'block') {
+            key = item.dueBlock.toString() + item.coin.symbol;
+        } else {
+            throw new Error('Invalid squashKeep option value');
+        }
+        if (!accumulator[key]) {
+            accumulator[key] = item;
+        } else {
+            const storedItem = accumulator[key];
+            storedItem.value = new Big(storedItem.value).plus(item.value).toString();
+            storedItem.dueBlock = Math.min(storedItem.dueBlock, item.dueBlock);
+            storedItem.startBlock = Math.min(storedItem.startBlock, item.startBlock);
+        }
+
+        return accumulator;
+    }, {});
+
+    return Object.values(lockMap);
+}
+
+/**
+ * @typedef {Object} BalanceLockItem
+ * @property {Coin} coin
+ * @property {string|number} value
+ * @property {string|number} dueBlock
+ * @property {string|number} startBlock
+ */
+
+/**
+ * @param {string} address
  * @param {Object} [params]
  * @param {number|string} [params.page]
  * @param {number|string} [params.limit]
@@ -360,11 +408,17 @@ export function getAddressOrderList(address, params) {
 
 /**
  * @param {string} address
- * @return {Promise<Array<StakeItem>>}
+ * @return {Promise<DelegationData>}
  */
-export function getAddressStakeList(address) {
+export function getAddressStake(address) {
     return explorer.get(`addresses/${address}/delegations`, {params: {limit: 999}})
-        .then((response) => response.data.data);
+        .then((response) => {
+            return {
+                list: response.data.data,
+                totalDelegatedBipValue: response.data.meta.additional.totalDelegatedBipValue,
+                lock: response.data.meta.additional.lockedData,
+            };
+        });
 }
 
 /**
@@ -895,6 +949,13 @@ export function getCoinBySymbol(symbol) {
  */
 
 /**
+ * @typedef {Object} DelegationData
+ * @property {Array<StakeItem>} list
+ * @property {number|string} totalDelegatedBipValue
+ * @property {{startBlock: number, endBlock: number, startTimestamp: string|timestamp}} lock
+ */
+
+/**
  * @typedef {Object} ValidatorListItem
  * @property {Validator} validator
  * @property {boolean} signed
@@ -1033,6 +1094,9 @@ export function getCoinBySymbol(symbol) {
  * @property {string} [data.pubKey]
  * @property {Coin} [data.coin]
  * @property {number} [data.value]
+ * -- type: TX_TYPE.MOVE_STAKE
+ * @property {string} [data.fromPubKey]
+ * @property {string} [data.toPubKey]
  * -- type: TX_TYPE.REDEEM_CHECK
  * @property {string} [data.rawCheck]
  * @property {string} [data.proof]

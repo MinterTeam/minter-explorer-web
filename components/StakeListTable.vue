@@ -1,6 +1,6 @@
 <script>
     import debounce from 'lodash-es/debounce';
-    import {pretty, prettyPrecise, getExplorerValidatorUrl, getExplorerAddressUrl} from '~/assets/utils';
+    import {pretty, prettyPrecise, prettyRound, getDateHuman, getExplorerValidatorUrl, getExplorerAddressUrl} from '~/assets/utils';
     import TableLink from "~/components/TableLink";
 
     const STAKE_TYPE_VALIDATOR = 'validator'; // delegator page: list of validators for current delegator
@@ -17,9 +17,6 @@
         components: {
             TableLink,
         },
-        filters: {
-            pretty,
-        },
         props: {
             /** @type Array<StakeItem> */
             stakeList: {
@@ -30,6 +27,20 @@
                 type: String,
                 default: STAKE_TYPE_VALIDATOR,
             },
+            /* STAKE_TYPE_VALIDATOR fields start */
+            totalDelegatedBipValue: {
+                type: [String, Number],
+                required: false,
+            },
+            lock: {
+                type: Object,
+                required: false,
+            },
+            lockEndTimestamp: {
+                type: String,
+                required: false,
+            },
+            /* STAKE_TYPE_VALIDATOR fields end */
             isLoading: {
                 type: Boolean,
                 default: false,
@@ -48,6 +59,9 @@
             };
         },
         computed: {
+            isDelegatorPage() {
+                return this.stakeItemType === STAKE_TYPE_VALIDATOR;
+            },
             hashName() {
                 if (this.stakeItemType === STAKE_TYPE_VALIDATOR) {
                     return 'Validator';
@@ -96,6 +110,9 @@
                         },
             */
             totalStake() {
+                if (this.totalDelegatedBipValue) {
+                    return this.totalDelegatedBipValue;
+                }
                 return this.stakeList.reduce((accumulator, item) => {
                     return accumulator + Number(item.bipValue);
                 }, 0);
@@ -116,6 +133,8 @@
         },
         methods: {
             prettyPrecise,
+            prettyRound,
+            getDateHuman,
             getGroupCoinList(stakeGroup) {
                 // keep unique coins
                 return stakeGroup.stakeList.map((item) => item.coin.symbol).filter(function(item, index, self) {
@@ -418,14 +437,33 @@
                 </template>
             </template>
             </tbody>
-            <tfoot v-if="stakeListGrouped.length > 1 && stakeItemType === $options.STAKE_TYPE_VALIDATOR">
+            <tfoot v-if="isDelegatorPage">
+            <tr class="u-hidden-medium-up">
+                <td colspan="4">Total {{ $options.pretty(totalStake) }} {{ $store.getters.COIN_NAME }} </td>
+            </tr>
             <tr>
                 <!-- hash -->
-                <td>Total</td>
-                <!-- placeholder for waitlist and coin-->
-                <td colspan="2" class="u-hidden-medium-down"></td>
+                <td>
+                    <template v-if="lock">
+                        Unbond disabled until {{ prettyRound(lock.endBlock) }} block
+                        <template v-if="lockEndTimestamp">(≈{{ getDateHuman(lockEndTimestamp) }})</template>
+                    </template>
+                    <template v-else>Unbond available</template>
+                </td>
+                <!-- placeholder for waitlist -->
+                <td class="u-hidden-medium-down"></td>
+                <!-- coin-->
+                <td class="u-hidden-medium-down">
+                    <template v-if="stakeListGrouped.length > 1">
+                        Total {{ $store.getters.COIN_NAME }}
+                    </template>
+                </td>
                 <!-- amount (colspan controls)-->
-                <td colspan="2" class="table__cell-total-amount">{{ $options.pretty(totalStake) }} {{ $store.getters.COIN_NAME }}</td>
+                <td colspan="2">
+                    <span class="u-hidden-medium-down" v-if="stakeListGrouped.length > 1">
+                        {{ $options.pretty(totalStake) }}
+                    </span>
+                </td>
             </tr>
             </tfoot>
         </table>
