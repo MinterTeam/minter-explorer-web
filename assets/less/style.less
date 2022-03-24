@@ -57,7 +57,10 @@
 .panel__header-title-icon {margin-right: 10px; margin-left: -8px; line-height: 40px;}
 .panel__header-controls {margin-top: 16px;}
 .panel__switcher-section {padding: 0;}
-.panel__switcher {display: flex; align-items: center; overflow-x: auto; overflow-y: hidden;}
+.panel__switcher {
+    display: flex; align-items: center; overflow-x: auto; overflow-y: hidden;
+    &+& {border-top: 1px solid @c-border;}
+}
 .panel__switcher-item {
     flex-grow: 2; flex-basis: 1px; padding: 11px 20px 13px; justify-content: center; position: relative; margin-bottom: -1px; white-space: nowrap;
     &::after {content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: currentColor; opacity: 0; transition: 0.15s;}

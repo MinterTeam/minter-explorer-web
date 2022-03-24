@@ -10,6 +10,7 @@
     import InlineSvg from 'vue-inline-svg';
     import ButtonCopyIcon from '~/components/common/ButtonCopyIcon';
     import Modal from '~/components/common/Modal';
+    import TabSwitcher from '~/components/common/TabSwitcher.vue';
     import TransactionListTable from '~/components/TransactionListTable';
     import PoolProviderList from '@/components/PoolProviderList.vue';
     import PoolOrderList from '@/components/PoolOrderList.vue';
@@ -52,6 +53,7 @@
             InlineSvg,
             ButtonCopyIcon,
             Modal,
+            TabSwitcher,
             TransactionListTable,
             PoolProviderList,
             PoolOrderList,
@@ -226,34 +228,6 @@
             prettyPrecise,
             getCoinIconUrl(coin) {
                 return this.$store.getters['explorer/getCoinIcon'](coin);
-            },
-            switchTab(newTab) {
-                // save previous page
-                if (this.$route.query.active_tab) {
-                    this.storedTabPages[this.$route.query.active_tab] = this.$route.query.page;
-                }
-                // restore saved page
-                let newTabPage;
-                if (this.storedTabPages[newTab]) {
-                    newTabPage = this.storedTabPages[newTab];
-                }
-
-                let newQuery = {
-                    page: newTabPage,
-                    active_tab: undefined, // fix: uncaught exception: Object
-                };
-                if (newTab !== DEFAULT_TAB) {
-                    newQuery.active_tab = newTab;
-                }
-
-                // update route
-                this.$router.replace({
-                    // path: this.$route.path,
-                    query: newQuery,
-                });
-
-                // wait for rewards chart to disappear
-                this.$nextTick(this.checkPanelPosition);
             },
             checkPanelPosition() {
                 const panelEl = document.querySelector('[data-tab-panel]');
@@ -536,64 +510,53 @@
         </section>
 
         <section class="panel u-section" data-tab-panel>
-            <div class="panel__switcher">
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
-                        @click="switchTab($options.TAB_TYPES.TX)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
-                    Txs
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.PROVIDER}"
-                        @click="switchTab($options.TAB_TYPES.PROVIDER)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
-                    Pools
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.ORDER}"
-                        @click="switchTab($options.TAB_TYPES.ORDER)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-limit-order.svg" width="40" height="40" alt="" role="presentation">
-                    Orders
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.STAKE}"
-                        @click="switchTab($options.TAB_TYPES.STAKE)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-mining.svg" width="40" height="40" alt="" role="presentation">
-                    Stakes
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.REWARD}"
-                        @click="switchTab($options.TAB_TYPES.REWARD)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-reward.svg" width="40" height="40" alt="" role="presentation">
-                    Rewards
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.SLASH}"
-                        @click="switchTab($options.TAB_TYPES.SLASH)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
-                    Penalties
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.FAILED_TX}"
-                        @click="switchTab($options.TAB_TYPES.FAILED_TX)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
-                    Failed txs
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.UNBOND}"
-                        @click="switchTab($options.TAB_TYPES.UNBOND)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-unbond.svg" width="40" height="40" alt="" role="presentation">
-                    Unbonds
-                </button>
-            </div>
+            <TabSwitcher :tabs="[
+                {
+                    caption: 'Txs',
+                    iconName: 'transaction',
+                    isGroup: true,
+                    tabs: [
+                        {
+                            slug: $options.TAB_TYPES.TX,
+                            caption: 'Successful',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.FAILED_TX,
+                            caption: 'Failed',
+                        },
+                    ]
+                },
+                {
+                    slug: $options.TAB_TYPES.PROVIDER,
+                    caption: 'Pools',
+                    iconName: 'pool',
+                },
+                {
+                    slug: $options.TAB_TYPES.ORDER,
+                    caption: 'Orders',
+                    iconName: 'limit-order',
+                },
+                {
+                    slug: $options.TAB_TYPES.STAKE,
+                    caption: 'Stakes',
+                    iconName: 'mining',
+                },
+                {
+                    slug: $options.TAB_TYPES.REWARD,
+                    caption: 'Rewards',
+                    iconName: 'reward',
+                },
+                {
+                    slug: $options.TAB_TYPES.SLASH,
+                    caption: 'Penalties',
+                    iconName: 'slash',
+                },
+                {
+                    slug: $options.TAB_TYPES.UNBOND,
+                    caption: 'Unbonds',
+                    iconName: 'unbond',
+                },
+            ]"/>
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-address="$route.params.address" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
             <!-- Failed Transactions -->
