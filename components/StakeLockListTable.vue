@@ -13,7 +13,7 @@
             TableLink,
         },
         props: {
-            /** @type Array<Reward|Slash> */
+            /** @type Array<StakeLockItem> */
             dataList: {
                 type: Array,
                 required: true,
@@ -46,10 +46,11 @@
         <table class="u-text-nowrap" v-else-if="dataList.length">
             <thead>
             <tr>
-                <!--<th>Name</th>-->
-<!--                <th>Time</th>-->
                 <th>Block</th>
-                <th>Validator</th>
+<!-- @TODO end block, end time -->
+                <th>Lock type</th>
+                <th>From validator</th>
+                <th>To validator</th>
                 <th>Value</th>
             </tr>
             </thead>
@@ -60,16 +61,17 @@
                     <template v-if="dataType === $options.TYPE_REWARD">
                         {{ $options.getDate(dataItem.timestamp) }}
                     </template>
-                    <template v-else>
-                        {{ $options.getTimeMinutes(dataItem.timestamp) }}
-                        <span class="u-text-muted">{{ $options.getTimeZone(dataItem.timestamp) }}</span>
-                    </template>
                 </td>-->
                 <!-- block -->
                 <td>
                     <nuxt-link class="link--default" :to="'/blocks/' + dataItem.height">
                         {{ dataItem.height }}
                     </nuxt-link>
+                    ({{ $options.getTimeMinutes(dataItem.createdAt) }}
+                    <span class="u-text-muted">{{ $options.getTimeZone(dataItem.createdAt) }}</span>)
+                </td>
+                <td>
+                    {{ dataItem.type }}
                 </td>
                 <!-- public key -->
                 <td>
@@ -78,13 +80,23 @@
                                :should-not-shorten="!!dataItem.validator.name"
                     />
                 </td>
+                <!-- to validator -->
+                <td>
+                    <TableLink
+                        v-if="dataItem.toValidator"
+                        :link-text="getLabel(dataItem)"
+                        :link-path="getExplorerValidatorUrl(dataItem.toValidator.publicKey)"
+                        :should-not-shorten="!!dataItem.toValidator.name"
+                    />
+                    <span class="u-text-muted" v-else>—</span>
+                </td>
                 <!-- value -->
                 <td>
-                    {{ dataItem.coin.symbol }} {{ $options.prettyPrecise(dataItem.amount) }}
+                    {{ $options.prettyPrecise(dataItem.value) }} {{ dataItem.coin.symbol }}
                 </td>
             </tr>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No unbonds</div>
+        <div class="panel__content panel__section u-text-center" v-else>No locks</div>
     </div>
 </template>

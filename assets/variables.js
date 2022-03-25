@@ -64,7 +64,7 @@ export const TAB_TYPES = {
     STAKE: 'stake',
     REWARD: 'reward',
     SLASH: 'penalty',
-    UNBOND: 'unbond',
+    STAKE_LOCK: 'stake_lock',
     PROVIDER: 'provider',
     ORDER: 'order',
 };
