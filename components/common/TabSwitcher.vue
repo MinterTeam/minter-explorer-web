@@ -106,7 +106,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="panel__section panel__section--wrap">
         <div class="panel__switcher">
             <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
                     v-for="tab in tabs"

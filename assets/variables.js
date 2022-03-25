@@ -63,6 +63,7 @@ export const TAB_TYPES = {
     FAILED_TX: 'failed_tx',
     STAKE: 'stake',
     REWARD: 'reward',
+    REWARD_CHART: 'reward_chart',
     SLASH: 'penalty',
     STAKE_LOCK: 'stake_lock',
     PROVIDER: 'provider',
