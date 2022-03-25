@@ -556,6 +556,11 @@
                             // iconName: 'reward',
                         },
                         {
+                            slug: $options.TAB_TYPES.REWARD_CHART,
+                            caption: 'Reward chart',
+                            // iconName: 'reward',
+                        },
+                        {
                             slug: $options.TAB_TYPES.SLASH,
                             caption: 'Penalties',
                             // iconName: 'slash',
@@ -596,15 +601,19 @@
                 :is-loading="isStakeListLoading"
                 v-if="activeTab === $options.TAB_TYPES.STAKE"
             />
+            <StakeLockListTable
+                :data-list="stakeLockList"
+                :is-loading="isStakeLockListLoading"
+                v-if="activeTab === $options.TAB_TYPES.STAKE_LOCK"
+            />
             <RewardListTable :data-list="rewardList" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
+            <!-- Delegation Reward Chard-->
+            <keep-alive>
+                <RewardChart v-if="activeTab === $options.TAB_TYPES.REWARD_CHART"/>
+            </keep-alive>
             <PenaltyListTable :data-list="slashList" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
-            <StakeLockListTable :data-list="stakeLockList" :is-loading="isStakeLockListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE_LOCK"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
-        <!-- Delegation Reward Chard-->
-        <keep-alive>
-            <RewardChart v-if="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
-        </keep-alive>
 
 
         <Modal class="qr-modal"
