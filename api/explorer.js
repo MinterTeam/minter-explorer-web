@@ -422,6 +422,17 @@ export function getAddressStake(address) {
 }
 
 /**
+ * @param {string} address
+ * @return {Promise<Array<StakeLockItem>>}
+ */
+export function getAddressStakeLockList(address) {
+    return explorer.get(`addresses/${address}/events/unbonds`)
+        .then((response) => {
+            return response.data.data;
+        });
+}
+
+/**
  * @typedef {Object} RewardListInfo
  * @property {Array<Reward>} data
  * @property {PaginationMeta} meta
@@ -953,6 +964,18 @@ export function getCoinBySymbol(symbol) {
  * @property {Array<StakeItem>} list
  * @property {number|string} totalDelegatedBipValue
  * @property {{startBlock: number, endBlock: number, startTimestamp: string|timestamp}} lock
+ */
+
+/**
+ * @typedef {Object} StakeLockItem
+ * @property {Coin} coin
+ * @property {string|number} value
+ * @property {Validator} validator
+ * @property {Validator} [toValidator]
+ * @property {string} address
+ * @property {number} height
+ * @property {string|timestamp} createdAt
+ * @property {string} type
  */
 
 /**

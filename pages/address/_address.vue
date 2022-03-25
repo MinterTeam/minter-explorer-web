@@ -1,6 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
-    import {getBalance, getBalanceLock, getAddressTransactionList, getAddressStake, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList, getPoolList, getProviderPoolList, getAddressOrderList, checkBlockTime} from '~/api/explorer.js';
+    import {getBalance, getBalanceLock, getAddressTransactionList, getAddressStake, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressStakeLockList, getPoolList, getProviderPoolList, getAddressOrderList, checkBlockTime} from '~/api/explorer.js';
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -17,7 +17,7 @@
     import StakeListTable from '~/components/StakeListTable';
     import RewardListTable from '~/components/RewardListTable.vue';
     import PenaltyListTable from '~/components/PenaltyListTable.vue';
-    import UnbondListTable from '~/components/UnbondListTable';
+    import StakeLockListTable from '~/components/StakeLockListTable.vue';
     import RewardChart from '~/components/RewardChart';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -60,7 +60,7 @@
             StakeListTable,
             RewardListTable,
             PenaltyListTable,
-            UnbondListTable,
+            StakeLockListTable,
             RewardChart,
             BackButton,
             Pagination,
@@ -151,8 +151,8 @@
                 isOrderListLoaded: false,
                 // stakes
                 stakeList: [],
-                stakeLock: null,
-                stakeLockEndTimestamp: '',
+                unbondLock: null,
+                unbondLockEndTimestamp: '',
                 totalDelegatedBipValue: 0,
                 isStakeListLoading: false,
                 isStakeListLoaded: false,
@@ -166,11 +166,11 @@
                 slashPaginationInfo: {},
                 isSlashListLoading: false,
                 isSlashListLoaded: false,
-                // unbonds
-                unbondList: [],
-                // unbondPaginationInfo: {},
-                isUnbondListLoading: false,
-                isUnbondListLoaded: false,
+                // stake locks
+                stakeLockList: [],
+                // stakeLockPaginationInfo: {},
+                isStakeLockListLoading: false,
+                isStakeLockListLoaded: false,
                 nonce: '',
                 isNonceQrModalVisible: false,
                 isAddressQrModalVisible: false,
@@ -216,9 +216,9 @@
                 if (this.activeTab === TAB_TYPES.SLASH) {
                     return this.slashPaginationInfo;
                 }
-                if (this.activeTab === TAB_TYPES.UNBOND) {
+                if (this.activeTab === TAB_TYPES.STAKE_LOCK) {
                     return null;
-                    // return this.unbondPaginationInfo;
+                    // return this.stakeLockPaginationInfo;
                 }
                 return false;
             },
@@ -264,8 +264,8 @@
                     if (this.activeTab === TAB_TYPES.SLASH && !this.isSlashListLoaded) {
                         this.fetchSlashes();
                     }
-                    if (this.activeTab === TAB_TYPES.UNBOND && !this.isUnbondListLoaded) {
-                        this.fetchUnbonds();
+                    if (this.activeTab === TAB_TYPES.STAKE_LOCK && !this.isStakeLockListLoaded) {
+                        this.fetchStakeLocks();
                     }
 
                     this.checkPanelPosition();
@@ -290,8 +290,8 @@
                     if (this.activeTab === TAB_TYPES.SLASH) {
                         this.fetchSlashes();
                     }
-                    if (this.activeTab === TAB_TYPES.UNBOND) {
-                        this.fetchUnbonds();
+                    if (this.activeTab === TAB_TYPES.STAKE_LOCK) {
+                        this.fetchStakeLocks();
                     }
 
                     this.checkPanelPosition();
@@ -367,7 +367,7 @@
                 getAddressStake(this.$route.params.address)
                     .then((stakeData) => {
                         this.stakeList = stakeData.list;
-                        this.stakeLock = stakeData.lock;
+                        this.unbondLock = stakeData.lock;
                         this.totalDelegatedBipValue = stakeData.totalDelegatedBipValue;
                         this.isStakeListLoading = false;
                         this.isStakeListLoaded = true;
@@ -375,7 +375,7 @@
                         if (stakeData.lock.endBlock) {
                             checkBlockTime(stakeData.lock.endBlock)
                                 .then((blockTimeInfo) => {
-                                    this.stakeLockEndTimestamp = blockTimeInfo.timestamp;
+                                    this.unbondLockEndTimestamp = blockTimeInfo.timestamp;
                                 })
                                 .catch((error) => {
                                     console.log(error);
@@ -412,17 +412,17 @@
                     this.isSlashListLoading = false;
                 });
             },
-            fetchUnbonds() {
-                this.isUnbondListLoading = true;
-                getAddressUnbondList(this.$route.params.address, this.$route.query)
-                    .then((unbondList) => {
-                        this.unbondList = unbondList;
-                        // this.unbondPaginationInfo = unbondListInfo.meta;
-                        this.isUnbondListLoading = false;
-                        this.isUnbondListLoaded = true;
+            fetchStakeLocks() {
+                this.isStakeLockListLoading = true;
+                getAddressStakeLockList(this.$route.params.address, this.$route.query)
+                    .then((stakeLockList) => {
+                        this.stakeLockList = stakeLockList;
+                        // this.stakeLockPaginationInfo = stakeLockListInfo.meta;
+                        this.isStakeLockListLoading = false;
+                        this.isStakeLockListLoaded = true;
                     })
                     .catch(() => {
-                        this.isUnbondListLoading = false;
+                        this.isStakeLockListLoading = false;
                     });
             },
         },
@@ -537,24 +537,30 @@
                     iconName: 'limit-order',
                 },
                 {
-                    slug: $options.TAB_TYPES.STAKE,
                     caption: 'Stakes',
                     iconName: 'mining',
-                },
-                {
-                    slug: $options.TAB_TYPES.REWARD,
-                    caption: 'Rewards',
-                    iconName: 'reward',
-                },
-                {
-                    slug: $options.TAB_TYPES.SLASH,
-                    caption: 'Penalties',
-                    iconName: 'slash',
-                },
-                {
-                    slug: $options.TAB_TYPES.UNBOND,
-                    caption: 'Unbonds',
-                    iconName: 'unbond',
+                    isGroup: true,
+                    tabs: [
+                        {
+                            slug: $options.TAB_TYPES.STAKE,
+                            caption: 'Delegated',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.STAKE_LOCK,
+                            caption: 'Locked',
+                            // iconName: 'unbond',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.REWARD,
+                            caption: 'Rewards',
+                            // iconName: 'reward',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.SLASH,
+                            caption: 'Penalties',
+                            // iconName: 'slash',
+                        },
+                    ]
                 },
             ]"/>
             <!-- Transactions -->
@@ -585,14 +591,14 @@
                 :stake-list="stakeList"
                 stake-item-type="validator"
                 :total-delegated-bip-value="totalDelegatedBipValue"
-                :lock="stakeLock"
-                :lock-end-timestamp="stakeLockEndTimestamp"
+                :lock="unbondLock"
+                :lock-end-timestamp="unbondLockEndTimestamp"
                 :is-loading="isStakeListLoading"
                 v-if="activeTab === $options.TAB_TYPES.STAKE"
             />
             <RewardListTable :data-list="rewardList" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
             <PenaltyListTable :data-list="slashList" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
-            <UnbondListTable :data-list="unbondList" :is-loading="isUnbondListLoading" v-if="activeTab === $options.TAB_TYPES.UNBOND"/>
+            <StakeLockListTable :data-list="stakeLockList" :is-loading="isStakeLockListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE_LOCK"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
         <!-- Delegation Reward Chard-->

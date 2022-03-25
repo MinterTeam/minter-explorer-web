@@ -118,8 +118,8 @@ export default {
                 {{ tab.caption }}
             </button>
         </div>
-        <div class="panel__switcher" v-if="activeGroup">
-            <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
+        <div class="panel__tabs" v-if="activeGroup">
+            <button class="panel__tabs-item button"
                     v-for="tab in activeGroup.tabs"
                     :key="tab.slug"
                     :class="{'is-active': activeTabSlug === tab.slug}"
