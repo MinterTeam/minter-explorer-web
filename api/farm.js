@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import coinBlockList from 'minter-coin-block-list';
-import {FARM_API_URL} from "~/assets/variables.js";
+import {FARM_API_URL, NETWORK, MAINNET} from "~/assets/variables.js";
 import addToCamelInterceptor from '~/assets/axios-to-camel.js';
 import {getPoolList, getPoolByToken} from '@/api/explorer.js';
 
@@ -35,6 +35,9 @@ const farmCache = new Cache({maxAge: 1 * 60 * 1000});
  * @return {Promise<Array<FarmItem>>}
  */
 export function getFarmList({onlyTrusted = false} = {}) {
+    if (NETWORK !== MAINNET) {
+        return Promise.resolve([]);
+    }
     return _getFarmList()
         .then((farmList) => {
             let farmMap = {};
