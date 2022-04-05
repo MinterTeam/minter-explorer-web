@@ -1,6 +1,6 @@
 <script>
     import {isValidAddress} from 'minterjs-util/src/prefix';
-    import {getBalance, getAddressTransactionList, getAddressStakeList, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressUnbondList, getPoolList, getProviderPoolList, getAddressOrderList} from '~/api/explorer.js';
+    import {getBalance, getBalanceLock, getAddressTransactionList, getAddressStake, getAddressRewardAggregatedList, getAddressPenaltyList, getAddressStakeLockList, getPoolList, getProviderPoolList, getAddressOrderList, checkBlockTime} from '~/api/explorer.js';
     import {getNonce} from '~/api/gate';
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
@@ -10,13 +10,14 @@
     import InlineSvg from 'vue-inline-svg';
     import ButtonCopyIcon from '~/components/common/ButtonCopyIcon';
     import Modal from '~/components/common/Modal';
+    import TabSwitcher from '~/components/common/TabSwitcher.vue';
     import TransactionListTable from '~/components/TransactionListTable';
     import PoolProviderList from '@/components/PoolProviderList.vue';
     import PoolOrderList from '@/components/PoolOrderList.vue';
     import StakeListTable from '~/components/StakeListTable';
     import RewardListTable from '~/components/RewardListTable.vue';
     import PenaltyListTable from '~/components/PenaltyListTable.vue';
-    import UnbondListTable from '~/components/UnbondListTable';
+    import StakeLockListTable from '~/components/StakeLockListTable.vue';
     import RewardChart from '~/components/RewardChart';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
@@ -52,13 +53,14 @@
             InlineSvg,
             ButtonCopyIcon,
             Modal,
+            TabSwitcher,
             TransactionListTable,
             PoolProviderList,
             PoolOrderList,
             StakeListTable,
             RewardListTable,
             PenaltyListTable,
-            UnbondListTable,
+            StakeLockListTable,
             RewardChart,
             BackButton,
             Pagination,
@@ -99,6 +101,12 @@
         },
         fetch() {
             this.fetchTab(this.$route.query);
+
+            getBalanceLock(this.$route.params.address, {squashKeep: 'coin'})
+                .then((lockList) => {
+                    this.balanceLockList = lockList;
+                });
+
             getNonce(this.$route.params.address)
                 .then((nonce) => {
                     this.nonce = nonce.toString();
@@ -119,6 +127,7 @@
                 balanceList: [],
                 balanceTotal: '',
                 balanceTotalUsd: '',
+                balanceLockList: [],
                 storedTabPages: {},
                 // txs
                 txList: [],
@@ -142,6 +151,9 @@
                 isOrderListLoaded: false,
                 // stakes
                 stakeList: [],
+                unbondLock: null,
+                unbondLockEndTimestamp: '',
+                totalDelegatedBipValue: 0,
                 isStakeListLoading: false,
                 isStakeListLoaded: false,
                 // rewards
@@ -154,11 +166,11 @@
                 slashPaginationInfo: {},
                 isSlashListLoading: false,
                 isSlashListLoaded: false,
-                // unbonds
-                unbondList: [],
-                // unbondPaginationInfo: {},
-                isUnbondListLoading: false,
-                isUnbondListLoaded: false,
+                // stake locks
+                stakeLockList: [],
+                // stakeLockPaginationInfo: {},
+                isStakeLockListLoading: false,
+                isStakeLockListLoaded: false,
                 nonce: '',
                 isNonceQrModalVisible: false,
                 isAddressQrModalVisible: false,
@@ -204,9 +216,9 @@
                 if (this.activeTab === TAB_TYPES.SLASH) {
                     return this.slashPaginationInfo;
                 }
-                if (this.activeTab === TAB_TYPES.UNBOND) {
+                if (this.activeTab === TAB_TYPES.STAKE_LOCK) {
                     return null;
-                    // return this.unbondPaginationInfo;
+                    // return this.stakeLockPaginationInfo;
                 }
                 return false;
             },
@@ -216,34 +228,6 @@
             prettyPrecise,
             getCoinIconUrl(coin) {
                 return this.$store.getters['explorer/getCoinIcon'](coin);
-            },
-            switchTab(newTab) {
-                // save previous page
-                if (this.$route.query.active_tab) {
-                    this.storedTabPages[this.$route.query.active_tab] = this.$route.query.page;
-                }
-                // restore saved page
-                let newTabPage;
-                if (this.storedTabPages[newTab]) {
-                    newTabPage = this.storedTabPages[newTab];
-                }
-
-                let newQuery = {
-                    page: newTabPage,
-                    active_tab: undefined, // fix: uncaught exception: Object
-                };
-                if (newTab !== DEFAULT_TAB) {
-                    newQuery.active_tab = newTab;
-                }
-
-                // update route
-                this.$router.replace({
-                    // path: this.$route.path,
-                    query: newQuery,
-                });
-
-                // wait for rewards chart to disappear
-                this.$nextTick(this.checkPanelPosition);
             },
             checkPanelPosition() {
                 const panelEl = document.querySelector('[data-tab-panel]');
@@ -280,8 +264,8 @@
                     if (this.activeTab === TAB_TYPES.SLASH && !this.isSlashListLoaded) {
                         this.fetchSlashes();
                     }
-                    if (this.activeTab === TAB_TYPES.UNBOND && !this.isUnbondListLoaded) {
-                        this.fetchUnbonds();
+                    if (this.activeTab === TAB_TYPES.STAKE_LOCK && !this.isStakeLockListLoaded) {
+                        this.fetchStakeLocks();
                     }
 
                     this.checkPanelPosition();
@@ -306,8 +290,8 @@
                     if (this.activeTab === TAB_TYPES.SLASH) {
                         this.fetchSlashes();
                     }
-                    if (this.activeTab === TAB_TYPES.UNBOND) {
-                        this.fetchUnbonds();
+                    if (this.activeTab === TAB_TYPES.STAKE_LOCK) {
+                        this.fetchStakeLocks();
                     }
 
                     this.checkPanelPosition();
@@ -380,11 +364,23 @@
             },
             fetchStakes() {
                 this.isStakeListLoading = true;
-                getAddressStakeList(this.$route.params.address)
-                    .then((stakeList) => {
-                        this.stakeList = stakeList;
+                getAddressStake(this.$route.params.address)
+                    .then((stakeData) => {
+                        this.stakeList = stakeData.list;
+                        this.unbondLock = stakeData.lock;
+                        this.totalDelegatedBipValue = stakeData.totalDelegatedBipValue;
                         this.isStakeListLoading = false;
                         this.isStakeListLoaded = true;
+
+                        if (stakeData.lock.endBlock) {
+                            checkBlockTime(stakeData.lock.endBlock)
+                                .then((blockTimeInfo) => {
+                                    this.unbondLockEndTimestamp = blockTimeInfo.timestamp;
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                });
+                        }
                     })
                     .catch(() => {
                         this.isStakeListLoading = false;
@@ -416,17 +412,17 @@
                     this.isSlashListLoading = false;
                 });
             },
-            fetchUnbonds() {
-                this.isUnbondListLoading = true;
-                getAddressUnbondList(this.$route.params.address, this.$route.query)
-                    .then((unbondList) => {
-                        this.unbondList = unbondList;
-                        // this.unbondPaginationInfo = unbondListInfo.meta;
-                        this.isUnbondListLoading = false;
-                        this.isUnbondListLoaded = true;
+            fetchStakeLocks() {
+                this.isStakeLockListLoading = true;
+                getAddressStakeLockList(this.$route.params.address, this.$route.query)
+                    .then((stakeLockList) => {
+                        this.stakeLockList = stakeLockList;
+                        // this.stakeLockPaginationInfo = stakeLockListInfo.meta;
+                        this.isStakeLockListLoading = false;
+                        this.isStakeLockListLoaded = true;
                     })
                     .catch(() => {
-                        this.isUnbondListLoading = false;
+                        this.isStakeLockListLoading = false;
                     });
             },
         },
@@ -473,10 +469,29 @@
                     </table>
                 </dd>
 
-                <dt>Total</dt>
+                <dt>Total available</dt>
                 <dd>
                     <span :title="prettyPrecise(balanceTotal)">{{ $store.getters.COIN_NAME }} {{ balanceTotal | pretty }}</span> <br>
                     <span class="u-text-muted">${{ balanceTotalUsd | prettyUsd }}</span>
+                </dd>
+
+                <dt>Locked balance</dt>
+                <dd>
+                    <table class="table--balance" v-if="balanceLockList.length">
+                        <tr v-for="balance in balanceLockList" :key="balance.coin.id">
+                            <td>
+                                <span class="u-icon-wrap">
+                                    <img class="u-icon--coin" :src="getCoinIconUrl(balance.coin.symbol)" width="20" height="20" alt="" role="presentation">
+                                    {{ balance.coin.symbol }}
+                                    <img class="u-icon--verified" src="/img/icon-verified.svg" width="12" height="12" alt="" role="presentation" v-if="balance.coin.verified">
+                                </span>
+                            </td>
+                            <td :title="prettyPrecise(balance.value)">
+                                {{ pretty(balance.value) }}
+                            </td>
+                        </tr>
+                    </table>
+                    <span class="u-text-muted" v-else>—</span>
                 </dd>
 
                 <dt>#Transactions</dt>
@@ -495,64 +510,64 @@
         </section>
 
         <section class="panel u-section" data-tab-panel>
-            <div class="panel__switcher">
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.TX}"
-                        @click="switchTab($options.TAB_TYPES.TX)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
-                    Txs
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.PROVIDER}"
-                        @click="switchTab($options.TAB_TYPES.PROVIDER)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-pool.svg" width="40" height="40" alt="" role="presentation">
-                    Pools
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.ORDER}"
-                        @click="switchTab($options.TAB_TYPES.ORDER)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-limit-order.svg" width="40" height="40" alt="" role="presentation">
-                    Orders
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.STAKE}"
-                        @click="switchTab($options.TAB_TYPES.STAKE)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-mining.svg" width="40" height="40" alt="" role="presentation">
-                    Stakes
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.REWARD}"
-                        @click="switchTab($options.TAB_TYPES.REWARD)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-reward.svg" width="40" height="40" alt="" role="presentation">
-                    Rewards
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.SLASH}"
-                        @click="switchTab($options.TAB_TYPES.SLASH)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-slash.svg" width="40" height="40" alt="" role="presentation">
-                    Penalties
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.FAILED_TX}"
-                        @click="switchTab($options.TAB_TYPES.FAILED_TX)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation">
-                    Failed txs
-                </button>
-                <button class="panel__switcher-item panel__switcher-item--small panel__title panel__header-title u-semantic-button"
-                        :class="{'is-active': activeTab === $options.TAB_TYPES.UNBOND}"
-                        @click="switchTab($options.TAB_TYPES.UNBOND)"
-                >
-                    <img class="panel__header-title-icon u-hidden-large-down" src="/img/icon-unbond.svg" width="40" height="40" alt="" role="presentation">
-                    Unbonds
-                </button>
-            </div>
+            <TabSwitcher :tabs="[
+                {
+                    caption: 'Txs',
+                    iconName: 'transaction',
+                    isGroup: true,
+                    tabs: [
+                        {
+                            slug: $options.TAB_TYPES.TX,
+                            caption: 'Successful',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.FAILED_TX,
+                            caption: 'Failed',
+                        },
+                    ]
+                },
+                {
+                    slug: $options.TAB_TYPES.PROVIDER,
+                    caption: 'Pools',
+                    iconName: 'pool',
+                },
+                {
+                    slug: $options.TAB_TYPES.ORDER,
+                    caption: 'Orders',
+                    iconName: 'limit-order',
+                },
+                {
+                    caption: 'Stakes',
+                    iconName: 'mining',
+                    isGroup: true,
+                    tabs: [
+                        {
+                            slug: $options.TAB_TYPES.STAKE,
+                            caption: 'Delegated',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.STAKE_LOCK,
+                            caption: 'Locked',
+                            // iconName: 'unbond',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.REWARD,
+                            caption: 'Rewards',
+                            // iconName: 'reward',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.REWARD_CHART,
+                            caption: 'Reward chart',
+                            // iconName: 'reward',
+                        },
+                        {
+                            slug: $options.TAB_TYPES.SLASH,
+                            caption: 'Penalties',
+                            // iconName: 'slash',
+                        },
+                    ]
+                },
+            ]"/>
             <!-- Transactions -->
             <TransactionListTable :tx-list="txList" :current-address="$route.params.address" :is-loading="isTxListLoading" v-if="activeTab === $options.TAB_TYPES.TX"/>
             <!-- Failed Transactions -->
@@ -577,16 +592,28 @@
                 :is-loading="isOrderListLoading"
             />
             <!-- Delegation -->
-            <StakeListTable :stake-list="stakeList" stake-item-type="validator" :is-loading="isStakeListLoading" v-if="activeTab === $options.TAB_TYPES.STAKE"/>
+            <StakeListTable
+                :stake-list="stakeList"
+                stake-item-type="validator"
+                :total-delegated-bip-value="totalDelegatedBipValue"
+                :lock="unbondLock"
+                :lock-end-timestamp="unbondLockEndTimestamp"
+                :is-loading="isStakeListLoading"
+                v-if="activeTab === $options.TAB_TYPES.STAKE"
+            />
+            <StakeLockListTable
+                :data-list="stakeLockList"
+                :is-loading="isStakeLockListLoading"
+                v-if="activeTab === $options.TAB_TYPES.STAKE_LOCK"
+            />
             <RewardListTable :data-list="rewardList" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
+            <!-- Delegation Reward Chard-->
+            <keep-alive>
+                <RewardChart v-if="activeTab === $options.TAB_TYPES.REWARD_CHART"/>
+            </keep-alive>
             <PenaltyListTable :data-list="slashList" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
-            <UnbondListTable :data-list="unbondList" :is-loading="isUnbondListLoading" v-if="activeTab === $options.TAB_TYPES.UNBOND"/>
         </section>
         <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
-        <!-- Delegation Reward Chard-->
-        <keep-alive>
-            <RewardChart v-if="activeTab === $options.TAB_TYPES.REWARD && rewardList.length"/>
-        </keep-alive>
 
 
         <Modal class="qr-modal"

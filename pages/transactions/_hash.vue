@@ -4,12 +4,12 @@
     import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
-    import {getTransaction, getBlock, getBlockList, getCoinById, checkBlockTime} from '~/api/explorer.js';
+    import {getTransaction, getBlock, getBlockList, getCoinById, getLimitOrder, checkBlockTime} from '~/api/explorer.js';
     import {getTransferFee, getTransferStatus} from '~/api/hub.js';
-    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, shortHashFilter, txTypeFilter, fromBase64, getEvmTxUrl, getEvmAddressUrl, getExplorerValidatorUrl} from "~/assets/utils.js";
+    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, shortHashFilter, txTypeFilter, snakeCaseToText, fromBase64, getEvmTxUrl, getEvmAddressUrl, getExplorerValidatorUrl} from "~/assets/utils.js";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {UNBOND_PERIOD, TX_STATUS, HUB_MINTER_MULTISIG_ADDRESS, HUB_CHAIN_DATA, HUB_TRANSFER_STATUS as WITHDRAW_STATUS} from "~/assets/variables.js";
+    import {UNBOND_PERIOD, LOCK_STAKE_PERIOD, TX_STATUS, HUB_MINTER_MULTISIG_ADDRESS, HUB_CHAIN_DATA, HUB_TRANSFER_STATUS as WITHDRAW_STATUS} from "~/assets/variables.js";
     import Amount from '@/components/common/Amount.vue';
     import PoolLink from '~/components/common/PoolLink.vue';
     import BackButton from '~/components/BackButton';
@@ -82,6 +82,9 @@
                 unbondTimeInfo: null,
                 /** @type BlockTimeInfo|null */
                 voteTimeInfo: null,
+                /** @type BlockTimeInfo|null */
+                dueBlockTimeInfo: null,
+                limitOrderStatus: '',
                 currentCoinSymbol: '',
                 hubFee: null,
                 hubStatus: null,
@@ -93,6 +96,12 @@
                     return;
                 }
                 return this.tx.height + UNBOND_PERIOD;
+            },
+            dueBlockHeight() {
+                if (this.isTxType(TX_TYPE.LOCK_STAKE)) {
+                    return this.tx.height + LOCK_STAKE_PERIOD;
+                }
+                return this.tx?.data?.dueBlock || this.tx?.check?.dueBlock;
             },
             validatorMeta() {
                 const tx = this.tx;
@@ -184,10 +193,10 @@
                 }
                 return false;
             },
-            /** @type {HubChainDataItem|null}*/
+            /** @type {HubChainDataItem}*/
             hubNetworkData() {
                 if (!this.isToHubTx) {
-                    return null;
+                    return undefined;
                 }
                 const networkName = this.payloadParsed.type.replace('send_to_', '');
                 return HUB_CHAIN_DATA[networkName];
@@ -243,7 +252,6 @@
             isToHubTx: {
                 handler() {
                     if (this.isToHubTx) {
-                        console.log('fetch hub fee');
                         this.fetchHubTxFee();
                         this.fetchHubTxStatus();
                     }
@@ -257,6 +265,8 @@
             } else {
                 this.fetchUnbondBlock();
                 this.fetchVoteBlock();
+                this.fetchDueBlock();
+                this.fetchOrderStatus();
                 this.fetchCreatedCoinCurrentSymbol();
             }
             if (process.client) {
@@ -285,6 +295,7 @@
             time: getTime,
             timeMinutes: getTimeMinutes,
             shortHashFilter,
+            snakeCaseToText,
             getWithdrawTxUrl(hash) {
                 return getEvmTxUrl(this.hubNetworkData?.chainId, hash);
             },
@@ -297,9 +308,13 @@
                     .then((tx) => {
                         this.tx = tx;
                         fetchTxTimer = null;
-                        this.fetchUnbondBlock();
-                        this.fetchVoteBlock();
-                        this.fetchCreatedCoinCurrentSymbol();
+                        this.$nextTick(() => {
+                            this.fetchUnbondBlock();
+                            this.fetchVoteBlock();
+                            this.fetchDueBlock();
+                            this.fetchOrderStatus();
+                            this.fetchCreatedCoinCurrentSymbol();
+                        });
                     })
                     .catch((e) => {
                         if (fetchTxDestroy) {
@@ -325,6 +340,24 @@
                         .then((timeInfo) => this.voteTimeInfo = timeInfo)
                         .catch((e) => {
                             console.log('Unable to get vote block info', e);
+                        });
+                }
+            },
+            fetchDueBlock() {
+                if (this.dueBlockHeight) {
+                    checkBlockTime(this.dueBlockHeight)
+                        .then((timeInfo) => this.dueBlockTimeInfo = timeInfo)
+                        .catch((e) => {
+                            console.log('Unable to get due block info', e);
+                        });
+                }
+            },
+            fetchOrderStatus() {
+                if (this.isAddOrderType) {
+                    getLimitOrder(this.tx.data.orderId)
+                        .then((orderData) => this.limitOrderStatus = orderData.status)
+                        .catch((e) => {
+                            console.log('Unable to get limit order info', e);
                         });
                 }
             },
@@ -472,6 +505,8 @@
                     <dd v-if="tx.data.id || tx.data.orderId">{{ tx.data.id || tx.data.orderId }}</dd>
 
                     <!-- ADD_LIMIT_ORDER -->
+                    <dt v-if="isAddOrderType">Order status</dt>
+                    <dd v-if="isAddOrderType">{{ snakeCaseToText(limitOrderStatus) }}</dd>
                     <dt v-if="isAddOrderType">Pool</dt>
                     <dd v-if="isAddOrderType"><PoolLink :pool="{coin0: tx.data.coinToSell, coin1: tx.data.coinToBuy}"/></dd>
                     <dt v-if="isAddOrderType">Want to sell</dt>
@@ -586,7 +621,9 @@
                 <dt v-if="isDefined(tx.data.commission)">Commission</dt>
                 <dd v-if="isDefined(tx.data.commission)">{{ tx.data.commission }}&thinsp;%</dd>
                 <dt v-if="isUnbondType">Unbond block</dt>
-                <dd v-if="isUnbondType">{{ prettyRound(unbondBlockHeight) }}</dd>
+                <dd v-if="isUnbondType">
+                    <nuxt-link class="link--default" :to="'/blocks/' + unbondBlockHeight">{{ prettyRound(unbondBlockHeight) }}</nuxt-link>
+                </dd>
                 <dt v-if="isUnbondType && unbondTimeInfo">Unbond time</dt>
                 <dd v-if="isUnbondType && unbondTimeInfo">
                     <span v-if="!unbondTimeInfo.isFutureBlock">{{ timeDistance(unbondTimeInfo.timestamp) }} ago ({{ time(unbondTimeInfo.timestamp) }})</span>
@@ -599,7 +636,9 @@
                     <dt v-if="tx.data.controlAddress">Control address</dt>
                     <dd v-if="tx.data.controlAddress"><nuxt-link class="link--default" :to="'/address/' + tx.data.controlAddress">{{ tx.data.controlAddress }}</nuxt-link></dd>
                     <dt v-if="isDefined(tx.data.height)">Vote height</dt>
-                    <dd v-if="isDefined(tx.data.height)">{{ tx.data.height }}</dd>
+                    <dd v-if="isDefined(tx.data.height)">
+                        <nuxt-link class="link--default" :to="'/blocks/' + tx.data.height">{{ prettyRound(tx.data.height) }}</nuxt-link>
+                    </dd>
                     <dt v-if="isDefined(tx.data.height) && voteTimeInfo">Height time</dt>
                     <dd v-if="isDefined(tx.data.height) && voteTimeInfo">
                         <span v-if="!voteTimeInfo.isFutureBlock">{{ timeDistance(voteTimeInfo.timestamp) }} ago ({{ time(voteTimeInfo.timestamp) }})</span>
@@ -613,13 +652,17 @@
                     <dd v-if="isTxType($options.TX_TYPE.VOTE_COMMISSION)" class="dd u-text-pre-line">{{ commissionPriceList }}</dd>
                     <!-- @TODO UPDATE_COMMISSION -->
 
-                <!-- REDEEM_CHECK -->
-                <dt v-if="tx.data.check && tx.data.check.sender">Check issuer</dt>
-                <dd v-if="tx.data.check && tx.data.check.sender"><nuxt-link class="link--default" :to="'/address/' + tx.data.check.sender">{{ tx.data.check.sender }}</nuxt-link></dd>
-                <dt v-if="tx.data.check && tx.data.check.nonce">Check nonce</dt>
-                <dd v-if="tx.data.check && tx.data.check.nonce">{{ fromBase64(tx.data.check.nonce) }}</dd>
-                <dt v-if="tx.data.check && tx.data.check.dueBlock">Due Block</dt>
-                <dd v-if="tx.data.check && tx.data.check.dueBlock">{{ tx.data.check.dueBlock }}</dd>
+                    <!-- MOVE_STAKE -->
+                    <dt v-if="tx.data.fromPubKey">From public key</dt>
+                    <dd v-if="tx.data.fromPubKey"><nuxt-link class="link--default" :to="getExplorerValidatorUrl(tx.data.fromPubKey)">{{ tx.data.fromPubKey }}</nuxt-link></dd>
+                    <dt v-if="tx.data.toPubKey">To public key</dt>
+                    <dd v-if="tx.data.toPubKey"><nuxt-link class="link--default" :to="getExplorerValidatorUrl(tx.data.toPubKey)">{{ tx.data.toPubKey }}</nuxt-link></dd>
+
+                    <!-- REDEEM_CHECK -->
+                    <dt v-if="tx.data.check && tx.data.check.sender">Check issuer</dt>
+                    <dd v-if="tx.data.check && tx.data.check.sender"><nuxt-link class="link--default" :to="'/address/' + tx.data.check.sender">{{ tx.data.check.sender }}</nuxt-link></dd>
+                    <dt v-if="tx.data.check && tx.data.check.nonce">Check nonce</dt>
+                    <dd v-if="tx.data.check && tx.data.check.nonce">{{ fromBase64(tx.data.check.nonce) }}</dd>
                     <dt v-if="tx.data.check && tx.data.check.value">Amount</dt>
                     <Amount tag="dd"
                             v-if="tx.data.check && tx.data.check.value"
@@ -629,6 +672,17 @@
                     />
                     <dt v-if="tx.data.rawCheck">Check</dt>
                     <dd v-if="tx.data.rawCheck">{{ checkFromBase64(tx.data.rawCheck) }}</dd>
+
+                    <!-- LOCK, LOCK_STAKE, REDEEM_CHECK -->
+                    <dt v-if="dueBlockHeight">Due block</dt>
+                    <dd v-if="dueBlockHeight">
+                        <nuxt-link class="link--default" :to="'/blocks/' + dueBlockHeight">{{ prettyRound(dueBlockHeight) }}</nuxt-link>
+                    </dd>
+                    <dt v-if="dueBlockHeight && dueBlockTimeInfo">Due block time</dt>
+                    <dd v-if="dueBlockHeight && dueBlockTimeInfo">
+                        <span v-if="!dueBlockTimeInfo.isFutureBlock">{{ timeDistance(dueBlockTimeInfo.timestamp) }} ago ({{ time(dueBlockTimeInfo.timestamp) }})</span>
+                        <span v-else>In {{ timeDistanceFuture(dueBlockTimeInfo.timestamp) }} ({{ timeMinutes(dueBlockTimeInfo.timestamp) }})</span>
+                    </dd>
 
                 <!-- MULTISEND -->
                 <dt v-if="tx.data.list">#Recipients</dt>

@@ -1,5 +1,5 @@
 <script>
-import {pretty} from '~/assets/utils.js';
+import {pretty, snakeCaseToText} from '~/assets/utils.js';
 import TableLink from '@/components/TableLink.vue';
 
 const ITEM_TYPE = {
@@ -38,10 +38,7 @@ export default {
     },
     methods: {
         pretty,
-        formatStatus(status) {
-            status = status.replaceAll('_', ' ');
-            return status[0].toUpperCase() + status.substring(1);
-        },
+        formatStatus: snakeCaseToText,
         getCoinIconUrl(coin) {
             return this.$store.getters['explorer/getCoinIcon'](coin);
         },

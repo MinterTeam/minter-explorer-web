@@ -89,6 +89,18 @@ export function txTypeFilter(value) {
     return value;
 }
 
+/**
+ * @param {string} value
+ * @return {string|*}
+ */
+export function snakeCaseToText(value) {
+    if (!value || typeof value !== 'string') {
+        return value;
+    }
+    value = value.replaceAll('_', ' ');
+    return value[0].toUpperCase() + value.substring(1);
+}
+
 export function getExplorerAddressUrl(address) {
     return '/address/' + address;
 }
