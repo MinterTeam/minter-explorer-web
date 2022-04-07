@@ -15,6 +15,8 @@ const TRUSTED_FARM_OWNERS = [
     'Mxcb272d7efc6c4a3122d705100fa0032703446e3e',
     'Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d',
     'Mx9ff587d747d6f1875c2729c6b0f351ed7af50c01',
+    'Mxe9fd1e557a4851fe1ba76def2967da15defa4e4d', // HUB
+    'Mx9ff587d747d6f1875c2729c6b0f351ed7af50c01', // MUSD
 ];
 function isFarmTrusted(farmItem) {
     return TRUSTED_FARM_OWNERS.includes(farmItem.ownerAddress);
@@ -46,7 +48,7 @@ export function getFarmList({onlyTrusted = false} = {}) {
                         return false;
                     }
                     // filter out untrusted
-                    if (onlyTrusted && !isFarmTrusted(farmItem)) {
+                    if (onlyTrusted && !farmItem.isTrusted) {
                         return false;
                     }
                     return true;
@@ -107,6 +109,7 @@ function _getFarmList(ownerAddress) {
                 })
                 .map((farmItem) => {
                     farmItem.tokenSymbol = `LP-${farmItem.poolId}`;
+                    farmItem.isTrusted = isFarmTrusted(farmItem);
 
                     return farmItem;
                 });
@@ -115,13 +118,14 @@ function _getFarmList(ownerAddress) {
 
 /**
  * Fill with pool data and aggregate identical pools
- * @param {Promise<Array<FarmItem>>} farmPromise
- * @param {boolean} [skipLowLiquidity]
- * @return {Promise<Array<FarmItem>>}
+ * @param {Promise<Array<FarmItem>>|Array<FarmItem>} farmPromise
+ * @param {boolean} [trySharePoolsRequest] - will fetch default top 50 pools and additionally will fetch all trusted (other untrusted and not in top50 will be skipped)
+ * @return {Promise<Array<FarmItemWithPoolData>>}
  */
-export function fillFarmWithPoolData(farmPromise, {skipLowLiquidity} = {}) {
-    // get default pool list to share request with index pool list, anyway first 50 pools should be enough
-    const poolListPromise = getPoolList(/*{limit: 1000}*/);
+export function fillFarmWithPoolData(farmPromise, {trySharePoolsRequest} = {}) {
+    // get default pool list to share request with index pool list
+    // 0 - get all, undefined - get default 50
+    const poolListPromise = getPoolList({limit: trySharePoolsRequest ? undefined : 0});
 
     return Promise.all([farmPromise, poolListPromise])
         .then(([farmList, poolListInfo]) => {
@@ -132,7 +136,7 @@ export function fillFarmWithPoolData(farmPromise, {skipLowLiquidity} = {}) {
             farmList = farmList.map((farmItem) => {
                 if (poolMap[farmItem.tokenSymbol]) {
                     farmItem = addPoolFields(farmItem, poolMap[farmItem.tokenSymbol]);
-                } else if (!skipLowLiquidity || isFarmTrusted(farmItem)) {
+                } else if (farmItem.isTrusted) {
                     absentPoolTokenList.push(farmItem.tokenSymbol);
                 }
 
@@ -169,6 +173,11 @@ function poolListToMap(poolList) {
     return poolMap;
 }
 
+/**
+ * @param {FarmItem} farmProgram
+ * @param {Pool} pool
+ * @return {FarmItemWithPoolData}
+ */
 function addPoolFields(farmProgram, pool) {
     if (pool) {
         farmProgram.liquidityBip = pool.liquidityBip;
@@ -179,7 +188,13 @@ function addPoolFields(farmProgram, pool) {
 }
 
 /**
- * @typedef {{id:number, address:string, ownerAddress: string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string, unpaidTxCount: number, debt: number|string}} FarmItem
+ * @typedef {{id:number, address:string, ownerAddress: string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string, unpaidTxCount: number, debt: number|string, isTrusted: boolean}} FarmItem
+ */
+
+/**
+ * @typedef {FarmItem} FarmItemWithPoolData
+ * @property {number|string} liquidityBip
+ * @property {number|string} tradeVolumeBip1D
  */
 
 
