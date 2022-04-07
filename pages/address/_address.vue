@@ -42,11 +42,10 @@
         'HUSD',
     ];
     function isStableCoin(symbol) {
-        return STABLE_LIST.some((stableName) => new RegExp(`^${stableName}`).test(symbol));
+        return STABLE_LIST.some((stableName) => new RegExp(`^${stableName}(BSC|E)?$`).test(symbol));
     }
 
     export default {
-        ideFix: null,
         TAB_TYPES,
         components: {
             QrcodeVue,

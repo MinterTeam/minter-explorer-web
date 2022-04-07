@@ -755,10 +755,34 @@ const poolCache = new Cache({maxAge: 15 * 1000});
  * @return {Promise<PoolListInfo>}
  */
 export function getPoolList(params, options = {}) {
-    return explorer.get('pools', {
+    let poolPromise;
+    if (params?.limit !== 0) {
+        poolPromise = explorer.get('pools', {
             params,
             cache: poolCache,
+        });
+    } else {
+        poolPromise = explorer.get('pools/all', {
+            params: {
+                ...params,
+                limit: undefined,
+            },
+            cache: poolCache,
         })
+            .then((response) => {
+                response.data = {
+                    data: response.data,
+                    meta: {
+                        currentPage: 1,
+                        lastPage: 1,
+                        perPage: 0,
+                        total: response.data.length,
+                    },
+                };
+                return response;
+            });
+    }
+    return poolPromise
         .then((response) => {
             if (options.filterBlocked) {
                 response.data.data = response.data.data.filter((pool) => {
