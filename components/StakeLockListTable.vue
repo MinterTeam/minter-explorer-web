@@ -1,14 +1,10 @@
 <script>
-    import {getTimeMinutes, getDate, getTimeZone, prettyPrecise, getExplorerValidatorUrl} from '~/assets/utils';
-    import TableLink from '~/components/TableLink';
+    import {getTimeMinutes, getDate, getTimeZone, prettyPrecise, prettyRound, getExplorerValidatorUrl, snakeCaseToText} from '~/assets/utils.js';
+    import {checkBlockTime} from '~/api/explorer.js';
+    import TableLink from '~/components/TableLink.vue';
 
 
     export default {
-        ideFix: null,
-        getTimeMinutes,
-        getDate,
-        getTimeZone,
-        prettyPrecise,
         components: {
             TableLink,
         },
@@ -17,19 +13,56 @@
             dataList: {
                 type: Array,
                 required: true,
+                default: () => [],
             },
             isLoading: {
                 type: Boolean,
                 default: false,
             },
         },
+        data() {
+            return {
+                blockTimestamp: {},
+            };
+        },
+        computed: {
+            lockList() {
+                return this.dataList.map((item) => {
+                    return {
+                        ...item,
+                        endTimestamp: this.blockTimestamp[item.endHeight],
+                    };
+                });
+            },
+        },
+        watch: {
+            dataList: {
+                handler() {
+                    this.dataList.forEach((stakeLockItem) => {
+                        if (this.blockTimestamp[stakeLockItem.endHeight]) {
+                            return;
+                        }
+                        checkBlockTime(stakeLockItem.endHeight, {forceFutureBlock: true})
+                            .then(({timestamp}) => {
+                                this.$set(this.blockTimestamp, stakeLockItem.endHeight, timestamp);
+                            });
+                    });
+                },
+            },
+        },
         methods: {
+            getTimeMinutes,
+            getDate,
+            getTimeZone,
+            prettyPrecise,
+            prettyRound,
+            snakeCaseToText,
             getExplorerValidatorUrl,
             getValidatorName(item) {
                 return item.validator.name;
             },
-            getLabel(item) {
-                const name = item.validator.name || item.validator.publicKey;
+            getLabel(validator) {
+                const name = validator.name || validator.publicKey;
                 return name.toString();
             },
         },
@@ -46,8 +79,8 @@
         <table class="u-text-nowrap" v-else-if="dataList.length">
             <thead>
             <tr>
-                <th>Block</th>
-<!-- @TODO end block, end time -->
+                <th>Start block</th>
+                <th>End block</th>
                 <th>Lock type</th>
                 <th>From validator</th>
                 <th>To validator</th>
@@ -55,27 +88,34 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(dataItem, index) in dataList" :key="index">
+            <tr v-for="(dataItem, index) in lockList" :key="index">
                 <!-- Time -->
                 <!--<td>
                     <template v-if="dataType === $options.TYPE_REWARD">
-                        {{ $options.getDate(dataItem.timestamp) }}
+                        {{ getDate(dataItem.timestamp) }}
                     </template>
                 </td>-->
                 <!-- block -->
                 <td>
-                    <nuxt-link class="link--default" :to="'/blocks/' + dataItem.height">
-                        {{ dataItem.height }}
+                    <nuxt-link class="link--default" :to="'/blocks/' + dataItem.startHeight">
+                        {{ prettyRound(dataItem.startHeight) }}
                     </nuxt-link>
-                    ({{ $options.getTimeMinutes(dataItem.createdAt) }}
-                    <span class="u-text-muted">{{ $options.getTimeZone(dataItem.createdAt) }}</span>)
+<!--                    ({{ getTimeMinutes(dataItem.createdAt) }}-->
+<!--                    <span class="u-text-muted">{{ getTimeZone(dataItem.createdAt) }}</span>)-->
                 </td>
                 <td>
-                    {{ dataItem.type }}
+                    {{ prettyRound(dataItem.endHeight) }}
+                    <template v-if="dataItem.endTimestamp">
+                        (≈{{ getTimeMinutes(dataItem.endTimestamp) }}
+                        <span class="u-text-muted">{{ getTimeZone(dataItem.endTimestamp) }}</span>)
+                    </template>
+                </td>
+                <td>
+                    {{ snakeCaseToText(dataItem.type) }}
                 </td>
                 <!-- public key -->
                 <td>
-                    <TableLink :link-text="getLabel(dataItem)"
+                    <TableLink :link-text="getLabel(dataItem.validator)"
                                :link-path="getExplorerValidatorUrl(dataItem.validator.publicKey)"
                                :should-not-shorten="!!dataItem.validator.name"
                     />
@@ -84,7 +124,7 @@
                 <td>
                     <TableLink
                         v-if="dataItem.toValidator"
-                        :link-text="getLabel(dataItem)"
+                        :link-text="getLabel(dataItem.toValidator)"
                         :link-path="getExplorerValidatorUrl(dataItem.toValidator.publicKey)"
                         :should-not-shorten="!!dataItem.toValidator.name"
                     />
@@ -92,7 +132,7 @@
                 </td>
                 <!-- value -->
                 <td>
-                    {{ $options.prettyPrecise(dataItem.value) }} {{ dataItem.coin.symbol }}
+                    {{ prettyPrecise(dataItem.value) }} {{ dataItem.coin.symbol }}
                 </td>
             </tr>
             </tbody>

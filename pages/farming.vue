@@ -19,8 +19,10 @@ export default {
         //         this.uniswapPair = pairDayData;
         //     });
 
-        const farmListPromise = fillFarmWithPoolData(getFarmList(), {skipLowLiquidity: true})
+        const farmListPromise = fillFarmWithPoolData(getFarmList())
             .then((farmList) => {
+                farmList = farmList
+                    .filter((item) => item.isTrusted || item.liquidityBip >= 100000);
                 this.farmList = farmList;
             });
 
@@ -166,6 +168,7 @@ export default {
                                     {{ pool.coin0.symbol }} / {{ pool.coin1.symbol }}
                                 </nuxt-link>
                             </div>
+                            <img src="/img/icon-verified.svg" width="14" height="14" alt="Verified" v-tooltip="'Provided by the team'" v-if="pool.isTrusted">
                         </div>
                         <div class="panel__content panel__section">
                             <dl class="farm__dl">

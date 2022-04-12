@@ -10,11 +10,14 @@ export default {
         //         this.uniswapPair = pairDayData;
         //     });
 
-        const farmListPromise = fillFarmWithPoolData(getFarmList({onlyTrusted: true}), {skipLowLiquidity: true})
+        const farmListPromise = getFarmList({onlyTrusted: true})
+            .then((farmList) => {
+                return fillFarmWithPoolData(selectRandomItems(farmList, 3), {trySharePoolsRequest: true});
+            })
             .then((farmList) => {
                 // farmList = farmList
                 //     .filter((item) => item.liquidityBip > 100000);
-                this.farmList = selectRandomItems(farmList, 3);
+                this.farmList = farmList;
             });
 
         return Promise.all([/*uniswapFarmPromise, */farmListPromise]);

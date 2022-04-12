@@ -42,11 +42,10 @@
         'HUSD',
     ];
     function isStableCoin(symbol) {
-        return STABLE_LIST.some((stableName) => new RegExp(`^${stableName}`).test(symbol));
+        return STABLE_LIST.some((stableName) => new RegExp(`^${stableName}(BSC|E)?$`).test(symbol));
     }
 
     export default {
-        ideFix: null,
         TAB_TYPES,
         components: {
             QrcodeVue,
@@ -168,7 +167,7 @@
                 isSlashListLoaded: false,
                 // stake locks
                 stakeLockList: [],
-                // stakeLockPaginationInfo: {},
+                stakeLockPaginationInfo: {},
                 isStakeLockListLoading: false,
                 isStakeLockListLoaded: false,
                 nonce: '',
@@ -217,8 +216,7 @@
                     return this.slashPaginationInfo;
                 }
                 if (this.activeTab === TAB_TYPES.STAKE_LOCK) {
-                    return null;
-                    // return this.stakeLockPaginationInfo;
+                    return this.stakeLockPaginationInfo;
                 }
                 return false;
             },
@@ -415,9 +413,9 @@
             fetchStakeLocks() {
                 this.isStakeLockListLoading = true;
                 getAddressStakeLockList(this.$route.params.address, this.$route.query)
-                    .then((stakeLockList) => {
-                        this.stakeLockList = stakeLockList;
-                        // this.stakeLockPaginationInfo = stakeLockListInfo.meta;
+                    .then((stakeLockListInfo) => {
+                        this.stakeLockList = stakeLockListInfo.data;
+                        this.stakeLockPaginationInfo = stakeLockListInfo.meta;
                         this.isStakeLockListLoading = false;
                         this.isStakeLockListLoaded = true;
                     })
@@ -601,11 +599,13 @@
                 :is-loading="isStakeListLoading"
                 v-if="activeTab === $options.TAB_TYPES.STAKE"
             />
-            <StakeLockListTable
-                :data-list="stakeLockList"
-                :is-loading="isStakeLockListLoading"
-                v-if="activeTab === $options.TAB_TYPES.STAKE_LOCK"
-            />
+            <keep-alive>
+                <StakeLockListTable
+                    :data-list="stakeLockList"
+                    :is-loading="isStakeLockListLoading"
+                    v-if="activeTab === $options.TAB_TYPES.STAKE_LOCK"
+                />
+            </keep-alive>
             <RewardListTable :data-list="rewardList" :is-loading="isRewardListLoading" v-if="activeTab === $options.TAB_TYPES.REWARD"/>
             <!-- Delegation Reward Chard-->
             <keep-alive>
