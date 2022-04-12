@@ -61,8 +61,8 @@
             getValidatorName(item) {
                 return item.validator.name;
             },
-            getLabel(item) {
-                const name = item.validator.name || item.validator.publicKey;
+            getLabel(validator) {
+                const name = validator.name || validator.publicKey;
                 return name.toString();
             },
         },
@@ -115,7 +115,7 @@
                 </td>
                 <!-- public key -->
                 <td>
-                    <TableLink :link-text="getLabel(dataItem)"
+                    <TableLink :link-text="getLabel(dataItem.validator)"
                                :link-path="getExplorerValidatorUrl(dataItem.validator.publicKey)"
                                :should-not-shorten="!!dataItem.validator.name"
                     />
@@ -124,7 +124,7 @@
                 <td>
                     <TableLink
                         v-if="dataItem.toValidator"
-                        :link-text="getLabel(dataItem)"
+                        :link-text="getLabel(dataItem.toValidator)"
                         :link-path="getExplorerValidatorUrl(dataItem.toValidator.publicKey)"
                         :should-not-shorten="!!dataItem.toValidator.name"
                     />
