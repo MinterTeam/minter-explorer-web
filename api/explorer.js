@@ -104,10 +104,12 @@ export function getBlockTransactionList(height, params) {
 
 /**
  * @param {number|string} height
+ * @param {object} [options]
+ * @param {boolean} [options.forceFutureBlock]
  * @return {Promise<BlockTimeInfo>}
  */
-export async function checkBlockTime(height) {
-    const pastOrCurrentBlock = await getPastOrCurrentBlockInfo(height);
+export async function checkBlockTime(height, {forceFutureBlock} = {}) {
+    const pastOrCurrentBlock = forceFutureBlock ? await getCurrentBlockInfo(height) : await getPastOrCurrentBlockInfo(height);
     const isFutureBlock = height > pastOrCurrentBlock.height;
 
     let timestamp;
@@ -124,11 +126,14 @@ function getPastOrCurrentBlockInfo(height) {
     return getBlock(height)
         .catch((e) => {
             if (e.request.status === 404) {
-                return getBlockList().then((blockList) => blockList.data[0]);
+                return getCurrentBlockInfo();
             } else {
                 throw e;
             }
         });
+}
+function getCurrentBlockInfo() {
+    return getBlockList().then((blockList) => blockList.data[0]);
 }
 
 /**
@@ -423,12 +428,15 @@ export function getAddressStake(address) {
 
 /**
  * @param {string} address
- * @return {Promise<Array<StakeLockItem>>}
+ * @param {object} [params]
+ * @param {number|string} [params.page]
+ * @param {number|string} [params.limit]
+ * @return {Promise<StakeLockItemInfo>}
  */
-export function getAddressStakeLockList(address) {
-    return explorer.get(`addresses/${address}/events/unbonds`)
+export function getAddressStakeLockList(address, params) {
+    return explorer.get(`addresses/${address}/delegations/locked`, {params})
         .then((response) => {
-            return response.data.data;
+            return response.data;
         });
 }
 
@@ -997,9 +1005,15 @@ export function getCoinBySymbol(symbol) {
  * @property {Validator} validator
  * @property {Validator} [toValidator]
  * @property {string} address
- * @property {number} height
- * @property {string|timestamp} createdAt
+ * @property {number} startHeight
+ * @property {number} endHeight
+ * @property {string|timestamp} createdAt - timestamp of startHeight
  * @property {string} type
+ */
+/**
+ * @typedef {object} StakeLockItemInfo
+ * @property {Array<StakeLockItem>} data
+ * @property {PaginationMeta} meta
  */
 
 /**
