@@ -312,7 +312,7 @@
             <!-- Penalties -->
             <PenaltyListTable :data-list="penaltyList" item-type="address" :is-loading="isPenaltyListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
         </section>
-        <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
+        <Pagination class="u-section" :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
 
     </div>
 </template>

@@ -65,14 +65,16 @@
                         </span>
                     </span>
                 </h1>
-                <Pagination :pagination-info="paginationInfo"
-                            pagination-class="pagination--header u-hidden-medium-down"
-                            button-class="button--white"
-                            button-disabled-class="u-hidden"
+                <Pagination
+                    :pagination-info="paginationInfo"
+                    class="u-hidden-medium-down"
+                    pagination-class="pagination--header"
+                    button-class="button--white"
+                    button-disabled-class="u-hidden"
                 />
             </div>
             <PoolList :pool-list="poolList"/>
         </section>
-        <Pagination :pagination-info="paginationInfo"/>
+        <Pagination class="u-section" :pagination-info="paginationInfo"/>
     </div>
 </template>

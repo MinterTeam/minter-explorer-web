@@ -376,7 +376,7 @@ function calculateTradeRate(amountIn, amountOut) {
                         :is-loading="isProviderListLoading"
                     />
                 </section>
-                <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
+                <Pagination class="u-section" :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
             </div>
         </div>
     </div>

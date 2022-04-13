@@ -164,7 +164,7 @@
                          :pagination-info="txPaginationInfo"
                          :is-loading="isTxListLoading"
         />
-        <Pagination :pagination-info="txPaginationInfo"/>
+        <Pagination class="u-section" :pagination-info="txPaginationInfo"/>
         <ValidatorList id="validators" :validator-list="block.validators" v-if="block.validators && block.validators.length"/>
     </div>
 </template>

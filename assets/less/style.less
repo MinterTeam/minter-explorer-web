@@ -70,15 +70,16 @@
 }
 .panel__switcher-item--small {padding-left: 10px; padding-right: 10px;}
 .panel__switcher-item--auto {flex-grow: 0; flex-basis: auto;}
+@panel-tab-margin-small: 12px;
+@panel-tab-margin: 16px;
 .panel__tabs {
-    padding: 16px;
+    padding: 16px; padding-top: (16px - @panel-tab-margin-small); padding-left: (16px - @panel-tab-margin-small);
     .panel__switcher + & {border-top: 1px solid @c-border;}
 }
 .panel__tabs-item {
     .button--ghost-main();
-    padding: 6px 10px; border-radius: 8px;
+    padding: 6px 10px; border-radius: 8px; margin-left: @panel-tab-margin-small; margin-top: @panel-tab-margin-small;
     &.is-active {.button--main();}
-    & + & {margin-left: 16px;}
 }
 @media (min-width: @breakpoint-mini-up) {
     //.panel__switcher-item--small {padding-left: 14px; padding-right: 14px;}
@@ -92,6 +93,8 @@
     .panel__header-controls {margin-left: 20px; margin-top: 0;}
     .panel__switcher {flex-grow: 2;}
     .panel__switcher-item--small {padding-left: 20px; padding-right: 20px;}
+    .panel__tabs {padding-left: (16px - @panel-tab-margin);}
+    .panel__tabs-item {margin-left: @panel-tab-margin;}
 }
 // common pagination
 .pagination {
@@ -99,6 +102,8 @@
     .button {
         &:hover, &:focus, &:active {z-index: 2;}
     }
+}
+.pagination-wrap, .pagination {
     & + .u-section {margin-top: 50px;}
 }
 .pagination--header {margin-left: 10px;}
@@ -112,6 +117,7 @@
     &:focus {border-color: @c-main;}
     .is-error > & {border-color: @c-red;}
 }
+.pagination__meta {margin-top: 16px;}
 // common navigation
 .navigation {display: flex; justify-content: space-between;}
 .u-amount {font-variant: tabular-nums;}
