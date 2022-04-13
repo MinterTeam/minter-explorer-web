@@ -132,11 +132,13 @@
                 </td>
                 <!-- value -->
                 <td>
-                    {{ prettyPrecise(dataItem.value) }} {{ dataItem.coin.symbol }}
+                    <span :title="prettyPrecise(dataItem.value) + ' ' + dataItem.coin.symbol">
+                        {{ pretty(dataItem.value) }} {{ dataItem.coin.symbol }}
+                    </span>
                 </td>
             </tr>
             </tbody>
         </table>
-        <div class="panel__content panel__section u-text-center" v-else>No locks</div>
+        <div class="panel__content panel__section u-text-center" v-else>No locks caused by <strong>Unbond</strong> and <strong>Move stake</strong> transactions</div>
     </div>
 </template>

@@ -43,7 +43,7 @@
 <template>
     <div>
         <TransactionList :tx-list="txList" :pagination-info="paginationInfo" :back-button="true"/>
-        <Pagination :pagination-info="paginationInfo"/>
+        <Pagination class="u-section" :pagination-info="paginationInfo"/>
     </div>
 </template>
 

@@ -492,8 +492,6 @@
                     <span class="u-text-muted" v-else>—</span>
                 </dd>
 
-                <dt>#Transactions</dt>
-                <dd>{{ txPaginationInfo.total || 0 }}</dd>
                 <dt>Nonce for tx</dt>
                 <dd class="dd u-icon-wrap">
                     <template v-if="nonce">
@@ -613,7 +611,7 @@
             </keep-alive>
             <PenaltyListTable :data-list="slashList" :is-loading="isSlashListLoading" v-if="activeTab === $options.TAB_TYPES.SLASH"/>
         </section>
-        <Pagination :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
+        <Pagination class="u-section" :pagination-info="activePaginationInfo" :active-tab="activeTab" v-if="activePaginationInfo"/>
 
 
         <Modal class="qr-modal"

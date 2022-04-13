@@ -199,6 +199,6 @@ export default {
             <PoolList v-if="!$fetchState.pending" :pool-list="poolList" :coin0="$route.params.symbol"/>
             <div class="panel__section" v-else>Loading…</div>
         </section>
-        <Pagination :pagination-info="paginationInfo"/>
+        <Pagination class="u-section" :pagination-info="paginationInfo"/>
     </div>
 </template>
