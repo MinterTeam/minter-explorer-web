@@ -47,11 +47,13 @@
                 <img class="panel__header-title-icon" src="/img/icon-transaction.svg" width="40" height="40" alt="" role="presentation" v-else>
                 Transactions
             </h1>
-            <Pagination v-show="!isLoading"
-                        :pagination-info="paginationInfo"
-                        pagination-class="pagination--header u-hidden-medium-down"
-                        button-class="button--white"
-                        button-disabled-class="u-hidden"
+            <Pagination
+                v-show="!isLoading"
+                :pagination-info="paginationInfo"
+                class="u-hidden-medium-down"
+                pagination-class="pagination--header"
+                button-class="button--white"
+                button-disabled-class="u-hidden"
             />
         </div>
         <TransactionListTable :tx-list="txList" :current-address="currentAddress" :current-validator="currentValidator" :current-block="currentBlock" :is-loading="isLoading"/>

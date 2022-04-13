@@ -115,6 +115,6 @@ export default {
                 </table>
             </div>
         </section>
-        <Pagination :pagination-info="paginationInfo"/>
+        <Pagination class="u-section" :pagination-info="paginationInfo"/>
     </div>
 </template>

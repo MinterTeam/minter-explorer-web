@@ -17,7 +17,7 @@
             },
             paginationClass: {
                 type: String,
-                default: 'pagination--bottom u-section',
+                default: 'pagination--bottom',
             },
             buttonClass: {
                 type: String,
@@ -63,6 +63,14 @@
                     classList = classList.concat(this.buttonDisabledClass.split(' '));
                 }
                 return classList;
+            },
+            firstNumber() {
+                return (this.currentPage - 1) * this.paginationInfo.perPage + 1;
+            },
+            lastNumber() {
+              const displayedAmount = this.currentPage === this.paginationInfo.lastPage ? this.paginationInfo.total % this.paginationInfo.perPage : this.paginationInfo.perPage;
+
+              return this.firstNumber - 1 + displayedAmount;
             },
         },
         methods: {
@@ -112,37 +120,40 @@
 </script>
 
 <template>
-    <div class="pagination" :class="paginationClass" v-if="currentPage && paginationInfo.lastPage > 1">
-        <nuxt-link class="button button--icon"
-                   :class="buttonClassPrev"
-                   :to="getPageHref(1)"
-                   :event="!hasPrev ? '' : 'click'"
-                   @click.native="handlePrev(1)"
-        > &lt;&lt;</nuxt-link>
-        <nuxt-link class="button button--icon"
-                   :class="buttonClassPrev"
-                   :to="getPageHref(currentPage - 1)"
-                   :event="!hasPrev ? '' : 'click'"
-                   @click.native="handlePrev(currentPage - 1)"
-        > &lt;</nuxt-link>
-        <form class="pagination__current" novalidate @submit.prevent="submit">
-            <input class="pagination__current-input" type="text" ref="pageInput"
-                   v-model="inputPage"
-                   @blur="handleBlur"
-            >
-            of {{ paginationInfo.lastPage }}
-        </form>
-        <nuxt-link class="button button--icon"
-                   :class="buttonClassNext"
-                   :to="getPageHref(currentPage + 1)"
-                   :event="!hasNext ? '' : 'click'"
-                   @click.native="handleNext(currentPage + 1)"
-        > ></nuxt-link>
-        <nuxt-link class="button button--icon"
-                   :class="buttonClassNext"
-                   :to="getPageHref(paginationInfo.lastPage)"
-                   :event="!hasNext ? '' : 'click'"
-                   @click.native="handleNext(paginationInfo.lastPage)"
-        > >></nuxt-link>
+    <div class="pagination-wrap">
+        <div class="pagination" :class="paginationClass" v-if="currentPage && paginationInfo.lastPage > 1">
+            <nuxt-link class="button button--icon"
+                       :class="buttonClassPrev"
+                       :to="getPageHref(1)"
+                       :event="!hasPrev ? '' : 'click'"
+                       @click.native="handlePrev(1)"
+            > &lt;&lt;</nuxt-link>
+            <nuxt-link class="button button--icon"
+                       :class="buttonClassPrev"
+                       :to="getPageHref(currentPage - 1)"
+                       :event="!hasPrev ? '' : 'click'"
+                       @click.native="handlePrev(currentPage - 1)"
+            > &lt;</nuxt-link>
+            <form class="pagination__current" novalidate @submit.prevent="submit">
+                <input class="pagination__current-input" type="text" ref="pageInput"
+                       v-model="inputPage"
+                       @blur="handleBlur"
+                >
+                of {{ paginationInfo.lastPage }}
+            </form>
+            <nuxt-link class="button button--icon"
+                       :class="buttonClassNext"
+                       :to="getPageHref(currentPage + 1)"
+                       :event="!hasNext ? '' : 'click'"
+                       @click.native="handleNext(currentPage + 1)"
+            > ></nuxt-link>
+            <nuxt-link class="button button--icon"
+                       :class="buttonClassNext"
+                       :to="getPageHref(paginationInfo.lastPage)"
+                       :event="!hasNext ? '' : 'click'"
+                       @click.native="handleNext(paginationInfo.lastPage)"
+            > >></nuxt-link>
+        </div>
+        <div class="pagination__meta u-text-muted u-text-small u-text-center" v-if="firstNumber && lastNumber">Displayed {{ firstNumber }}-{{ lastNumber }} of total {{ paginationInfo.total }} items</div>
     </div>
 </template>
