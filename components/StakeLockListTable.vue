@@ -1,5 +1,5 @@
 <script>
-    import {getTimeMinutes, getDate, getTimeZone, prettyPrecise, prettyRound, getExplorerValidatorUrl, snakeCaseToText} from '~/assets/utils.js';
+    import {getTimeMinutes, getDate, getTimeZone, pretty, prettyPrecise, prettyRound, getExplorerValidatorUrl, snakeCaseToText} from '~/assets/utils.js';
     import {checkBlockTime} from '~/api/explorer.js';
     import TableLink from '~/components/TableLink.vue';
 
@@ -54,6 +54,7 @@
             getTimeMinutes,
             getDate,
             getTimeZone,
+            pretty,
             prettyPrecise,
             prettyRound,
             snakeCaseToText,
