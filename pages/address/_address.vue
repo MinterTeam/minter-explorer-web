@@ -188,11 +188,11 @@
             balanceListFormatted() {
                 return this.balanceList
                     .map((item) => {
-                        if (isStableCoin(item.coin.symbol)) {
-                            item.usdAmount = 0;
-                        } else {
-                            item.usdAmount = item.bipAmount * this.$store.getters['explorer/bipPriceUsd'];
-                        }
+                        // if (isStableCoin(item.coin.symbol)) {
+                        //     item.usdAmount = 0;
+                        // } else {
+                        item.usdAmount = item.bipAmount * this.$store.getters['explorer/bipPriceUsd'];
+                        // }
                         return item;
                     });
             },

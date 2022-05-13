@@ -1,8 +1,8 @@
 import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
-import stripZeros from 'pretty-num/src/strip-zeros';
-import Big from '~/assets/big.js';
+import stripZeros from 'pretty-num/src/strip-zeros.js';
 import coinBlockList from 'minter-coin-block-list';
+import Big from '~/assets/big.js';
 import {getCoinIconList as getChainikIconList} from '~/api/chainik.js';
 import {EXPLORER_API_URL, REWARD_CHART_TYPES, BASE_COIN, TX_STATUS} from "~/assets/variables.js";
 import addToCamelInterceptor from '~/assets/axios-to-camel.js';
@@ -210,7 +210,6 @@ export function getTransactionChart() {
 
 
 /**
- *
  * @param {string} address
  * @return {Promise<BalanceData>}
  */
@@ -667,6 +666,8 @@ export function getCoinList({skipMeta} = {}) {
         .then((response) => {
             const coinList = response.data.data;
             return coinList;
+            // rely on api being already filtered
+            // return coinList.filter((coin) => !isBlocked(coin.symbol));
         });
 
     if (!skipMeta) {
@@ -727,6 +728,26 @@ export function getCoinList({skipMeta} = {}) {
                     return /-\d+$/.test(coin.symbol);
                 }
             });
+        });
+}
+
+/**
+ * @param {string|number} [coin]
+ * @param {number} [depth]
+ * @return {Promise<Array<CoinInfo>>}
+ */
+export function getSwapCoinList(coin, depth) {
+    const coinUrlSuffix = coin ? '/' + coin : '';
+    return explorer.get('pools/list/coins' + coinUrlSuffix, {
+            params: {depth},
+            cache: coinsCache,
+        })
+        .then((response) => {
+            return response.data
+                .filter((coin) => !isBlocked(coin.symbol))
+                .sort((a, b) => {
+                    return a.id - b.id;
+                });
         });
 }
 
@@ -807,6 +828,9 @@ export function getPoolList(params, options = {}) {
  * @return {Promise<Pool>}
  */
 export function getPool(coin0, coin1) {
+    if (coin0 === coin1) {
+        return Promise.reject(new Error('coin0 is equal to coin1'));
+    }
     return explorer.get(`pools/coins/${coin0}/${coin1}`, {
             cache: poolCache,
         })
@@ -842,7 +866,6 @@ export function getPoolTransactionList(coin0, coin1, params) {
 }
 
 /**
- * //@TODO check cache is working with query params
  * Get limit order list by pool
  * @param {string|number} coin0
  * @param {string|number} coin1

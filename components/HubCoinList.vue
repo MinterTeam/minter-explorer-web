@@ -133,7 +133,7 @@ function getPriceFromList(list, name) {
                             </td>
                             <td>
                                 <template v-if="group.ethereum">
-                                    <nuxt-link class="link--default" :to="'/coins/' + group.ethereum.minter.symbol" target="_blank">
+                                    <nuxt-link class="link--default" :to="'/coins/' + group.ethereum.minter.symbol">
                                         <img class="u-icon--coin-small" src="/img/minter-logo-circle.svg" alt="Minter">
                                         {{ group.ethereum.minter.symbol }}
                                     </nuxt-link>
@@ -148,7 +148,7 @@ function getPriceFromList(list, name) {
                             </td>
                             <td>
                                 <template v-if="group.bsc">
-                                    <nuxt-link class="link--default" :to="'/coins/' + group.bsc.minter.symbol" target="_blank">
+                                    <nuxt-link class="link--default" :to="'/coins/' + group.bsc.minter.symbol">
                                         <img class="u-icon--coin-small" src="/img/minter-logo-circle.svg" alt="Minter">
                                         {{ group.bsc.minter.symbol }}
                                     </nuxt-link>
