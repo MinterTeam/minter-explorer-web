@@ -12,7 +12,7 @@ export default {
 
         const farmListPromise = getFarmList({onlyTrusted: true})
             .then((farmList) => {
-                return fillFarmWithPoolData(selectRandomItems(farmList, 3), {trySharePoolsRequest: true});
+                return fillFarmWithPoolData(selectRandomItems(farmList, 5), {trySharePoolsRequest: true});
             })
             .then((farmList) => {
                 // farmList = farmList
