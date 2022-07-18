@@ -58,7 +58,7 @@ export default {
                     </td>
                     <td>
                         <div class="u-text-muted">CRR</div>
-                        <div class="u-fw-500" v-if="coin.crr">{{ coin.crr }}&thinsp;%</div>
+                        <div class="u-fw-500 u-text-nowrap" v-if="coin.crr">{{ coin.crr }}&thinsp;%</div>
                         <div v-else>—</div>
                     </td>
                 </tr>

@@ -32,6 +32,7 @@ const explorer = instance;
  * @property {number} bipPriceUsd
  * @property {number} bipPriceChange - in %
  * @property {number} latestBlockHeight - block count
+ * @property {number} latestBlockTime
  * @property {number} avgBlockTime - in seconds
  * @property {number} totalTransactions - tx count
  * @property {number} transactionsPerSecond - tps
