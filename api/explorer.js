@@ -32,6 +32,7 @@ const explorer = instance;
  * @property {number} bipPriceUsd
  * @property {number} bipPriceChange - in %
  * @property {number} latestBlockHeight - block count
+ * @property {number} latestBlockTime
  * @property {number} avgBlockTime - in seconds
  * @property {number} totalTransactions - tx count
  * @property {number} transactionsPerSecond - tps
@@ -69,17 +70,14 @@ export function getBlockList(params) {
 }
 
 /**
- * @typedef {Object} BlockInfo
- * @property {Block} data
- * @property {PaginationMeta} meta
- * @property {number} meta.latestBlockHeight
- */
-
-/**
- * @param {number} height
+ * @param {number|'latest'} height
  * @return {Promise<Block>}
  */
 export function getBlock(height) {
+    if (height === 'latest') {
+        // don't use `limit: 1`, instead use default limit to share request and possibly get from cache
+        return getBlockList({limit: undefined}).then((blockList) => blockList.data[0]);
+    }
     return explorer.get(`blocks/${height}`)
         .then((response) => response.data.data);
 }
@@ -109,7 +107,7 @@ export function getBlockTransactionList(height, params) {
  * @return {Promise<BlockTimeInfo>}
  */
 export async function checkBlockTime(height, {forceFutureBlock} = {}) {
-    const pastOrCurrentBlock = forceFutureBlock ? await getCurrentBlockInfo(height) : await getPastOrCurrentBlockInfo(height);
+    const pastOrCurrentBlock = forceFutureBlock ? await getBlock('latest') : await getPastOrCurrentBlockInfo(height);
     const isFutureBlock = height > pastOrCurrentBlock.height;
 
     let timestamp;
@@ -126,14 +124,11 @@ function getPastOrCurrentBlockInfo(height) {
     return getBlock(height)
         .catch((e) => {
             if (e.request.status === 404) {
-                return getCurrentBlockInfo();
+                return getBlock('latest');
             } else {
                 throw e;
             }
         });
-}
-function getCurrentBlockInfo() {
-    return getBlockList().then((blockList) => blockList.data[0]);
 }
 
 /**

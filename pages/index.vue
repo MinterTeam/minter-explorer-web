@@ -202,20 +202,6 @@
 
 <template>
     <div class="u-grid u-grid--vertical-margin" v-if="stats || blockList.length || txList.length">
-        <div class="u-cell">
-            <div class="panel panel__header bnb-notice">
-                <div class="bnb-notice__container">
-                    <div class="bnb-notice__content">
-                        <div class="bnb-notice__title">
-                            Withdraw your <span class="bnb-notice__color-bnb">BNB</span> from centralised exchanges
-                            <span class="u-display-ib">before it’s too late!</span>
-                        </div>
-                        <a class="bnb-notice__link link--main link--underline" href="https://www.minter.network/ru/earn/bnb-yf" target="_blank">Learn how to earn in Minter DEX 120% APR</a>
-                    </div>
-                    <a href="https://console.minter.network/hub?coin=BNB&chainId=56" class="button button--main bnb-notice__button">Deposit BNB Now!</a>
-                </div>
-            </div>
-        </div>
         <section class="u-cell u-cell--large--1-2">
             <Stats :stats="stats" :latest-block-height="latestBlockHeight" :total-transactions="totalTransactions"/>
         </section>
