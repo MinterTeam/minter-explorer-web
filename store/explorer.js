@@ -1,5 +1,6 @@
 // import {isCoinId} from 'minter-js-sdk/src/utils.js';
 import {getStatus, getCoinList} from '~/api/explorer.js';
+import {arrayToMap} from '~/assets/utils/collection.js';
 import {ACCOUNTS_API_URL, EXPLORER_STATIC_HOST} from '~/assets/variables.js';
 // import {BASE_URL_PREFIX} from '~/assets/variables.js';
 const BASE_URL_PREFIX = '';
@@ -7,14 +8,10 @@ const BASE_URL_PREFIX = '';
 export const state = () => ({
     /** @type Status|null */
     status: null,
-    /** @type Array<CoinItem> */
+    /** @type Array<CoinInfo> */
     coinList: [],
-    /** @type {Object.<string, CoinItem>} */
+    /** @type {Object.<string, CoinInfo>} */
     coinMap: {},
-    /** @type {Object.<string, string>} */
-    coinIconMap: {},
-    /** @type {Object.<string, boolean>} */
-    coinVerifiedMap: {},
 });
 
 export const getters = {
@@ -32,7 +29,7 @@ export const getters = {
                 return `${BASE_URL_PREFIX}/img/icon-coin-lp.svg`;
             }
 
-            const coinIcon = state.coinIconMap[coinSymbol];
+            const coinIcon = state.coinMap[coinSymbol]?.icon;
 
             // chainik icon
             if (coinIcon) {
@@ -60,7 +57,7 @@ export const getters = {
                 return true;
             }
 
-            return state.coinVerifiedMap[coinSymbol];
+            return state.coinMap[coinSymbol].verified;
         };
     },
 };
@@ -70,23 +67,8 @@ export const mutations = {
         state.status = statusData;
     },
     SET_COIN_LIST(state, data) {
-        let coinMap = {};
-        let coinIconMap = {};
-        let coinVerifiedMap = {};
-        data.forEach((coin) => {
-            coinMap[coin.symbol] = coin;
-            if (coin.icon) {
-                coinIconMap[coin.symbol] = coin.icon;
-            }
-            if (coin.verified) {
-                coinVerifiedMap[coin.symbol] = true;
-            }
-        });
-
         state.coinList = Object.freeze(data);
-        state.coinMap = Object.freeze(coinMap);
-        state.coinIconMap = Object.freeze(coinIconMap);
-        state.coinVerifiedMap = Object.freeze(coinVerifiedMap);
+        state.coinMap = Object.freeze(arrayToMap(data, 'symbol'));
     },
 };
 

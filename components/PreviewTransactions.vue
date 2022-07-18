@@ -37,7 +37,7 @@
                     || this.getConvertValue(tx)
                     || tx.data.stake
                     || tx.data.initialAmount
-                    || (tx.data.check && tx.data.check.value)
+                    || tx.data.check?.value
                     || this.getMultisendValue(tx);
             },
             hasAmount(tx) {
@@ -47,7 +47,7 @@
                 if (this.isMultisend(tx) && this.isMultisendMultipleCoin(tx)) {
                     return 'Multiple coins';
                 } else {
-                    return pretty(this.getAmount(tx) || 0) + ' ' + (tx.data.coin?.symbol || tx.data.symbol || this.getConvertCoinSymbol(tx) || tx.data.check?.coin?.symbol || this.getMultisendCoin(tx));
+                    return pretty(this.getAmount(tx) || 0) + ' ' + (getCoinSymbol(tx.data.coin) || tx.data.symbol || this.getConvertCoinSymbol(tx) || getCoinSymbol(tx.data.check?.coin) || this.getMultisendCoin(tx));
                 }
             },
             isEditPool(tx) {
@@ -55,16 +55,30 @@
             },
             getConvertCoinSymbol(tx) {
                 if (this.isSell(tx)) {
-                    return tx.data.coinToSell.symbol;
+                    return getCoinSymbol(tx.data.coinToSell);
                 }
                 if (this.isBuy(tx)) {
-                    return tx.data.coinToBuy.symbol;
+                    return getCoinSymbol(tx.data.coinToBuy);
                 }
                 if (this.isSellPool(tx)) {
-                    return tx.data.coins[0].symbol;
+                    return getCoinSymbol(tx.data.coins[0]);
                 }
                 if (this.isBuyPool(tx)) {
-                    return tx.data.coins[tx.data.coins.length - 1].symbol;
+                    return getCoinSymbol(tx.data.coins[tx.data.coins.length - 1]);
+                }
+            },
+            getSwapOppositeCoinSymbol(tx) {
+                if (this.isSell(tx)) {
+                    return getCoinSymbol(tx.data.coinToBuy);
+                }
+                if (this.isBuy(tx)) {
+                    return getCoinSymbol(tx.data.coinToSell);
+                }
+                if (this.isSellPool(tx)) {
+                    return getCoinSymbol(tx.data.coins[tx.data.coins.length - 1]);
+                }
+                if (this.isBuyPool(tx)) {
+                    return getCoinSymbol(tx.data.coins[0]);
                 }
             },
             getConvertValue(tx) {
@@ -94,7 +108,7 @@
                 return this.isTxType(tx, TX_TYPE.MULTISEND);
             },
             isTxType(tx, txType) {
-                return tx.type === Number(txType);
+                return Number(tx.type) === Number(txType);
             },
             getMultisendDeliveryList(tx) {
                 return tx.data.list || [];
@@ -105,7 +119,7 @@
                 }
                 const currentUserDeliveryList = this.getMultisendDeliveryList(tx);
                 return currentUserDeliveryList.some((delivery) => {
-                    return delivery.coin.id !== currentUserDeliveryList[0].coin.id;
+                    return getCoinId(delivery.coin) !== getCoinId(currentUserDeliveryList[0].coin);
                 });
             },
             getMultisendCoin(tx) {
@@ -113,7 +127,7 @@
                     return;
                 }
                 if (!this.isMultisendMultipleCoin(tx)) {
-                    return this.getMultisendDeliveryList(tx)[0].coin.symbol;
+                    return getCoinSymbol(this.getMultisendDeliveryList(tx)[0].coin);
                 }
             },
             getMultisendValue(tx) {
@@ -129,6 +143,23 @@
             },
         },
     };
+
+    /**
+     * Accept coin object from explorer or coin string from txParams
+     * @param {Coin|string} coin
+     * @return {string}
+     */
+    function getCoinSymbol(coin) {
+        return coin?.symbol || coin;
+    }
+    /**
+     * Accept coin object from explorer or coin string from txParams
+     * @param {Coin|number|string} coin
+     * @return {number|string}
+     */
+    function getCoinId(coin) {
+        return coin?.id || coin;
+    }
 </script>
 
 <template>
@@ -158,9 +189,12 @@
                     <div class="preview__transaction-row preview__transaction-meta">
                         <div>
                             {{ tx.type | txType }}
-                            <span v-if="hasAmount(tx)">
+                            <template v-if="hasAmount(tx)">
                                 {{ getAmountWithCoin(tx) }}
-                            </span>
+                            </template>
+                            <template v-if="getSwapOppositeCoinSymbol(tx)">
+                                for {{ getSwapOppositeCoinSymbol(tx) }}
+                            </template>
                             <PoolLink class="u-fw-400" v-else-if="isEditPool(tx)" :pool="tx.data"/>
                             <PoolLink class="u-fw-400" v-else-if="isAddOrder(tx)" :pool="{coin0: tx.data.coinToSell, coin1: tx.data.coinToBuy}"/>
                         </div>

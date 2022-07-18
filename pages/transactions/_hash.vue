@@ -54,6 +54,9 @@
                 .catch((e) => {
                     console.log({e});
                     if (e.response && e.response.status === 404) {
+                        return {
+                            tx: null,
+                        };
                         // do nothing, wait for tx to appear in the blockchain
                     } else {
                         error({
@@ -184,10 +187,10 @@
                 }
             },
             isFromHubTx() {
-                return this.tx.from === HUB_ADDRESS;
+                return this.tx?.from === HUB_ADDRESS;
             },
             isToHubTx() {
-                if (this.tx.data.to === HUB_ADDRESS) {
+                if (this.tx?.data.to === HUB_ADDRESS) {
                     const hubTypes = Object.keys(HUB_CHAIN_DATA).map((item) => `send_to_${item}`);
                     return hubTypes.includes(this.payloadParsed?.type);
                 }

@@ -120,8 +120,8 @@
 </script>
 
 <template>
-    <div class="pagination-wrap">
-        <div class="pagination" :class="paginationClass" v-if="currentPage && paginationInfo.lastPage > 1">
+    <div class="pagination-wrap" v-if="currentPage && paginationInfo.lastPage > 1">
+        <div class="pagination" :class="paginationClass">
             <nuxt-link class="button button--icon"
                        :class="buttonClassPrev"
                        :to="getPageHref(1)"

@@ -202,9 +202,6 @@
 
 <template>
     <div class="u-grid u-grid--vertical-margin" v-if="stats || blockList.length || txList.length">
-        <div class="u-cell">
-            <PreviewFarm/>
-        </div>
         <section class="u-cell u-cell--large--1-2">
             <Stats :stats="stats" :latest-block-height="latestBlockHeight" :total-transactions="totalTransactions"/>
         </section>
@@ -217,14 +214,17 @@
         <section class="u-cell u-cell--large--1-2">
             <PreviewTransactions :tx-list="txList"/>
         </section>
+        <div class="u-cell">
+            <PreviewFarm/>
+        </div>
+        <section class="u-cell">
+            <PreviewPools :pool-list="poolList"/>
+        </section>
         <section class="u-cell u-cell--large--1-2">
             <PreviewValidators/>
         </section>
         <section class="u-cell u-cell--large--1-2">
             <PreviewCoins/>
-        </section>
-        <section class="u-cell">
-            <PreviewPools :pool-list="poolList"/>
         </section>
     </div>
     <h1 class="u-text-center" style="margin-top: 50px" v-else>{{ network }} explorer is not available</h1>
