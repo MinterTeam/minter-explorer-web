@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import stripZeros from 'pretty-num/src/strip-zeros.js';
 import {getCoinList} from '@/api/explorer.js';
@@ -15,6 +15,7 @@ addToCamelInterceptor(instance);
 const fastCache = new Cache({maxAge: 5 * 1000});
 
 /**
+ * Withdraw tx fee in dollars
  * @param {HUB_CHAIN_ID} network
  * @return {Promise<{min: string, fast: string}>}
  */
@@ -179,9 +180,26 @@ const persistentCache = new Cache({maxAge: 24 * 60 * 60 * 1000});
  */
 export function getTransferFee(inputTxHash) {
     return instance.get(`mhub2/v1/transaction_fee_record/${inputTxHash}`, {
-        cache: persistentCache,
-    })
+            cache: persistentCache,
+        })
         .then((response) => {
+            if (!response.data.record) {
+                response.status = 404;
+                response.statusText = 'Not found';
+                response.request = {
+                    ...response.request,
+                    status: 404,
+                    statusText: 'Not found',
+                };
+                throw new AxiosError(
+                    'Request failed with status code ' + response.status,
+                    AxiosError.ERR_BAD_REQUEST,
+                    response.config,
+                    response.request,
+                    response,
+                );
+            }
+
             return {
                 valCommission: new Big(response.data.record.valCommission).div(1e18).toString(),
                 externalFee: new Big(response.data.record.externalFee).div(1e18).toString(),
