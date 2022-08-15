@@ -77,6 +77,10 @@ function getUniversalSymbol(hubCoin) {
             return '1INCH';
         }
 
+        if (/.{3,7}ETH$/.test(hubCoin.symbol)) {
+            return hubCoin.symbol.replace(/ETH$/, '');
+        }
+
         return hubCoin[HUB_CHAIN_ID.ETHEREUM].denom.toUpperCase();
     }
 
