@@ -30,6 +30,10 @@
             activeTab: {
                 type: String,
             },
+            hideMeta: {
+                type: Boolean,
+                default: false,
+            },
         },
         data() {
             return {
@@ -154,6 +158,6 @@
                        @click.native="handleNext(paginationInfo.lastPage)"
             > >></nuxt-link>
         </div>
-        <div class="pagination__meta u-text-muted u-text-small u-text-center" v-if="firstNumber && lastNumber">Displayed {{ firstNumber }}-{{ lastNumber }} of total {{ paginationInfo.total }} items</div>
+        <div class="pagination__meta u-text-muted u-text-small u-text-center" v-if="!hideMeta && firstNumber && lastNumber">Displayed {{ firstNumber }}-{{ lastNumber }} of total {{ paginationInfo.total }} items</div>
     </div>
 </template>
