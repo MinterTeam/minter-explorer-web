@@ -1070,6 +1070,7 @@ export function getCoinBySymbol(symbol) {
  * @property {number|string} liquidityBip
  * @property {string} token
  * @property {number|string} tradeVolumeBip1D
+ * @property {number|string} tradeVolumeBip30D
  */
 
 /**

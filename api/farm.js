@@ -2,8 +2,9 @@ import axios from 'axios';
 import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
 import coinBlockList from 'minter-coin-block-list';
 import {FARM_API_URL, NETWORK, MAINNET} from "~/assets/variables.js";
+import {arrayToMap} from '~/assets/utils/collection.js';
 import addToCamelInterceptor from '~/assets/axios-to-camel.js';
-import {getPoolList, getPoolByToken} from '@/api/explorer.js';
+import {getPoolList, getPoolByToken} from '~/api/explorer.js';
 
 
 const coinBlockMap = Object.fromEntries(coinBlockList.map((symbol) => [symbol, true]));
@@ -96,7 +97,7 @@ export function getFarmList({onlyTrusted = false} = {}) {
 
 /**
  * @param {string} [ownerAddress]
- * @return {Promise<Array<FarmItem>>}
+ * @return {Promise<Array<FarmProgram>>}
  */
 function _getFarmList(ownerAddress) {
     return instance.get('rewarding' + (ownerAddress ? `?owner=${ownerAddress}` : ''), {
@@ -110,13 +111,19 @@ function _getFarmList(ownerAddress) {
                     // isPaid or isTrusted
                     return farmItem.period * farmItem.unpaidTxCount < 24 * 3 || isFarmTrusted(farmItem);
                 })
-                .map((farmItem) => {
-                    farmItem.tokenSymbol = `LP-${farmItem.poolId}`;
-                    farmItem.isTrusted = isFarmTrusted(farmItem);
-
-                    return farmItem;
-                });
+                .map((farmItem) => prepareFarmProgram(farmItem));
         });
+}
+
+/**
+ * @param farmItem
+ * @return {FarmProgram}
+ */
+function prepareFarmProgram(farmItem) {
+    farmItem.tokenSymbol = `LP-${farmItem.poolId}`;
+    farmItem.isTrusted = isFarmTrusted(farmItem);
+
+    return farmItem;
 }
 
 /**
@@ -133,7 +140,7 @@ export function fillFarmWithPoolData(farmPromise, {trySharePoolsRequest} = {}) {
     return Promise.all([farmPromise, poolListPromise])
         .then(([farmList, poolListInfo]) => {
             // make hashmap
-            const poolMap = poolListToMap(poolListInfo.data);
+            const poolMap = arrayToMap(poolListInfo.data, 'token.symbol');
             // fill farm if pool exist, otherwise save absent token
             let absentPoolTokenList = [];
             farmList = farmList.map((farmItem) => {
@@ -154,7 +161,7 @@ export function fillFarmWithPoolData(farmPromise, {trySharePoolsRequest} = {}) {
         })
         .then(([farmList, absentPoolList]) => {
             if (absentPoolList.length) {
-                const absentPoolMap = poolListToMap(absentPoolList);
+                const absentPoolMap = arrayToMap(absentPoolList, 'token.symbol');
 
                 farmList = farmList.map((farmItem) => {
                     return addPoolFields(farmItem, absentPoolMap[farmItem.tokenSymbol]);
@@ -165,16 +172,6 @@ export function fillFarmWithPoolData(farmPromise, {trySharePoolsRequest} = {}) {
         });
 }
 
-
-function poolListToMap(poolList) {
-    // make hashmap
-    let poolMap = {};
-    poolList.forEach((pool) => {
-        poolMap[pool.token.symbol] = pool;
-    });
-
-    return poolMap;
-}
 
 /**
  * @param {FarmItem} farmProgram
@@ -191,7 +188,13 @@ function addPoolFields(farmProgram, pool) {
 }
 
 /**
- * @typedef {{id:number, address:string, ownerAddress: string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoinList:Coin[], coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string, unpaidTxCount: number, debt: number|string, isTrusted: boolean}} FarmItem
+ * @typedef {{id:number, address:string, ownerAddress: string, pair:string, poolId:number, tokenSymbol: string, percent:number, rewardCoin:Coin, coin0: Coin, coin1: Coin, period:number, startAt: string, finishAt: string, unpaidTxCount: number, debt: number|string, isTrusted: boolean}} FarmProgram
+ */
+
+/**
+ * @typedef {FarmProgram} FarmItem
+ * @property {Coin[]} rewardCoinList
+ * @property {Array<string>} finishDateList
  */
 
 /**

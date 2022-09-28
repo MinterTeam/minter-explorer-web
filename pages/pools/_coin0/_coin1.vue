@@ -119,6 +119,9 @@ export default {
         apy() {
             return getApy(this.pool.tradeVolumeBip1D, this.pool.liquidityBip);
         },
+        apy30d() {
+            return getApy(this.pool.tradeVolumeBip30D / 30, this.pool.liquidityBip);
+        },
         activeTab() {
             return ensureTab(this.$route.query.active_tab);
         },
@@ -322,6 +325,9 @@ function calculateTradeRate(amountIn, amountOut) {
 
                         <dt>APY</dt>
                         <dd><span title="Based on 24hr volume annualized">{{ pretty(apy) }}%</span></dd>
+
+                        <dt>APY 30D</dt>
+                        <dd><span title="Based on 30d volume annualized">{{ pretty(apy30d) }}%</span></dd>
                     </dl>
                 </section>
             </div>
