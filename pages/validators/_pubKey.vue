@@ -11,6 +11,7 @@
     import PenaltyListTable from '~/components/PenaltyListTable.vue';
     import BackButton from '~/components/BackButton';
     import Pagination from "~/components/Pagination";
+    import TableLink from '@/components/TableLink.vue';
 
     function ensureTab(val) {
         return Object.values(TAB_TYPES).indexOf(val) !== -1 ? val : TAB_TYPES.TX;
@@ -31,6 +32,7 @@
             TransactionListTable,
             BackButton,
             Pagination,
+            TableLink,
         },
         filters: {
             pretty,
@@ -278,6 +280,33 @@
 
                 <dt>Minimal stake</dt>
                 <Amount :amount="validator.minStake" :coin="$store.state.COIN_NAME" tag="dd"/>
+
+                <dt>Owner</dt>
+                <dd>
+                    <TableLink
+                        :link-text="validator.ownerAddress"
+                        :link-path="'/address/' + validator.ownerAddress"
+                        :should-not-shorten="true"
+                    />
+                </dd>
+
+                <dt>Control address</dt>
+                <dd>
+                    <TableLink
+                        :link-text="validator.controlAddress"
+                        :link-path="'/address/' + validator.controlAddress"
+                        :should-not-shorten="true"
+                    />
+                </dd>
+
+                <dt>Reward address</dt>
+                <dd>
+                    <TableLink
+                        :link-text="validator.rewardAddress"
+                        :link-path="'/address/' + validator.rewardAddress"
+                        :should-not-shorten="true"
+                    />
+                </dd>
             </dl>
         </section>
 

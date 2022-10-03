@@ -1058,6 +1058,9 @@ export function getCoinBySymbol(symbol) {
  * @property {number} commission
  * @property {number} delegatorCount
  * @property {Array<{coin: Coin, value: string, address: string}>} delegatorList
+ * @property {string} ownerAddress
+ * @property {string} controlAddress
+ * @property {string} rewardAddress
  */
 
 /**
