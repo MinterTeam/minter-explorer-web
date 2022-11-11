@@ -67,6 +67,7 @@
                 </h1>
                 <Pagination
                     :pagination-info="paginationInfo"
+                    :hide-meta="true"
                     class="u-hidden-medium-down"
                     pagination-class="pagination--header"
                     button-class="button--white"

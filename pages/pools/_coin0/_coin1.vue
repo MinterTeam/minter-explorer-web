@@ -116,8 +116,14 @@ export default {
         tradeFee() {
             return this.pool.tradeVolumeBip1D * 0.002;
         },
+        tradeFee30d() {
+            return this.pool.tradeVolumeBip30D * 0.002;
+        },
         apy() {
             return getApy(this.pool.tradeVolumeBip1D, this.pool.liquidityBip);
+        },
+        apy30d() {
+            return getApy(this.pool.tradeVolumeBip30D / 30, this.pool.liquidityBip);
         },
         activeTab() {
             return ensureTab(this.$route.query.active_tab);
@@ -316,12 +322,19 @@ function calculateTradeRate(amountIn, amountOut) {
 
                         <dt>Volume (1d)</dt>
                         <Amount :amount="pool.tradeVolumeBip1D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+                        <dt>Volume (30d)</dt>
+                        <Amount :amount="pool.tradeVolumeBip30D" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
                         <dt>Fees (1d)</dt>
                         <Amount :amount="tradeFee" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
+                        <dt>Fees (30d)</dt>
+                        <Amount :amount="tradeFee30d" :coin="$store.getters.BASE_COIN" :exact="false" tag="dd"/>
 
-                        <dt>APY</dt>
+                        <dt>APY (1d)</dt>
                         <dd><span title="Based on 24hr volume annualized">{{ pretty(apy) }}%</span></dd>
+
+                        <dt>APY (30d)</dt>
+                        <dd><span title="Based on 30d volume annualized">{{ pretty(apy30d) }}%</span></dd>
                     </dl>
                 </section>
             </div>

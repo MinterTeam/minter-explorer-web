@@ -7,6 +7,7 @@ export const BASE_TITLE_END = ' — Minter';
 export const BASE_TITLE = BASE_TITLE_NETWORK + 'Explorer' + BASE_TITLE_END;
 export const BASE_DESCRIPTION = '';
 export const BASE_COIN = NETWORK === MAINNET ? 'BIP' : 'MNT';
+export const BASE_URL_PREFIX = '';
 /**
  * @deprecated
  * @type {string}

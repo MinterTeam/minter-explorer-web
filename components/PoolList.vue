@@ -34,13 +34,6 @@ import {getApy, pretty} from '~/assets/utils.js';
                             apy,
                             apy30d: getApy((pool.tradeVolumeBip30D || 0) / 30, pool.liquidityBip),
                         };
-                    })
-                    .sort((a, b) => {
-                        if (a.liquidityUsd > 100 || b.liquidityUsd > 100) {
-                            return b.liquidityUsd - a.liquidityUsd;
-                        } else {
-                            return b.tradeVolumeBip1D - a.tradeVolumeBip1D;
-                        }
                     });
             },
         },
