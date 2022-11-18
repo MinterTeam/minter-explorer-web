@@ -4,18 +4,16 @@
     import {TX_TYPE} from 'minterjs-util/src/tx-types.js';
     import {isValidTransaction} from 'minterjs-util/src/prefix';
     import {convertFromPip} from "minterjs-util/src/converter.js";
-    import {getTransaction, getBlock, getBlockList, getCoinById, getLimitOrder, checkBlockTime} from '~/api/explorer.js';
-    import {getTransferFee, getTransferStatus} from '~/api/hub.js';
-    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, shortHashFilter, txTypeFilter, snakeCaseToText, fromBase64, getEvmTxUrl, getEvmAddressUrl, getExplorerValidatorUrl} from "~/assets/utils.js";
+    import {getTransaction, getCoinById, getLimitOrder, checkBlockTime} from '~/api/explorer.js';
+    import {getTimeDistance, getTime, getTimeMinutes, pretty, prettyExact, prettyRound, shortHashFilter, txTypeFilter, snakeCaseToText, fromBase64, getExplorerValidatorUrl} from "~/assets/utils.js";
     import getTitle from '~/assets/get-title';
     import {getErrorText} from '~/assets/server-error';
-    import {UNBOND_PERIOD, LOCK_STAKE_PERIOD, TX_STATUS, HUB_MINTER_MULTISIG_ADDRESS, HUB_CHAIN_DATA, HUB_TRANSFER_STATUS as WITHDRAW_STATUS} from "~/assets/variables.js";
-    import Amount from '@/components/common/Amount.vue';
+    import {UNBOND_PERIOD, LOCK_STAKE_PERIOD, TX_STATUS} from "~/assets/variables.js";
+    import Amount from '~/components/common/Amount.vue';
     import PoolLink from '~/components/common/PoolLink.vue';
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
-
-    const HUB_ADDRESS = HUB_MINTER_MULTISIG_ADDRESS;
+    import TxHubInfo from '~/components/TxHubInfo.vue';
 
     let fetchTxTimer;
     let fetchTxDestroy;
@@ -25,12 +23,12 @@
         TX_TYPE,
         UNBOND_PERIOD,
         TX_STATUS,
-        WITHDRAW_STATUS,
         components: {
             Amount,
             PoolLink,
             BackButton,
             TableLink,
+            TxHubInfo,
         },
         filters: {
             txType: txTypeFilter,
@@ -89,8 +87,6 @@
                 dueBlockTimeInfo: null,
                 limitOrderStatus: '',
                 currentCoinSymbol: '',
-                hubFee: null,
-                hubStatus: null,
             };
         },
         computed: {
@@ -186,81 +182,6 @@
                     return null;
                 }
             },
-            isFromHubTx() {
-                return this.tx?.from === HUB_ADDRESS;
-            },
-            isToHubTx() {
-                if (this.tx?.data.to === HUB_ADDRESS) {
-                    const hubTypes = Object.keys(HUB_CHAIN_DATA).map((item) => `send_to_${item}`);
-                    return hubTypes.includes(this.payloadParsed?.type);
-                }
-                return false;
-            },
-            /** @type {HubChainDataItem}*/
-            hubNetworkData() {
-                if (!this.isToHubTx) {
-                    return undefined;
-                }
-                const networkName = this.payloadParsed.type.replace('send_to_', '');
-                return HUB_CHAIN_DATA[networkName];
-            },
-            hubNetworkFee() {
-                if (!this.isToHubTx) {
-                    return 0;
-                }
-
-                return convertFromPip(this.payloadParsed.fee);
-            },
-            hubNetworkFeeUsed() {
-                if (!this.isToHubTx || !this.hubFee) {
-                    return 0;
-                }
-
-                return this.hubFee.networkFee;
-            },
-            hubNetworkFeeRefunded() {
-                if (!this.isToHubTx || !this.hubFee) {
-                    return 0;
-                }
-
-                return new Big(this.hubNetworkFee).minus(this.hubNetworkFeeUsed).toString();
-            },
-            hubBridgeFee() {
-                if (!this.isToHubTx) {
-                    return 0;
-                }
-
-                if (this.hubFee) {
-                    return this.hubFee.bridgeFee;
-                }
-
-                return new Big(this.tx.data.value).times(0.01).toString();
-            },
-            hubBridgePercent() {
-                if (!this.isToHubTx || !this.hubFee) {
-                    return 1;
-                }
-
-                return new Big(this.hubFee.bridgeFee).div(this.tx.data.value).times(100).toString(2);
-            },
-            hubAmount() {
-                if (!this.isToHubTx) {
-                    return;
-                }
-
-                return new Big(this.tx.data.value).minus(this.hubBridgeFee).minus(this.hubNetworkFee).toString();
-            },
-        },
-        watch: {
-            isToHubTx: {
-                handler() {
-                    if (this.isToHubTx) {
-                        this.fetchHubTxFee();
-                        this.fetchHubTxStatus();
-                    }
-                },
-                immediate: true,
-            },
         },
         mounted() {
             if (!this.tx) {
@@ -299,12 +220,6 @@
             timeMinutes: getTimeMinutes,
             shortHashFilter,
             snakeCaseToText,
-            getWithdrawTxUrl(hash) {
-                return getEvmTxUrl(this.hubNetworkData?.chainId, hash);
-            },
-            getWithdrawRecipientUrl(address) {
-                return getEvmAddressUrl(this.hubNetworkData?.chainId, address);
-            },
             getExplorerValidatorUrl,
             fetchTx() {
                 getTransaction(this.$route.params.hash)
@@ -372,27 +287,6 @@
                             console.log('Unable to get current coin', e);
                         });
                 }
-            },
-            fetchHubTxFee() {
-                getTransferFee(this.tx.hash)
-                    .then((transferFee) => {
-                        this.hubFee = {
-                            bridgeFee: transferFee.valCommission,
-                            networkFee: transferFee.externalFee,
-                        };
-                    })
-                    .catch((e) => {
-                        console.log('Unable to get Hub tx fee', e);
-                    });
-            },
-            fetchHubTxStatus() {
-                getTransferStatus(this.tx.hash)
-                    .then((transferStatus) => {
-                        this.hubStatus = transferStatus;
-                    })
-                    .catch((e) => {
-                        console.log('Unable to get Hub tx fee', e);
-                    });
             },
             isDefined(value) {
                 return typeof value !== 'undefined';
@@ -706,33 +600,7 @@
                 <dt v-if="tx.data.weights">Weights Sum</dt>
                 <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
 
-                    <!-- HUB -->
-                    <dt v-if="isFromHubTx || isToHubTx">Purpose</dt>
-                    <dd v-if="isFromHubTx || isToHubTx">
-                        <template v-if="isFromHubTx">Deposit from Hub</template>
-                        <template v-if="isToHubTx">Withdraw to Hub</template>
-                    </dd>
-                    <dt v-if="isToHubTx">Hub info</dt>
-                    <dd v-if="isToHubTx">
-                        Type: {{ payloadParsed.type.includes('send_to_') ? `Send to ${hubNetworkData.shortName}` : payloadParsed.type }}
-                        <div v-if="hubStatus">
-                            Status:
-                            <template v-if="hubStatus.status === $options.WITHDRAW_STATUS.not_found">Not found</template>
-                            <template v-if="hubStatus.status === $options.WITHDRAW_STATUS.deposit_to_hub_received || hubStatus.status === $options.WITHDRAW_STATUS.batch_created">Processing</template>
-                            <template v-if="hubStatus.status === $options.WITHDRAW_STATUS.batch_executed">
-                                Success
-                                <a class="link--default" :href="getWithdrawTxUrl(hubStatus.outTxHash)" target="_blank">{{ shortHashFilter(hubStatus.outTxHash) }}</a>
-                            </template>
-                            <template v-if="hubStatus.status === $options.WITHDRAW_STATUS.refund">Refunded</template>
-                        </div>
-                        Recipient:
-                        <a class="link--default" :href="getWithdrawRecipientUrl(payloadParsed.recipient)" target="_blank">{{ payloadParsed.recipient }}</a><br>
-                        Amount: {{ prettyExact(hubAmount) }} {{ tx.data.coin.symbol }}<br>
-                        {{ hubNetworkData.shortName }} fee sent: {{ prettyExact(hubNetworkFee) }} {{ tx.data.coin.symbol }}<br>
-                        {{ hubNetworkData.shortName }} fee used: {{ prettyExact(hubNetworkFeeUsed) }} {{ tx.data.coin.symbol }}<br>
-                        {{ hubNetworkData.shortName }} fee refund: {{ prettyExact(hubNetworkFeeRefunded) }} {{ tx.data.coin.symbol }}<br>
-                        Hub bridge fee ({{hubBridgePercent}}%): {{ prettyExact(hubBridgeFee) }} {{ tx.data.coin.symbol }}
-                    </dd>
+                    <TxHubInfo :tx="tx" :payloadParsed="payloadParsed" v-if="tx && payloadParsed"/>
 
 
                 <dt v-if="tx.commissionInBaseCoin">Fee</dt>
