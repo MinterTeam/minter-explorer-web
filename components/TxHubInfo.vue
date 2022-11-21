@@ -125,7 +125,7 @@ export default {
                     this.hubStatus = transferStatus;
                 })
                 .catch((e) => {
-                    console.log('Unable to get Hub tx fee', e);
+                    console.log('Unable to get Hub tx status', e);
                 });
         },
     },
@@ -134,10 +134,9 @@ export default {
 </script>
 
 <template>
-    <div style="display: contents;">
-        <!-- HUB -->
-        <dt v-if="isFromHubTx || isToHubTx">Purpose</dt>
-        <dd v-if="isFromHubTx || isToHubTx">
+    <div v-if="isFromHubTx || isToHubTx" style="display: contents;">
+        <dt>Purpose</dt>
+        <dd>
             <template v-if="isFromHubTx">Deposit from Hub</template>
             <template v-if="isToHubTx">Withdraw to Hub</template>
         </dd>

@@ -140,6 +140,16 @@ export function getEvmAddressUrl(chainId, hash) {
 }
 
 /**
+ * @param {number} chainId
+ * @param {number|string} blockNumber
+ * @return {string}
+ */
+export function getEvmBlockUrl(chainId, blockNumber) {
+    const host = HUB_CHAIN_BY_ID[Number(chainId)]?.explorerHost;
+    return host + '/block/' + blockNumber;
+}
+
+/**
  * @param {string|number} value
  * @return {string}
  */

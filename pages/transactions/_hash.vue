@@ -14,6 +14,7 @@
     import BackButton from '~/components/BackButton';
     import TableLink from '~/components/TableLink';
     import TxHubInfo from '~/components/TxHubInfo.vue';
+    import TxRelayInfo from '~/components/TxRelayInfo.vue';
 
     let fetchTxTimer;
     let fetchTxDestroy;
@@ -29,6 +30,7 @@
             BackButton,
             TableLink,
             TxHubInfo,
+            TxRelayInfo,
         },
         filters: {
             txType: txTypeFilter,
@@ -601,6 +603,8 @@
                 <dd v-if="tx.data.weights">{{ tx.data.weights.reduce((prev, next) => Number(prev) + Number(next)) }}</dd>
 
                     <TxHubInfo :tx="tx" :payloadParsed="payloadParsed" v-if="tx && payloadParsed"/>
+
+                    <TxRelayInfo :tx="tx" :payloadParsed="payloadParsed" v-if="tx && payloadParsed"/>
 
 
                 <dt v-if="tx.commissionInBaseCoin">Fee</dt>
