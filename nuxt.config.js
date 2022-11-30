@@ -59,7 +59,7 @@ module.exports = {
         { src: '~/plugins/history.js', ssr: false },
     ],
     env: Object.assign({}, processEnv, dotEnv),
-    modern: 'client',
+    modern: process.env.NODE_ENV === 'development' ? false : 'client',
     /*
     ** Build configuration
     */

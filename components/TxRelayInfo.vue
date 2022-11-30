@@ -35,14 +35,34 @@ export default {
         isFromRelayTx() {
             return this.tx?.from === SMART_WALLET_RELAY_MINTER_ADDRESS;
         },
-        isToRelayTx() {
+        isToRelayTxViaMiner() {
             return this.tx?.data.to === SMART_WALLET_RELAY_MINTER_ADDRESS && this.payloadParsed.a && this.payloadParsed.d && this.payloadParsed.gp;
         },
+        isToRelayTxViaApi() {
+            return this.payloadParsed.smartWalletTx;
+        },
+        isToRelayTx() {
+            return this.isToRelayTxViaMiner || this.isToRelayTxViaApi;
+        },
+        relayTxParams() {
+            if (this.isToRelayTxViaApi) {
+                try {
+                    return JSON.parse(this.relayTxStatus?.tx);
+                } catch (e) {
+                    return undefined;
+                }
+            } else {
+                return this.payloadParsed;
+            }
+        },
         callDestination() {
-            return this.payloadParsed.a;
+            return this.relayTxParams.a;
         },
         callPayload() {
-            return '0x' + Buffer.from(this.payloadParsed.d, 'base64').toString('hex');
+            if (!this.relayTxParams) {
+                return '';
+            }
+            return '0x' + Buffer.from(this.relayTxParams.d, 'base64').toString('hex');
         },
         callPayloadDecoded() {
             try {
@@ -52,7 +72,7 @@ export default {
                 } else {
                     abi = smartWalletABI.find((item) => item.name === 'call');
                 }
-                console.debug(abi);
+                // console.debug(abi);
                 return web3Abi.decodeParameters(abi.inputs, '0x' + this.callPayload.slice(2 + 8));
             } catch (error) {
                 console.error(error);
@@ -69,10 +89,14 @@ export default {
             });
         },
         gasPriceGwei() {
-            return web3Utils.fromWei(this.payloadParsed.gp, 'gwei');
+            if (!this.relayTxParams) {
+                return '';
+            }
+            return web3Utils.fromWei(this.relayTxParams.gp, 'gwei');
         },
         gasLimit() {
-            return new Big(web3Utils.toWei(this.tx.data.value, 'ether')).div(this.payloadParsed.gp).toFixed();
+            return this.relayTxParams.gl;
+            // return new Big(web3Utils.toWei(this.tx.data.value, 'ether')).div(this.payloadParsed.gp).toFixed();
         },
         /** @type {HubChainDataItem}*/
         hubNetworkData() {
@@ -97,7 +121,8 @@ export default {
             return getEvmBlockUrl(this.hubNetworkData?.chainId, blockNumber);
         },
         fetchRelayTxStatus() {
-            getRelayTxStatus(this.tx.hash)
+            const hash = this.isToRelayTxViaApi ? this.payloadParsed.smartWalletTx : this.tx.hash;
+            getRelayTxStatus(hash)
                 .then((result) => {
                     this.relayTxStatus = result;
                 })
@@ -117,10 +142,10 @@ export default {
             <template v-if="isFromRelayTx">Refund from Relay</template>
             <template v-if="isToRelayTx">Send to Relay</template>
         </dd>
-        <dt v-if="isToRelayTx">Smart wallet Relay info</dt>
-        <dd v-if="isToRelayTx">
-            <div v-if="relayTxStatus">
-                Status:
+        <dt v-if="isToRelayTx && relayTxParams">Smart wallet Relay info</dt>
+        <dd v-if="isToRelayTx && relayTxParams">
+            Status:
+            <template v-if="relayTxStatus">
                 {{ relayTxStatus.status }}
                 <a v-if="relayTxStatus.txHash" class="link--default" :href="getTxUrl(relayTxStatus.txHash)" target="_blank">{{ shortHashFilter(relayTxStatus.txHash) }}</a>
                 <template v-if="relayTxStatus.reason">
@@ -128,7 +153,10 @@ export default {
                     Reason:
                     {{ relayTxStatus.reason }}
                 </template>
-            </div>
+            </template>
+            <template v-else-if="$fetchState.pending">Unable to get tx status</template>
+
+            <br>
             Call destination:
             <a class="link--default" :href="getAddressUrl(callDestination)" target="_blank">{{ callDestination }}</a>
 
@@ -172,6 +200,9 @@ export default {
                 <pre style="white-space: pre-wrap;">{{ prettyJson(callPayloadDecoded) }}</pre>
                 Hex:
                 {{ callPayload }}
+                <br><br>
+                Base64:
+                {{ relayTxParams.d }}
             </details>
         </dd>
     </div>
