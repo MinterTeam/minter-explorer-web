@@ -178,7 +178,7 @@ export default {
             Gas limit:
             {{ gasLimit }}
 
-            <div class="u-mt-10">Tx list:</div>
+            <div class="u-mt-10">Internal tx list:</div>
             <div class="u-mt-10" v-for="(tx, txIndex) in txList" :key="txIndex">
                 Tx number: {{ txIndex + 1}}
                 <br>
