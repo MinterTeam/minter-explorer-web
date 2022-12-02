@@ -37,7 +37,7 @@
                 required: false,
             },
             lockEndTimestamp: {
-                type: String,
+                type: [String, Number],
                 required: false,
             },
             /* STAKE_TYPE_VALIDATOR fields end */
@@ -305,6 +305,7 @@
                                         </button>
                     -->
                 </th>
+                <th>Fee</th>
                 <th class="table__cell-waitlist"><!-- Waitlist--></th>
                 <th>
                     Coins
@@ -352,6 +353,7 @@
                                                 <div class="u-hidden-medium-up" v-else>{{ stakeGroup.stakeList[0].coin }} {{ $options.pretty(stakeGroup.stakeList[0].value) }}</div>
                         -->
                     </td>
+                    <td class="u-hidden-medium-down">{{ stakeGroup.stakeList[0].validator.commission }}%</td>
                     <!-- waitlist-->
                     <td class="table__cell-waitlist">
                         <span class="u-emoji u-hidden-medium-down"
@@ -412,8 +414,8 @@
                 <!-- expanded stake items -->
                 <template v-if="isGroupCanExpand(stakeGroup) && isExpandedList[stakeGroup.hash]">
                     <tr v-for="stakeItem in stakeGroup.stakeList" :key="stakeGroup.hash + stakeItem.coin.id" class="is-expanded" :class="{'is-waitlisted': stakeItem.isWaitlisted}">
-                        <!-- hash -->
-                        <td class="u-hidden-medium-down"></td>
+                        <!-- hash + fee -->
+                        <td class="u-hidden-medium-down" colspan="2"></td>
                         <!-- waitlist-->
                         <td class="u-hidden-medium-down table__cell-waitlist">
                             <span class="u-emoji" v-if="stakeItem.isWaitlisted" title="Stake is dropped to wait list, top up or unbond it">⚠️</span>
@@ -439,19 +441,17 @@
             </tbody>
             <tfoot v-if="isDelegatorPage">
             <tr class="u-hidden-medium-up">
-                <td colspan="4">Total {{ $options.pretty(totalStake) }} {{ $store.getters.COIN_NAME }} </td>
+                <td colspan="3">Total {{ $options.pretty(totalStake) }} {{ $store.getters.COIN_NAME }} </td>
             </tr>
             <tr>
-                <!-- hash -->
-                <td>
+                <!-- hash + fee and waitlist -->
+                <td colspan="3">
                     <template v-if="lock">
                         Unbond disabled until {{ prettyRound(lock.endBlock) }} block
                         <template v-if="lockEndTimestamp">(≈{{ getDateHuman(lockEndTimestamp) }})</template>
                     </template>
                     <template v-else>Unbond available</template>
                 </td>
-                <!-- placeholder for waitlist -->
-                <td class="u-hidden-medium-down"></td>
                 <!-- coin-->
                 <td class="u-hidden-medium-down">
                     <template v-if="stakeListGrouped.length > 1">
@@ -459,10 +459,10 @@
                     </template>
                 </td>
                 <!-- amount (colspan controls)-->
-                <td colspan="2">
-                    <span class="u-hidden-medium-down" v-if="stakeListGrouped.length > 1">
+                <td colspan="2" class="u-hidden-medium-down">
+                    <template v-if="stakeListGrouped.length > 1">
                         {{ $options.pretty(totalStake) }}
-                    </span>
+                    </template>
                 </td>
             </tr>
             </tfoot>

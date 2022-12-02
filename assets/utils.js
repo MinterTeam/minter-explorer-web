@@ -9,6 +9,12 @@ import {txTypeList} from 'minterjs-util/src/tx-types.js';
 import {getTimeOffset} from 'assets/axios-time-offset.js';
 import {ETHERSCAN_HOST, HUB_CHAIN_BY_ID} from '~/assets/variables.js';
 
+/**
+ *
+ * @param {string|number} timestamp - iso string or milliseconds number
+ * @param {string} pattern
+ * @return {string|boolean}
+ */
 function timeFormat(timestamp, pattern) {
     if (typeof timestamp === 'string') {
         timestamp = parseISO(timestamp);
