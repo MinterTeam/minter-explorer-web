@@ -9,6 +9,12 @@ import {txTypeList} from 'minterjs-util/src/tx-types.js';
 import {getTimeOffset} from 'assets/axios-time-offset.js';
 import {ETHERSCAN_HOST, HUB_CHAIN_BY_ID} from '~/assets/variables.js';
 
+/**
+ *
+ * @param {string|number} timestamp - iso string or milliseconds number
+ * @param {string} pattern
+ * @return {string|boolean}
+ */
 function timeFormat(timestamp, pattern) {
     if (typeof timestamp === 'string') {
         timestamp = parseISO(timestamp);
@@ -137,6 +143,16 @@ export function getEvmTxUrl(chainId, hash) {
 export function getEvmAddressUrl(chainId, hash) {
     const host = HUB_CHAIN_BY_ID[Number(chainId)]?.explorerHost;
     return host + '/address/' + hash;
+}
+
+/**
+ * @param {number} chainId
+ * @param {number|string} blockNumber
+ * @return {string}
+ */
+export function getEvmBlockUrl(chainId, blockNumber) {
+    const host = HUB_CHAIN_BY_ID[Number(chainId)]?.explorerHost;
+    return host + '/block/' + blockNumber;
 }
 
 /**

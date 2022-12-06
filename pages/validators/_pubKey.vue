@@ -6,6 +6,7 @@
     import {pretty, prettyPrecise, prettyRound} from '~/assets/utils';
     import {TAB_TYPES, VALIDATOR_STATUS} from '~/assets/variables.js';
     import Amount from '@/components/common/Amount.vue';
+    import ButtonCopyIcon from '~/components/common/ButtonCopyIcon';
     import TransactionListTable from '~/components/TransactionListTable';
     import StakeListTable from '~/components/StakeListTable';
     import PenaltyListTable from '~/components/PenaltyListTable.vue';
@@ -27,6 +28,7 @@
         VALIDATOR_STATUS,
         components: {
             Amount,
+            ButtonCopyIcon,
             StakeListTable,
             PenaltyListTable,
             TransactionListTable,
@@ -245,7 +247,10 @@
             </div>
             <dl>
                 <dt>Public Key</dt>
-                <dd class="dd u-select-all">{{ $route.params.pubKey }}</dd>
+                <dd>
+                    <span class="u-select-all">{{ $route.params.pubKey }}</span>
+                    <ButtonCopyIcon :copy-text="$route.params.pubKey"/>
+                </dd>
 
                 <dt v-if="validator.name">Name</dt>
                 <dd v-if="validator.name">
