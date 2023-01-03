@@ -2,14 +2,14 @@
     import Snackbar from '~/components/common/Snackbar';
     import HeaderMenu from '~/components/HeaderMenu';
     import Search from '~/components/Search';
-    import Footer from '~/layouts/_footer.vue';
+    import TheFooter from '~/layouts/_footer.vue';
 
     export default {
         components: {
             Snackbar,
             HeaderMenu,
             Search,
-            Footer,
+            TheFooter,
         },
         data() {
             return {
@@ -48,7 +48,7 @@
             <nuxt/>
         </main>
 
-        <Footer/>
+        <TheFooter/>
 
         <Snackbar/>
     </div>

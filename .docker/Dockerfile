@@ -1,4 +1,4 @@
-FROM node:14 as builder
+FROM node:16 as builder
 
 ARG APP_ENV
 ARG APP_EXPLORER_API_URL
