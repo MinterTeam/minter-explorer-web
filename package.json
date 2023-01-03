@@ -37,7 +37,7 @@
     "minter-js-sdk": "^0.45.6",
     "minterjs-tx": "^12.0.3",
     "minterjs-util": "^0.24.2",
-    "nuxt": "^2.15.8",
+    "nuxt": "^3.0.0",
     "pretty-num": "^0.5.2",
     "qrcode.vue": "^1.7.0",
     "thousands": "^1.0.1",
