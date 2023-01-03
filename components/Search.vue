@@ -14,7 +14,7 @@
                     return;
                 }
 
-                if (query.slice(0, 2) === 'Mx') {
+                if (query.slice(0, 2) === 'Mx' || (query.slice(0, 2) === '0x' && query.length === 42)) {
                     this.$router.push('/address/' + query);
                 } else if (query.slice(0, 2) === 'Mp') {
                     this.$router.push('/validators/' + query);
