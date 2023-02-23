@@ -96,37 +96,55 @@ export const VALIDATOR_STATUS = {
  * @readonly
  * @enum {string}
  */
-export const HUB_CHAIN_ID = {
+export const HUB_NETWORK_SLUG = {
     ETHEREUM: 'ethereum',
     BSC: 'bsc',
     MINTER: 'minter',
 };
 
 /**
- * @typedef {{coinSymbol: string, name: string, shortName: string, chainId: number, hubChainId: HUB_CHAIN_ID, apiUrl: string, explorerHost: string, hubContractAddress: string, wrappedNativeContractAddress: string}} HubChainDataItem
+ * @deprecated
+ * @type {typeof HUB_NETWORK_SLUG}
+ */
+export const HUB_CHAIN_ID = HUB_NETWORK_SLUG;
+
+/**
+ * @typedef {object} HubChainDataItem
+ * @property {string} coinSymbol
+ * @property {string} name
+ * @property {string} shortName
+ * @property {ChainId} chainId
+ * @property {HUB_NETWORK_SLUG} hubNetworkSlug
+ * @property {HUB_CHAIN_ID} hubChainId
+ * @property {string} apiUrl
+ * @property {string} explorerHost
+ * @property {string} hubContractAddress
+ * @property {string} wrappedNativeContractAddress
  */
 
 /**
  * @readonly
- * @type {{[HUB_CHAIN_ID]: HubChainDataItem}}}
+ * @type {Record<HUB_NETWORK_SLUG, HubChainDataItem>}
  */
 export const HUB_CHAIN_DATA = {
-    [HUB_CHAIN_ID.ETHEREUM]: {
+    [HUB_NETWORK_SLUG.ETHEREUM]: {
         name: 'Ethereum',
         shortName: 'Ethereum',
         coinSymbol: 'ETH',
         chainId: ETHEREUM_CHAIN_ID,
+        hubNetworkSlug: HUB_NETWORK_SLUG.ETHEREUM,
         hubChainId: HUB_CHAIN_ID.ETHEREUM,
         // apiUrl: ETHEREUM_API_URL,
         explorerHost: ETHERSCAN_HOST,
         // hubContractAddress: HUB_ETHEREUM_CONTRACT_ADDRESS.toLowerCase(),
         wrappedNativeContractAddress: WETH_CONTRACT_ADDRESS.toLowerCase(),
     },
-    [HUB_CHAIN_ID.BSC]: {
-        name: 'Binance Smart Chain',
+    [HUB_NETWORK_SLUG.BSC]: {
+        name: 'BNB Chain',
         shortName: 'BSC',
         coinSymbol: 'BNB',
         chainId: BSC_CHAIN_ID,
+        hubNetworkSlug: HUB_NETWORK_SLUG.BSC,
         hubChainId: HUB_CHAIN_ID.BSC,
         // apiUrl: BSC_API_URL,
         explorerHost: BSCSCAN_HOST,
@@ -137,7 +155,7 @@ export const HUB_CHAIN_DATA = {
 
 /**
  * @readonly
- * @type {{number: HubChainDataItem}}
+ * @type {Record<ChainId, HubChainDataItem>}
  */
 export const HUB_CHAIN_BY_ID = Object.fromEntries(Object.values(HUB_CHAIN_DATA).map((item) => [item.chainId, item]));
 
@@ -153,3 +171,7 @@ export const HUB_TRANSFER_STATUS = {
     batch_executed: "TX_STATUS_BATCH_EXECUTED",
     refund: "TX_STATUS_REFUNDED",
 };
+
+/**
+ * @typedef {number} ChainId
+ */
