@@ -1,12 +1,12 @@
 <script>
 import web3Utils from 'web3-utils';
 import web3Abi from 'web3-eth-abi';
-import Big from '~/assets/big.js';
 import {getRelayTxStatus, SMART_WALLET_RELAY_TX_STATUS} from '~/api/smart-wallet-relay.js';
 import {prettyExact, shortHashFilter, getEvmTxUrl, getEvmAddressUrl, getEvmBlockUrl} from "~/assets/utils.js";
-import {SMART_WALLET_RELAY_MINTER_ADDRESS, SMART_WALLET_FACTORY_CONTRACT_ADDRESS, HUB_CHAIN_DATA, HUB_CHAIN_ID} from "~/assets/variables.js";
+import {SMART_WALLET_RELAY_MINTER_ADDRESS, SMART_WALLET_FACTORY_CONTRACT_ADDRESS, SMART_WALLET_FACTORY_LEGACY_BSC_CONTRACT_ADDRESS, HUB_CHAIN_DATA} from "~/assets/variables.js";
 import smartWalletABI from '~/assets/abi-smartwallet.js';
 import smartWalletFactoryABI from '~/assets/abi-smartwallet-factory.js';
+import smartWalletFactoryABILegacy from '~/assets/abi-smartwallet-factory-legacy.js';
 
 
 export default {
@@ -68,7 +68,9 @@ export default {
             try {
                 let abi;
                 if (this.callDestination === SMART_WALLET_FACTORY_CONTRACT_ADDRESS) {
-                    abi = smartWalletFactoryABI.find((item) => item.name === 'createAndCall');
+                    abi = smartWalletFactoryABI.find((item) => item.name === 'call');
+                } else if (this.callDestination === SMART_WALLET_FACTORY_LEGACY_BSC_CONTRACT_ADDRESS) {
+                    abi = smartWalletFactoryABILegacy.find((item) => item.name === 'createAndCall');
                 } else {
                     abi = smartWalletABI.find((item) => item.name === 'call');
                 }
