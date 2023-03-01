@@ -3,14 +3,23 @@ import web3Utils from 'web3-utils';
 import web3Abi from 'web3-eth-abi';
 import {getRelayTxStatus, SMART_WALLET_RELAY_TX_STATUS} from '~/api/smart-wallet-relay.js';
 import {prettyExact, shortHashFilter, getEvmTxUrl, getEvmAddressUrl, getEvmBlockUrl} from "~/assets/utils.js";
-import {SMART_WALLET_RELAY_MINTER_ADDRESS, SMART_WALLET_FACTORY_CONTRACT_ADDRESS, SMART_WALLET_FACTORY_LEGACY_BSC_CONTRACT_ADDRESS, HUB_CHAIN_DATA} from "~/assets/variables.js";
+import {
+    SMART_WALLET_RELAY_MINTER_ADDRESS,
+    SMART_WALLET_FACTORY_CONTRACT_ADDRESS,
+    SMART_WALLET_FACTORY_LEGACY_BSC_CONTRACT_ADDRESS,
+    SMART_WALLET_RELAY_BROADCASTER_ADDRESS,
+    HUB_CHAIN_DATA,
+    HUB_NETWORK_SLUG,
+} from "~/assets/variables.js";
 import smartWalletABI from '~/assets/abi-smartwallet.js';
 import smartWalletFactoryABI from '~/assets/abi-smartwallet-factory.js';
 import smartWalletFactoryABILegacy from '~/assets/abi-smartwallet-factory-legacy.js';
+import {getSmartWalletAddress} from '~/composables/use-web3-smartwallet.js';
 
 
 export default {
     SMART_WALLET_RELAY_TX_STATUS,
+    SMART_WALLET_RELAY_BROADCASTER_ADDRESS,
     props: {
         tx: {
             type: Object,
@@ -81,6 +90,14 @@ export default {
                 return '';
             }
         },
+        smartWalletAddress() {
+            if (this.callDestination === SMART_WALLET_FACTORY_CONTRACT_ADDRESS && this.callPayloadDecoded?._owner && this.callPayloadDecoded?._nonce) {
+                return getSmartWalletAddress(this.callPayloadDecoded._owner, {
+                    walletIndex: this.callPayloadDecoded._nonce,
+                });
+            }
+            return '';
+        },
         txList() {
             return this.callPayloadDecoded._logicContractAddress.map((to, index) => {
                 return {
@@ -105,7 +122,9 @@ export default {
             const networkName = this.payloadParsed.type.replace('send_to_', '');
             return HUB_CHAIN_DATA[networkName];
         },
-
+        tenderlyNetworkSlug() {
+            return this.hubNetworkData?.hubNetworkSlug === HUB_NETWORK_SLUG.ETHEREUM ? 'mainnet' : this.hubNetworkData?.hubNetworkSlug;
+        },
     },
     methods: {
         prettyExact,
@@ -169,6 +188,16 @@ export default {
                     Owner:
                     <a class="link--default" :href="getAddressUrl(callPayloadDecoded._owner)" target="_blank">{{ callPayloadDecoded._owner }}</a>
                 </template>
+                <template v-if="callPayloadDecoded._nonce">
+                    <br>
+                    Smart-wallet index:
+                    {{ callPayloadDecoded._nonce }}
+                </template>
+                <template v-if="smartWalletAddress">
+                    <br>
+                    Smart-wallet:
+                    <a class="link--default" :href="getAddressUrl(smartWalletAddress)" target="_blank">{{ smartWalletAddress }}</a>
+                </template>
 
                 <br>
                 Timeout block:
@@ -207,6 +236,22 @@ export default {
                     <br><br>
                     Base64:
                     {{ relayTxParams.d }}
+                    <br><br>
+                    <a
+                        class="link--default" target="_blank"
+                        v-if="relayTxStatus?.txHash"
+                        :href="`https://dashboard.tenderly.co/tx/${tenderlyNetworkSlug}/${relayTxStatus?.txHash}`"
+                    >
+                        Tenderly inspect
+                    </a>
+                    <a
+                        class="link--default" target="_blank"
+                        v-else
+                        :href="`https://dashboard.tenderly.co/simulator/new?contractAddress=${callDestination}&rawFunctionInput=${callPayload}&block=${callPayloadDecoded._timeout - 10}&from=${$options.SMART_WALLET_RELAY_BROADCASTER_ADDRESS}&gas=${gasLimit}&gasPrice=${relayTxParams.gp}&value=0&network=${hubNetworkData?.chainId}`"
+                    >
+                        Tenderly simulate
+                    </a>
+
                 </details>
             </template>
         </dd>

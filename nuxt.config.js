@@ -100,11 +100,11 @@ module.exports = {
         plugins: [
             new webpack.ContextReplacementPlugin(/moment[/]locale$/, /^\.\/(en|ru)$/),
         ],
-        babel: {
-            presets: ['@nuxt/babel-preset-app'],
-            // prevent @babel/plugin-transform-runtime from inserting `import` statement into commonjs files (bc. it breaks webpack)
-            sourceType: 'unambiguous',
-        },
+        // babel: {
+        //     presets: ['@nuxt/babel-preset-app'],
+        //     // prevent @babel/plugin-transform-runtime from inserting `import` statement into commonjs files (bc. it breaks webpack)
+        //     sourceType: 'unambiguous',
+        // },
         transpile: [
             /es6-promise|\.(?!(?:js|json)$).{1,5}$/i,
             '/base-x/',
