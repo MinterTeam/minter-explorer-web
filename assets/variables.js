@@ -4,7 +4,7 @@ export const NETWORK = process.env.APP_ENV === MAINNET ? MAINNET : TESTNET;
 export const PURPOSE = process.env.APP_PURPOSE;
 export const BASE_TITLE_NETWORK = NETWORK === MAINNET ? '' : 'Testnet ';
 export const BASE_TITLE_END = ' — Minter';
-export const BASE_TITLE = BASE_TITLE_NETWORK + 'Explorer' + BASE_TITLE_END;
+export const BASE_TITLE = (BASE_TITLE_NETWORK || 'Blockchain ') + 'Explorer' + BASE_TITLE_END;
 export const BASE_DESCRIPTION = '';
 export const BASE_COIN = NETWORK === MAINNET ? 'BIP' : 'MNT';
 export const BASE_URL_PREFIX = '';
