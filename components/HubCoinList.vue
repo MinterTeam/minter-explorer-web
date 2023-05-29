@@ -1,6 +1,6 @@
 <script>
 import {pretty, getEvmAddressUrl, shortHashFilter} from '~/assets/utils.js';
-import {HUB_CHAIN_ID, HUB_CHAIN_DATA, BSC_CHAIN_ID, ETHEREUM_CHAIN_ID} from '~/assets/variables.js';
+import {HUB_CHAIN_ID, HUB_CHAIN_DATA, BSC_CHAIN_ID, ETHEREUM_CHAIN_ID, MEGACHAIN_CHAIN_ID} from '~/assets/variables.js';
 
 export default {
     HUB_CHAIN_ID,
@@ -41,10 +41,11 @@ export default {
                         universalSymbol: symbol,
                         [HUB_CHAIN_ID.ETHEREUM]: getPair(this.coinList, symbol, HUB_CHAIN_ID.ETHEREUM),
                         [HUB_CHAIN_ID.BSC]: getPair(this.coinList, symbol, HUB_CHAIN_ID.BSC),
+                        [HUB_CHAIN_ID.MEGACHAIN]: getPair(this.coinList, symbol, HUB_CHAIN_ID.MEGACHAIN),
                     };
                 })
                 .map((item) => {
-                    const pair = item[HUB_CHAIN_ID.ETHEREUM] || item[HUB_CHAIN_ID.BSC];
+                    const pair = item[HUB_CHAIN_ID.ETHEREUM] || item[HUB_CHAIN_ID.BSC] || item[HUB_CHAIN_ID.MEGACHAIN];
                     return {
                         ...item,
                         price: getPriceFromList(this.priceList, pair.minter.denom),
@@ -68,6 +69,7 @@ export default {
                 const cleanCoin = {...minterToken};
                 delete cleanCoin[HUB_CHAIN_ID.BSC];
                 delete cleanCoin[HUB_CHAIN_ID.ETHEREUM];
+                delete cleanCoin[HUB_CHAIN_ID.MEGACHAIN];
                 return cleanCoin;
             }
         },
@@ -83,6 +85,9 @@ export default {
         },
         getBscAddressUrl(address) {
             return getEvmAddressUrl(BSC_CHAIN_ID, address);
+        },
+        getMegachainAddressUrl(address) {
+            return getEvmAddressUrl(MEGACHAIN_CHAIN_ID, address);
         },
     },
 };
@@ -107,7 +112,7 @@ function getPriceFromList(list, name) {
                     <thead>
                         <tr class="u-text-nowrap">
                             <th>
-                                <span class="u-hidden-small-down">{{ $td('Available assets', 'hub.coin-table-name') }}</span>
+                                <span class="u-hidden-small-down">{{ $td('Assets', 'hub.coin-table-name') }}</span>
                                 <span class="u-hidden-small-up">{{ $td('Tokens', 'hub.coin-table-name-mobile') }}</span>
                             </th>
                             <th>
@@ -116,6 +121,10 @@ function getPriceFromList(list, name) {
                             </th>
                             <th>
                                 {{ $options.HUB_CHAIN_DATA[$options.HUB_CHAIN_ID.BSC].shortName }}
+                                {{ $td('bridge', 'hub.coin-table-contract') }}
+                            </th>
+                            <th>
+                                {{ $options.HUB_CHAIN_DATA[$options.HUB_CHAIN_ID.MEGACHAIN].shortName }}
                                 {{ $td('bridge', 'hub.coin-table-contract') }}
                             </th>
                             <th>{{ $td('Price', 'hub.coin-table-price') }}</th>
@@ -158,6 +167,21 @@ function getPriceFromList(list, name) {
                                     <a class="link--default" :href="getBscAddressUrl(group.bsc.external.externalTokenId)" target="_blank">
                                         <img class="u-icon--coin-small" src="/img/icon-network-bsc.svg" alt="BSC">
                                         {{ shortHash(group.bsc.external.externalTokenId) }}
+                                    </a>
+                                </template>
+                            </td>
+                            <td>
+                                <template v-if="group.metagarden">
+                                    <nuxt-link class="link--default" :to="'/coins/' + group.metagarden.minter.symbol">
+                                        <img class="u-icon--coin-small" src="/img/minter-logo-circle.svg" alt="Minter">
+                                        {{ group.metagarden.minter.symbol }}
+                                    </nuxt-link>
+
+                                    <span class="u-icon--left-right-arrow">⟷</span>
+
+                                    <a class="link--default" :href="getMegachainAddressUrl(group.metagarden.external.externalTokenId)" target="_blank">
+                                        <img class="u-icon--coin-small" src="/img/icon-network-megachain.svg" alt="Megachain">
+                                        {{ shortHash(group.metagarden.external.externalTokenId) }}
                                     </a>
                                 </template>
                             </td>

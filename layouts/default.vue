@@ -3,7 +3,7 @@
     import HeaderMenu from '~/components/HeaderMenu';
     import Search from '~/components/Search';
     import TestnetNotice from '~/components/TestnetNotice';
-    import Footer from '~/layouts/_footer.vue';
+    import TheFooter from '~/layouts/_footer.vue';
 
     export default {
         components: {
@@ -11,7 +11,7 @@
             HeaderMenu,
             Search,
             TestnetNotice,
-            Footer,
+            TheFooter,
         },
         data() {
             return {
@@ -51,7 +51,7 @@
             <nuxt/>
         </main>
 
-        <Footer/>
+        <TheFooter/>
 
         <Snackbar/>
     </div>

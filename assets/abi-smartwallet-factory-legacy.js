@@ -17,13 +17,46 @@ export default [
     "inputs": [
       {
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "contracts",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_owner",
         "type": "address"
-      },
+      }
+    ],
+    "name": "create",
+    "outputs": [
       {
-        "internalType": "uint256",
-        "name": "_nonce",
-        "type": "uint256"
+        "internalType": "contract SmartWallet",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
       },
       {
         "internalType": "address[]",
@@ -61,7 +94,7 @@ export default [
         "type": "bytes32"
       }
     ],
-    "name": "call",
+    "name": "createAndCall",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -74,55 +107,12 @@ export default [
         "type": "address"
       }
     ],
-    "name": "contracts",
+    "name": "nonces",
     "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
-      }
-    ],
-    "name": "getBytecode",
-    "outputs": [
-      {
-        "internalType": "bytes",
-        "name": "",
-        "type": "bytes"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
-      },
       {
         "internalType": "uint256",
-        "name": "_nonce",
-        "type": "uint256"
-      }
-    ],
-    "name": "getSmartWalletAddress",
-    "outputs": [
-      {
-        "internalType": "address",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

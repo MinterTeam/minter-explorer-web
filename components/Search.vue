@@ -13,6 +13,9 @@
                 if (!query.length) {
                     return;
                 }
+                if (query.slice(0, 2) === '0x' && query.length === 42) {
+                    query = query.replace('0x', 'Mx');
+                }
 
                 if (query.slice(0, 2) === 'Mx') {
                     this.$router.push('/address/' + query);

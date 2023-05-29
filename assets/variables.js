@@ -4,7 +4,7 @@ export const NETWORK = process.env.APP_ENV === MAINNET ? MAINNET : TESTNET;
 export const PURPOSE = process.env.APP_PURPOSE;
 export const BASE_TITLE_NETWORK = NETWORK === MAINNET ? '' : 'Testnet ';
 export const BASE_TITLE_END = ' — Minter';
-export const BASE_TITLE = BASE_TITLE_NETWORK + 'Explorer' + BASE_TITLE_END;
+export const BASE_TITLE = (BASE_TITLE_NETWORK || 'Blockchain ') + 'Explorer' + BASE_TITLE_END;
 export const BASE_DESCRIPTION = '';
 export const BASE_COIN = NETWORK === MAINNET ? 'BIP' : 'MNT';
 export const BASE_URL_PREFIX = '';
@@ -30,16 +30,21 @@ export const ACCOUNTS_API_URL = process.env.APP_ACCOUNTS_API_URL;
 export const CHAINIK_API_URL = 'https://chainik.io/json/';
 export const HUB_MINTER_MULTISIG_ADDRESS = process.env.APP_HUB_MINTER_MULTISIG_ADDRESS;
 export const SMART_WALLET_RELAY_MINTER_ADDRESS = "Mxc9b1b39f4c94b1bcbf68c1beba97ab84f7763cf0";
-export const SMART_WALLET_FACTORY_CONTRACT_ADDRESS = "0x7F3C8d5363B44875001Fa2A63A7dB6FCb8BEE989";
+export const SMART_WALLET_FACTORY_CONTRACT_ADDRESS = "0x324718b3cE9906fcf5cE140342146Eb16970d889";
+export const SMART_WALLET_FACTORY_LEGACY_BSC_CONTRACT_ADDRESS = "0x7F3C8d5363B44875001Fa2A63A7dB6FCb8BEE989";
+export const SMART_WALLET_RELAY_BROADCASTER_ADDRESS = '0x64e51D5930CDBbf99f3cB27654A03b18f7060C5E';
 export const SMART_WALLET_RELAY_API_URL = process.env.APP_HUB_API_URL + 'smart-wallet-relay/';
 export const HUB_API_URL = process.env.APP_HUB_API_URL;
 export const FARM_API_URL = process.env.APP_FARM_API_URL;
 export const ETHEREUM_CHAIN_ID = NETWORK === MAINNET ? 1 : 3;
 export const BSC_CHAIN_ID = NETWORK === MAINNET ? 56 : 97;
-export const ETHERSCAN_HOST = NETWORK === MAINNET ? 'https://etherscan.io' : 'https://ropsten.etherscan.io';
+export const MEGACHAIN_CHAIN_ID = NETWORK === MAINNET ? 0 : 9000;
+export const ETHERSCAN_HOST = NETWORK === MAINNET ? 'https://etherscan.io' : 'https://sepolia.etherscan.io';
 export const BSCSCAN_HOST = NETWORK === MAINNET ? 'https://bscscan.com' : 'https://testnet.bscscan.com';
-export const WETH_CONTRACT_ADDRESS = NETWORK === MAINNET ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' : '0x0a180a76e4466bf68a7f86fb029bed3cccfaaac5';// '0xc778417e063141139fce010982780140aa0cd5ab';
-export const WBNB_CONTRACT_ADDRESS = NETWORK === MAINNET ? '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' : '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd';
+export const MEGASCAN_HOST = NETWORK === MAINNET ? '' : 'https://scan.testnet.metagarden.io';
+export const WETH_CONTRACT_ADDRESS = NETWORK === MAINNET ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' : '0x7b79995e5f793a07bc00c21412e50ecae098e7f9';// '0xc778417e063141139fce010982780140aa0cd5ab';
+export const WBNB_CONTRACT_ADDRESS = NETWORK === MAINNET ? '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' : '0x2a416168cea12820e288d36f77c1b7f936f4e228'; // 0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
+export const WMEGANET_CONTRACT_ADDRESS = NETWORK === MAINNET ? 'todo' : '0x64e2d183A4Ba20D06fa6B76c991FfB8b5766b2FD';
 
 
 export const HISTORY_V1_BLOCK_COUNT = 5000000;
@@ -96,48 +101,79 @@ export const VALIDATOR_STATUS = {
  * @readonly
  * @enum {string}
  */
-export const HUB_CHAIN_ID = {
+export const HUB_NETWORK_SLUG = {
     ETHEREUM: 'ethereum',
     BSC: 'bsc',
+    MEGACHAIN: 'metagarden',
     MINTER: 'minter',
 };
 
 /**
- * @typedef {{coinSymbol: string, name: string, shortName: string, chainId: number, hubChainId: HUB_CHAIN_ID, apiUrl: string, explorerHost: string, hubContractAddress: string, wrappedNativeContractAddress: string}} HubChainDataItem
+ * @deprecated
+ * @type {typeof HUB_NETWORK_SLUG}
+ */
+export const HUB_CHAIN_ID = HUB_NETWORK_SLUG;
+
+/**
+ * @typedef {object} HubChainDataItem
+ * @property {string} coinSymbol
+ * @property {string} name
+ * @property {string} shortName
+ * @property {ChainId} chainId
+ * @property {HUB_NETWORK_SLUG} hubNetworkSlug
+ * @property {HUB_CHAIN_ID} hubChainId
+ * @property {string} apiUrl
+ * @property {string} explorerHost
+ * @property {string} hubContractAddress
+ * @property {string} wrappedNativeContractAddress
  */
 
 /**
  * @readonly
- * @type {{[HUB_CHAIN_ID]: HubChainDataItem}}}
+ * @type {Record<HUB_NETWORK_SLUG, HubChainDataItem>}
  */
 export const HUB_CHAIN_DATA = {
-    [HUB_CHAIN_ID.ETHEREUM]: {
+    [HUB_NETWORK_SLUG.ETHEREUM]: {
         name: 'Ethereum',
         shortName: 'Ethereum',
         coinSymbol: 'ETH',
         chainId: ETHEREUM_CHAIN_ID,
+        hubNetworkSlug: HUB_NETWORK_SLUG.ETHEREUM,
         hubChainId: HUB_CHAIN_ID.ETHEREUM,
         // apiUrl: ETHEREUM_API_URL,
         explorerHost: ETHERSCAN_HOST,
         // hubContractAddress: HUB_ETHEREUM_CONTRACT_ADDRESS.toLowerCase(),
         wrappedNativeContractAddress: WETH_CONTRACT_ADDRESS.toLowerCase(),
     },
-    [HUB_CHAIN_ID.BSC]: {
-        name: 'Binance Smart Chain',
+    [HUB_NETWORK_SLUG.BSC]: {
+        name: 'BNB Chain',
         shortName: 'BSC',
         coinSymbol: 'BNB',
         chainId: BSC_CHAIN_ID,
+        hubNetworkSlug: HUB_NETWORK_SLUG.BSC,
         hubChainId: HUB_CHAIN_ID.BSC,
         // apiUrl: BSC_API_URL,
         explorerHost: BSCSCAN_HOST,
         // hubContractAddress: HUB_BSC_CONTRACT_ADDRESS.toLowerCase(),
         wrappedNativeContractAddress: WBNB_CONTRACT_ADDRESS.toLowerCase(),
     },
+    [HUB_NETWORK_SLUG.MEGACHAIN]: {
+        name: 'Metagarden Chain',
+        shortName: 'Megachain',
+        coinSymbol: 'MEGANET',
+        chainId: MEGACHAIN_CHAIN_ID,
+        hubNetworkSlug: HUB_NETWORK_SLUG.MEGACHAIN,
+        hubChainId: HUB_CHAIN_ID.MEGACHAIN,
+        // apiUrl: MEGACHAIN_API_URL,
+        explorerHost: MEGASCAN_HOST,
+        // hubContractAddress: HUB_MEGACHAIN_CONTRACT_ADDRESS.toLowerCase(),
+        wrappedNativeContractAddress: WMEGANET_CONTRACT_ADDRESS.toLowerCase(),
+    },
 };
 
 /**
  * @readonly
- * @type {{number: HubChainDataItem}}
+ * @type {Record<ChainId, HubChainDataItem>}
  */
 export const HUB_CHAIN_BY_ID = Object.fromEntries(Object.values(HUB_CHAIN_DATA).map((item) => [item.chainId, item]));
 
@@ -153,3 +189,7 @@ export const HUB_TRANSFER_STATUS = {
     batch_executed: "TX_STATUS_BATCH_EXECUTED",
     refund: "TX_STATUS_REFUNDED",
 };
+
+/**
+ * @typedef {number} ChainId
+ */

@@ -1,6 +1,6 @@
 import axios, {AxiosError} from 'axios';
 // import {cacheAdapterEnhancer, Cache} from 'axios-extensions';
-import {SMART_WALLET_RELAY_API_URL} from "~/assets/variables.js";
+import {HUB_CHAIN_BY_ID, SMART_WALLET_RELAY_API_URL} from "~/assets/variables.js";
 import addToCamelInterceptor from '~/assets/axios-to-camel.js';
 
 const instance = axios.create({
@@ -13,14 +13,19 @@ addToCamelInterceptor(instance);
 
 
 /**
+ * @param {ChainId} chainId
  * @param {string} inputTxHash
  * @return {Promise<SmartWalletRelayTxStatus>}
  */
-export function getRelayTxStatus(inputTxHash) {
-    return instance.get(`tx_status/${inputTxHash}`, {
+export function getRelayTxStatus(chainId, inputTxHash) {
+    const hubNetworkSlug = HUB_CHAIN_BY_ID[chainId].hubNetworkSlug;
+    return instance.get(`${hubNetworkSlug}/tx_status/${inputTxHash}`, {
             // cache: fastCache,
         })
         .then((response) => {
+            // if (response.data.status === SMART_WALLET_RELAY_TX_STATUS.NOT_FOUND) {
+            //     throw new Error(`${hubNetworkSlug} tx not found`);
+            // }
             return response.data;
         });
 }

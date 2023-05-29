@@ -62,6 +62,9 @@
             isDelegatorPage() {
                 return this.stakeItemType === STAKE_TYPE_VALIDATOR;
             },
+            isValidatorPage() {
+                return !!this.isDelegatorPage;
+            },
             hashName() {
                 if (this.stakeItemType === STAKE_TYPE_VALIDATOR) {
                     return 'Validator';
@@ -305,7 +308,7 @@
                                         </button>
                     -->
                 </th>
-                <th>Fee</th>
+                <th v-if="isValidatorPage">Fee</th>
                 <th class="table__cell-waitlist"><!-- Waitlist--></th>
                 <th>
                     Coins
@@ -353,7 +356,7 @@
                                                 <div class="u-hidden-medium-up" v-else>{{ stakeGroup.stakeList[0].coin }} {{ $options.pretty(stakeGroup.stakeList[0].value) }}</div>
                         -->
                     </td>
-                    <td class="u-hidden-medium-down">{{ stakeGroup.stakeList[0].validator.commission }}%</td>
+                    <td class="u-hidden-medium-down" v-if="isValidatorPage">{{ stakeGroup.stakeList[0].validator.commission }}%</td>
                     <!-- waitlist-->
                     <td class="table__cell-waitlist">
                         <span class="u-emoji u-hidden-medium-down"
