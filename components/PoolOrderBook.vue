@@ -70,7 +70,8 @@ export default {
             } else {
                 groupBase = 10 ** selectedPower;
             }
-            return groupOrdersByPrice(this.sellOrderList, groupBase).reverse();
+            const filteredList = this.sellOrderList.filter((order) => order.coin0Price >= this.midPrice);
+            return groupOrdersByPrice(filteredList, groupBase).reverse();
         },
         buyBook() {
             const selectedPower = this.priceGroupPowerList[this.selectedPriceGroupIndex];
@@ -81,7 +82,8 @@ export default {
             } else {
                 groupBase = 10 ** selectedPower;
             }
-            return groupOrdersByPrice(this.buyOrderList, groupBase);
+            const filteredList = this.buyOrderList.filter((order) => order.coin0Price <= this.midPrice);
+            return groupOrdersByPrice(filteredList, groupBase);
         },
         sellBookMaxAmount() {
             return this.sellBook.reduce((limit, item) => Math.max(limit, item.amount), 0);
